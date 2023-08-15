@@ -1,3 +1,9 @@
 [submodule "Utils"]
 	path = Utils
 	url = git@github.com:Edw590/VISOR-Utils.git
+[submodule "Modules/MOD_4"]
+	path = Modules/MOD_4
+	url = git@github.com:Edw590/VISOR-RssFeedNotifier
+[submodule "Modules/MOD_5"]
+	path = Modules/MOD_5
+	url = git@github.com:Edw590/VISOR-EmailSender
