@@ -25,3 +25,6 @@ Download this main project and the module(s) you want to compile, and in each mo
 
 All module are separated from each other *from the compiler's point of view* (so one can download each one and compile it without having any other module present) - but they can require files from the other modules when they run (for example, the RSS Feed Notifier requires the Email Sender to be present because it gets files from the latter's folders to generate the emails to be queued).
 
+#### Supported OSes
+The entire project is supposed to be able to be ran on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above.
+
