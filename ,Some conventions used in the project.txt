@@ -1,0 +1,31 @@
+-----------------------------------------------------------------
+EVERYthing in the Utils directory must be OS-independent.
+
+-----------------------------------------------------------------
+Naming formats of code, files, and folders:
+
+- Variables: this_is_a_variable
+- Constants: THIS_IS_A_CONSTANT
+- Functions: thisIsAFunction
+- Structs and Go files: ThisIsAStruct
+- TXT files, for example: same as variables
+- Folders: like a variable in case they're used by VISOR, or if they're not used (like documentation, for example),
+then they must start with an upper case letter and be written normally.
+
+If something that begins with an upper-case letter is not to be exported, it must start with an underscore.
+If something that begins with a lower-case letter is to be exported, it will have to start with an upper-case letter
+(¯\_(ツ)_/¯).
+
+-----------------------------------------------------------------
+Errors format:
+
+3234_ERROR_[Origin ID]_[Error ID]
+
+Origin: unique ID of each VISOR module OR "U" in case it's from one of the utilities files
+Error ID: unique error ID for the Origin ID
+
+Means there's a unique error ID for the module ID where it happens (there can exist various error IDs = 3, as long as
+it's in different modules).
+
+This format is used to identify the unique place in the entire VISOR project of where the error came from. The
+explanation must be commented near where the error is written.

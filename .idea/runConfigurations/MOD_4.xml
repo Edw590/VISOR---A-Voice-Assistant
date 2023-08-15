@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MOD_4" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="VISOR_S_L" />
+    <working_directory value="$PROJECT_DIR$/MOD_4" />
+    <envs>
+      <env name="GOOS" value="linux" />
+      <env name="GOARCH" value="arm" />
+    </envs>
+    <kind value="DIRECTORY" />
+    <package value="VISOR_S_L" />
+    <directory value="$PROJECT_DIR$/MOD_4/src" />
+    <filePath value="$PROJECT_DIR$/MOD_4_1/main_4.go" />
+    <output_directory value="$PROJECT_DIR$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>
