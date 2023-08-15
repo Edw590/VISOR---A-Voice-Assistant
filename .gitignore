@@ -1,7 +1,7 @@
 ########################################################
 # Exclude from Git, Project and Deployment (unused files in the project - documentation, notes,...)
 -*
-# Exclude only from Git (EOG = Exclude Only Git) - personal things
+# Exclude Only from Git (EOG) - personal things
 *_EOG
 
 bin/

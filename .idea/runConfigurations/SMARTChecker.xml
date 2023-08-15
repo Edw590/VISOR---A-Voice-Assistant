@@ -1,14 +1,15 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="SMARTChecker" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR_S_L" />
-    <working_directory value="$PROJECT_DIR$/Modules/SMARTChecker" />
+    <working_directory value="$PROJECT_DIR$/Modules/MOD_2" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_S_L\bin\MOD_2_linux" />
     <envs>
       <env name="GOOS" value="linux" />
       <env name="GOARCH" value="arm" />
     </envs>
     <kind value="DIRECTORY" />
     <package value="VISOR_S_L" />
-    <directory value="$PROJECT_DIR$/Modules/SMARTChecker" />
+    <directory value="$PROJECT_DIR$/Modules/MOD_2" />
     <filePath value="$PROJECT_DIR$/MOD_4_1/main_4.go" />
     <output_directory value="$PROJECT_DIR$/bin" />
     <option name="run" value="false" />
