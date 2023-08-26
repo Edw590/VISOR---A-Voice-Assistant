@@ -1,6 +1,5 @@
 Note: for the module names, use ONLY characters supported in file and folder names on Windows and Unix-like OSes.
 1 = Modules Manager
-2 = S.M.A.R.T. checker
-3 =
+2 = S.M.A.R.T. Checker
 4 = RSS Feed Notifier
 5 = Email sender

@@ -2,7 +2,7 @@
   <configuration default="false" name="VISOR_S_L" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR_S_L" />
     <working_directory value="$PROJECT_DIR$" />
-    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_S_L\bin\VISOR_S_L" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_S_L\bin\VISOR_S_L_linux" />
     <envs>
       <env name="GOOS" value="linux" />
       <env name="GOARCH" value="arm" />
