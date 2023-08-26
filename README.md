@@ -29,3 +29,7 @@ All module are separated from each other *from the compiler's point of view* (so
 The entire project is supposed to be able to be ran on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above.
 
 There is just one thing that needs to be hard-coded so far and that changes for every envionment: the path to project's directory, through the VISOR_DIR constant. Aside from that, the project can be ran anywhere, supposedly (I just changed the constant from the RPi path to a Windows path and the modules worked right there without any further modifications).
+
+## About
+### - License
+This project is licensed under Apache 2.0 License - http://www.apache.org/licenses/LICENSE-2.0.
