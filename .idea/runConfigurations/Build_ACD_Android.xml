@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Build ACD Android" type="BatchConfigurationType" factoryName="Batch">
-    <module name="VISOR_S_L" />
+    <module name="VISOR_Server" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="WORKING_DIRECTORY" value="./Modules/ACD" />
     <option name="PARENT_ENVS" value="true" />
