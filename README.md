@@ -5,7 +5,6 @@ The server version of my in-development assistant
 This project is a part of a bigger project, consisting of the following:
 -   [V.I.S.O.R. - A better Android assistant](https://github.com/DADi590/VISOR---A-better-Android-assistant)
 -   [V.I.S.O.R. - Server Version Assistant](https://github.com/Edw590/VISOR---Server-Version-Assistant)
--   [Advanced Commands Detection](https://github.com/DADi590/Advanced-Commands-Detection)
 
 ## Introduction
 This is the server version of my in-development assistant, V.I.S.O.R.. When it's ready, it'll be running 24/7 on my Raspberry Pi. For now, the modules it has are ran automatically by the OS on the RPi (OpenMediaVault) every some minutes and close after finishing the tasks (the infinite loop is disabled on them).
