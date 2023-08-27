@@ -7,8 +7,8 @@
       <env name="GOOS" value="linux" />
       <env name="GOARCH" value="arm" />
     </envs>
-    <kind value="DIRECTORY" />
-    <package value="VISOR_S_L" />
+    <kind value="PACKAGE" />
+    <package value="RssFeedNotifier" />
     <directory value="$PROJECT_DIR$/Modules/MOD_4" />
     <filePath value="$PROJECT_DIR$/MOD_4_1/main_4.go" />
     <output_directory value="$PROJECT_DIR$/bin" />
