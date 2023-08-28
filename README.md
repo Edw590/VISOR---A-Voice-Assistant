@@ -18,7 +18,7 @@ This is supposed to be VISOR's "operations center", where all 24/7 things run. A
 - **[RSS Feed Notifier](https://github.com/Edw590/VISOR-RssFeedNotifier)** – Checks RSS feeds and queues an email about any news. Currently it's tested on YouTube channels *and playlists* (something it didn't do nor does), and on StackExchange feeds. May work in others, but I didn't test (haven't needed so far).
 
 ## Developer notes
-This began as a Python project (in 2021 I think), but even using an IDE got the project confusing. So I'm translating it to Go, because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice). So this is now a GoLand project.
+This began as a Python project (in 2020), but even using an IDE got the project confusing. So I'm translating it to Go, because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice). So this is now a GoLand project.
 
 ### - To compile the project
 Download this main project and the module(s) you want to compile, and in each module folder compile the whole directory (all modules are `main` packages) with `go build .`.
