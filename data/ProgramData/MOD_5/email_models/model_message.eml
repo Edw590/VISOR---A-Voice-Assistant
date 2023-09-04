@@ -1,0 +1,15 @@
+﻿For-BOM-to-be: on the line
+From: |3234_MSG_SENDER_NAME| <a@a.a>
+Subject: |3234_MSG_SUBJECT|
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="|3234_MSG_BOUNDARY|"
+
+--|3234_MSG_BOUNDARY|
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+|3234_MSG_HTML|
+
+|3234_MSG_MULTIPARTS|
+
+--|3234_MSG_BOUNDARY|--

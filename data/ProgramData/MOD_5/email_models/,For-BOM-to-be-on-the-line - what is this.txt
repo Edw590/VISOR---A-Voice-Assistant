@@ -1,0 +1,12 @@
+The message files in TXT must be encoded in UTF-8 with BOM so that email programs that need it, know how to decode the
+text (even with the BOM not being needed supposedly, as said by Unicode - UTF-8 doesn't need BOM, officially, but there
+are people who use it to find out the encoding of the text, so use it always). This happens with Gmail Notifier Pro, for
+example, in which if the file is encoded in UTF-8 without BOM, it assumes it's CP1252, BUT only outside the body of the
+message - in the notifications and in the subject, not in the HTML (I found this out by chance).
+
+If the "For-BOM-to-be: on-the-line" isn't there, the 3 characters that are before From: (0xEF 0xBB 0xBF --> the BOM
+marker bytes) will make it be recognized as another word that doesn't exist, since these 3 characters are not printable.
+So anything can be put there, since it's there for nothing and it doesn't make any difference because it's going to be
+ignored (no email reader is going to use what I wrote for anything), so I decided to put that there.
+
+Edw590

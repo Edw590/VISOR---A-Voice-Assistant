@@ -1,0 +1,5 @@
+,ENCODE ALL MODELS OF ---MESSAGE--- WITH 'UTF-8 with BOM'!!!!!!!!!!!!
+
+Read the ",For-BOM-to-be-on-the-line - what is this.txt" file to know why.
+
+Edw590

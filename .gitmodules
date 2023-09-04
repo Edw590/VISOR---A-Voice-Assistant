@@ -1,12 +1,16 @@
+[submodule "Libraries/ACD"]
+	path = Libraries/ACD
+	url = git@github.com:Edw590/VISOR-AdvancedCommandsDetection.git
+	branch = master
 [submodule "Utils"]
 	path = Utils
 	url = git@github.com:Edw590/VISOR-Utils.git
+	branch = main
 [submodule "Modules/MOD_4"]
 	path = Modules/MOD_4
-	url = git@github.com:Edw590/VISOR-RssFeedNotifier
+	url = git@github.com:Edw590/VISOR-RssFeedNotifier.git
+	branch = main
 [submodule "Modules/MOD_5"]
 	path = Modules/MOD_5
-	url = git@github.com:Edw590/VISOR-EmailSender
-[submodule "Libraries/ACD"]
-	path = Libraries/ACD
-	url = git@github.com:Edw590/Advanced-Commands-Detection.git
+	url = git@github.com:Edw590/VISOR-EmailSender.git
+	branch = main
