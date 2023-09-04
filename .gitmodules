@@ -7,6 +7,6 @@
 [submodule "Modules/MOD_5"]
 	path = Modules/MOD_5
 	url = git@github.com:Edw590/VISOR-EmailSender
-[submodule "Modules/ACD"]
-	path = Modules/ACD
+[submodule "Libraries/ACD"]
+	path = Libraries/ACD
 	url = git@github.com:Edw590/Advanced-Commands-Detection.git

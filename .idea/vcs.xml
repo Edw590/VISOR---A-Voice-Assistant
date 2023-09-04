@@ -9,8 +9,8 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Modules/ACD" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Modules/ACD/Utils" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Libraries/ACD" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Libraries/ACD/Utils" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Modules/MOD_4" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Modules/MOD_4/Utils" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Modules/MOD_5" vcs="Git" />

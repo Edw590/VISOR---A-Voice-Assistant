@@ -1,8 +1,0 @@
-[submodule "Modules/MOD_5"]
-	main = main
-[submodule "Modules/MOD_4"]
-	main = main
-[submodule "Modules/ACD"]
-	main = main
-[submodule "Utils"]
-	main = main
