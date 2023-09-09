@@ -1,0 +1,15 @@
+{
+	// NOTICE: Rename this file to "PersonalConsts_EOG.json" and fill in the blanks
+
+	// _VISOR_DIR is the full path to the main directory of VISOR.
+	// ATTENTION: end it with a slash
+	"_VISOR_DIR": "",
+
+	// _VISOR_EMAIL_ADDR is VISOR's email address
+	"_VISOR_EMAIL_ADDR": "",
+	// _VISOR_EMAIL_PW is VISOR's email password
+	"_VISOR_EMAIL_PW": "",
+
+	// USER_EMAIL_ADDR is the email address of the user, used for all email communication
+	"USER_EMAIL_ADDR": ""
+}
