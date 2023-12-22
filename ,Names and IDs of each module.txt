@@ -2,4 +2,5 @@ Note: for the module names, use ONLY characters supported in file and folder nam
 1 = Modules Manager
 2 = S.M.A.R.T. Checker
 4 = RSS Feed Notifier
-5 = Email sender
+5 = Email Sender
+6 = Weather Checker

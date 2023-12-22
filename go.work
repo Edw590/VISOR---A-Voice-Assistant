@@ -3,9 +3,12 @@
 go 1.20
 
 use (
-	./Libraries/ACD
+	.
+	Modules/MOD_1
 	Modules/MOD_2
-	Modules/MOD_5
 	Modules/MOD_4
+	Modules/MOD_5
+	Modules/MOD_6
+	Libraries/ACD
 	Utils
 )

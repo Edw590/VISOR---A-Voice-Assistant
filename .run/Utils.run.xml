@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Utils" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="VISOR_Server" />
+    <working_directory value="$PROJECT_DIR$/Utils" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\Utils_linux" />
+    <envs>
+      <env name="GOOS" value="linux" />
+      <env name="GOARCH" value="arm" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="Utils" />
+    <directory value="$PROJECT_DIR$/Libraries/ACD" />
+    <filePath value="$PROJECT_DIR$/MOD_5/main/main_5.go" />
+    <output_directory value="$PROJECT_DIR$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

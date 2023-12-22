@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RssFeedNotifier" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="VISOR_Server" />
+    <working_directory value="$PROJECT_DIR$/Modules/MOD_4" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\MOD_4_linux" />
+    <envs>
+      <env name="GOOS" value="linux" />
+      <env name="GOARCH" value="arm" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="RssFeedNotifier" />
+    <directory value="$PROJECT_DIR$/Modules/MOD_4" />
+    <filePath value="$PROJECT_DIR$/MOD_4_1/main_4.go" />
+    <output_directory value="$PROJECT_DIR$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>
