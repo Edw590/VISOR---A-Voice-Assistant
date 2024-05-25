@@ -14,3 +14,6 @@
 	path = Modules/MOD_5
 	url = git@github.com:Edw590/VISOR-EmailSender.git
 	branch = main
+[submodule "Modules/MOD_2"]
+	path = Modules/MOD_2
+	url = git@github.com:Edw590/VISOR-SMARTChecker.git
