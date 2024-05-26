@@ -1,0 +1,2 @@
+This folder contains files for VISOR's website. It should be on an open port on the router, so that it can be accessed
+from any device on the network. The website is a simple static site, with no server-side processing.
