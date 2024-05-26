@@ -51,8 +51,8 @@ func main() {
 	fmt.Println(UtilsSWA.BytesToHexDATACONV(tmp))
 	fmt.Println(UtilsSWA.BytesToOctalDATACONV(tmp))*/
 
-	/*var commands_list string = "bash" + UtilsSWA.CMD_SEP + "ps -p $$"
-	output, err := UtilsSWA.ExecCmdSHELL(commands_list, false)
+	/*var commands_list string = "id -u ; ps -p $$"
+	output, err := UtilsSWA.ExecCmdSHELL(true, commands_list)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("-----------")
@@ -67,23 +67,25 @@ func main() {
 		fmt.Println(string(UtilsSWA.GetStderrSHELL(output)))
 	}*/
 
-	var commands_list []string = []string{
-		"ps -p $$",
-		"bash",
-		"ps -p $$",
+	/*var commands_list2 []string = []string{
+		"su -c \"id -u\"",
 	}
-	output, err := Utils.ExecCmdSHELL(commands_list)
+	output2, err := Utils.ExecCmdSHELL(commands_list2)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("-----------")
-		fmt.Println(output.Exit_code)
+		fmt.Println(output2.Exit_code)
 	} else {
 		fmt.Println(err)
 		fmt.Println("-----------")
-		fmt.Println(output.Exit_code)
+		fmt.Println(output2.Exit_code)
 		fmt.Println("-----------")
-		fmt.Println(output.Stdout_str)
+		fmt.Println(output2.Stdout_str)
 		fmt.Println("-----------")
-		fmt.Println(output.Stderr_str)
-	}
+		fmt.Println(output2.Stderr_str)
+	}*/
+
+	fmt.Println(Utils.PathFILESDIRS(false, "", "C:\\Users\\Edw590\\Desktop\\test.txt").GPathToStringConversion())
+
+	//(Utils.GPath{}).Path(false, "C:\\Users\\Edw590\\Desktop\\test.txt").WriteTextFile("Hello, World!")
 }

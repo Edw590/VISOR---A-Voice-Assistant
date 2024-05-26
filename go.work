@@ -10,5 +10,7 @@ use (
 	Modules/MOD_5
 	Modules/MOD_6
 	Libraries/ACD
+	Libraries/GPT
+	Libraries/OIG
 	Utils
 )

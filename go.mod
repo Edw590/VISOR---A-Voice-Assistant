@@ -4,6 +4,4 @@ module VISOR_Server
 // supporting it).
 go 1.20
 
-require github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a
-
-require golang.org/x/text v0.14.0 // indirect
+require github.com/ayush6624/go-chatgpt v0.3.0

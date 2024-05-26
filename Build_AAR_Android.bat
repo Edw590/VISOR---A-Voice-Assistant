@@ -15,6 +15,7 @@ gomobile bind^
  -ldflags="-v -s -w -compressdwarf=true"^
  -o="bin/MainLibraries.aar"^
  "Utils/UtilsSWA"^
- "ACD/ACD"
+ "ACD/ACD"^
+ "OIG/OIG"
 
 echo Error code: %ERRORLEVEL%
