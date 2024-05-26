@@ -10,5 +10,10 @@
 	"VISOR_EMAIL_PW": "",
 
 	// USER_EMAIL_ADDR is the email address of the user, used for all email communication
-	"USER_EMAIL_ADDR": ""
+	"USER_EMAIL_ADDR": "",
+
+	// WEBSITE_URL is the URL of the VISOR website
+	"WEBSITE_URL": "",
+	// WEBSITE_PW is the password for the VISOR website
+	"WEBSITE_PW": "",
 }
