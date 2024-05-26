@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Test ACD" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="OIG Test" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR_Server" />
-    <working_directory value="$PROJECT_DIR$/Libraries/ACD" />
+    <working_directory value="$PROJECT_DIR$/bin" />
     <kind value="PACKAGE" />
-    <package value="ACD" />
+    <package value="OIG" />
     <directory value="$PROJECT_DIR$/Libraries/ACD" />
     <filePath value="$PROJECT_DIR$/MOD_5/main/main_5.go" />
     <method v="2" />

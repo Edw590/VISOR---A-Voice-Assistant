@@ -1,14 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SMARTChecker" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="OnlineInfoChk" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR_Server" />
-    <working_directory value="$PROJECT_DIR$/Modules/MOD_2" />
-    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\MOD_2_linux -buildvcs=false" />
+    <working_directory value="$PROJECT_DIR$/Modules/MOD_6" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\MOD_6_linux" />
     <envs>
       <env name="GOOS" value="linux" />
       <env name="GOARCH" value="arm" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="SMARTChecker" />
+    <package value="WeatherChk" />
     <directory value="$PROJECT_DIR$/Modules/MOD_2" />
     <filePath value="$PROJECT_DIR$/MOD_4_1/main_4.go" />
     <output_directory value="$PROJECT_DIR$/bin" />
