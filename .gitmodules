@@ -17,3 +17,6 @@
 [submodule "Modules/MOD_2"]
 	path = Modules/MOD_2
 	url = git@github.com:Edw590/VISOR-SMARTChecker.git
+[submodule "Modules/MOD_6"]
+	path = Modules/MOD_6
+	url = git@github.com:Edw590/VISOR-OnlineInformationChecker.git
