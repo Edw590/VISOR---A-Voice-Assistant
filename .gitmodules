@@ -20,3 +20,6 @@
 [submodule "Modules/MOD_6"]
 	path = Modules/MOD_6
 	url = git@github.com:Edw590/VISOR-OnlineInformationChecker.git
+[submodule "Libraries/OIG"]
+	path = Libraries/OIG
+	url = git@github.com:Edw590/VISOR-OnlineInformationGetter.git
