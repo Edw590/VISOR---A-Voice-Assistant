@@ -9,6 +9,8 @@ use (
 	Modules/MOD_4
 	Modules/MOD_5
 	Modules/MOD_6
+	Modules/MOD_7
+	Modules/MOD_8
 	Libraries/ACD
 	Libraries/GPT
 	Libraries/OIG
