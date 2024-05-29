@@ -4,3 +4,5 @@ Note: for the module names, use ONLY characters supported in file and folder nam
 4 = RSS Feed Notifier
 5 = Email Sender
 6 = Online Information Checker
+7 = GPT Communicator
+8 = Website Backend
