@@ -1,5 +1,7 @@
 :: Execute with the current directory as the project root directory
 
+:: This needs JDK 8
+
 :: Update the module version
 :: python3 VersionUpdater.py
 
@@ -16,6 +18,7 @@ gomobile bind^
  -o="bin/MainLibraries.aar"^
  "Utils/UtilsSWA"^
  "ACD/ACD"^
- "OIG/OIG"
+ "OIG/OIG"^
+ "GPT/GPT"
 
 echo Error code: %ERRORLEVEL%
