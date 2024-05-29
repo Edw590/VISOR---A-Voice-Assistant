@@ -23,3 +23,12 @@
 [submodule "Libraries/OIG"]
 	path = Libraries/OIG
 	url = git@github.com:Edw590/VISOR-OnlineInformationGetter.git
+[submodule "Modules/MOD_7"]
+	path = Modules/MOD_7
+	url = git@github.com:Edw590/VISOR-GPTCommunicator.git
+[submodule "Modules/MOD_8"]
+	path = Modules/MOD_8
+	url = git@github.com:Edw590/VISOR-WebsiteBackend.git
+[submodule "Libraries/GPT"]
+	path = Libraries/GPT
+	url = git@github.com:Edw590/VISOR-GPT.git
