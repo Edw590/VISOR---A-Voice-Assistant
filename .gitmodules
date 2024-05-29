@@ -32,3 +32,6 @@
 [submodule "Libraries/GPT"]
 	path = Libraries/GPT
 	url = git@github.com:Edw590/VISOR-GPT.git
+[submodule "Modules/MOD_1"]
+	path = Modules/MOD_1
+	url = git@github.com:Edw590/VISOR-ModulesManager.git
