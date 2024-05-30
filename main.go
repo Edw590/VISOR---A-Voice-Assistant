@@ -23,8 +23,6 @@ package main
 
 import (
 	"fmt"
-
-	"Utils"
 )
 
 func main() {
@@ -84,8 +82,4 @@ func main() {
 		fmt.Println("-----------")
 		fmt.Println(output2.Stderr_str)
 	}*/
-
-	fmt.Println(Utils.PathFILESDIRS(false, "", "C:\\Users\\Edw590\\Desktop\\test.txt").GPathToStringConversion())
-
-	//(Utils.GPath{}).Path(false, "C:\\Users\\Edw590\\Desktop\\test.txt").WriteTextFile("Hello, World!")
 }
