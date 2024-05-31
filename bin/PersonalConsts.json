@@ -16,4 +16,6 @@
 	"WEBSITE_URL": "",
 	// WEBSITE_PW is the password for the VISOR website
 	"WEBSITE_PW": "",
+	// WEBSITE_DIR is the full path to the directory of the VISOR website
+	"WEBSITE_DIR": ""
 }

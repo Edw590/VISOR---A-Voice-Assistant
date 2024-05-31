@@ -1,6 +1,6 @@
 :: Execute with the current directory as the project root directory
 
-:: This needs JDK 8
+:: This needs JDK 8 to be on the PATH
 
 :: Update the module version
 :: python3 VersionUpdater.py
