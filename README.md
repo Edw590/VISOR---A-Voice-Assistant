@@ -7,9 +7,7 @@ This project is a part of a bigger project, consisting of the following:
 -   [V.I.S.O.R. - Server Version Assistant](https://github.com/Edw590/VISOR---Server-Version-Assistant)
 
 ## Introduction
-This is the server version of my in-development assistant, V.I.S.O.R.. When it's ready, it'll be running 24/7 on my Raspberry Pi. For now, the modules it has are ran automatically by the OS on the RPi (OpenMediaVault) every some minutes and close after finishing the tasks (the infinite loop is disabled on them).
-
-This is supposed to be VISOR's "operations center", where all 24/7 things run. As an example, the RSS Feed Notifier and Email Sender modules. The notifier checks for news on the feeds and the sender sends the emails that the notifier queues on it. All always running.
+This is the server version of my in-development assistant, V.I.S.O.R.. It runs 24/7 on my Raspberry Pi. This is supposed to be VISOR's "operations center", where all 24/7 things run. As an example, the RSS Feed Notifier and Email Sender modules. The notifier checks for news on the feeds and the sender sends the emails that the notifier queues on it. All always running.
 
 ## Modules
 - **[Utils](https://github.com/Edw590/VISOR-Utils)** – This is not a module, it's just a separate global package (all non-library modules are `main` packages; this one is the `Utils` package), but I'm writing about it because it can (and does) have utilities to communicate between modules. For example, it has utilities to queue emails to the Email Sender, so one just needs to call the function there to queue an email.
