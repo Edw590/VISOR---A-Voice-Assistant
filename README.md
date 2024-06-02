@@ -29,7 +29,7 @@ This began as a Python project (in 2020), but even using an IDE got the project 
 
 ### - To use the project
 - Download this main project and the module(s) you want to compile (to download all, `git clone --recursive [repo link here]`), and in each module folder compile the whole directory (all modules are `main` packages) with `go build .` (install Go first). After that, rename the generated executable file to the name of the folder + a suffix: MOD_1.exe for Windows or MOD_1_linux for Linux. Finally move the file to the `bin` folder.
-- Next go on the `bin` folder and edit the JSON file with your values and rename the file to PersonalConsts_EOG.json. VISOR needs an email of its own btw. Also needs a website. I'll try to remove that requirement soon. But for full functionality (like communication between the app and the server) the website must exist.
+- Next go on the `bin` folder and edit the JSON file with your values and rename the file to PersonalConsts_EOG.json. VISOR needs an email of his own btw. Also needs a website (I use Nginx for it). I'll try to remove that requirement soon. But for full functionality (like communication between the app and the server) the website must exist.
 - Go on each module folder and copy the JSON file to `data/UserData/MOD_[module number here]` (create the folders if they don't exist) and configure it (in case the module needs one).
 - To be sure each module is supported, start each module individually (except the Manager) and see if no errors pop up.
 - If no errors appear, start the Modules Manager (MOD_1), which will start and keep running all the other modules.
