@@ -1,10 +1,10 @@
-# V.I.S.O.R. - Server Version Assistant
-The server version of my in-development assistant
+# V.I.S.O.R. - A Virtual Assistant
+V.I.S.O.R., my in-development assistant, written in Go
 
 ## Notice
 This project is a part of a bigger project, consisting of the following:
 -   [V.I.S.O.R. - Android Version Assistant](https://github.com/DADi590/VISOR---A-better-Android-assistant)
--   [V.I.S.O.R. - Server Version Assistant](https://github.com/Edw590/VISOR---Server-Version-Assistant)
+-   [V.I.S.O.R. - A Virtual Assistant](https://github.com/Edw590/VISOR---A-Virtual-Assistant)
 
 ## Introduction
 This is the server version of my in-development assistant, V.I.S.O.R.. It runs 24/7 on my Raspberry Pi (but it can run on Windows too. It's supported on both). This is supposed to be VISOR's "operations center", where all 24/7 things run. As an example, the RSS Feed Notifier and Email Sender modules. The notifier checks for news on the feeds and the sender sends the emails that the notifier queues on it. All always running.
@@ -27,10 +27,12 @@ This is the server version of my in-development assistant, V.I.S.O.R.. It runs 2
 ## Developer notes
 This began as a Python project (in 2020), but even using an IDE got the project confusing. So I'm translating it to Go, because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice).
 
-### - To compile the project
-Download this main project and the module(s) you want to compile, and in each module folder compile the whole directory (all modules are `main` packages) with `go build .`.
-
-All module are separated from each other *from the compiler's point of view*. So one can download each one and compile it without having any other module present - but they still require the `data` folder, especially the `ProgramData` one, with everything of all modules inside it. This is because each module can require files from other modules when they run (for example, the RSS Feed Notifier requires the Email Sender to be present because it gets files from the latter's folders to generate the emails to be queued).
+### - To use the project
+- Download this main project and the module(s) you want to compile (to download all, `git clone --recursive [repo link here]`), and in each module folder compile the whole directory (all modules are `main` packages) with `go build .` (install Go first). After that, rename the generated executable file to the name of the folder + a suffix: MOD_1.exe for Windows or MOD_1_linux for Linux. Finally move the file to the `bin` folder.
+- Next go on the `bin` folder and edit the JSON file with your values and rename the file to PersonalConsts_EOG.json. VISOR needs an email of his own btw. Also needs a website (I use Nginx for it). I'll try to remove that requirement soon. But for full functionality (like communication between the app and the server) the website must exist.
+- Go on each module folder and copy the JSON file to `data/UserData/MOD_[module number here]` (create the folders if they don't exist) and configure it (in case the module needs one).
+- To be sure each module is supported, start each module individually (except the Manager) and see if no errors pop up.
+- If no errors appear, start the Modules Manager (MOD_1), which will start and keep running all the other modules.
 
 #### Supported OSes
 The entire project is supposed to be able to be ran on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above.
