@@ -35,3 +35,6 @@
 [submodule "Modules/MOD_1"]
 	path = Modules/MOD_1
 	url = git@github.com:Edw590/VISOR-ModulesManager.git
+[submodule "Modules/MOD_3"]
+	path = Modules/MOD_3
+	url = git@github.com:Edw590/VISOR-Speech.git
