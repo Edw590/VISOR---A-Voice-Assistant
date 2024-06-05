@@ -1,10 +1,10 @@
-# V.I.S.O.R. - Server Version Assistant
-The server version of my in-development assistant
+# V.I.S.O.R. - A Virtual Assistant
+V.I.S.O.R., my in-development assistant, written in Go
 
 ## Notice
 This project is a part of a bigger project, consisting of the following:
 -   [V.I.S.O.R. - Android Version Assistant](https://github.com/DADi590/VISOR---A-better-Android-assistant)
--   [V.I.S.O.R. - Server Version Assistant](https://github.com/Edw590/VISOR---A-Virtual-Assistant)
+-   [V.I.S.O.R. - A Virtual Assistant](https://github.com/Edw590/VISOR---A-Virtual-Assistant)
 
 ## Introduction
 This is the server version of my in-development assistant, V.I.S.O.R.. It runs 24/7 on my Raspberry Pi (but it can run on Windows too. It's supported on both). This is supposed to be VISOR's "operations center", where all 24/7 things run. As an example, the RSS Feed Notifier and Email Sender modules. The notifier checks for news on the feeds and the sender sends the emails that the notifier queues on it. All always running.
