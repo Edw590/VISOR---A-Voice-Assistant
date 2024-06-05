@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="RssFeedNotifier" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="VISOR_Server" />
+    <module name="VISOR" />
     <working_directory value="$PROJECT_DIR$/Modules/MOD_4" />
     <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\MOD_4_linux" />
     <envs>

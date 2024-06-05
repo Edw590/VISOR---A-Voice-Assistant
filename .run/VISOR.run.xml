@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="VISOR" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="VISOR" />
+    <working_directory value="$PROJECT_DIR$/bin" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\VISOR.exe" />
+    <kind value="PACKAGE" />
+    <package value="VISOR" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>

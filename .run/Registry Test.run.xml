@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GPT Test" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="Registry Test" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR" />
     <working_directory value="$PROJECT_DIR$/bin" />
     <kind value="PACKAGE" />
-    <package value="GPT" />
+    <package value="Registry" />
     <directory value="$PROJECT_DIR$/Libraries/ACD" />
     <filePath value="$PROJECT_DIR$/MOD_5/main/main_5.go" />
     <method v="2" />

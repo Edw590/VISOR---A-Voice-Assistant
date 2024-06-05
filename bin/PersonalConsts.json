@@ -3,6 +3,8 @@
 
 	// VISOR_DIR is the full path to the main directory of VISOR, be it a Windows or a Unix path
 	"VISOR_DIR": "",
+	// VISOR_SERVER is true if the version being used is the server version, false if it's the client version
+	"VISOR_SERVER": false,
 
 	// VISOR_EMAIL_ADDR is VISOR's email address
 	"VISOR_EMAIL_ADDR": "",

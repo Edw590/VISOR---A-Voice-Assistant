@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="ACD Test" type="GoApplicationRunConfiguration" factoryName="Go Application">
-    <module name="VISOR_Server" />
+    <module name="VISOR" />
     <working_directory value="$PROJECT_DIR$/bin" />
     <kind value="PACKAGE" />
     <package value="ACD" />

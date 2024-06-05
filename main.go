@@ -22,64 +22,56 @@
 package main
 
 import (
+	"GPT/GPT"
+	"Utils"
 	"fmt"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
+	"log"
+	"time"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
+	Utils.PersonalConsts_GL.Init()
 
-	/*password1 := []byte("this is a test")
-	password2 := []byte("this is one other test")
-	message := utf7.UTF7EncodeBytes([]byte("this is another test ´1ºªá¨nñë€§«"))
-	associated_data := []byte("Test 44")
+	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 
-	fmt.Println(string(password1))
-	fmt.Println(string(password2))
-	tmp, _ := utf7.UTF7DecodeBytes(message)
-	fmt.Println(string(tmp))
-	fmt.Println(string(associated_data))
+	a := app.New()
+	w := a.NewWindow("Entry Widget")
 
-	bytes:= UtilsSWA.EncryptBytesCRYPTOENDECRYPT(password1, password2, message, associated_data)
-	fmt.Println(string(bytes))
+	input := widget.NewEntry()
+	input.SetPlaceHolder("Enter text...")
 
-	bytes = UtilsSWA.DecryptBytesCRYPTOENDECRYPT(password1, password2, bytes, associated_data)
-	tmp, _ = utf7.UTF7DecodeBytes(bytes)
-	fmt.Println(string(tmp))
+	//text := canvas.NewText("Text Object", color.White)
+	var text = widget.NewLabel("Text Object")
+	text.Alignment = fyne.TextAlignTrailing
+	text.TextStyle = fyne.TextStyle{Italic: true}
 
-	fmt.Println(UtilsSWA.BytesToHexDATACONV(tmp))
-	fmt.Println(UtilsSWA.BytesToOctalDATACONV(tmp))*/
+	content := container.NewVBox(input,
+		widget.NewButton("Save", func() {
+			log.Println("Content was:", input.Text)
+		}),
+		text,
+	)
 
-	/*var commands_list string = "id -u ; ps -p $$"
-	output, err := UtilsSWA.ExecCmdSHELL(true, commands_list)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("-----------")
-		fmt.Println(UtilsSWA.GetExitCodeSHELL(output))
-	} else {
-		fmt.Println(err)
-		fmt.Println("-----------")
-		fmt.Println(UtilsSWA.GetExitCodeSHELL(output))
-		fmt.Println("-----------")
-		fmt.Println(string(UtilsSWA.GetStdoutSHELL(output)))
-		fmt.Println("-----------")
-		fmt.Println(string(UtilsSWA.GetStderrSHELL(output)))
-	}*/
+	fmt.Println(GPT.GetTextFromEntry(GPT.GetEntry(-1)))
 
-	/*var commands_list2 []string = []string{
-		"su -c \"id -u\"",
-	}
-	output2, err := Utils.ExecCmdSHELL(commands_list2)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("-----------")
-		fmt.Println(output2.Exit_code)
-	} else {
-		fmt.Println(err)
-		fmt.Println("-----------")
-		fmt.Println(output2.Exit_code)
-		fmt.Println("-----------")
-		fmt.Println(output2.Stdout_str)
-		fmt.Println("-----------")
-		fmt.Println(output2.Stderr_str)
-	}*/
+	go func() {
+		for {
+			var num_entries int = GPT.GetNumEntries()
+			fmt.Println(num_entries)
+			for i := num_entries - 1; i >= 0; i-- {
+				if GPT.GetTextFromEntry(GPT.GetEntry(i)) != GPT.GEN_ERROR {
+					text.SetText(GPT.GetTextFromEntry(GPT.GetEntry(i)))
+				}
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	w.SetContent(content)
+	w.ShowAndRun()
 }
