@@ -2,10 +2,10 @@
   <configuration default="false" name="SMARTChecker" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR" />
     <working_directory value="$PROJECT_DIR$/Modules/MOD_2" />
-    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR_Server\bin\MOD_2_linux -buildvcs=false" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR\bin\MOD_2_linux -buildvcs=false" />
     <envs>
       <env name="GOOS" value="linux" />
-      <env name="GOARCH" value="arm" />
+      <env name="GOARCH" value="arm64" />
     </envs>
     <kind value="PACKAGE" />
     <package value="SMARTChecker" />

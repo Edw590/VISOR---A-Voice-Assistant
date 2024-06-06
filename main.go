@@ -19,59 +19,61 @@
  * under the License.
  ******************************************************************************/
 
+// Package main provides various examples of Fyne API capabilities.
 package main
 
 import (
-	"GPT/GPT"
 	"Utils"
-	"fmt"
+	"VISOR/ClientCode/Screens"
+	"VISOR/logo"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"log"
-	"time"
 )
 
 func main() {
 	Utils.PersonalConsts_GL.Init()
 
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
+	// Create a new application
+	myApp := app.NewWithID("com.edw590.visor_c")
+	myApp.SetIcon(logo.LogoBlackGmail)
+	myWindow := myApp.NewWindow("V.I.S.O.R.")
 
-	a := app.New()
-	w := a.NewWindow("Entry Widget")
 
-	input := widget.NewEntry()
-	input.SetPlaceHolder("Enter text...")
+	// Create the content area with a label to display different screens
+	contentLabel := widget.NewLabel("Welcome!")
+	contentContainer := container.NewVBox(contentLabel)
 
-	//text := canvas.NewText("Text Object", color.White)
-	var text = widget.NewLabel("Text Object")
-	text.Alignment = fyne.TextAlignTrailing
-	text.TextStyle = fyne.TextStyle{Italic: true}
-
-	content := container.NewVBox(input,
-		widget.NewButton("Save", func() {
-			log.Println("Content was:", input.Text)
+	// Create the navigation bar
+	navBar := container.NewVBox(
+		widget.NewButton("Home", func() {
+			contentContainer.Objects = []fyne.CanvasObject{Screens.Home()}
+			contentContainer.Refresh()
 		}),
-		text,
+		widget.NewButton("Dev Mode", func() {
+			contentContainer.Objects = []fyne.CanvasObject{Screens.DevMode()}
+			contentContainer.Refresh()
+		}),
+		/*widget.NewButton("Entry & Button", func() {
+			contentContainer.Objects = []fyne.CanvasObject{createEntryButtonScreen()}
+			contentContainer.Refresh()
+		}),
+		widget.NewButton("Progress Bar", func() {
+			contentContainer.Objects = []fyne.CanvasObject{createTextScreen()}
+			contentContainer.Refresh()
+		}),*/
 	)
 
-	fmt.Println(GPT.GetTextFromEntry(GPT.GetEntry(-1)))
 
-	go func() {
-		for {
-			var num_entries int = GPT.GetNumEntries()
-			fmt.Println(num_entries)
-			for i := num_entries - 1; i >= 0; i-- {
-				if GPT.GetTextFromEntry(GPT.GetEntry(i)) != GPT.GEN_ERROR {
-					text.SetText(GPT.GetTextFromEntry(GPT.GetEntry(i)))
-				}
-			}
+	// Create a split container to hold the navigation bar and the content
+	split := container.NewHSplit(navBar, contentContainer)
+	split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
 
-			time.Sleep(1 * time.Second)
-		}
-	}()
+	// Set the content of the window
+	myWindow.SetContent(split)
 
-	w.SetContent(content)
-	w.ShowAndRun()
+	// Show and run the application
+	myWindow.Resize(fyne.NewSize(640, 480))
+	myWindow.ShowAndRun()
 }
