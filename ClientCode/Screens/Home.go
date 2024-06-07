@@ -23,12 +23,21 @@ package Screens
 
 import (
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"image/color"
 )
 
 func Home() fyne.CanvasObject {
-	return container.NewVBox(
-		widget.NewLabel("V.I.S.O.R. Systems"),
-	)
+	var text *canvas.Text = canvas.NewText("V.I.S.O.R. Systems", color.RGBA{
+		R: 34,
+		G: 177,
+		B: 76,
+		A: 255,
+	})
+	text.TextSize = 40
+	text.Alignment = fyne.TextAlignCenter
+	text.TextStyle.Bold = true
+
+	return container.NewVBox(text)
 }
