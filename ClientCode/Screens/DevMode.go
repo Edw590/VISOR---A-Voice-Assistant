@@ -25,45 +25,81 @@ import (
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 )
 
-func DevMode() fyne.CanvasObject {
-	type_ := widget.NewEntry()
-	text1 := widget.NewEntry()
-	text2 := widget.NewEntry()
-	text3 := widget.NewEntry()
+var dev_mode_canvas_object fyne.CanvasObject = nil
 
-	form := &widget.Form{
+func DevMode(my_app fyne.App, my_window fyne.Window) fyne.CanvasObject {
+	if dev_mode_canvas_object != nil {
+		return dev_mode_canvas_object
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	// Form section
+	var form_type_ *widget.Entry = widget.NewEntry()
+	var form_text1 *widget.Entry = widget.NewEntry()
+	var form_text2 *widget.Entry = widget.NewEntry()
+	var form_text3 *widget.Entry = widget.NewEntry()
+
+	var form *widget.Form = &widget.Form{
 		Items: []*widget.FormItem{
-			{Text: "Type",  Widget: type_},
-			{Text: "Text1", Widget: text1},
-			{Text: "Text2", Widget: text2},
-			{Text: "Text3", Widget: text3},
+			{Text: "Type",  Widget: form_type_},
+			{Text: "Text1", Widget: form_text1},
+			{Text: "Text2", Widget: form_text2},
+			{Text: "Text3", Widget: form_text3},
 		},
 		OnSubmit: func() {
 			Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-				Name:  type_.Text,
-				Text1: text1.Text,
-				Text2: text2.Text,
-				Text3: text3.Text,
+				Name:  form_type_.Text,
+				Text1: form_text1.Text,
+				Text2: form_text2.Text,
+				Text3: form_text3.Text,
 			})
 		},
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////
 	// Entry and Button section
-	entry := widget.NewEntry()
-	button := widget.NewButton("Submit", func() {
-		Utils.QueueSpeechSPEECH(entry.Text)
+	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
+	entry_txt_to_speech.PlaceHolder = "Enter text to speak"
+	entry_txt_to_speech.Text = "This is an example."
+	var btn_speak_min *widget.Button = widget.NewButton("Speak (min priority)", func() {
+		Utils.QueueSpeechSPEECH(entry_txt_to_speech.Text, Utils.PRIORITY_LOW)
 	})
-	entryButtonSection := container.NewVBox(entry, button)
+	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
+		//Utils.SkipSpeechSPEECH()
+	})
 
-	// Text Display section with vertical scrolling
-	text := widget.NewLabel(`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`)
-	text.Wrapping = fyne.TextWrapWord // Enable text wrapping
-	scroll := container.NewVScroll(text)
-	scroll.SetMinSize(fyne.NewSize(300, 200)) // Set the minimum size for the scroll container
+	//////////////////////////////////////////////////////////////////////////////////
+	// Entry and Button section
+	var entry_txt_to_send *widget.Entry = widget.NewEntry()
+	var btn_send_notif *widget.Button = widget.NewButton("Send Notification", func() {
+		notification := fyne.NewNotification("New Notification", entry_txt_to_send.Text)
+		my_app.SendNotification(notification)
+		dialog.ShowInformation("Notification Sent", "Notification sent successfully!", my_window)
+	})
 
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
-	return container.NewVBox(form, entryButtonSection, scroll)
+	var content *fyne.Container = container.NewVBox(
+		form,
+		entry_txt_to_speech,
+		btn_speak_min,
+		btn_skip_speech,
+		entry_txt_to_send,
+		btn_send_notif,
+	)
+
+	var main_scroll *container.Scroll = container.NewVScroll(content)
+	main_scroll.SetMinSize(fyne.NewSize(550, 480))
+
+	dev_mode_canvas_object = main_scroll
+
+	return dev_mode_canvas_object
 }

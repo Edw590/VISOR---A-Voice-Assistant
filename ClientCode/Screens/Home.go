@@ -28,7 +28,13 @@ import (
 	"image/color"
 )
 
+var home_canvas_object fyne.CanvasObject = nil
+
 func Home() fyne.CanvasObject {
+	if home_canvas_object != nil {
+		return home_canvas_object
+	}
+
 	var text *canvas.Text = canvas.NewText("V.I.S.O.R. Systems", color.RGBA{
 		R: 34,
 		G: 177,
@@ -39,5 +45,20 @@ func Home() fyne.CanvasObject {
 	text.Alignment = fyne.TextAlignCenter
 	text.TextStyle.Bold = true
 
-	return container.NewVBox(text)
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	// Combine all sections into a vertical box container
+	var content *fyne.Container = container.NewVBox(
+		container.NewVBox(text),
+	)
+
+	var main_scroll *container.Scroll = container.NewVScroll(content)
+	main_scroll.SetMinSize(fyne.NewSize(550, 480))
+
+	home_canvas_object = main_scroll
+
+	return home_canvas_object
 }

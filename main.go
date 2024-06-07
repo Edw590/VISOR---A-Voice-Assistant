@@ -23,43 +23,48 @@
 package main
 
 import (
+	"GPT/GPT"
+	"OIG/OIG"
 	"Utils"
 	"VISOR/ClientCode/Screens"
 	"VISOR/logo"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 )
 
 func main() {
 	Utils.PersonalConsts_GL.Init()
+	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
+	OIG.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 
 	// Create a new application
-	myApp := app.NewWithID("com.edw590.visor_c")
-	myApp.SetIcon(logo.LogoBlackGmail)
-	myWindow := myApp.NewWindow("V.I.S.O.R.")
+	var my_app fyne.App = app.NewWithID("com.edw590.visor_c")
+	my_app.SetIcon(logo.LogoBlackGmail)
+	var my_window fyne.Window = my_app.NewWindow("V.I.S.O.R.")
 
 
 	// Create the content area with a label to display different screens
-	contentLabel := widget.NewLabel("Welcome!")
-	contentContainer := container.NewVBox(contentLabel)
+	var content_label *widget.Label = widget.NewLabel("Welcome!")
+	var content_container *fyne.Container = container.NewVBox(content_label)
 
 	// Create the navigation bar
-	navBar := container.NewVBox(
+	var nav_bar *fyne.Container = container.NewVBox(
 		widget.NewButton("Home", func() {
-			contentContainer.Objects = []fyne.CanvasObject{Screens.Home()}
-			contentContainer.Refresh()
+			content_container.Objects = []fyne.CanvasObject{Screens.Home()}
+			content_container.Refresh()
 		}),
 		widget.NewButton("Dev Mode", func() {
-			contentContainer.Objects = []fyne.CanvasObject{Screens.DevMode()}
-			contentContainer.Refresh()
+			content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_app, my_window)}
+			content_container.Refresh()
 		}),
-		/*widget.NewButton("Entry & Button", func() {
-			contentContainer.Objects = []fyne.CanvasObject{createEntryButtonScreen()}
-			contentContainer.Refresh()
+		widget.NewButton("Communicator", func() {
+			content_container.Objects = []fyne.CanvasObject{Screens.Communicator()}
+			content_container.Refresh()
 		}),
-		widget.NewButton("Progress Bar", func() {
+		/*widget.NewButton("Progress Bar", func() {
 			contentContainer.Objects = []fyne.CanvasObject{createTextScreen()}
 			contentContainer.Refresh()
 		}),*/
@@ -67,13 +72,32 @@ func main() {
 
 
 	// Create a split container to hold the navigation bar and the content
-	split := container.NewHSplit(navBar, contentContainer)
+	var split *container.Split = container.NewHSplit(nav_bar, content_container)
 	split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
 
 	// Set the content of the window
-	myWindow.SetContent(split)
+	my_window.SetContent(split)
+
+	// Add system tray functionality
+	if desk, ok := my_app.(desktop.App); ok {
+		var icon *fyne.StaticResource = logo.LogoBlackGmail
+		var menu *fyne.Menu = fyne.NewMenu("Tray",
+			fyne.NewMenuItem("Show", func() {
+				my_window.Hide()
+				my_window.Show()
+				my_window.RequestFocus()
+			}),
+		)
+		desk.SetSystemTrayMenu(menu)
+		desk.SetSystemTrayIcon(icon)
+	}
+
+	// Minimize to tray on close
+	my_window.SetCloseIntercept(func() {
+		my_window.Hide()
+	})
 
 	// Show and run the application
-	myWindow.Resize(fyne.NewSize(640, 480))
-	myWindow.ShowAndRun()
+	my_window.Resize(fyne.NewSize(640, 480))
+	my_window.ShowAndRun()
 }
