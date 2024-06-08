@@ -45,6 +45,16 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/Edw590/sapi-go v0.0.0-20240605194221-3d5eec531c72 h1:O1YTjUDJVOK/lBB+EKwmD92xKbVro5cuSxUVjA1Ives=
 github.com/Edw590/sapi-go v0.0.0-20240605194221-3d5eec531c72/go.mod h1:GPHDFbc6TtX2iw0q9jXTn90UDI0rYqTQYSyXDQ4Y82w=
+github.com/Edw590/sapi-go v0.0.0-20240605195053-fbc465eea726 h1:q1Fz08C2+gVXKWFQugma4815iEjtWbctbVWrVIfyvx8=
+github.com/Edw590/sapi-go v0.0.0-20240605195053-fbc465eea726/go.mod h1:GPHDFbc6TtX2iw0q9jXTn90UDI0rYqTQYSyXDQ4Y82w=
+github.com/Edw590/sapi-go v0.0.0-20240607140158-20c7ec29eb81 h1:TyesFP7zEQUy1o6gjtIOlmA17qCvOv46cBojbzkt4Z4=
+github.com/Edw590/sapi-go v0.0.0-20240607140158-20c7ec29eb81/go.mod h1:GPHDFbc6TtX2iw0q9jXTn90UDI0rYqTQYSyXDQ4Y82w=
+github.com/Edw590/sapi-go v0.0.0-20240607141120-fc70fbbaeffe h1:P5Hx7sqHSdr+CYRwZO2ta9e9bA0xMu67ZW/j1iMCAQc=
+github.com/Edw590/sapi-go v0.0.0-20240607141120-fc70fbbaeffe/go.mod h1:GPHDFbc6TtX2iw0q9jXTn90UDI0rYqTQYSyXDQ4Y82w=
+github.com/Edw590/sapi-go v0.0.0-20240608081751-fbc7a0ae8919 h1:jAiy5qKX1KlvlC0JSDN2MwY3vubFHDgcbPXPfgV0cIE=
+github.com/Edw590/sapi-go v0.0.0-20240608081751-fbc7a0ae8919/go.mod h1:GPHDFbc6TtX2iw0q9jXTn90UDI0rYqTQYSyXDQ4Y82w=
+github.com/Edw590/sapi-go v0.0.0-20240608144041-371e96e43758 h1:u/V+/e8rRdg4pRlBJFb42tMidUFzDfFHLDFh6aV33wo=
+github.com/Edw590/sapi-go v0.0.0-20240608144041-371e96e43758/go.mod h1:GPHDFbc6TtX2iw0q9jXTn90UDI0rYqTQYSyXDQ4Y82w=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
@@ -210,6 +220,8 @@ github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORN
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
+github.com/lxn/win v0.0.0-20210218163916-a377121e959e h1:H+t6A/QJMbhCSEH5rAuRxh+CtW96g0Or0Fxa9IKr4uc=
+github.com/lxn/win v0.0.0-20210218163916-a377121e959e/go.mod h1:KxxjdtRkfNoYDCUP5ryK7XJJNTnpC8atvtmTheChOtk=
 github.com/magiconair/properties v1.8.5/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
@@ -438,6 +450,7 @@ golang.org/x/sys v0.0.0-20200523222454-059865788121/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20200803210538-64077c9b5642/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20201018230417-eeed37f84f13/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201201145000-ef89a241ccb3/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210104204734-6f8348627aad/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
