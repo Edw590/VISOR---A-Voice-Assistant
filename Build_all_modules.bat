@@ -2,8 +2,8 @@ cd bin
 
 :: Client-only modules, for Windows
 set GOOS=windows
-set GOARCH=386
-::go build -o VISOR.exe .\..\ - doesn't compile for 32 bits for some reason (but it's supported officially)
+set GOARCH=amd64
+go build -ldflags -H=windowsgui -o VISOR.exe .\..\
 go build -o MOD_1.exe .\..\Modules\MOD_1\
 go build -o MOD_3.exe .\..\Modules\MOD_3\
 
