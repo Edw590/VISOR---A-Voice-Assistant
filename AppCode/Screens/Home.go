@@ -28,11 +28,16 @@ import (
 	"image/color"
 )
 
-var home_canvas_object fyne.CanvasObject = nil
+// Current_screen_GL is the current app screen. It's currently used to let threads specific to each screen know if they
+// should continue processing data or not (they don't stop, they just keep waiting for the screen to become active again).
+var Current_screen_GL fyne.CanvasObject = nil
+
+var home_canvas_object_GL fyne.CanvasObject = nil
 
 func Home() fyne.CanvasObject {
-	if home_canvas_object != nil {
-		return home_canvas_object
+	Current_screen_GL = home_canvas_object_GL
+	if home_canvas_object_GL != nil {
+		return home_canvas_object_GL
 	}
 
 	var text *canvas.Text = canvas.NewText("V.I.S.O.R. Systems", color.RGBA{
@@ -58,7 +63,8 @@ func Home() fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(fyne.NewSize(550, 480))
 
-	home_canvas_object = main_scroll
+	home_canvas_object_GL = main_scroll
+	Current_screen_GL = home_canvas_object_GL
 
-	return home_canvas_object
+	return home_canvas_object_GL
 }

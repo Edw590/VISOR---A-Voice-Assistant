@@ -29,11 +29,12 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var dev_mode_canvas_object fyne.CanvasObject = nil
+var dev_mode_canvas_object_GL fyne.CanvasObject = nil
 
-func DevMode(my_app fyne.App, my_window fyne.Window) fyne.CanvasObject {
-	if dev_mode_canvas_object != nil {
-		return dev_mode_canvas_object
+func DevMode() fyne.CanvasObject {
+	Current_screen_GL = dev_mode_canvas_object_GL
+	if dev_mode_canvas_object_GL != nil {
+		return dev_mode_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +93,8 @@ func DevMode(my_app fyne.App, my_window fyne.Window) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(fyne.NewSize(550, 480))
 
-	dev_mode_canvas_object = main_scroll
+	dev_mode_canvas_object_GL = main_scroll
+	Current_screen_GL = dev_mode_canvas_object_GL
 
-	return dev_mode_canvas_object
+	return dev_mode_canvas_object_GL
 }

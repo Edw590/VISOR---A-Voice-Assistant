@@ -26,7 +26,7 @@ import (
 	"GPT/GPT"
 	"OIG/OIG"
 	"Utils"
-	"VISOR/ClientCode/Screens"
+	"VISOR/AppCode/Screens"
 	"VISOR/logo"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -63,7 +63,7 @@ func main() {
 			content_container.Refresh()
 		}),
 		widget.NewButton("Dev Mode", func() {
-			content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_app_GL, my_window)}
+			content_container.Objects = []fyne.CanvasObject{Screens.DevMode()}
 			content_container.Refresh()
 		}),
 		widget.NewButton("Communicator", func() {
@@ -84,14 +84,21 @@ func main() {
 	// Set the content of the window
 	my_window.SetContent(split)
 
+	var prev_screen fyne.CanvasObject = Screens.Current_screen_GL
 	// Add system tray functionality
 	if desk, ok := my_app_GL.(desktop.App); ok {
 		var icon *fyne.StaticResource = logo.LogoBlackGmail
 		var menu *fyne.Menu = fyne.NewMenu("Tray",
 			fyne.NewMenuItem("Show", func() {
+				// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
+				// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
+				// fixes whatever the problem is.
 				my_window.Hide()
 				my_window.Show()
 				my_window.RequestFocus()
+
+				// Restore the previous screen state
+				Screens.Current_screen_GL = prev_screen
 			}),
 		)
 		desk.SetSystemTrayMenu(menu)
@@ -100,6 +107,8 @@ func main() {
 
 	// Minimize to tray on close
 	my_window.SetCloseIntercept(func() {
+		// Store the previous screen before hiding
+		Screens.Current_screen_GL = nil
 		my_window.Hide()
 	})
 

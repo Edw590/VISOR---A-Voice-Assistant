@@ -29,11 +29,12 @@ import (
 	"time"
 )
 
-var communicator_canvas_object fyne.CanvasObject = nil
+var comm_canvas_object_GL fyne.CanvasObject = nil
 
 func Communicator() fyne.CanvasObject {
-	if communicator_canvas_object != nil {
-		return communicator_canvas_object
+	Current_screen_GL = comm_canvas_object_GL
+	if comm_canvas_object_GL != nil {
+		return comm_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +58,9 @@ func Communicator() fyne.CanvasObject {
 
 	go func() {
 		for {
-			response_text.SetText(GPT.GetEntry(-1))
+			if Current_screen_GL == comm_canvas_object_GL {
+				response_text.SetText(GPT.GetEntry(-1))
+			}
 
 			time.Sleep(1 * time.Second)
 		}
@@ -78,7 +81,8 @@ func Communicator() fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(fyne.NewSize(550, 480))
 
-	communicator_canvas_object = main_scroll
+	comm_canvas_object_GL = main_scroll
+	Current_screen_GL = comm_canvas_object_GL
 
-	return communicator_canvas_object
+	return comm_canvas_object_GL
 }
