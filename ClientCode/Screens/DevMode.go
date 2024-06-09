@@ -22,10 +22,10 @@
 package Screens
 
 import (
+	"SpeechQueue/SpeechQueue"
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -66,22 +66,13 @@ func DevMode(my_app fyne.App, my_window fyne.Window) fyne.CanvasObject {
 	entry_txt_to_speech.PlaceHolder = "Enter text to speak"
 	entry_txt_to_speech.Text = "This is an example."
 	var btn_speak_min *widget.Button = widget.NewButton("Speak (min priority)", func() {
-		Utils.QueueSpeechSPEECH(entry_txt_to_speech.Text, Utils.PRIORITY_LOW)
+		Utils.QueueSpeechSPEECH(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_LOW)
 	})
 	var btn_speak_high *widget.Button = widget.NewButton("Speak (high priority)", func() {
-		Utils.QueueSpeechSPEECH(entry_txt_to_speech.Text, Utils.PRIORITY_HIGH)
+		Utils.QueueSpeechSPEECH(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_HIGH)
 	})
 	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
 		Utils.SkipCurrentSpeechSPEECH()
-	})
-
-	//////////////////////////////////////////////////////////////////////////////////
-	// Entry and Button section
-	var entry_txt_to_send *widget.Entry = widget.NewEntry()
-	var btn_send_notif *widget.Button = widget.NewButton("Send Notification", func() {
-		notification := fyne.NewNotification("New Notification", entry_txt_to_send.Text)
-		my_app.SendNotification(notification)
-		dialog.ShowInformation("Notification Sent", "Notification sent successfully!", my_window)
 	})
 
 
@@ -96,8 +87,6 @@ func DevMode(my_app fyne.App, my_window fyne.Window) fyne.CanvasObject {
 		btn_speak_min,
 		btn_speak_high,
 		btn_skip_speech,
-		entry_txt_to_send,
-		btn_send_notif,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)

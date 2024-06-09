@@ -33,7 +33,11 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
+	"strings"
+	"time"
 )
+
+var my_app_GL fyne.App = nil
 
 func main() {
 	Utils.PersonalConsts_GL.Init()
@@ -41,9 +45,11 @@ func main() {
 	OIG.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 
 	// Create a new application
-	var my_app fyne.App = app.NewWithID("com.edw590.visor_c")
-	my_app.SetIcon(logo.LogoBlackGmail)
-	var my_window fyne.Window = my_app.NewWindow("V.I.S.O.R.")
+	my_app_GL = app.NewWithID("com.edw590.visor_c")
+	my_app_GL.SetIcon(logo.LogoBlackGmail)
+	var my_window fyne.Window = my_app_GL.NewWindow("V.I.S.O.R.")
+
+	processNotifications()
 
 
 	// Create the content area with a label to display different screens
@@ -57,7 +63,7 @@ func main() {
 			content_container.Refresh()
 		}),
 		widget.NewButton("Dev Mode", func() {
-			content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_app, my_window)}
+			content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_app_GL, my_window)}
 			content_container.Refresh()
 		}),
 		widget.NewButton("Communicator", func() {
@@ -79,7 +85,7 @@ func main() {
 	my_window.SetContent(split)
 
 	// Add system tray functionality
-	if desk, ok := my_app.(desktop.App); ok {
+	if desk, ok := my_app_GL.(desktop.App); ok {
 		var icon *fyne.StaticResource = logo.LogoBlackGmail
 		var menu *fyne.Menu = fyne.NewMenu("Tray",
 			fyne.NewMenuItem("Show", func() {
@@ -100,4 +106,28 @@ func main() {
 	// Show and run the application
 	my_window.Resize(fyne.NewSize(640, 480))
 	my_window.ShowAndRun()
+}
+
+/*
+processNotifications processes in a different thread the notifications queued in the notifications folder.
+ */
+func processNotifications() {
+	go func() {
+		for {
+			var file_list []Utils.FileInfo = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_VISOR).
+				Add2(true, Utils.NOTIFS_REL_FOLDER).GetFileList()
+			for _, file := range file_list {
+				// Display the notification
+				notification := fyne.NewNotification(strings.Split(file.Name, "-")[0], *file.GPath.ReadTextFile())
+				my_app_GL.SendNotification(notification)
+
+				// Remove the file
+				_ = file.GPath.Remove()
+
+				time.Sleep(5 * time.Second)
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
 }
