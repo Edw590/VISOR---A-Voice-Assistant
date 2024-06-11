@@ -2,39 +2,3 @@
 	path = Libraries/ACD
 	url = git@github.com:Edw590/VISOR-AdvancedCommandsDetection.git
 	branch = master
-[submodule "Utils"]
-	path = Utils
-	url = git@github.com:Edw590/VISOR-Utils.git
-	branch = main
-[submodule "Modules/MOD_4"]
-	path = Modules/MOD_4
-	url = git@github.com:Edw590/VISOR-RssFeedNotifier.git
-	branch = main
-[submodule "Modules/MOD_5"]
-	path = Modules/MOD_5
-	url = git@github.com:Edw590/VISOR-EmailSender.git
-	branch = main
-[submodule "Modules/MOD_2"]
-	path = Modules/MOD_2
-	url = git@github.com:Edw590/VISOR-SMARTChecker.git
-[submodule "Modules/MOD_6"]
-	path = Modules/MOD_6
-	url = git@github.com:Edw590/VISOR-OnlineInformationChecker.git
-[submodule "Libraries/OIG"]
-	path = Libraries/OIG
-	url = git@github.com:Edw590/VISOR-OnlineInformationGetter.git
-[submodule "Modules/MOD_8"]
-	path = Modules/MOD_8
-	url = git@github.com:Edw590/VISOR-WebsiteBackend.git
-[submodule "Modules/MOD_7"]
-	path = Modules/MOD_7
-	url = git@github.com:Edw590/VISOR-GPTCommunicator.git
-[submodule "Libraries/GPT"]
-	path = Libraries/GPT
-	url = git@github.com:Edw590/VISOR-GPT.git
-[submodule "Modules/MOD_1"]
-	path = Modules/MOD_1
-	url = git@github.com:Edw590/VISOR-ModulesManager.git
-[submodule "Modules/MOD_3"]
-	path = Modules/MOD_3
-	url = git@github.com:Edw590/VISOR-Speech.git
