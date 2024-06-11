@@ -1,0 +1,8 @@
+Website = "https://github.com/Edw590/VISOR---A-Virtual-Assistant"
+
+[Details]
+  Icon = "logo/logo_black_gmail.png"
+  Name = "V.I.S.O.R."
+  ID = "com.edw590.visor_c"
+  Version = "0.0.0"
+  Build = 4

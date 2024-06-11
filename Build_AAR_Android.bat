@@ -19,6 +19,8 @@ gomobile bind^
  "Utils/UtilsSWA"^
  "ACD/ACD"^
  "OIG/OIG"^
- "GPT/GPT"
+ "GPT/GPT"^
+ "Registry/Registry"^
+ "SpeechQueue/SpeechQueue"
 
 echo Error code: %ERRORLEVEL%

@@ -1,0 +1,8 @@
+{
+	"Disks_info": {
+		"DISK_SERIAL_HERE": {
+			"Label": "A label for the disk",
+			"Is_HDD": true // True if the disk is a HDD (the ones that have a disk spinning inside)
+		}
+	}
+}

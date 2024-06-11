@@ -3,10 +3,12 @@
 go 1.20
 
 use (
-	.
+	ClientCode
 	Libraries/ACD
 	Libraries/GPT
 	Libraries/OIG
+	Libraries/Registry
+	Libraries/SpeechQueue
 	Modules/MOD_1
 	Modules/MOD_2
 	Modules/MOD_3
@@ -15,5 +17,7 @@ use (
 	Modules/MOD_6
 	Modules/MOD_7
 	Modules/MOD_8
+	Modules/MOD_9
+	ServerCode
 	Utils
 )
