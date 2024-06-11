@@ -44,7 +44,7 @@ import (
 var my_app_GL fyne.App = nil
 
 func main() {
-	err := Utils.PersonalConsts_GL.Init()
+	err := Utils.PersonalConsts_GL.Init(false)
 	if err != nil {
 		log.Fatal("CRITICAL ERROR: " + Utils.GetFullErrorMsgGENERAL(err))
 	}

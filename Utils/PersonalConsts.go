@@ -32,7 +32,6 @@ var PersonalConsts_GL PersonalConsts = PersonalConsts{}
 // _PersonalConstsEOG is the internal struct with the format of the PersonalConsts_EOG.json file.
 type _PersonalConstsEOG struct {
 	VISOR_DIR string
-	VISOR_SERVER bool
 
 	VISOR_EMAIL_ADDR string
 	VISOR_EMAIL_PW string
@@ -70,7 +69,7 @@ type PersonalConsts struct {
 /*
 Init is the function that initializes the global variables of the PersonalConsts struct.
 */
-func (personalConsts *PersonalConsts) Init() error {
+func (personalConsts *PersonalConsts) Init(server bool) error {
 	const PERSONAL_CONSTS_FILE string = "PersonalConsts_EOG.json"
 
 	bytes, err := os.ReadFile(PERSONAL_CONSTS_FILE)
@@ -90,7 +89,7 @@ func (personalConsts *PersonalConsts) Init() error {
 	// Set the global variables
 
 	personalConsts._VISOR_DIR = PathFILESDIRS(true, "", struct_file_format.VISOR_DIR)
-	personalConsts.VISOR_SERVER = struct_file_format.VISOR_SERVER
+	personalConsts.VISOR_SERVER = server
 
 	personalConsts._VISOR_EMAIL_ADDR = struct_file_format.VISOR_EMAIL_ADDR
 	personalConsts._VISOR_EMAIL_PW = struct_file_format.VISOR_EMAIL_PW

@@ -45,7 +45,7 @@ func main() {
 	log.Println("------------------")
 	log.Println()
 
-	err := Utils.PersonalConsts_GL.Init()
+	err := Utils.PersonalConsts_GL.Init(true)
 	if err != nil {
 		log.Fatal("CRITICAL ERROR: " + Utils.GetFullErrorMsgGENERAL(err))
 	}
