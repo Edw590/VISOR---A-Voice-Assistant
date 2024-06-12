@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -65,9 +65,6 @@ func init() {realMain =
 
 			var last_file_sent emailSent
 			for len(files_to_send) > 0 {
-				// No mega fast email spamming - don't want the account blocked.
-				time.Sleep(1 * time.Second)
-
 				file_to_send, idx_to_remove := Utils.GetOldestFileFILESDIRS(files_to_send)
 				if *file_to_send.GPath.ReadTextFile() == last_file_sent.email && time.Now().Unix() - last_file_sent.time_s < 60 {
 					// Don't send the same email twice or more in a row.
@@ -113,6 +110,11 @@ func init() {realMain =
 					//	strconv.Itoa(_MAX_EMAILS_HOUR) + "). Waiting for the next hour...")
 
 					goto end_loop
+				}
+
+				// No mega fast email spamming - don't want the account blocked.
+				if Utils.WaitWithStop(module_stop, 1) {
+					return
 				}
 			}
 
