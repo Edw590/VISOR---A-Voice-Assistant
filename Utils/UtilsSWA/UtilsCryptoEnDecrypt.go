@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -91,7 +91,7 @@ const _SCRYPT_P int = 1
 
 
 
-// TODO: IMPLEMENT TIME-CONSTANT PREVENTIONS!!!! Check the other todo
+// TODO: IMPLEMENT TIME-CONSTANT PREVENTIONS!!!!
 
 
 
