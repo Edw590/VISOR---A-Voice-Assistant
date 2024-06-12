@@ -1,0 +1,9 @@
+[Unit]
+Description=V.I.S.O.R.
+[Service]
+User=root
+WorkingDirectory=/home/edw590/VISOR/bin
+ExecStart=/home/edw590/VISOR/bin/VISOR_linux --nostatus
+Restart=always
+[Install]
+WantedBy=multi-user.target
