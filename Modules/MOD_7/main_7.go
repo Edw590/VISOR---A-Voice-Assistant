@@ -106,7 +106,7 @@ func init() {realMain =
 		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llamacpp -m /home/edw590/llamacpp_models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf " +
-			"--no-mmap --in-suffix [3234_START] --color --instruct --ctx-size 1024 --temp 0.2 --prompt \"" +
+			"--in-suffix [3234_START] --color --instruct --ctx-size 1024 --temp 0.2 --mlock --no-mmap --prompt \"" +
 			config_str + "\"\n")
 		_, _ = writer.WriteString("hello\n")
 		_ = writer.Flush()
