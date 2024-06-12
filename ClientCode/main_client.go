@@ -61,7 +61,9 @@ func main() {
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		if !isOpenGLSupport() {
-			log.Fatal("openGL not supported - exiting")
+			log.Println("Required OpenGL version not supported. Exiting...")
+
+			return
 		}
 
 		// All mainly alright, let's hide the terminal window
