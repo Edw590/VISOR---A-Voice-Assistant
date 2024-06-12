@@ -217,9 +217,7 @@ func ModStartup[T any](mod_num int, realMain RealMain, module *Module) {
 		}
 	}()
 
-	if module.Num == NUM_MOD_VISOR {
-		// Don't run in another thread if it's the main program - it must be run on the main thread.
-
+	var to_do func() = func() {
 		module.Stopped = false
 
 		Tcef.Tcef{
@@ -239,27 +237,14 @@ func ModStartup[T any](mod_num int, realMain RealMain, module *Module) {
 		}.Do()
 
 		module.Stopped = true
+	}
+
+	if module.Num == NUM_MOD_VISOR {
+		// Don't run in another thread if it's the main program - it must be run on the main thread.
+		to_do()
 	} else {
 		go func() {
-			module.Stopped = false
-
-			Tcef.Tcef{
-				Try: func() {
-					// Execute realMain()
-					realMain(&module.Stop, moduleInfo)
-				},
-				Catch: func(e Tcef.Exception) {
-					var str_error string = GetFullErrorMsgGENERAL(e)
-
-					// Print the error and send an email with it
-					log.Println(str_error)
-					if err := SendModErrorEmailMODULES(mod_num, str_error); nil != err {
-						log.Println("Error sending email with error:\n" + GetFullErrorMsgGENERAL(err) + "\n-----\n" + str_error)
-					}
-				},
-			}.Do()
-
-			module.Stopped = true
+			to_do()
 		}()
 	}
 }
