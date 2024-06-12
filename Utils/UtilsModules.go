@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -655,12 +655,14 @@ SignalModulesStopMODULES signals all the modules to stop and waits for them to s
 func SignalModulesStopMODULES(modules []Module) {
 	// Stop the modules gracefully before forcing an exit and wait for them to stop
 	for {
-		for i := 0; i < MODS_ARRAY_SIZE; i++ {
+		// Begin with the Manager (i := 1). VISOR doesn't count - of course it's running, else we wouldn't be here.
+
+		for i := 1; i < MODS_ARRAY_SIZE; i++ {
 			modules[i].Stop = true
 		}
 
 		var all_stopped bool = true
-		for i := 0; i < MODS_ARRAY_SIZE; i++ {
+		for i := 1; i < MODS_ARRAY_SIZE; i++ {
 			if !modules[i].Stopped {
 				all_stopped = false
 

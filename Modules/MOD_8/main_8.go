@@ -24,7 +24,6 @@ package MOD_8
 import (
 	"Utils"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -46,7 +45,7 @@ func init() {realMain =
 			if srv_GL == nil {
 				http.HandleFunc("/submit-form", formHandler)
 
-				log.Println("Server running on port 8080")
+				//log.Println("Server running on port 8080")
 				srv_GL = &http.Server{Addr: ":8080"}
 				_ = srv_GL.ListenAndServe()
 				srv_GL = nil
