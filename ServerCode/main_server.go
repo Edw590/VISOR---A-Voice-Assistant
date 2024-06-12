@@ -39,17 +39,6 @@ var (
 	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
 )
 func main() {
-	log.Println("//------------------------------------------\\\\")
-	log.Println("--- Server version ---")
-	log.Println("V.I.S.O.R. Systems")
-	log.Println("------------------")
-	log.Println()
-
-	err := Utils.PersonalConsts_GL.Init(true)
-	if err != nil {
-		log.Fatal("CRITICAL ERROR: " + Utils.GetFullErrorMsgGENERAL(err))
-	}
-
 	var module Utils.Module = Utils.Module{
 		Num:     Utils.NUM_MOD_VISOR,
 		Name:    Utils.GetModNameMODULES(Utils.NUM_MOD_VISOR),
@@ -57,7 +46,7 @@ func main() {
 		Stopped: false,
 		Enabled: true,
 	}
-	Utils.ModStartup[_MGIModSpecInfo](Utils.NUM_MOD_VISOR, realMain, &module)
+	Utils.ModStartup2[_MGIModSpecInfo](realMain, &module, true)
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
@@ -100,11 +89,6 @@ func init() {realMain =
 		}
 
 		Utils.SignalModulesStopMODULES(modules)
-
-		log.Println()
-		log.Println("---------")
-		log.Println("Exiting V.I.S.O.R. normally...")
-		log.Println("\\\\------------------------------------------//")
 
 		return
 	}

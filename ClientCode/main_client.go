@@ -43,125 +43,134 @@ import (
 
 var my_app_GL fyne.App = nil
 
+type _MGIModSpecInfo any
+var (
+	realMain        Utils.RealMain = nil
+	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
+)
 func main() {
-	err := Utils.PersonalConsts_GL.Init(false)
-	if err != nil {
-		log.Fatal("CRITICAL ERROR: " + Utils.GetFullErrorMsgGENERAL(err))
+	var module Utils.Module = Utils.Module{
+		Num:     Utils.NUM_MOD_VISOR,
+		Name:    Utils.GetModNameMODULES(Utils.NUM_MOD_VISOR),
+		Stop:    false,
+		Stopped: false,
+		Enabled: true,
 	}
+	Utils.ModStartup2[_MGIModSpecInfo](realMain, &module, false)
+}
+func init() {realMain =
+	func(module_stop *bool, moduleInfo_any any) {
+		if !isOpenGLSupport() {
+			log.Fatal("openGL not supported - exiting")
+		}
 
-	// Client stuff
-	if !isOpenGLSupport() {
-		log.Fatal("openGL not supported - exiting")
-	}
-
-	// All mainly alright, let's hide the terminal window
-	if runtime.GOOS == "windows" {
-		if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
-			// Restart the process with conhost.exe on Windows to be able to actually hide the window
-			if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, "VISOR.exe"), "--conhost") {
-				return
+		// All mainly alright, let's hide the terminal window
+		if runtime.GOOS == "windows" {
+			if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
+				// Restart the process with conhost.exe on Windows to be able to actually hide the window
+				if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, "VISOR.exe"), "--conhost") {
+					return
+				}
 			}
 		}
-	}
-	Utils.HideConsoleWindowPROCESSES()
+		Utils.HideConsoleWindowPROCESSES()
 
-	//////////////////////////////////////////
-	// No terminal window from here on
+		//////////////////////////////////////////
+		// No terminal window from here on
 
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
-	OIG.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
+		GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
+		OIG.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 
-	var modules []Utils.Module
-	for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
-		modules = append(modules, Utils.Module{
-			Num:     i,
-			Name:    Utils.GetModNameMODULES(i),
-			Stop:    true,
-			Stopped: true,
-			Enabled: true,
-		})
-	}
-	// The Manager needs to be started first. It'll handle the others.
-	modules[Utils.NUM_MOD_ModManager].Stop = false
+		var modules []Utils.Module
+		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
+			modules = append(modules, Utils.Module{
+				Num:     i,
+				Name:    Utils.GetModNameMODULES(i),
+				Stop:    true,
+				Stopped: true,
+				Enabled: true,
+			})
+		}
+		// The Manager needs to be started first. It'll handle the others.
+		modules[Utils.NUM_MOD_ModManager].Stop = false
 
-	MOD_1.Start(modules)
+		MOD_1.Start(modules)
 
-	// Create a new application
-	my_app_GL = app.NewWithID("com.edw590.visor_c")
-	my_app_GL.SetIcon(Logo.LogoBlackGmail)
-	var my_window fyne.Window = my_app_GL.NewWindow("V.I.S.O.R.")
+		// Create a new application
+		my_app_GL = app.NewWithID("com.edw590.visor_c")
+		my_app_GL.SetIcon(Logo.LogoBlackGmail)
+		var my_window fyne.Window = my_app_GL.NewWindow("V.I.S.O.R.")
 
-	processNotifications()
+		processNotifications()
 
+		// Create the content area with a label to display different screens
+		var content_label *widget.Label = widget.NewLabel("Welcome!")
+		var content_container *fyne.Container = container.NewVBox(content_label)
 
-	// Create the content area with a label to display different screens
-	var content_label *widget.Label = widget.NewLabel("Welcome!")
-	var content_container *fyne.Container = container.NewVBox(content_label)
-
-	// Create the navigation bar
-	var nav_bar *fyne.Container = container.NewVBox(
-		widget.NewButton("Home", func() {
-			content_container.Objects = []fyne.CanvasObject{Screens.Home()}
-			content_container.Refresh()
-		}),
-		widget.NewButton("Dev Mode", func() {
-			content_container.Objects = []fyne.CanvasObject{Screens.DevMode()}
-			content_container.Refresh()
-		}),
-		widget.NewButton("Communicator", func() {
-			content_container.Objects = []fyne.CanvasObject{Screens.Communicator()}
-			content_container.Refresh()
-		}),
-		widget.NewButton("Modules Status", func() {
-			content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
-			content_container.Refresh()
-		}),
-	)
-
-
-	// Create a split container to hold the navigation bar and the content
-	var split *container.Split = container.NewHSplit(nav_bar, content_container)
-	split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
-
-	// Set the content of the window
-	my_window.SetContent(split)
-
-	var prev_screen fyne.CanvasObject = Screens.Current_screen_GL
-	// Add system tray functionality
-	if desk, ok := my_app_GL.(desktop.App); ok {
-		var icon *fyne.StaticResource = Logo.LogoBlackGmail
-		var menu *fyne.Menu = fyne.NewMenu("Tray",
-			fyne.NewMenuItem("Show", func() {
-				// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
-				// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
-				// fixes whatever the problem is.
-				my_window.Hide()
-				my_window.Show()
-				my_window.RequestFocus()
-
-				// Restore the previous screen state
-				Screens.Current_screen_GL = prev_screen
+		// Create the navigation bar
+		var nav_bar *fyne.Container = container.NewVBox(
+			widget.NewButton("Home", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Home()}
+				content_container.Refresh()
 			}),
-			fyne.NewMenuItem("Quit", func() {
-				Utils.SignalModulesStopMODULES(modules)
-
-				my_app_GL.Quit()
+			widget.NewButton("Dev Mode", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.DevMode()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Communicator", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Communicator()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Modules Status", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
+				content_container.Refresh()
 			}),
 		)
-		desk.SetSystemTrayMenu(menu)
-		desk.SetSystemTrayIcon(icon)
+
+		// Create a split container to hold the navigation bar and the content
+		var split *container.Split = container.NewHSplit(nav_bar, content_container)
+		split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
+
+		// Set the content of the window
+		my_window.SetContent(split)
+
+		var prev_screen fyne.CanvasObject = Screens.Current_screen_GL
+		// Add system tray functionality
+		if desk, ok := my_app_GL.(desktop.App); ok {
+			var icon *fyne.StaticResource = Logo.LogoBlackGmail
+			var menu *fyne.Menu = fyne.NewMenu("Tray",
+				fyne.NewMenuItem("Show", func() {
+					// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
+					// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
+					// fixes whatever the problem is.
+					my_window.Hide()
+					my_window.Show()
+					my_window.RequestFocus()
+
+					// Restore the previous screen state
+					Screens.Current_screen_GL = prev_screen
+				}),
+				fyne.NewMenuItem("Quit", func() {
+					Utils.SignalModulesStopMODULES(modules)
+
+					my_app_GL.Quit()
+				}),
+			)
+			desk.SetSystemTrayMenu(menu)
+			desk.SetSystemTrayIcon(icon)
+		}
+
+		// Minimize to tray on close
+		my_window.SetCloseIntercept(func() {
+			// Store the previous screen before hiding
+			Screens.Current_screen_GL = nil
+			my_window.Hide()
+		})
+
+		// Show and run the application
+		my_window.Resize(fyne.NewSize(640, 480))
+		my_window.ShowAndRun()
 	}
-
-	// Minimize to tray on close
-	my_window.SetCloseIntercept(func() {
-		// Store the previous screen before hiding
-		Screens.Current_screen_GL = nil
-		my_window.Hide()
-	})
-
-	// Show and run the application
-	my_window.Resize(fyne.NewSize(640, 480))
-	my_window.ShowAndRun()
 }
 
 /*

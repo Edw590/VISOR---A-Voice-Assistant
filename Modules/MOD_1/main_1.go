@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -55,9 +55,13 @@ var (
 	realMain Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo[_MGIModSpecInfo]
 )
-func Start(modules []Utils.Module) {realMain =
+func Start(modules []Utils.Module) {
+	modules_GL = modules
+	Utils.ModStartup[_MGIModSpecInfo](realMain, &modules_GL[Utils.NUM_MOD_ModManager])
+}
+func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
+		//moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
 		// Check all modules' support and put on a list to later warn if there were changes of support or not.
 		var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
@@ -102,14 +106,14 @@ func Start(modules []Utils.Module) {realMain =
 				//log.Println("-----------------------")
 				//log.Println("Module " + mod_name + " is supported: " + strconv.FormatBool(module_supported))
 				//log.Println("Module " + mod_name + " is running: " + strconv.FormatBool(isModRunning(mod_num)))
-				//log.Println("Module " + mod_name + " is enabled: " + strconv.FormatBool(modules[mod_num].Enabled))
+				//log.Println("Module " + mod_name + " is enabled: " + strconv.FormatBool(modules_GL[mod_num].Enabled))
 
 				if module_supported {
-					if !isModRunning(mod_num) && modules[mod_num].Enabled {
+					if !isModRunning(mod_num) && modules_GL[mod_num].Enabled {
 						//log.Println("Starting module: " + mod_name)
 
 						modules_to_start[mod_num] = true
-					} else if isModRunning(mod_num) && !modules[mod_num].Enabled {
+					} else if isModRunning(mod_num) && !modules_GL[mod_num].Enabled {
 						//log.Println("Stopping module: " + mod_name)
 
 						modules_to_stop[mod_num] = true
@@ -125,11 +129,11 @@ func Start(modules []Utils.Module) {realMain =
 
 			// Start the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
-				if modules_to_start[mod_num] && modules[mod_num].Enabled {
-					modules[mod_num].Stop = false
+				if modules_to_start[mod_num] && modules_GL[mod_num].Enabled {
+					modules_GL[mod_num].Stop = false
 					var start_func = _MAP_MOD_NUM_START[mod_num]
 					if start_func != nil {
-						start_func(&modules[mod_num])
+						start_func(&modules_GL[mod_num])
 					}
 				}
 			}
@@ -137,7 +141,7 @@ func Start(modules []Utils.Module) {realMain =
 			// Stop the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_stop[mod_num] {
-					modules[mod_num].Stop = true
+					modules_GL[mod_num].Stop = true
 				}
 			}
 
@@ -148,9 +152,6 @@ func Start(modules []Utils.Module) {realMain =
 			}
 		}
 	}
-
-	modules_GL = modules
-	Utils.ModStartup[_MGIModSpecInfo](Utils.NUM_MOD_ModManager, realMain, &modules[Utils.NUM_MOD_ModManager])
 }
 
 func isModRunning(mod_num int) bool {

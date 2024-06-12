@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -43,7 +43,7 @@ var (
 	realMain        Utils.RealMain = nil
 	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](Utils.NUM_MOD_SMARTChecker, realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module) }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
