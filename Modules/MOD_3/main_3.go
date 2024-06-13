@@ -84,7 +84,7 @@ func init() {realMain =
 				// Speak too if there was an error getting the mute status (maybe it's not muted, who knows), if the
 				// speech is critical, or if the speech is set to always notify.
 				var speak bool = err_muted != nil || curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL ||
-					(curr_speech.GetMode()&SpeechQueue.MODE1_ALWAYS_NOTIFY != 0)
+					(curr_speech.GetMode() & SpeechQueue.MODE1_ALWAYS_NOTIFY != 0)
 
 				var speech_mode int32 = curr_speech.GetMode()
 				var speech_priority int32 = curr_speech.GetPriority()
@@ -93,9 +93,9 @@ func init() {realMain =
 				if speech_priority == SpeechQueue.PRIORITY_CRITICAL {
 					notify = true
 				} else {
-					if speech_mode&SpeechQueue.MODE1_ALWAYS_NOTIFY != 0 {
+					if speech_mode & SpeechQueue.MODE1_ALWAYS_NOTIFY != 0 {
 						notify = true
-					} else if speech_mode&SpeechQueue.MODE1_NO_NOTIF == 0 {
+					} else if speech_mode & SpeechQueue.MODE1_NO_NOTIF == 0 {
 						// If it's not to not notify, notify if he can't speak
 						if was_muted {
 							notify = true
@@ -117,45 +117,41 @@ func init() {realMain =
 					SpeechQueue.RemoveSpeech(curr_speech.GetID())
 				}
 
-				if !speak {
-					curr_speech = nil
-
-					continue
-				}
-
-				old_volume, err := volume.GetVolume()
-				if err != nil {
-					old_volume = -1
-				}
-				if curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
-					_ = volume.SetVolume(100)
-					if curr_speech.GetMode()&SpeechQueue.MODE2_BYPASS_NO_SND != 0 {
-						_ = volume.Unmute()
+				if speak {
+					old_volume, err := volume.GetVolume()
+					if err != nil {
+						old_volume = -1
 					}
-				} else {
-					if old_volume < 50 {
-						_ = volume.SetVolume(50)
-					}
-				}
-				if err = tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err == nil {
-					if old_volume != -1 {
-						_ = volume.SetVolume(old_volume)
-					}
-					if was_muted {
-						_ = volume.Mute()
-					}
-
-					if !higher_priority_came {
-						//log.Println("Speech spoken successfully.")
-
-						SpeechQueue.RemoveSpeech(curr_speech.GetID())
+					if curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
+						_ = volume.SetVolume(100)
+						if curr_speech.GetMode()&SpeechQueue.MODE2_BYPASS_NO_SND != 0 {
+							_ = volume.Unmute()
+						}
 					} else {
-						//log.Println("Speech interrupted successfully.")
-
-						higher_priority_came = false
+						if old_volume < 50 {
+							_ = volume.SetVolume(50)
+						}
 					}
-				} else {
-					//log.Println("Error speaking speech: ", err)
+					if err = tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err == nil {
+						if old_volume != -1 {
+							_ = volume.SetVolume(old_volume)
+						}
+						if was_muted {
+							_ = volume.Mute()
+						}
+
+						if !higher_priority_came {
+							//log.Println("Speech spoken successfully.")
+
+							SpeechQueue.RemoveSpeech(curr_speech.GetID())
+						} else {
+							//log.Println("Speech interrupted successfully.")
+
+							higher_priority_came = false
+						}
+					} else {
+						//log.Println("Error speaking speech: ", err)
+					}
 				}
 
 				curr_speech = nil

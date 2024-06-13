@@ -59,7 +59,7 @@ func Communicator() fyne.CanvasObject {
 	go func() {
 		for {
 			if Current_screen_GL == comm_canvas_object_GL {
-				response_text.SetText(GPT.GetEntry(-1))
+				response_text.SetText(GPT.GetTextFromEntry(GPT.GetEntry(-1)))
 			}
 
 			time.Sleep(1 * time.Second)
