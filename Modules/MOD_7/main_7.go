@@ -67,7 +67,12 @@ func init() {realMain =
 			var writing bool = true
 			for {
 				var one_byte []byte = make([]byte, 1)
-				_, _ = buf.Read(one_byte)
+				n, _ := buf.Read(one_byte)
+				if n == 0 {
+					// End of the stream (pipe closed by the main module thread)
+
+					return
+				}
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
@@ -146,6 +151,7 @@ func init() {realMain =
 
 				if shut_down {
 					forceStopLlama()
+					_ = stdout.Close()
 
 					return
 				}
@@ -153,6 +159,7 @@ func init() {realMain =
 
 			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
 				forceStopLlama()
+				_ = stdout.Close()
 
 				return
 			}
