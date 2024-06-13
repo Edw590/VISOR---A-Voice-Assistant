@@ -23,14 +23,13 @@ package Utils
 
 import (
 	"errors"
+	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/shirou/gopsutil/v4/process"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-
-	"Utils/Tcef"
 )
 
 const (

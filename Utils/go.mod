@@ -12,4 +12,7 @@ require (
 	golang.org/x/sys v0.20.0
 )
 
-require golang.org/x/text v0.15.0 // indirect
+require (
+	github.com/Edw590/TryCatch-go v0.0.0-20240613114733-8e01c7b01734 // indirect
+	golang.org/x/text v0.15.0 // indirect
+)
