@@ -93,6 +93,9 @@ func init() {realMain =
 				Enabled: true,
 			})
 		}
+		// Just for it to print that VISOR is running
+		modules[Utils.NUM_MOD_VISOR].Stop = false
+		modules[Utils.NUM_MOD_VISOR].Stopped = false
 		// The Manager needs to be started first. It'll handle the others.
 		modules[Utils.NUM_MOD_ModManager].Stop = false
 
