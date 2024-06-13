@@ -37,7 +37,6 @@ const VOLUME int = 100
 const _TIME_SLEEP_S int = 1
 
 var tts_GL *sapi.Sapi = nil
-var curr_speech_GL *SpeechQueue.Speech = nil
 
 type _MGIModSpecInfo any
 var (
@@ -61,104 +60,105 @@ func init() {realMain =
 
 		//log.Println("Waiting for speeches to speak...")
 
+		var curr_speech *SpeechQueue.Speech = nil
 		var higher_priority_came bool = false
+		var speeches_ch chan *SpeechQueue.Speech = make(chan *SpeechQueue.Speech)
+		var kill_ch chan bool = make(chan bool)
 		go func() {
 			for {
-				// FIXME This thread keeps running even after the module stopping. Because this blocks here!
-				//  Use timers again instead of channels...
-				if curr_speech_GL != nil {
-					//log.Println("Speaking speech with priority " + strconv.Itoa(int(speech.GetPriority())) + " and ID " +
-					//	speech.GetID()[:10] + "(...)...")
+				select {
+					case curr_speech = <-speeches_ch:
+					case <-kill_ch:
+						return
+				}
 
-					was_muted, err_muted := volume.GetMuted()
-					if err_muted != nil {
-						// If there was an error getting the mute status, assume it was muted
-						was_muted = true
-					}
+				//log.Println("Speaking speech with priority " + strconv.Itoa(int(curr_speech.GetPriority())) + " and ID " +
+				//	curr_speech.GetID()[:10] + "(...)...")
 
-					// Speak too if there was an error getting the mute status (maybe it's not muted, who knows), if the
-					// speech is critical, or if the speech is set to always notify.
-					var speak bool = err_muted != nil || curr_speech_GL.GetPriority() == SpeechQueue.PRIORITY_CRITICAL ||
-						(curr_speech_GL.GetMode()&SpeechQueue.MODE1_ALWAYS_NOTIFY != 0)
+				was_muted, err_muted := volume.GetMuted()
+				if err_muted != nil {
+					// If there was an error getting the mute status, assume it was muted
+					was_muted = true
+				}
 
-					var speech_mode int32 = curr_speech_GL.GetMode()
-					var speech_priority int32 = curr_speech_GL.GetPriority()
+				// Speak too if there was an error getting the mute status (maybe it's not muted, who knows), if the
+				// speech is critical, or if the speech is set to always notify.
+				var speak bool = err_muted != nil || curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL ||
+					(curr_speech.GetMode()&SpeechQueue.MODE1_ALWAYS_NOTIFY != 0)
 
-					var notify bool = false
-					if speech_priority == SpeechQueue.PRIORITY_CRITICAL {
+				var speech_mode int32 = curr_speech.GetMode()
+				var speech_priority int32 = curr_speech.GetPriority()
+
+				var notify bool = false
+				if speech_priority == SpeechQueue.PRIORITY_CRITICAL {
+					notify = true
+				} else {
+					if speech_mode&SpeechQueue.MODE1_ALWAYS_NOTIFY != 0 {
 						notify = true
-					} else {
-						if speech_mode&SpeechQueue.MODE1_ALWAYS_NOTIFY != 0 {
-							notify = true
-						} else if speech_mode&SpeechQueue.MODE1_NO_NOTIF == 0 {
-							// If it's not to not notify, notify if he can't speak
-							if was_muted {
-								notify = true
-							}
-						}
-					}
-
-					if !was_muted || err_muted != nil || curr_speech_GL.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
-						speak = true
-					}
-
-					if notify {
-						Utils.QueueNotificationNOTIFS("Speeches", curr_speech_GL.GetText())
-
-						//log.Println("Speech notified.")
-
-						// Remove the speech. This means if he can't speak it in case it's to also speak, he won't retry.
-						// But it's notified, so shouldn't be a problem I guess.
-						SpeechQueue.RemoveSpeech(curr_speech_GL.GetID())
-					}
-
-					if !speak {
-						curr_speech_GL = nil
-
-						continue
-					}
-
-					old_volume, err := volume.GetVolume()
-					if err != nil {
-						old_volume = -1
-					}
-					if curr_speech_GL.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
-						_ = volume.SetVolume(100)
-						if curr_speech_GL.GetMode()&SpeechQueue.MODE2_BYPASS_NO_SND != 0 {
-							_ = volume.Unmute()
-						}
-					} else {
-						if old_volume < 50 {
-							_ = volume.SetVolume(50)
-						}
-					}
-					if err = tts_GL.Speak(curr_speech_GL.GetText(), sapi.SVSFDefault); err == nil {
-						if old_volume != -1 {
-							_ = volume.SetVolume(old_volume)
-						}
+					} else if speech_mode&SpeechQueue.MODE1_NO_NOTIF == 0 {
+						// If it's not to not notify, notify if he can't speak
 						if was_muted {
-							_ = volume.Mute()
+							notify = true
 						}
+					}
+				}
 
-						if !higher_priority_came {
-							//log.Println("Speech spoken successfully.")
+				if !was_muted || err_muted != nil || curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
+					speak = true
+				}
 
-							SpeechQueue.RemoveSpeech(curr_speech_GL.GetID())
-						} else {
-							//log.Println("Speech interrupted successfully.")
+				if notify {
+					Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
 
-							higher_priority_came = false
-						}
-					} else {
-						//log.Println("Error speaking speech: ", err)
+					//log.Println("Speech notified.")
+
+					// Remove the speech. This means if he can't speak it in case it's to also speak, he won't retry.
+					// But it's notified, so shouldn't be a problem I guess.
+					SpeechQueue.RemoveSpeech(curr_speech.GetID())
+				}
+
+				if !speak {
+					curr_speech = nil
+
+					continue
+				}
+
+				old_volume, err := volume.GetVolume()
+				if err != nil {
+					old_volume = -1
+				}
+				if curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
+					_ = volume.SetVolume(100)
+					if curr_speech.GetMode()&SpeechQueue.MODE2_BYPASS_NO_SND != 0 {
+						_ = volume.Unmute()
+					}
+				} else {
+					if old_volume < 50 {
+						_ = volume.SetVolume(50)
+					}
+				}
+				if err = tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err == nil {
+					if old_volume != -1 {
+						_ = volume.SetVolume(old_volume)
+					}
+					if was_muted {
+						_ = volume.Mute()
 					}
 
-					curr_speech_GL = nil
+					if !higher_priority_came {
+						//log.Println("Speech spoken successfully.")
+
+						SpeechQueue.RemoveSpeech(curr_speech.GetID())
+					} else {
+						//log.Println("Speech interrupted successfully.")
+
+						higher_priority_came = false
+					}
+				} else {
+					//log.Println("Error speaking speech: ", err)
 				}
 
-				if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
-					return
-				}
+				curr_speech = nil
 			}
 		}()
 
@@ -169,16 +169,16 @@ func init() {realMain =
 					continue
 				}
 
-				if curr_speech_GL == nil {
-					curr_speech_GL = speech
+				if curr_speech == nil {
+					speeches_ch <- speech
 
 					break
-				} else if speech.GetPriority() > curr_speech_GL.GetPriority() {
-					var old_speech *SpeechQueue.Speech = curr_speech_GL
+				} else if speech.GetPriority() > curr_speech.GetPriority() {
+					var old_speech *SpeechQueue.Speech = curr_speech
 					if stopTts(tts_GL) {
 						higher_priority_came = true
 						old_speech.RephraseInterrSpeech()
-						curr_speech_GL = speech
+						speeches_ch <- speech
 					}
 
 					break
@@ -186,6 +186,8 @@ func init() {realMain =
 			}
 
 			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+				kill_ch <- true
+
 				return
 			}
 		}
@@ -198,24 +200,6 @@ func QueueSpeech(to_speak string, priority int32, mode int32) {
 
 func SkipCurrentSpeech() bool {
 	return stopTts(tts_GL)
-}
-
-/*
-checkSkipSpeech checks if the current speech should be skipped.
-
------------------------------------------------------------
-
-– Returns:
-  - true if the current speech should be skipped, false otherwise
- */
-func checkSkipSpeech() bool {
-	if moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "SKIP").Exists() {
-		_ = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "SKIP").Remove()
-
-		return true
-	}
-
-	return false
 }
 
 func stopTts(tts *sapi.Sapi) bool {
