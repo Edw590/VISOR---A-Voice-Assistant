@@ -43,16 +43,21 @@ func ModulesStatus(modules []Utils.Module) fyne.CanvasObject {
 	var module_status *widget.Label = widget.NewLabel("")
 	module_status.Wrapping = fyne.TextWrapWord // Enable text wrapping
 	var scroll_text *container.Scroll = container.NewVScroll(module_status)
-	scroll_text.SetMinSize(fyne.NewSize(300, 400)) // Set the minimum size for the scroll container
+	scroll_text.SetMinSize(module_status.MinSize()) // Set the minimum size for the scroll container
 
 	go func() {
 		for {
 			if Current_screen_GL == module_status_canvas_object_GL {
 				var text string = ""
 				for i, module := range modules {
-					text += "- " + Utils.GetModNameMODULES(i) + " running: " + strconv.FormatBool(!module.Stopped) + "\n\n"
+					if Utils.MOD_NUMS_SUPPORT[i] & Utils.MOD_CLIENT != 0 {
+						text += "- " + Utils.GetModNameMODULES(i) + " running: " + strconv.FormatBool(!module.Stopped) +
+							"\n\n"
+					}
 				}
+				text = text[:len(text)-2] // Remove the last 2 newlines
 				module_status.SetText(text)
+				scroll_text.SetMinSize(module_status.MinSize())
 			}
 
 			time.Sleep(1 * time.Second)
@@ -96,31 +101,12 @@ func getCheckBoxes(modules []Utils.Module) []fyne.CanvasObject {
 
 	// Couldn't do it automatically. So here they are manually...
 
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_SMARTChecker), func(b bool) {
-		modules[Utils.NUM_MOD_SMARTChecker].Enabled = b
-	}))
 	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_Speech), func(b bool) {
 		modules[Utils.NUM_MOD_Speech].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_RssFeedNotifier), func(b bool) {
-		modules[Utils.NUM_MOD_RssFeedNotifier].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_EmailSender), func(b bool) {
-		modules[Utils.NUM_MOD_EmailSender].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_OnlineInfoChk), func(b bool) {
-		modules[Utils.NUM_MOD_OnlineInfoChk].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_GPTCommunicator), func(b bool) {
-		modules[Utils.NUM_MOD_GPTCommunicator].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_WebsiteBackend), func(b bool) {
-		modules[Utils.NUM_MOD_WebsiteBackend].Enabled = b
 	}))
 	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_UserLocator), func(b bool) {
 		modules[Utils.NUM_MOD_UserLocator].Enabled = b
 	}))
-
 
 	return check_boxes
 }
