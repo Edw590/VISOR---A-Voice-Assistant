@@ -24,12 +24,11 @@ package MOD_8
 import (
 	"Utils"
 	"fmt"
+	Tcef "github.com/Edw590/TryCatch-go"
 	"net/http"
 )
 
 // Modules Manager //
-
-var srv_GL *http.Server = nil
 
 type _MGIModSpecInfo any
 var (
@@ -41,19 +40,24 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
+		var srv *http.Server = nil
 		go func() {
-			if srv_GL == nil {
-				http.HandleFunc("/submit-form", formHandler)
+			Tcef.Tcef{
+				Try: func() {
+					// Try to register. If it's already registered, ignore the panic.
+					http.HandleFunc("/submit-form", formHandler)
+				},
+			}.Do()
 
-				//log.Println("Server running on port 8080")
-				srv_GL = &http.Server{Addr: ":8080"}
-				_ = srv_GL.ListenAndServe()
-				srv_GL = nil
-			}
+			//log.Println("Server running on port 8080")
+			srv = &http.Server{Addr: ":8080"}
+			_ = srv.ListenAndServe()
 		}()
 
 		for {
 			if Utils.WaitWithStop(module_stop, 1000000000) {
+				_ = srv.Shutdown(nil)
+
 				return
 			}
 		}
