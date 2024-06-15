@@ -54,13 +54,14 @@ func Communicator() fyne.CanvasObject {
 		"proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 	response_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 	var scroll_text *container.Scroll = container.NewVScroll(response_text)
-	scroll_text.SetMinSize(fyne.NewSize(300, 200)) // Set the minimum size for the scroll container
+	scroll_text.SetMinSize(response_text.MinSize()) // Set the minimum size for the scroll container
 
 	go func() {
 		for {
 			if Current_screen_GL == comm_canvas_object_GL {
 				response_text.SetText(GPT.GetTextFromEntry(GPT.GetEntry(-1)))
 			}
+			scroll_text.SetMinSize(response_text.MinSize())
 
 			time.Sleep(1 * time.Second)
 		}

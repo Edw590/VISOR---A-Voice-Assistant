@@ -43,7 +43,7 @@ var (
 	realMain        Utils.RealMain = nil
 	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module) }
+func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
@@ -111,7 +111,7 @@ func init() {realMain =
 		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llamacpp -m /home/edw590/llamacpp_models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf " +
-			"--in-suffix [3234_START] --color --instruct --ctx-size 1024 --temp 0.2 --mlock --no-mmap --prompt \"" +
+			"--in-suffix [3234_START] --color --instruct --ctx-size 0 --temp 0.2 --mlock --prompt \"" +
 			config_str + "\"\n")
 		_, _ = writer.WriteString("hello\n")
 		_ = writer.Flush()

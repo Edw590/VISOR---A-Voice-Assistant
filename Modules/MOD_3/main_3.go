@@ -43,7 +43,7 @@ var (
 	realMain Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo[_MGIModSpecInfo]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module) }
+func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
@@ -132,7 +132,7 @@ func init() {realMain =
 							_ = volume.SetVolume(50)
 						}
 					}
-					if err = tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err == nil {
+					if _, err = tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err == nil {
 						if old_volume != -1 {
 							_ = volume.SetVolume(old_volume)
 						}
@@ -199,7 +199,7 @@ func SkipCurrentSpeech() bool {
 }
 
 func stopTts(tts *sapi.Sapi) bool {
-	err := tts.Skip(50) // Equivalent to stopping all speeches it seems
+	_, err := tts.Skip(50) // Equivalent to stopping all speeches it seems
 	if err != nil {
 		//log.Println("Error stopping speech: ", err)
 
