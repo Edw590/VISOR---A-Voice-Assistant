@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,6 +29,7 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+	"unicode"
 	"unsafe"
 
 	"github.com/dchest/jsmin"
@@ -244,4 +245,26 @@ func WasArgUsedGENERAL(args []string, wanted_arg string) bool {
 	}
 
 	return false
+}
+
+/*
+RemoveNonGraphicChars removes all the non-graphic characters from a string.
+
+-----------------------------------------------------------
+
+– Params:
+  - str – the string to remove the non-graphic characters from
+
+– Returns:
+  - the string without the non-graphic characters
+ */
+func RemoveNonGraphicChars(str string) string {
+	str = strings.Map(func(r rune) rune {
+		if unicode.IsGraphic(r) {
+			return r
+		}
+		return -1
+	}, str)
+
+	return str
 }

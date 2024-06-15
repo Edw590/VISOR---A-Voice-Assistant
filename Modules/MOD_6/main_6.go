@@ -24,11 +24,13 @@ package MOD_6
 import (
 	"OnlineInfoChk/OICNews"
 	"OnlineInfoChk/OICWeather"
+	"Utils"
 	"fmt"
+	"github.com/Krognol/go-wolfram"
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
-
-	"Utils"
+	gowiki "github.com/trietmn/go-wiki"
+	"log"
 )
 
 // Online Information Checker //
@@ -169,4 +171,88 @@ func init() {realMain =
 			}
 		}
 	}
+}
+
+/*
+RetrieveWolframAlpha retrieves the information from the given query using Wolfram Alpha.
+
+-----------------------------------------------------------
+
+– Params:
+  - query – the query to search for
+
+– Returns:
+  - the information retrieved
+  - whether the information is a direct result or is a combination of results (maybe the LLM should be called to
+	summarize it)
+*/
+func RetrieveWolframAlpha(query string) (string, bool) {
+	//Initialize a new client
+	c := &wolfram.Client{
+		AppID: Utils.PersonalConsts_GL.WOLFRAM_ALPHA_APPID,
+	}
+
+	//Get a result without additional parameters
+	res, err := c.GetQueryResult(query, nil)
+	if err != nil {
+		log.Println(err)
+
+		return "ERROR", true
+	}
+
+	var query_results wolfram.QueryResult = res.QueryResult
+
+	if len(query_results.Pods) < 2 {
+		return "ERROR", true
+	}
+
+	if query_results.Pods[1].Title == "Result" {
+		if len(query_results.Pods[1].SubPods) < 1 {
+			return "ERROR", true
+		}
+
+		return query_results.Pods[1].SubPods[0].Plaintext, true
+	} else {
+		// Iterate through the pods and subpods and get the plaintext info from each
+		var result string = ""
+		for _, i := range res.QueryResult.Pods {
+			result += i.Title + ": "
+
+			for _, j := range i.SubPods {
+				result += j.Plaintext + " / "
+			}
+		}
+		result = result[:len(result)-3]
+
+		return result, false
+	}
+}
+
+/*
+RetrieveWikipedia retrieves the information from the given query using Wikipedia.
+
+-----------------------------------------------------------
+
+– Params:
+  - query – the query to search for
+
+– Returns:
+  - the information retrieved
+*/
+func RetrieveWikipedia(query string) string {
+	page, err := gowiki.GetPage(query, -1, true, true)
+	if err != nil {
+		log.Println(err)
+
+		return "ERROR"
+	}
+
+	content, err := page.GetContent()
+	if err != nil {
+		log.Println(err)
+
+		return "ERROR"
+	}
+
+	return content
 }

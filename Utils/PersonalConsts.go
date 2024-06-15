@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -41,6 +41,8 @@ type _PersonalConstsEOG struct {
 	WEBSITE_URL string
 	WEBSITE_PW string
 	WEBSITE_DIR string
+
+	WOLFRAM_ALPHA_APPID string
 }
 
 // PersonalConsts is a struct containing the constants that are personal to the user.
@@ -64,6 +66,9 @@ type PersonalConsts struct {
 	WEBSITE_PW string
 	// _WEBSITE_DIR is the full path to the directory of the VISOR website
 	_WEBSITE_DIR GPath
+
+	// WOLFRAM_ALPHA_APPID is the app ID for the Wolfram Alpha API
+	WOLFRAM_ALPHA_APPID string
 }
 
 /*
@@ -100,10 +105,12 @@ func (personalConsts *PersonalConsts) Init(server bool) error {
 	personalConsts.WEBSITE_PW = struct_file_format.WEBSITE_PW
 	personalConsts._WEBSITE_DIR = PathFILESDIRS(true, "", struct_file_format.WEBSITE_DIR)
 
+	personalConsts.WOLFRAM_ALPHA_APPID = struct_file_format.WOLFRAM_ALPHA_APPID
+
 	if personalConsts.VISOR_SERVER {
 		if !strings.Contains(personalConsts._VISOR_EMAIL_ADDR, "@") || personalConsts._VISOR_EMAIL_PW == "" ||
 				!strings.Contains(personalConsts.USER_EMAIL_ADDR, "@") || !strings.Contains(personalConsts.WEBSITE_URL, "http") ||
-				personalConsts.WEBSITE_PW == "" {
+				personalConsts.WEBSITE_PW == "" || personalConsts.WOLFRAM_ALPHA_APPID == "" {
 			return errors.New("some fields in " + PERSONAL_CONSTS_FILE + " are empty or incorrect - aborting")
 		}
 	} else {

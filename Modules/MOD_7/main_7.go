@@ -22,19 +22,23 @@
 package MOD_7
 
 import (
+	MOD_6 "OnlineInfoChk"
 	"Utils"
 	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 )
 
 // GPT Communicator //
 
 const _TO_PROCESS_REL_FOLDER string = "to_process"
+
+const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
+const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
 const _TIME_SLEEP_S int = 1
 
@@ -57,9 +61,9 @@ func init() {realMain =
 		stdout, _ := cmd.StdoutPipe()
 		_ = cmd.Start()
 
+		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 		// Start a goroutine to print to the screen and write to a file the output of the LLM model
 		go func() {
-			var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
 			buf := bufio.NewReader(stdout)
 			var last_answer string = ""
@@ -76,7 +80,7 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				//fmt.Print(one_byte_str)
+				fmt.Print(one_byte_str)
 
 				if writing {
 					if one_byte_str == " " || one_byte_str == "\n" {
@@ -94,12 +98,11 @@ func init() {realMain =
 					writing = true
 					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
 
-					var curr_time string = strconv.FormatInt(time.Now().UnixMilli(), 10)
-					_ = gpt_text_txt.WriteTextFile("[3234_START:" + curr_time + "]", true)
+					_ = gpt_text_txt.WriteTextFile(getStartString(), true)
 				} else if strings.Contains(last_answer, "[3234_END]") {
 					writing = false
 
-					_ = gpt_text_txt.WriteTextFile("[3234_END]\n", true)
+					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
 
 					last_word = ""
 					last_answer = ""
@@ -116,6 +119,11 @@ func init() {realMain =
 		_, _ = writer.WriteString("hello\n")
 		_ = writer.Flush()
 
+		sendToGPT := func(to_send string) {
+			_, _ = writer.WriteString(Utils.RemoveNonGraphicChars(to_send) + "\n")
+			_ = writer.Flush()
+		}
+
 		// Process the files to input to the LLM model
 		for {
 			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
@@ -126,23 +134,33 @@ func init() {realMain =
 				var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
 
 				var to_process string = *file_path.ReadTextFile()
-				// Remove non-graphic characters
-				to_process = strings.Map(func(r rune) rune {
-					if unicode.IsGraphic(r) {
-						return r
-					}
-					return -1
-				}, to_process)
 				if to_process != "" {
 					if strings.HasPrefix(to_process, "/") {
 						// Control commands begin with a slash
-						if to_process == "/clear" {
-							// Clear the context of the LLM model by restarting the module (the Manager will restart it)
+						if to_process == "/clear" || to_process == "/stop" {
+							// Clear the context of the LLM model or stop while its writing by stopping the module (the
+							// Manager will restart it)
 							shut_down = true
+						} else if strings.HasPrefix(to_process, ASK_WOLFRAM_ALPHA) {
+							// Ask Wolfram Alpha the question
+							var question string = to_process[len(ASK_WOLFRAM_ALPHA):]
+							result, direct_result := MOD_6.RetrieveWolframAlpha(question)
+
+							if direct_result {
+								_ = gpt_text_txt.WriteTextFile(getStartString() + "The answer is: " + result + ". " +
+									getEndString(), true)
+							} else {
+								sendToGPT("Summarize in sentences the following: " + result)
+							}
+						} else if strings.HasPrefix(to_process, SEARCH_WIKIPEDIA) {
+							// Search for the Wikipedia page title
+							var query string = to_process[len(ASK_WOLFRAM_ALPHA):]
+
+							_ = gpt_text_txt.WriteTextFile(getStartString() + MOD_6.RetrieveWikipedia(query) +
+								getEndString(), true)
 						}
 					} else {
-						_, _ = writer.WriteString(to_process + "\n")
-						_ = writer.Flush()
+						sendToGPT(to_process)
 					}
 				}
 
@@ -172,4 +190,12 @@ forceStopLlama stops the LLM model by killing its processes.
  */
 func forceStopLlama() {
 	_, _ = Utils.ExecCmdSHELL([]string{"killall llamacpp"})
+}
+
+func getStartString() string {
+	return "[3234_START:" + strconv.FormatInt(time.Now().UnixMilli(), 10) + "]"
+}
+
+func getEndString() string {
+	return "[3234_END]\n"
 }
