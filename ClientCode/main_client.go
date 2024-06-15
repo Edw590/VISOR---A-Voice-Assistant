@@ -130,6 +130,10 @@ func init() {realMain =
 				content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
 				content_container.Refresh()
 			}),
+			widget.NewButton("Calendar", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Calendar()}
+				content_container.Refresh()
+			}),
 		)
 
 		// Create a split container to hold the navigation bar and the content
