@@ -18,7 +18,6 @@ use (
 	Modules/MOD_7
 	Modules/MOD_8
 	Modules/MOD_9
-	Modules/MOD_10
 	ServerCode
 	Utils
 )

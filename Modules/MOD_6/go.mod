@@ -4,10 +4,16 @@ module OnlineInfoChk
 // supporting it).
 go 1.20
 
-require github.com/tebeka/selenium v0.9.9
+require (
+	github.com/Krognol/go-wolfram v0.0.0-20180610151123-5b91101b92a8
+	github.com/tebeka/selenium v0.9.9
+	github.com/trietmn/go-wiki v1.0.3
+)
 
 require (
+	github.com/anaskhan96/soup v1.2.5 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 )

@@ -39,6 +39,7 @@ const _TIME_SLEEP_S int = 5
 
 var modules_GL []Utils.Module
 
+// Make sure to add the modules support check for each new module too...
 var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
 	Utils.NUM_MOD_SMARTChecker:    MOD_2.Start,
 	Utils.NUM_MOD_Speech:          MOD_3.Start,
@@ -61,7 +62,7 @@ func Start(modules []Utils.Module) {
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		//moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
 		// Check all modules' support and put on a list to later warn if there were changes of support or not.
 		var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
