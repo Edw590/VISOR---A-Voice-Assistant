@@ -22,7 +22,6 @@
 package OICWeather
 
 import (
-	"Utils"
 	"github.com/tebeka/selenium"
 )
 
@@ -49,7 +48,7 @@ UpdateWeather updates the weather for the given locations to a file called "weat
 – Returns:
   - the error if any
 */
-func UpdateWeather(driver selenium.WebDriver, locations []string) error {
+func UpdateWeather(driver selenium.WebDriver, locations []string) []Weather {
 	var weather []Weather = nil
 	for _, location := range locations {
 		if location == "" {
@@ -83,7 +82,7 @@ func UpdateWeather(driver selenium.WebDriver, locations []string) error {
 		})
 	}
 
-	return Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "weather.json").WriteTextFile(*Utils.ToJsonGENERAL(weather), false)
+	return weather
 }
 
 /*

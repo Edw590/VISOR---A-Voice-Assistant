@@ -22,7 +22,6 @@
 package OICNews
 
 import (
-	"Utils"
 	"github.com/tebeka/selenium"
 )
 
@@ -52,7 +51,7 @@ UpdateNews updates the news for the given locations to a file called "news.json"
 – Returns:
   - the error if any
 */
-func UpdateNews(driver selenium.WebDriver, news_locs []NewsLocs) error {
+func UpdateNews(driver selenium.WebDriver, news_locs []NewsLocs) []News {
 	var news []News = nil
 	for _, news_loc := range news_locs {
 		texts, err := findNews(driver, news_loc.News_str)
@@ -72,7 +71,7 @@ func UpdateNews(driver selenium.WebDriver, news_locs []NewsLocs) error {
 		})
 	}
 
-	return Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "news.json").WriteTextFile(*Utils.ToJsonGENERAL(news), false)
+	return news
 }
 
 /*

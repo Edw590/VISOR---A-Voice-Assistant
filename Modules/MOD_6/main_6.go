@@ -105,7 +105,7 @@ const _TIME_SLEEP_S int = 15*60
 // Firefox: log.Sprintf("http://localhost:%d", port)
 // Chrome: log.Sprintf("http://127.0.0.1:%d/wd/hub", port) - default
 
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module) }
+func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
@@ -147,13 +147,21 @@ func init() {realMain =
 			}
 			////////////////////////////////
 
-			bypassGoogleCookies(driver)
+			_ = bypassGoogleCookies(driver)
 
-			OICWeather.UpdateWeather(driver, modUserInfo.Temp_locs)
-			OICNews.UpdateNews(driver, modUserInfo.News_locs)
+			var weather []OICWeather.Weather = OICWeather.UpdateWeather(driver, modUserInfo.Temp_locs)
+			if err = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "weather.json").
+					WriteTextFile(*Utils.ToJsonGENERAL(weather), false); err != nil {
+				panic(err)
+			}
+			var news []OICNews.News = OICNews.UpdateNews(driver, modUserInfo.News_locs)
+			if err = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "news.json").
+					WriteTextFile(*Utils.ToJsonGENERAL(news), false); err != nil {
+				panic(err)
+			}
 
-			driver.Quit()
-			service.Stop()
+			_ = driver.Quit()
+			_ = service.Stop()
 
 
 			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
