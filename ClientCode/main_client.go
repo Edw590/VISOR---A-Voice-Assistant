@@ -147,7 +147,7 @@ func init() {realMain =
 		// Set the content of the window
 		my_window.SetContent(split)
 
-		var prev_screen fyne.CanvasObject = Screens.Current_screen_GL
+		var prev_screen fyne.CanvasObject = nil
 		// Add system tray functionality
 		if desk, ok := my_app_GL.(desktop.App); ok {
 			var icon *fyne.StaticResource = Logo.LogoBlackGmail
@@ -176,6 +176,7 @@ func init() {realMain =
 		// Minimize to tray on close
 		my_window.SetCloseIntercept(func() {
 			// Store the previous screen before hiding
+			prev_screen = Screens.Current_screen_GL
 			Screens.Current_screen_GL = nil
 			my_window.Hide()
 		})
