@@ -23,9 +23,9 @@ package MOD_11
 
 import (
 	"Utils"
+	"VISOR_Client/ControlChannel"
 	porcupine "github.com/Picovoice/porcupine/binding/go/v3"
 	"github.com/gordonklaus/portaudio"
-	"log"
 )
 
 var (
@@ -73,7 +73,7 @@ func init() {realMain =
 		for {
 			keywordIndex, _ := porcupine_.Process(getNextFrameAudio())
 			if keywordIndex >= 0 {
-				log.Println("Keyword detected")
+				ControlChannel.Channel <- ControlChannel.SHOW_WINDOW
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 0) {

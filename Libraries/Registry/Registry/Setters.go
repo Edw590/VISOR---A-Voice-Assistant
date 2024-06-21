@@ -26,6 +26,9 @@ import (
 	"time"
 )
 
+/*
+setInternal sets the internal variables for the value.
+ */
 func (value *Value) setInternal() {
 	value.prev_data = value.curr_data
 	value.time_updated_prev = value.time_updated_curr
@@ -33,6 +36,18 @@ func (value *Value) setInternal() {
 	value.time_updated_curr = time.Now().UnixMilli()
 }
 
+/*
+SetBool sets the value to a boolean.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
 func (value *Value) SetBool(data bool, update_if_same bool) bool {
 	if value.type_ != TYPE_BOOL {
 		return false
@@ -54,6 +69,18 @@ func (value *Value) SetBool(data bool, update_if_same bool) bool {
 	return true
 }
 
+/*
+SetInt sets the value to an integer.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
 func (value *Value) SetInt(data int, update_if_same bool) bool {
 	if value.type_ != TYPE_INT {
 		return false
@@ -71,6 +98,18 @@ func (value *Value) SetInt(data int, update_if_same bool) bool {
 	return true
 }
 
+/*
+SetLong sets the value to a long.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
 func (value *Value) SetLong(data int64, update_if_same bool) bool {
 	if value.type_ != TYPE_LONG {
 		return false
@@ -88,6 +127,18 @@ func (value *Value) SetLong(data int64, update_if_same bool) bool {
 	return true
 }
 
+/*
+SetFloat sets the value to a float.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
 func (value *Value) SetFloat(data float32, update_if_same bool) bool {
 	if value.type_ != TYPE_FLOAT {
 		return false
@@ -105,6 +156,18 @@ func (value *Value) SetFloat(data float32, update_if_same bool) bool {
 	return true
 }
 
+/*
+SetDouble sets the value to a double.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
 func (value *Value) SetDouble(data float64, update_if_same bool) bool {
 	if value.type_ != TYPE_DOUBLE {
 		return false
@@ -122,6 +185,18 @@ func (value *Value) SetDouble(data float64, update_if_same bool) bool {
 	return true
 }
 
+/*
+SetString sets the value to a string.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
 func (value *Value) SetString(data string, update_if_same bool) bool {
 	if value.type_ != TYPE_STRING {
 		return false

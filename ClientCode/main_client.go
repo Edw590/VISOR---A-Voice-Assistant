@@ -26,6 +26,7 @@ import (
 	MOD_1 "ModManager"
 	"OIG/OIG"
 	"Utils"
+	"VISOR_Client/ControlChannel"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
 	"fyne.io/fyne/v2"
@@ -42,6 +43,7 @@ import (
 )
 
 var my_app_GL fyne.App = nil
+var my_window_GL fyne.Window = nil
 
 type _MGIModSpecInfo any
 var (
@@ -104,7 +106,7 @@ func init() {realMain =
 		// Create a new application
 		my_app_GL = app.NewWithID("com.edw590.visor_c")
 		my_app_GL.SetIcon(Logo.LogoBlackGmail)
-		var my_window fyne.Window = my_app_GL.NewWindow("V.I.S.O.R.")
+		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
 
 		processNotifications()
 
@@ -145,7 +147,7 @@ func init() {realMain =
 		split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
 
 		// Set the content of the window
-		my_window.SetContent(split)
+		my_window_GL.SetContent(split)
 
 		var prev_screen fyne.CanvasObject = nil
 		// Add system tray functionality
@@ -156,9 +158,9 @@ func init() {realMain =
 					// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
 					// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
 					// fixes whatever the problem is.
-					my_window.Hide()
-					my_window.Show()
-					my_window.RequestFocus()
+					my_window_GL.Hide()
+					my_window_GL.Show()
+					my_window_GL.RequestFocus()
 
 					// Restore the previous screen state
 					Screens.Current_screen_GL = prev_screen
@@ -174,16 +176,31 @@ func init() {realMain =
 		}
 
 		// Minimize to tray on close
-		my_window.SetCloseIntercept(func() {
+		my_window_GL.SetCloseIntercept(func() {
 			// Store the previous screen before hiding
 			prev_screen = Screens.Current_screen_GL
 			Screens.Current_screen_GL = nil
-			my_window.Hide()
+			my_window_GL.Hide()
 		})
 
+		go func() {
+			for {
+				var code int = <- ControlChannel.Channel
+
+				switch code {
+					case ControlChannel.SHOW_WINDOW:
+						showWindow()
+				}
+
+				if Utils.WaitWithStopTIMEDATE(module_stop, 0) {
+					return
+				}
+			}
+		}()
+
 		// Show and run the application
-		my_window.Resize(fyne.NewSize(640, 480))
-		my_window.ShowAndRun()
+		my_window_GL.Resize(fyne.NewSize(640, 480))
+		my_window_GL.ShowAndRun()
 	}
 }
 
@@ -226,4 +243,13 @@ func isOpenGLSupport() bool {
 	defer window.Destroy()
 
 	return true
+}
+
+func showWindow() {
+	// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
+	// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
+	// fixes whatever the problem is.
+	my_window_GL.Hide()
+	my_window_GL.Show()
+	my_window_GL.RequestFocus()
 }
