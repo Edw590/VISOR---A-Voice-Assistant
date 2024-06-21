@@ -88,7 +88,7 @@ func ModulesStatus(modules []Utils.Module) fyne.CanvasObject {
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(fyne.NewSize(550, 480))
+	main_scroll.SetMinSize(screens_size_GL)
 
 	module_status_canvas_object_GL = main_scroll
 	Current_screen_GL = module_status_canvas_object_GL
@@ -104,8 +104,14 @@ func getCheckBoxes(modules []Utils.Module) []fyne.CanvasObject {
 	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_Speech), func(b bool) {
 		modules[Utils.NUM_MOD_Speech].Enabled = b
 	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_UserLocator), func(b bool) {
-		modules[Utils.NUM_MOD_UserLocator].Enabled = b
+	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_DeviceLocator), func(b bool) {
+		modules[Utils.NUM_MOD_DeviceLocator].Enabled = b
+	}))
+	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_SystemState), func(b bool) {
+		modules[Utils.NUM_MOD_SystemState].Enabled = b
+	}))
+	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_SpeechRecognition), func(b bool) {
+		modules[Utils.NUM_MOD_SpeechRecognition].Enabled = b
 	}))
 
 	return check_boxes

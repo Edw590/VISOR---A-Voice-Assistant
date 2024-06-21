@@ -21,19 +21,9 @@
 
 package Registry
 
-import "strconv"
-
-func (value *Value) GetPrettyName() string {
-	return value.pretty_name
-}
-
-func (value *Value) GetDescription() string {
-	return value.description
-}
-
-func (value *Value) GetType() int {
-	return value.type_
-}
+import (
+	"strconv"
+)
 
 func (value *Value) GetTimeUpdated(curr_data bool) int64 {
 	if curr_data {

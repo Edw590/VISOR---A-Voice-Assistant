@@ -22,15 +22,8 @@
 package MOD_1
 
 import (
-	MOD_5 "EmailSender"
-	MOD_7 "GPTCommunicator"
-	MOD_6 "OnlineInfoChk"
-	MOD_4 "RssFeedNotifier"
-	MOD_2 "SMARTChecker"
-	MOD_3 "Speech"
-	MOD_9 "UserLocator"
+	"Registry/Registry"
 	"Utils"
-	MOD_8 "WebsiteBackend"
 )
 
 // Modules Manager //
@@ -38,18 +31,6 @@ import (
 const _TIME_SLEEP_S int = 5
 
 var modules_GL []Utils.Module
-
-// Make sure to add the modules support check for each new module too...
-var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
-	Utils.NUM_MOD_SMARTChecker:    MOD_2.Start,
-	Utils.NUM_MOD_Speech:          MOD_3.Start,
-	Utils.NUM_MOD_RssFeedNotifier: MOD_4.Start,
-	Utils.NUM_MOD_EmailSender:     MOD_5.Start,
-	Utils.NUM_MOD_OnlineInfoChk:   MOD_6.Start,
-	Utils.NUM_MOD_GPTCommunicator: MOD_7.Start,
-	Utils.NUM_MOD_WebsiteBackend:  MOD_8.Start,
-	Utils.NUM_MOD_UserLocator:     MOD_9.Start,
-}
 
 type _MGIModSpecInfo any
 var (
@@ -131,6 +112,8 @@ func init() {realMain =
 			// Start the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_start[mod_num] && modules_GL[mod_num].Enabled {
+					var value *Registry.Value = Registry.GetValue(Registry.K_MODULES_ACTIVE)
+					value.SetLong(value.GetLong(true) | (1 << mod_num), false)
 					modules_GL[mod_num].Stop = false
 					var start_func = _MAP_MOD_NUM_START[mod_num]
 					if start_func != nil {
@@ -142,13 +125,15 @@ func init() {realMain =
 			// Stop the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_stop[mod_num] {
+					var value *Registry.Value = Registry.GetValue(Registry.K_MODULES_ACTIVE)
+					value.SetLong(value.GetLong(true) & ^(1 << mod_num), false)
 					modules_GL[mod_num].Stop = true
 				}
 			}
 
 			//////////////////////////////////////////////////////////////////
 
-			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
 			}
 		}

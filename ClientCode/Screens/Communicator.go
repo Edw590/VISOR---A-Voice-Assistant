@@ -59,7 +59,12 @@ func Communicator() fyne.CanvasObject {
 	go func() {
 		for {
 			if Current_screen_GL == comm_canvas_object_GL {
-				response_text.SetText(GPT.GetTextFromEntry(GPT.GetEntry(-1)))
+				var entry *GPT.Entry = GPT.GetEntry(-1, -1)
+				if entry != nil {
+					response_text.SetText(entry.GetText())
+				} else {
+					response_text.SetText("3234_ERROR")
+				}
 			}
 			scroll_text.SetMinSize(response_text.MinSize())
 
@@ -80,7 +85,7 @@ func Communicator() fyne.CanvasObject {
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(fyne.NewSize(550, 480))
+	main_scroll.SetMinSize(screens_size_GL)
 
 	comm_canvas_object_GL = main_scroll
 	Current_screen_GL = comm_canvas_object_GL

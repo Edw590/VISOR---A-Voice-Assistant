@@ -19,30 +19,10 @@
  * under the License.
  ******************************************************************************/
 
-package main
+package MOD_7
 
-import (
-	"GPT/GPT"
-	"Utils"
-	"log"
-	"time"
-)
-
-func main() {
-	Utils.PersonalConsts_GL.Init(false)
-
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
-
-	log.Println(GPT.SendText("Hi there! How are you?"))
-	/*for {
-		log.Println(GPT.GetEntry(-1, -1))
-
-		time.Sleep(1 * time.Second)
-	}*/
-
-	for sentence := GPT.GetNextSpeechSentence(); sentence != GPT.END_ENTRY; sentence = GPT.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
-
-		time.Sleep(1 * time.Second)
-	}
+// _ModUserInfo is the format of the custom information file about this specific module.
+type _ModUserInfo struct {
+	// Model_loc is the location of the model file
+	Model_loc string
 }

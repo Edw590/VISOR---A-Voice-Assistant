@@ -222,7 +222,7 @@ func init() {realMain =
 				//log.Println("__________________________ENDING__________________________")
 			}
 
-			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
 			}
 		}

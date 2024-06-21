@@ -55,7 +55,7 @@ func init() {realMain =
 		}()
 
 		for {
-			if Utils.WaitWithStop(module_stop, 1000000000) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
 				_ = srv.Shutdown(nil)
 
 				return

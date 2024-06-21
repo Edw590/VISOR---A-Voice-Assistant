@@ -19,30 +19,36 @@
  * under the License.
  ******************************************************************************/
 
-package main
+package GPT
 
-import (
-	"GPT/GPT"
-	"Utils"
-	"log"
-	"time"
-)
+// Entry is a struct containing the time and text of a generated text.
+type Entry struct {
+	// text is the text generated
+	text string
+	// time is the Unix time in milliseconds
+	time int64
+}
 
-func main() {
-	Utils.PersonalConsts_GL.Init(false)
+/*
+GetText gets the text of the entry.
 
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
+-----------------------------------------------------------
 
-	log.Println(GPT.SendText("Hi there! How are you?"))
-	/*for {
-		log.Println(GPT.GetEntry(-1, -1))
+– Returns:
+  - the text, ending in END_ENTRY
+*/
+func (entry Entry) GetText() string {
+	return entry.text
+}
 
-		time.Sleep(1 * time.Second)
-	}*/
+/*
+GetTime gets the time of the entry.
 
-	for sentence := GPT.GetNextSpeechSentence(); sentence != GPT.END_ENTRY; sentence = GPT.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
+-----------------------------------------------------------
 
-		time.Sleep(1 * time.Second)
-	}
+– Returns:
+  - the time in milliseconds
+*/
+func (entry Entry) GetTime() int64 {
+	return entry.time
 }

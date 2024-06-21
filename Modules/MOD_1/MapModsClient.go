@@ -19,30 +19,22 @@
  * under the License.
  ******************************************************************************/
 
-package main
+//go:build client
+
+package MOD_1
 
 import (
-	"GPT/GPT"
+	MOD_9 "DeviceLocator"
+	MOD_3 "Speech"
+	MOD_11 "SpeechRecognition"
+	MOD_10 "SystemState"
 	"Utils"
-	"log"
-	"time"
 )
 
-func main() {
-	Utils.PersonalConsts_GL.Init(false)
-
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
-
-	log.Println(GPT.SendText("Hi there! How are you?"))
-	/*for {
-		log.Println(GPT.GetEntry(-1, -1))
-
-		time.Sleep(1 * time.Second)
-	}*/
-
-	for sentence := GPT.GetNextSpeechSentence(); sentence != GPT.END_ENTRY; sentence = GPT.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
-
-		time.Sleep(1 * time.Second)
-	}
+// Make sure to add the modules support check for each new module too...
+var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
+	Utils.NUM_MOD_Speech:            MOD_3.Start,
+	Utils.NUM_MOD_DeviceLocator:     MOD_9.Start,
+	Utils.NUM_MOD_SystemState:       MOD_10.Start,
+	Utils.NUM_MOD_SpeechRecognition: MOD_11.Start,
 }

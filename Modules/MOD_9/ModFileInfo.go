@@ -23,8 +23,8 @@ package MOD_9
 
 // _ModUserInfo is the format of the custom information file about this specific module.
 type _ModUserInfo struct {
-	// LocsInfo is the information about the locations
-	LocsInfo []_LocInfo
+	// Locs_info is the information about the locations
+	Locs_info []_LocInfo
 }
 
 type _LocInfo struct {

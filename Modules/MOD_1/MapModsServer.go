@@ -19,30 +19,26 @@
  * under the License.
  ******************************************************************************/
 
-package main
+//go:build server
+
+package MOD_1
 
 import (
-	"GPT/GPT"
+	MOD_5 "EmailSender"
+	MOD_7 "GPTCommunicator"
+	MOD_6 "OnlineInfoChk"
+	MOD_4 "RssFeedNotifier"
+	MOD_2 "SMARTChecker"
 	"Utils"
-	"log"
-	"time"
+	MOD_8 "WebsiteBackend"
 )
 
-func main() {
-	Utils.PersonalConsts_GL.Init(false)
-
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
-
-	log.Println(GPT.SendText("Hi there! How are you?"))
-	/*for {
-		log.Println(GPT.GetEntry(-1, -1))
-
-		time.Sleep(1 * time.Second)
-	}*/
-
-	for sentence := GPT.GetNextSpeechSentence(); sentence != GPT.END_ENTRY; sentence = GPT.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
-
-		time.Sleep(1 * time.Second)
-	}
+// Make sure to add the modules support check for each new module too...
+var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
+	Utils.NUM_MOD_SMARTChecker:      MOD_2.Start,
+	Utils.NUM_MOD_RssFeedNotifier:   MOD_4.Start,
+	Utils.NUM_MOD_EmailSender:       MOD_5.Start,
+	Utils.NUM_MOD_OnlineInfoChk:     MOD_6.Start,
+	Utils.NUM_MOD_GPTCommunicator:   MOD_7.Start,
+	Utils.NUM_MOD_WebsiteBackend:    MOD_8.Start,
 }

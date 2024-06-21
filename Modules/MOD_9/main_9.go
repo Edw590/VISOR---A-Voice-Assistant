@@ -24,57 +24,40 @@ package MOD_9
 import (
 	"Utils"
 	"github.com/schollz/wifiscan"
-	"log"
-	"strings"
+	"strconv"
 )
 
 const _TIME_SLEEP_S int = 5
 
 const _DEFAULT_LOCATION string = "unknown"
 
-const _LOCATION_FILE string = "curr_loc.txt"
-
 type _MGIModSpecInfo any
 var (
 	realMain        Utils.RealMain = nil
 	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module) }
+func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
 		for {
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
-
 			// Get the current wifi SSID and check if it's in the list of locations
-			// (The "device" parameter of GetSSID is ignored when the OS is Windows)
-			wifi_nets, _ := wifiscan.Scan()
-			log.Println("Nearby wifi networks:", wifi_nets)
-			for _, wifi_net := range wifi_nets {
-				if wifi_net.SSID == "" {
-					continue
-				}
-
-				var wifi_bssid string = strings.ToUpper(wifi_net.SSID)
-
-				log.Println(modUserInfo.LocsInfo)
-
-				for _, locInfo := range modUserInfo.LocsInfo {
-					log.Println(locInfo.Address == wifi_bssid)
-					if locInfo.Type == "wifi" && locInfo.Address == wifi_bssid {
-						log.Println("Location found:", locInfo.Location)
-						_ = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _LOCATION_FILE).WriteTextFile(locInfo.Location,false)
-
-						break
-					}
-				}
+			wifi_nets, err := wifiscan.Scan()
+			if err != nil {
+				// TODO: do something with this. Can mean the adapter is off
 			}
+			//log.Println("Nearby wifi networks:", wifi_nets)
+			var final_string string = ""
+			for _, wifi_net := range wifi_nets {
+				final_string += wifi_net.BSSID + "|" + strconv.Itoa(wifi_net.RSSI) + "|" + wifi_net.SSID + "\n"
+			}
+			//log.Println("Final string:", final_string)
 
-			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+			// TODO: send the string to the server
+			//  And be careful processing it! It can have ANY characters, including \n...
+
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
 			}
 		}

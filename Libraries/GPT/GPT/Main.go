@@ -27,13 +27,7 @@ import (
 	"strings"
 )
 
-type Entry struct {
-	// Time is the Unix time in milliseconds
-	Time int64
-	// Text is the text generated
-	Text string
-}
-
+// GEN_ERROR is the error message for general errors
 const GEN_ERROR string = "3234_ERROR"
 
 var website_url_GL string = ""
@@ -53,6 +47,14 @@ func SetWebsiteInfo(url string, pw string) {
 	website_pw_GL = pw
 }
 
+/*
+GetNumEntries gets the number of entries in the text file.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the number of entries
+ */
 func GetNumEntries() int {
 	var page_contents string = string(Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/gpt_text.txt", website_pw_GL))
 	var entries []string = strings.Split(page_contents, "[3234_START:")
@@ -66,34 +68,83 @@ func GetNumEntries() int {
 	return len(entries)
 }
 
-func GetEntry(num int) string {
+/*
+GetEntry gets the entry at the given number or time.
+
+If -1 is provided on both parameters, it will return the last entry. The time parameter is prioritized over the number
+parameter.
+
+-----------------------------------------------------------
+
+– Params:
+  - time – the time of the entry or -1 if the entry is to be found by number
+  - num – the number of the entry or negative to count from the end
+
+– Returns:
+  - the entry or nil if an error occurred
+ */
+func GetEntry(time int64, num int32) *Entry {
 	var page_contents string = string(Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/gpt_text.txt", website_pw_GL))
+	if page_contents == "" {
+		return nil
+	}
 	var entries []string = strings.Split(page_contents, "[3234_START:")
 
-	for i := 0; i < len(entries); i++ {
-		if entries[i] == "" {
-			Utils.DelElemSLICES(&entries, i)
+	if time != -1 {
+		for _, entry := range entries {
+			if getTimeFromEntry(entry) == time {
+				return &Entry{
+					text: getTextFromEntry(entry),
+					time: getTimeFromEntry(entry),
+				}
+			}
+		}
+	} else {
+		if len(entries) == 0 {
+			return nil
+		}
+
+		if num < 0 {
+			num = int32(len(entries)) + num
+		} else if num >= int32(len(entries)) {
+			num = int32(len(entries)) - 1
+		} else {
+			// Do nothing
+		}
+
+		var entry string = entries[num]
+
+		return &Entry{
+			text: getTextFromEntry(entry),
+			time: getTimeFromEntry(entry),
 		}
 	}
 
-	if len(entries) == 0 {
-		return GEN_ERROR
-	}
-
-	if num < 0 {
-		num = len(entries) + num
-	} else if num >= len(entries) {
-		num = len(entries) - 1
-	} else {
-		// Do nothing
-	}
-
-	var entry string = entries[num]
-
-	return entry[:strings.Index(entry, "]")] + "|" + entry[strings.Index(entry, "]") + 1:]
+	return nil
 }
 
-func GetTimeFromEntry(entry string) int64 {
+func SendText(text string) error {
+	return Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
+		Name: "GPT",
+		Text1: text,
+	})
+}
+
+/*
+getTimeFromEntry gets the time from the entry.
+
+-----------------------------------------------------------
+
+– Params:
+  - entry – the entry
+
+– Returns:
+  - the time
+*/
+func getTimeFromEntry(entry string) int64 {
+	// It comes like: "[3234_START:time]text[3234_END]"
+	// Filtered gets it like: "time|text[3234_END]"
+	entry = entry[:strings.Index(entry, "]")] + "|" + entry[strings.Index(entry, "]") + 1:]
 	var parts []string = strings.Split(entry, "|")
 
 	if len(parts) < 2 {
@@ -108,19 +159,30 @@ func GetTimeFromEntry(entry string) int64 {
 	return time
 }
 
-func GetTextFromEntry(entry string) string {
+/*
+getTextFromEntry gets the text from the entry.
+
+-----------------------------------------------------------
+
+– Params:
+
+*/
+func getTextFromEntry(entry string) string {
+	entry = entry[:strings.Index(entry, "]")] + "|" + entry[strings.Index(entry, "]") + 1:]
 	var parts []string = strings.Split(entry, "|")
 
 	if len(parts) < 2 {
 		return GEN_ERROR
 	}
 
-	return parts[1]
-}
+	// Remove all after END_ENTRY if it exists
+	var end_entry_exists bool = strings.Contains(parts[1], END_ENTRY)
 
-func SendText(text string) error {
-	return Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-		Name: "GPT",
-		Text1: text,
-	})
+	parts = strings.Split(parts[1], END_ENTRY)
+
+	if end_entry_exists {
+		parts[0] += END_ENTRY
+	}
+
+	return parts[0]
 }

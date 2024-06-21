@@ -25,7 +25,6 @@ import (
 	MOD_6 "OnlineInfoChk"
 	"Utils"
 	"bufio"
-	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -51,6 +50,11 @@ func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, mo
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
+
+		var modUserInfo _ModUserInfo
+		if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
+			panic(err)
+		}
 
 		// Force stop Llama to start fresh, in case for any reason it's running without the module being running too,
 		// like a force-stop on the module which doesn't call forceStopLlama().
@@ -80,7 +84,7 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				fmt.Print(one_byte_str)
+				//fmt.Print(one_byte_str)
 
 				if writing {
 					if one_byte_str == " " || one_byte_str == "\n" {
@@ -113,7 +117,7 @@ func init() {realMain =
 		// Configure the LLM model
 		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
-		_, _ = writer.WriteString("llamacpp -m /home/edw590/llamacpp_models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf " +
+		_, _ = writer.WriteString("llama-cli -m " + modUserInfo.Model_loc + " " +
 			"--in-suffix [3234_START] --color --instruct --ctx-size 0 --temp 0.2 --mlock --prompt \"" +
 			config_str + "\"\n")
 		_, _ = writer.WriteString("hello\n")
@@ -175,7 +179,7 @@ func init() {realMain =
 				}
 			}
 
-			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				forceStopLlama()
 				_ = stdout.Close()
 
@@ -189,7 +193,7 @@ func init() {realMain =
 forceStopLlama stops the LLM model by killing its processes.
  */
 func forceStopLlama() {
-	_, _ = Utils.ExecCmdSHELL([]string{"killall llamacpp"})
+	_, _ = Utils.ExecCmdSHELL([]string{"killall llama-cli"})
 }
 
 func getStartString() string {

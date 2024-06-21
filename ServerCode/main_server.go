@@ -87,7 +87,7 @@ func init() {realMain =
 				printModulesStatus(modules)
 			}
 
-			if Utils.WaitWithStop(module_stop, 1) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
 				break
 			}
 		}
@@ -115,6 +115,7 @@ func printModulesStatus(modules []Utils.Module) {
 		log.Println("--- " + module.Name + " ---")
 		log.Println("- Enabled: " + strconv.FormatBool(module.Enabled))
 		log.Println("- To stop: " + strconv.FormatBool(module.Stop))
+		log.Println("- Support: " + strconv.FormatBool(Utils.IsModSupportedMODULES(module.Num)))
 		log.Println("- Running: " + strconv.FormatBool(!module.Stopped))
 	}
 }

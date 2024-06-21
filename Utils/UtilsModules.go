@@ -27,6 +27,7 @@ import (
 	"github.com/shirou/gopsutil/v4/process"
 	"log"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -64,31 +65,35 @@ const (
 )
 
 const (
-	NUM_MOD_VISOR           int = 0 // This is a special one. Includes both the client and the server version main apps
-	NUM_MOD_ModManager      int = 1
-	NUM_MOD_SMARTChecker    int = 2
-	NUM_MOD_Speech          int = 3
-	NUM_MOD_RssFeedNotifier int = 4
-	NUM_MOD_EmailSender     int = 5
-	NUM_MOD_OnlineInfoChk   int = 6
-	NUM_MOD_GPTCommunicator int = 7
-	NUM_MOD_WebsiteBackend  int = 8
-	NUM_MOD_UserLocator     int = 9
+	NUM_MOD_VISOR           int = iota // This is a special one. Includes both the client and the server version main apps
+	NUM_MOD_ModManager
+	NUM_MOD_SMARTChecker
+	NUM_MOD_Speech
+	NUM_MOD_RssFeedNotifier
+	NUM_MOD_EmailSender
+	NUM_MOD_OnlineInfoChk
+	NUM_MOD_GPTCommunicator
+	NUM_MOD_WebsiteBackend
+	NUM_MOD_DeviceLocator
+	NUM_MOD_SystemState
+	NUM_MOD_SpeechRecognition
 
-	MODS_ARRAY_SIZE         int = 9 + 1
+	MODS_ARRAY_SIZE
 )
 // MOD_NUMS_NAMES is a map of the numbers of the modules and their names. Use with the NUM_MOD_ constants.
 var MOD_NUMS_NAMES map[int]string = map[int]string{
-	NUM_MOD_VISOR:           "V.I.S.O.R.",
-	NUM_MOD_ModManager:      "Modules Manager",
-	NUM_MOD_SMARTChecker:    "S.M.A.R.T. Checker",
-	NUM_MOD_Speech:          "Speech",
-	NUM_MOD_RssFeedNotifier: "RSS Feed Notifier",
-	NUM_MOD_EmailSender:     "Email Sender",
-	NUM_MOD_OnlineInfoChk:   "Online Information Checker",
-	NUM_MOD_GPTCommunicator: "GPT Communicator",
-	NUM_MOD_WebsiteBackend:  "Website Backend",
-	NUM_MOD_UserLocator:     "User Locator",
+	NUM_MOD_VISOR:             "V.I.S.O.R.",
+	NUM_MOD_ModManager:        "Modules Manager",
+	NUM_MOD_SMARTChecker:      "S.M.A.R.T. Checker",
+	NUM_MOD_Speech:            "Speech",
+	NUM_MOD_RssFeedNotifier:   "RSS Feed Notifier",
+	NUM_MOD_EmailSender:       "Email Sender",
+	NUM_MOD_OnlineInfoChk:     "Online Information Checker",
+	NUM_MOD_GPTCommunicator:   "GPT Communicator",
+	NUM_MOD_WebsiteBackend:    "Website Backend",
+	NUM_MOD_DeviceLocator:     "Device Locator",
+	NUM_MOD_SystemState:       "System State",
+	NUM_MOD_SpeechRecognition: "Speech Recognition",
 }
 
 const (
@@ -99,16 +104,18 @@ const (
 // MOD_NUMS_SUPPORT is a map of the numbers of the modules and if they are supported on the server version, client
 // version, or both.
 var MOD_NUMS_SUPPORT map[int]int = map[int]int{
-	NUM_MOD_VISOR:           MOD_BOTH,
-	NUM_MOD_ModManager:      MOD_BOTH,
-	NUM_MOD_SMARTChecker:    MOD_SERVER,
-	NUM_MOD_Speech:          MOD_CLIENT,
-	NUM_MOD_RssFeedNotifier: MOD_SERVER,
-	NUM_MOD_EmailSender:     MOD_SERVER,
-	NUM_MOD_OnlineInfoChk:   MOD_SERVER,
-	NUM_MOD_GPTCommunicator: MOD_SERVER,
-	NUM_MOD_WebsiteBackend:  MOD_SERVER,
-	NUM_MOD_UserLocator:     MOD_CLIENT,
+	NUM_MOD_VISOR:             MOD_BOTH,
+	NUM_MOD_ModManager:        MOD_BOTH,
+	NUM_MOD_SMARTChecker:      MOD_SERVER,
+	NUM_MOD_Speech:            MOD_CLIENT,
+	NUM_MOD_RssFeedNotifier:   MOD_SERVER,
+	NUM_MOD_EmailSender:       MOD_SERVER,
+	NUM_MOD_OnlineInfoChk:     MOD_SERVER,
+	NUM_MOD_GPTCommunicator:   MOD_SERVER,
+	NUM_MOD_WebsiteBackend:    MOD_SERVER,
+	NUM_MOD_DeviceLocator:     MOD_CLIENT,
+	NUM_MOD_SystemState:       MOD_CLIENT,
+	NUM_MOD_SpeechRecognition: MOD_CLIENT,
 }
 
 // _LOOP_TIME_S is the number of seconds to wait for the next timestamp to be registered by a module (must be more than
@@ -661,21 +668,53 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_ModManager:
 			return true
 		case NUM_MOD_SMARTChecker:
-			return isMOD2Supported()
+			// Check if the command "smartctl" is available
+			output, err := ExecCmdSHELL([]string{"smartctl{{EXE}} -h"})
+			if err != nil {
+				return false
+			}
+
+			return output.Exit_code == 0
 		case NUM_MOD_Speech:
-			return isMOD3Supported()
+			return runtime.GOOS == "windows"
 		case NUM_MOD_RssFeedNotifier:
-			return isMOD4Supported()
+			return true
 		case NUM_MOD_EmailSender:
-			return isMOD5Supported()
+			// Check if the command "curl" is available
+			output, err := ExecCmdSHELL([]string{"curl{{EXE}} -h"})
+			if err != nil {
+				return false
+			}
+
+			return output.Exit_code == 0
 		case NUM_MOD_OnlineInfoChk:
-			return isMOD6Supported()
+			if runtime.GOOS == "windows" {
+				return false
+			}
+
+			// Check if the command "/usr/bin/chromedriver" is available
+			output, err := ExecCmdSHELL([]string{"/usr/bin/chromedriver{{EXE}} -h"})
+			if err != nil {
+				return false
+			}
+
+			return output.Exit_code == 0
 		case NUM_MOD_GPTCommunicator:
-			return isMOD7Supported()
+			// Check if the command "llama-cli" is available
+			output, err := ExecCmdSHELL([]string{"llama-cli{{EXE}} --version"})
+			if err != nil {
+				return false
+			}
+
+			return output.Exit_code == 0
 		case NUM_MOD_WebsiteBackend:
-			return isMOD8Supported()
-		case NUM_MOD_UserLocator:
-			return isMOD9Supported()
+			return true
+		case NUM_MOD_DeviceLocator:
+			return true
+		case NUM_MOD_SystemState:
+			return runtime.GOOS == "windows"
+		case NUM_MOD_SpeechRecognition:
+			return true
 		default:
 			return false
 	}

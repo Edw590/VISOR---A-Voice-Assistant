@@ -22,42 +22,41 @@
 package Screens
 
 import (
+	"Registry/Registry"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	xwidget "fyne.io/x/fyne/widget"
 	"time"
 )
 
-var calendar_canvas_object_GL fyne.CanvasObject = nil
+var registry_canvas_object_GL fyne.CanvasObject = nil
 
-type date struct {
-	instruction *widget.Label
-	dateChosen  *widget.Label
-}
-
-func (d *date) onSelected(t time.Time) {
-	// use time object to set text on label with given format
-	d.instruction.SetText("Date Selected:")
-	d.dateChosen.SetText(t.Format("Mon 02 Jan 2006"))
-}
-
-func Calendar() fyne.CanvasObject {
-	Current_screen_GL = calendar_canvas_object_GL
-	if calendar_canvas_object_GL != nil {
-		return calendar_canvas_object_GL
+func GlobalValues() fyne.CanvasObject {
+	Current_screen_GL = registry_canvas_object_GL
+	if registry_canvas_object_GL != nil {
+		return registry_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
-	// Calendar section
-	i := widget.NewLabel("Please Choose a Date")
-	i.Alignment = fyne.TextAlignCenter
-	l := widget.NewLabel("")
-	l.Alignment = fyne.TextAlignCenter
-	d := &date{instruction: i, dateChosen: l}
+	// Text Display section with vertical scrolling
+	var registry_text *widget.Label = widget.NewLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed " +
+		"do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud " +
+		"exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit " +
+		"in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non " +
+		"proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+	registry_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
+	var scroll_text *container.Scroll = container.NewVScroll(registry_text)
+	scroll_text.SetMinSize(screens_size_GL) // Set the minimum size for the scroll container
 
-	// Defines which date you would like the calendar to start
-	calendar := xwidget.NewCalendar(time.Now(), d.onSelected)
+	go func() {
+		for {
+			if Current_screen_GL == registry_canvas_object_GL {
+				registry_text.SetText(Registry.GetRegistryText())
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
 
 
 
@@ -66,16 +65,14 @@ func Calendar() fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		i,
-		l,
-		calendar,
+		scroll_text,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	calendar_canvas_object_GL = main_scroll
-	Current_screen_GL = calendar_canvas_object_GL
+	registry_canvas_object_GL = main_scroll
+	Current_screen_GL = registry_canvas_object_GL
 
-	return calendar_canvas_object_GL
+	return registry_canvas_object_GL
 }

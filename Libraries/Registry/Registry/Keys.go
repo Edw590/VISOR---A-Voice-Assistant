@@ -19,30 +19,28 @@
  * under the License.
  ******************************************************************************/
 
-package main
+package Registry
 
-import (
-	"GPT/GPT"
-	"Utils"
-	"log"
-	"time"
-)
+// Type: int64
+const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 
-func main() {
-	Utils.PersonalConsts_GL.Init(false)
+// Type: string
+const K_LAST_SPEECH string = "LAST_SPEECH"
 
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
+// Type: bool
+const K_BATTERY_PRESENT string = "BATTERY_PRESENT"
+// Type: int32
+const K_BATTERY_PERCENT string = "BATTERY_PERCENT"
+// Type: bool
+const K_POWER_CONNECTED string = "POWER_CONNECTED"
 
-	log.Println(GPT.SendText("Hi there! How are you?"))
-	/*for {
-		log.Println(GPT.GetEntry(-1, -1))
-
-		time.Sleep(1 * time.Second)
-	}*/
-
-	for sentence := GPT.GetNextSpeechSentence(); sentence != GPT.END_ENTRY; sentence = GPT.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
-
-		time.Sleep(1 * time.Second)
-	}
+func init() {
+	// Modules Manager
+	RegisterValue(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", TYPE_LONG)
+	// Speech
+	RegisterValue(K_LAST_SPEECH, "Last speech", "The last speech that was said", TYPE_STRING)
+	// Power Processor
+	//RegisterValue(K_BATTERY_PRESENT, "Battery present", "Whether the battery is present", TYPE_BOOL)
+	//RegisterValue(K_BATTERY_PERCENT, "Battery percentage", "The battery percentage", TYPE_INT)
+	//RegisterValue(K_POWER_CONNECTED, "Power connected", "Whether the power is connected", TYPE_BOOL)
 }

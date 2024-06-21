@@ -21,38 +21,44 @@
 
 package Registry
 
-const TYPE_BOOL int = 0
-const TYPE_INT int = 1
-const TYPE_LONG int = 2
-const TYPE_FLOAT int = 3
-const TYPE_DOUBLE int = 4
-const TYPE_STRING int = 5
+import (
+	"Utils"
+)
 
-// Value represents a value in the registry.
+const TYPE_BOOL string = "TYPE_BOOL"
+const TYPE_INT string = "TYPE_INT"
+const TYPE_LONG string = "TYPE_LONG"
+const TYPE_FLOAT string = "TYPE_FLOAT"
+const TYPE_DOUBLE string = "TYPE_DOUBLE"
+const TYPE_STRING string = "TYPE_STRING"
+
+// Value represents a value in the registry
 type Value struct {
-	// key is the key of the value.
+	// key is the key of the value
 	key string
-	// pretty_name is the pretty name of the value.
+	// pretty_name is the pretty name of the value
 	pretty_name string
-	// description is the description of the value.
+	// description is the description of the value
 	description string
-	// type_ is the type of the value.
-	type_ int
+	// type_ is the type of the value
+	type_ string
 
-	// prev_data is the previous data of the value.
+	// prev_data is the previous data of the value
 	prev_data string
-	// time_updated_prev is the time the previous data was updated in milliseconds.
+	// time_updated_prev is the time the previous data was updated in milliseconds
 	time_updated_prev int64
-	// curr_data is the current data of the value.
+	// curr_data is the current data of the value
 	curr_data string
-	// time_updated_curr is the time the data was updated in milliseconds.
+	// time_updated_curr is the time the data was updated in milliseconds
 	time_updated_curr int64
 }
 
-var registry_GL map[string]*Value = make(map[string]*Value)
+var registry_GL []*Value = nil
+
+// There's an init() function on Keys.go
 
 /*
-AddValue adds a value to the registry.
+RegisterValue registers a value in the registry.
 
 -----------------------------------------------------------
 
@@ -65,19 +71,44 @@ AddValue adds a value to the registry.
 – Returns:
   - the created value or nil if the value already exists
 */
-func AddValue(key string, pretty_name string, description string, value_type int) *Value {
-	if _, ok := registry_GL[key]; ok {
-		return nil
+func RegisterValue(key string, pretty_name string, description string, value_type string) *Value {
+	if value := GetValue(key); value != nil {
+		return value
 	}
 
-	registry_GL[key] = &Value{
+	var value *Value = &Value{
 		key:          key,
 		pretty_name:  pretty_name,
 		description:  description,
 		type_:        value_type,
 	}
 
-	return registry_GL[key]
+	switch value.type_ {
+		case TYPE_BOOL:
+			value.prev_data = "false"
+			value.curr_data = "false"
+		case TYPE_INT: fallthrough
+		case TYPE_LONG: fallthrough
+		case TYPE_FLOAT: fallthrough
+		case TYPE_DOUBLE:
+			value.prev_data = "0"
+			value.curr_data = "0"
+	}
+
+
+	registry_GL = append(registry_GL, value)
+
+	return value
+}
+
+func GetValue(key string) *Value {
+	for _, value := range registry_GL {
+		if value.key == key {
+			return value
+		}
+	}
+
+	return nil
 }
 
 /*
@@ -89,29 +120,27 @@ RemoveValue removes a value from the registry based on its key.
   - key – the key of the value
  */
 func RemoveValue(key string) {
-	delete(registry_GL, key)
+	for i, value := range registry_GL {
+		if value.key == key {
+			registry_GL = append(registry_GL[:i], registry_GL[i+1:]...)
+
+			return
+		}
+	}
 }
 
-type TestFunction func() bool
-type TestInterface interface {
-	Test() bool
-	TestBool (bool) bool
-}
+func GetRegistryText() string {
+	var text string = ""
 
-func TestFunc(function TestFunction) bool {
-	return true
-}
-func TestFunc2(func() bool) bool {
-	return true
-}
-func TestInterfaceFunc(test_interface TestInterface) bool {
-	return test_interface.Test()
-}
+	for _, value := range registry_GL {
+		text += "Name: " + value.pretty_name + "\n" +
+				"Type: " + value.type_ + "\n" +
+				"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.time_updated_prev) + "\n" +
+				"Prev data: " + value.prev_data + "\n" +
+				"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.time_updated_curr) + "\n" +
+				"Curr data: " + value.curr_data + "\n" +
+				"Description: " + value.description + "\n\n"
+	}
 
-type SomeCallback interface {
-	DoSomething()
-}
-
-func TestCallback(callback SomeCallback) {
-	callback.DoSomething()
+	return text
 }

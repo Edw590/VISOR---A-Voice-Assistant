@@ -203,7 +203,7 @@ func init() {realMain =
 							break
 						}
 
-						if Utils.WaitWithStop(module_stop, 60) {
+						if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
 							return
 						}
 					}
@@ -241,7 +241,7 @@ func init() {realMain =
 				return
 			}
 
-			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
 			}
 		}

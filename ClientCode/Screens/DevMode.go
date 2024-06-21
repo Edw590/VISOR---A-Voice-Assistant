@@ -92,7 +92,7 @@ func DevMode() fyne.CanvasObject {
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(fyne.NewSize(550, 480))
+	main_scroll.SetMinSize(screens_size_GL)
 
 	dev_mode_canvas_object_GL = main_scroll
 	Current_screen_GL = dev_mode_canvas_object_GL

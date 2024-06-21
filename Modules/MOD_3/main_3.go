@@ -22,6 +22,7 @@
 package MOD_3
 
 import (
+	"Registry/Registry"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
 	"time"
@@ -107,6 +108,8 @@ func init() {realMain =
 					speak = true
 				}
 
+				var removed_from_queue bool = false
+
 				if notify {
 					Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
 
@@ -115,6 +118,7 @@ func init() {realMain =
 					// Remove the speech. This means if he can't speak it in case it's to also speak, he won't retry.
 					// But it's notified, so shouldn't be a problem I guess.
 					SpeechQueue.RemoveSpeech(curr_speech.GetID())
+					removed_from_queue = true
 				}
 
 				if speak {
@@ -144,6 +148,7 @@ func init() {realMain =
 							//log.Println("Speech spoken successfully.")
 
 							SpeechQueue.RemoveSpeech(curr_speech.GetID())
+							removed_from_queue = true
 						} else {
 							//log.Println("Speech interrupted successfully.")
 
@@ -152,6 +157,10 @@ func init() {realMain =
 					} else {
 						//log.Println("Error speaking speech: ", err)
 					}
+				}
+
+				if removed_from_queue {
+					Registry.GetValue(Registry.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
 				}
 
 				curr_speech = nil
@@ -181,7 +190,7 @@ func init() {realMain =
 				}
 			}
 
-			if Utils.WaitWithStop(module_stop, _TIME_SLEEP_S) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				kill_ch <- true
 
 				return

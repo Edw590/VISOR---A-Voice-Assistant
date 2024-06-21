@@ -43,6 +43,8 @@ type _PersonalConstsEOG struct {
 	WEBSITE_DIR string
 
 	WOLFRAM_ALPHA_APPID string
+
+	PICOVOICE_API_KEY string
 }
 
 // PersonalConsts is a struct containing the constants that are personal to the user.
@@ -69,6 +71,9 @@ type PersonalConsts struct {
 
 	// WOLFRAM_ALPHA_APPID is the app ID for the Wolfram Alpha API
 	WOLFRAM_ALPHA_APPID string
+
+	// PICOVOICE_API_KEY is the API key for the Picovoice API
+	PICOVOICE_API_KEY string
 }
 
 /*
@@ -107,10 +112,13 @@ func (personalConsts *PersonalConsts) Init(server bool) error {
 
 	personalConsts.WOLFRAM_ALPHA_APPID = struct_file_format.WOLFRAM_ALPHA_APPID
 
+	personalConsts.PICOVOICE_API_KEY = struct_file_format.PICOVOICE_API_KEY
+
 	if personalConsts.VISOR_SERVER {
 		if !strings.Contains(personalConsts._VISOR_EMAIL_ADDR, "@") || personalConsts._VISOR_EMAIL_PW == "" ||
 				!strings.Contains(personalConsts.USER_EMAIL_ADDR, "@") || !strings.Contains(personalConsts.WEBSITE_URL, "http") ||
-				personalConsts.WEBSITE_PW == "" || personalConsts.WOLFRAM_ALPHA_APPID == "" {
+				personalConsts.WEBSITE_PW == "" || personalConsts.WOLFRAM_ALPHA_APPID == "" ||
+				personalConsts.PICOVOICE_API_KEY == "" {
 			return errors.New("some fields in " + PERSONAL_CONSTS_FILE + " are empty or incorrect - aborting")
 		}
 	} else {

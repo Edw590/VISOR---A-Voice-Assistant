@@ -33,8 +33,13 @@ func (value *Value) setInternal() {
 	value.time_updated_curr = time.Now().UnixMilli()
 }
 
-func (value *Value) SetBool(data bool) bool {
+func (value *Value) SetBool(data bool, update_if_same bool) bool {
 	if value.type_ != TYPE_BOOL {
+		return false
+	}
+
+	var data_str string = strconv.FormatBool(data)
+	if !update_if_same && value.curr_data == data_str {
 		return false
 	}
 
@@ -49,8 +54,13 @@ func (value *Value) SetBool(data bool) bool {
 	return true
 }
 
-func (value *Value) SetInt(data int) bool {
+func (value *Value) SetInt(data int, update_if_same bool) bool {
 	if value.type_ != TYPE_INT {
+		return false
+	}
+
+	var data_str string = strconv.Itoa(data)
+	if !update_if_same && value.curr_data == data_str {
 		return false
 	}
 
@@ -61,8 +71,13 @@ func (value *Value) SetInt(data int) bool {
 	return true
 }
 
-func (value *Value) SetLong(data int64) bool {
+func (value *Value) SetLong(data int64, update_if_same bool) bool {
 	if value.type_ != TYPE_LONG {
+		return false
+	}
+
+	var data_str string = strconv.FormatInt(data, 10)
+	if !update_if_same && value.curr_data == data_str {
 		return false
 	}
 
@@ -73,8 +88,13 @@ func (value *Value) SetLong(data int64) bool {
 	return true
 }
 
-func (value *Value) SetFloat(data float32) bool {
+func (value *Value) SetFloat(data float32, update_if_same bool) bool {
 	if value.type_ != TYPE_FLOAT {
+		return false
+	}
+
+	var data_str string = strconv.FormatFloat(float64(data), 'f', -1, 32)
+	if !update_if_same && value.curr_data == data_str {
 		return false
 	}
 
@@ -85,8 +105,13 @@ func (value *Value) SetFloat(data float32) bool {
 	return true
 }
 
-func (value *Value) SetDouble(data float64) bool {
+func (value *Value) SetDouble(data float64, update_if_same bool) bool {
 	if value.type_ != TYPE_DOUBLE {
+		return false
+	}
+
+	var data_str string = strconv.FormatFloat(data, 'f', -1, 64)
+	if !update_if_same && value.curr_data == data_str {
 		return false
 	}
 
@@ -97,8 +122,12 @@ func (value *Value) SetDouble(data float64) bool {
 	return true
 }
 
-func (value *Value) SetString(data string) bool {
+func (value *Value) SetString(data string, update_if_same bool) bool {
 	if value.type_ != TYPE_STRING {
+		return false
+	}
+
+	if !update_if_same && value.curr_data == data {
 		return false
 	}
 

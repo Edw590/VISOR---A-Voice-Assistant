@@ -23,10 +23,11 @@ package main
 
 import (
 	"Registry/Registry"
+	"log"
 )
 
 func main() {
-	var value *Registry.Value = Registry.AddValue("key1", "Pretty Name 1", "Description 1", Registry.TYPE_BOOL)
+	var value *Registry.Value = Registry.RegisterValue("key1", "Pretty Name 1", "Description 1", Registry.TYPE_BOOL)
 
 	log.Println(value.GetBool(true))
 }

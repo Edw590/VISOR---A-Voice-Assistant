@@ -32,6 +32,8 @@ import (
 // should continue processing data or not (they don't stop, they just keep waiting for the screen to become active again).
 var Current_screen_GL fyne.CanvasObject = nil
 
+var screens_size_GL fyne.Size = fyne.NewSize(550, 480)
+
 var home_canvas_object_GL fyne.CanvasObject = nil
 
 func Home() fyne.CanvasObject {
@@ -61,7 +63,7 @@ func Home() fyne.CanvasObject {
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(fyne.NewSize(550, 480))
+	main_scroll.SetMinSize(screens_size_GL)
 
 	home_canvas_object_GL = main_scroll
 	Current_screen_GL = home_canvas_object_GL

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -34,11 +34,14 @@ GetDateTimeStrTIMEDATE gets the current time and date in the format DATE_TIME_FO
 
 -----------------------------------------------------------
 
+– Params:
+  - millis – the time in milliseconds or -1 for the current time
+
 – Returns:
   - the current time and date in the default format
 */
 func GetDateTimeStrTIMEDATE(millis int64) string {
-	return getTimeDateInFormat(millis, DATE_TIME_FORMAT)
+	return getTimeDateInFormatTIMEDATE(millis, DATE_TIME_FORMAT)
 }
 
 /*
@@ -46,11 +49,14 @@ GetDateStrTIMEDATE gets the current date in the format DATE_FORMAT.
 
 -----------------------------------------------------------
 
+– Params:
+  - millis – the time in milliseconds or -1 for the current time
+
 – Returns:
   - the current time in the default format
 */
 func GetDateStrTIMEDATE(millis int64) string {
-	return getTimeDateInFormat(millis, DATE_FORMAT)
+	return getTimeDateInFormatTIMEDATE(millis, DATE_FORMAT)
 }
 
 /*
@@ -58,26 +64,29 @@ GetTimeStrTIMEDATE gets the current time in the format TIME_FORMAT.
 
 -----------------------------------------------------------
 
+– Params:
+  - millis – the time in milliseconds or -1 for the current time
+
 – Returns:
   - the current date in the default format
 */
 func GetTimeStrTIMEDATE(millis int64) string {
-	return getTimeDateInFormat(millis, TIME_FORMAT)
+	return getTimeDateInFormatTIMEDATE(millis, TIME_FORMAT)
 }
 
 /*
-getTimeDateInFormat gets the time and/or date in the given format.
+getTimeDateInFormatTIMEDATE gets the time and/or date in the given format.
 
 -----------------------------------------------------------
 
 – Params:
-  - millis – the time in milliseconds
+  - millis – the time in milliseconds or -1 for the current time
   - format – the format to use
 
 – Returns:
   - the time and/or date in the given format
- */
-func getTimeDateInFormat(millis int64, format string) string {
+*/
+func getTimeDateInFormatTIMEDATE(millis int64, format string) string {
 	if millis != -1 {
 		return time.Unix(0, millis*1e6).Format(format)
 	} else {
@@ -86,7 +95,7 @@ func getTimeDateInFormat(millis int64, format string) string {
 }
 
 /*
-WaitWithStop waits for a certain amount of time or until a stop signal is received (checked every second).
+WaitWithStopTIMEDATE waits for a certain amount of time or until a stop signal is received (checked every second).
 
 -----------------------------------------------------------
 
@@ -96,8 +105,13 @@ WaitWithStop waits for a certain amount of time or until a stop signal is receiv
 
 – Returns:
   - whether the loop was stopped (true) or it reached the end time (false)
- */
-func WaitWithStop(stop *bool, time_wait_s int) bool {
+*/
+func WaitWithStopTIMEDATE(stop *bool, time_wait_s int) bool {
+	if *stop {
+		// In case time_wait_s is 0, it returns immediately in case the stop signal has been given
+		return true
+	}
+
 	var time_end int64 = time.Now().Unix() + int64(time_wait_s)
 	var stopped bool = false
 	for time.Now().Unix() < time_end {
