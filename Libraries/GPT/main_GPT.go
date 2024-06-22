@@ -33,14 +33,14 @@ func main() {
 
 	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 
-	log.Println(GPT.SendText("Hi there! How are you?"))
+	log.Println(GPT.SendText("hello"))
 	/*for {
 		log.Println(GPT.GetEntry(-1, -1))
 
 		time.Sleep(1 * time.Second)
 	}*/
 
-	for sentence := GPT.GetNextSpeechSentence(); sentence != GPT.END_ENTRY; sentence = GPT.GetNextSpeechSentence() {
+	for sentence := GPT.GetNextSpeechSentence(); ; sentence = GPT.GetNextSpeechSentence() {
 		log.Println("sentence: " + sentence)
 
 		time.Sleep(1 * time.Second)

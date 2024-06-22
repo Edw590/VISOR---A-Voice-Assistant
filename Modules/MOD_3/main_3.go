@@ -32,9 +32,6 @@ import (
 	"github.com/itchyny/volume-go"
 )
 
-const RATE int = 0
-const VOLUME int = 100
-
 const _TIME_SLEEP_S int = 1
 
 var tts_GL *sapi.Sapi = nil
@@ -56,8 +53,8 @@ func init() {realMain =
 		} else {
 			tts_GL = tts
 		}
-		_ = tts_GL.SetRate(RATE)
-		_ = tts_GL.SetVolume(VOLUME)
+		_ = tts_GL.SetRate(-4)
+		_ = tts_GL.SetVolume(100)
 
 		//log.Println("Waiting for speeches to speak...")
 

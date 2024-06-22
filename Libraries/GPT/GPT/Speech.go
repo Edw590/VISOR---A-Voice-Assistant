@@ -22,7 +22,6 @@
 package GPT
 
 import (
-	"log"
 	"strings"
 	"time"
 )
@@ -32,10 +31,12 @@ var curr_idx int = 0
 
 const END_ENTRY string = "[3234_END]"
 /*
-GetNextSpeechSentence gets the next sentence to be spoken.
+GetNextSpeechSentence gets the next sentence to be spoken of the most recent speech.
 
 Each time the function is called, a new sentence is returned, until the end of the text file is reached, in which case
 the function will return END_ENTRY.
+
+In case a new speech is added to the text file, the function will continue the speech it was on until its end.
 
 -----------------------------------------------------------
 
@@ -68,17 +69,17 @@ func GetNextSpeechSentence() string {
 		}
 		var text_split []string = strings.Split(entry.GetText(), " ")
 
-		log.Println("--------------------------")
+		//log.Println("--------------------------")
 		if curr_idx >= len(text_split) {
 			break
 		}
 		for i := curr_idx; i < len(text_split); i++ {
 			var word string = text_split[i]
-			log.Println("curr_idx:", i)
-			log.Println("word:", word)
+			//log.Println("curr_idx:", i)
+			//log.Println("word:", word)
 
 			if strings.Contains(word, END_ENTRY) {
-				// If the word contains the end entry, remove it and add a period at the end in case there's not already
+				// If the word contains END_ENTRY, remove it and add a period at the end in case there's not already
 				// one. Example: "peers[3234_END]" --> "peers.". Or "peers.[3234_END]" --> "peers.".
 
 				// But if the word is END_ENTRY alone, just break the loop and return whatever there is - including
@@ -108,7 +109,7 @@ func GetNextSpeechSentence() string {
 			}
 
 			if strings.HasSuffix(word, ".") || strings.HasSuffix(word, "!") || strings.HasSuffix(word, "?") {
-				log.Println("sentence: \"" + sentence + "\"")
+				//log.Println("sentence: \"" + sentence + "\"")
 				//log.Println("word: \"" + word + "\"")
 				sentence = strings.TrimSuffix(sentence, " ")
 

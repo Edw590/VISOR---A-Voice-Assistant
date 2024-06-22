@@ -190,9 +190,7 @@ func init() {realMain =
 					Registry.GetValue(Registry.K_SHOW_APP_SIG).SetBool(false, false)
 				}
 
-				if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
-					return
-				}
+				time.Sleep(1 * time.Second)
 			}
 		}()
 

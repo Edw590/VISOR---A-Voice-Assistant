@@ -21,7 +21,7 @@
 
 package GPT
 
-// Entry is a struct containing the time and text of a generated text.
+// Entry is a struct containing the text and time of a generated text.
 type Entry struct {
 	// text is the text generated
 	text string
