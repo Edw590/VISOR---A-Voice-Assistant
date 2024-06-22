@@ -28,6 +28,9 @@ const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 const K_LAST_SPEECH string = "LAST_SPEECH"
 
 // Type: bool
+const K_SHOW_APP_SIG string = "SHOW_APP_SIG"
+
+// Type: bool
 const K_BATTERY_PRESENT string = "BATTERY_PRESENT"
 // Type: int32
 const K_BATTERY_PERCENT string = "BATTERY_PERCENT"
@@ -39,6 +42,8 @@ func init() {
 	RegisterValue(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", TYPE_LONG)
 	// Speech
 	RegisterValue(K_LAST_SPEECH, "Last speech", "The last speech that was said", TYPE_STRING)
+	// Speech Recognition
+	RegisterValue(K_SHOW_APP_SIG, "Show app signal", "Signal to show the app", TYPE_BOOL)
 	// Power Processor
 	//RegisterValue(K_BATTERY_PRESENT, "Battery present", "Whether the battery is present", TYPE_BOOL)
 	//RegisterValue(K_BATTERY_PERCENT, "Battery percentage", "The battery percentage", TYPE_INT)

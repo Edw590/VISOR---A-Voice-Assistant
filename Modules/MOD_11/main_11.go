@@ -22,8 +22,8 @@
 package MOD_11
 
 import (
+	"Registry/Registry"
 	"Utils"
-	"VISOR_Client/ControlChannel"
 	porcupine "github.com/Picovoice/porcupine/binding/go/v3"
 	"github.com/gordonklaus/portaudio"
 )
@@ -73,7 +73,7 @@ func init() {realMain =
 		for {
 			keywordIndex, _ := porcupine_.Process(getNextFrameAudio())
 			if keywordIndex >= 0 {
-				ControlChannel.Channel <- ControlChannel.SHOW_WINDOW
+				Registry.GetValue(Registry.K_SHOW_APP_SIG).SetBool(true, false)
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 0) {

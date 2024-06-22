@@ -25,8 +25,8 @@ import (
 	"GPT/GPT"
 	MOD_1 "ModManager"
 	"OIG/OIG"
+	"Registry/Registry"
 	"Utils"
-	"VISOR_Client/ControlChannel"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
 	"fyne.io/fyne/v2"
@@ -185,14 +185,12 @@ func init() {realMain =
 
 		go func() {
 			for {
-				var code int = <- ControlChannel.Channel
-
-				switch code {
-					case ControlChannel.SHOW_WINDOW:
-						showWindow()
+				if Registry.GetValue(Registry.K_SHOW_APP_SIG).GetBool(true) {
+					showWindow()
+					Registry.GetValue(Registry.K_SHOW_APP_SIG).SetBool(false, false)
 				}
 
-				if Utils.WaitWithStopTIMEDATE(module_stop, 0) {
+				if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
 					return
 				}
 			}
