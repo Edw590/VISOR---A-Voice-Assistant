@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -295,25 +295,30 @@ func (gPath GPath) WriteFile(content []byte, append bool) error {
 		return errors.New("the path describes a directory or it couldn't be created")
 	}
 
-	var flags int = os.O_CREATE | os.O_WRONLY
 	if append {
-		flags |= os.O_APPEND
-	}
+		var flags int = os.O_WRONLY | os.O_APPEND
 
-	file, err := os.OpenFile(gPath.p, flags, 0o777)
-	if nil != err {
-		return err
-	}
+		file, err := os.OpenFile(gPath.p, flags, 0o777)
+		if nil != err {
+			return err
+		}
+		defer file.Close()
 
-	_, err = file.Write(content)
+		_, err = file.Write(content)
+	} else {
+		// This way is here too because the other one doesn't seem to work well when it's not to append. Sometimes it
+		// adds stuff to the file who knows why. This way here doesn't at least.
+		err := os.WriteFile(gPath.p, content, 0o777)
+		if nil != err {
+			return err
+		}
+	}
 
 	// Set the permissions to 777 after writing the file to be sure the file is accessible (OpenFile only sets the
 	// permissions for the file creation).
 	_ = os.Chmod(gPath.p, 0o777)
 
-	_ = file.Close()
-
-	return err
+	return nil
 }
 
 /*
