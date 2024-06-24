@@ -9,6 +9,7 @@ use (
 	Libraries/OIG
 	Libraries/Registry
 	Libraries/SpeechQueue
+	Libraries/ULComm
 	Modules/MOD_1
 	Modules/MOD_2
 	Modules/MOD_3
@@ -17,9 +18,9 @@ use (
 	Modules/MOD_6
 	Modules/MOD_7
 	Modules/MOD_8
-	Modules/MOD_9
 	Modules/MOD_10
 	Modules/MOD_11
+	Modules/MOD_12
 	ServerCode
 	Utils
 )

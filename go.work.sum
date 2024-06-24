@@ -187,6 +187,10 @@ github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f h1:UFr9zpz4xgTnIE5yIMtWAMngCdZ9p/+q6lTbgelo80M=
 github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca h1:NugYot0LIVPxTvN8n+Kvkn6TrbMyxQiuvKdEwFdR9vI=
 github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca/go.mod h1:uugorj2VCxiV1x+LzaIdVa9b4S4qGAcH6cbhh4qVxOU=
+github.com/schollz/logger v1.2.0 h1:5WXfINRs3lEUTCZ7YXhj0uN+qukjizvITLm3Ca2m0Ho=
+github.com/schollz/logger v1.2.0/go.mod h1:P6F4/dGMGcx8wh+kG1zrNEd4vnNpEBY/mwEMd/vn6AM=
+github.com/schollz/wifiscan v1.1.2-0.20240616123334-6fc669145a0b h1:L2pTrbMF7m6q3ETJ8ksYWhU6VdD1BGo/QJA2TECYow0=
+github.com/schollz/wifiscan v1.1.2-0.20240616123334-6fc669145a0b/go.mod h1:i76xTtJcW/hvdTMrIhz6MVg9MAuP41aRLgAcaHjq1wE=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 h1:nn5Wsu0esKSJiIVhscUtVbo7ada43DJhG55ua/hjS5I=
 github.com/shoenig/test v0.6.4/go.mod h1:byHiCGXqrVaflBLAMq/srcZIHynQPQgeyvkvXnjqq0k=
 github.com/shogo82148/go-shuffle v0.0.0-20180218125048-27e6095f230d h1:rUbV6LJa5RXK3jT/4jnJUz3UkrXzW6cqB+n9Fkbv9jY=

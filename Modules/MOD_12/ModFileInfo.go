@@ -19,28 +19,26 @@
  * under the License.
  ******************************************************************************/
 
-//go:build server
+package MOD_12
 
-package MOD_1
+// _ModUserInfo is the format of the custom information file about this specific module.
+type _ModUserInfo struct {
+	// Locs_info is the information about the locations
+	Locs_info []_LocInfo
+}
 
-import (
-	MOD_5 "EmailSender"
-	MOD_7 "GPTCommunicator"
-	MOD_6 "OnlineInfoChk"
-	MOD_4 "RssFeedNotifier"
-	MOD_2 "SMARTChecker"
-	MOD_12 "UserLocator"
-	"Utils"
-	MOD_8 "WebsiteBackend"
-)
-
-// Make sure to add the modules support check for each new module too...
-var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
-	Utils.NUM_MOD_SMARTChecker:      MOD_2.Start,
-	Utils.NUM_MOD_RssFeedNotifier:   MOD_4.Start,
-	Utils.NUM_MOD_EmailSender:       MOD_5.Start,
-	Utils.NUM_MOD_OnlineInfoChk:     MOD_6.Start,
-	Utils.NUM_MOD_GPTCommunicator:   MOD_7.Start,
-	Utils.NUM_MOD_WebsiteBackend:    MOD_8.Start,
-	Utils.NUM_MOD_UserLocator:       MOD_12.Start,
+type _LocInfo struct {
+	// Type is the type of the location "detector" (e.g. wifi)
+	Type string
+	// Name is the name of the detection (e.g. the wifi SSID)
+	Name string
+	// Address is the address of the detection (e.g. the wifi BSSID) in the format XX:XX:XX:XX:XX:XX
+	Address string
+	// Last_detection is the maximum amount of time in seconds without checking in which the device may still be in the
+	// specified location
+	Last_detection int64
+	// Max_distance is the maximum distance in meters in which the device is in the specified location
+	Max_distance int
+	// Location is where the device is (e.g. "home")
+	Location string
 }

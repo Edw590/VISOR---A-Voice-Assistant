@@ -19,26 +19,41 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_9
+package main
 
-// _ModUserInfo is the format of the custom information file about this specific module.
-type _ModUserInfo struct {
-	// Locs_info is the information about the locations
-	Locs_info []_LocInfo
-}
+import (
+	"ULComm/ULComm"
+	"Utils"
+	"log"
+	"time"
+)
 
-type _LocInfo struct {
-	// Type is the type of the location "detector" (e.g. wifi)
-	Type string
-	// Name is the name of the detection (e.g. the wifi SSID)
-	Name string
-	// Address is the address of the detection (e.g. the wifi BSSID) in the format XX:XX:XX:XX:XX:XX
-	Address string
-	// Last_detection is the maximum amount of time in seconds without checking in which the device may still be in the
-	// specified location
-	Last_detection int64
-	// Max_distance is the maximum distance in meters in which the device is in the specified location
-	Max_distance int
-	// Location is where the device is (e.g. "home")
-	Location string
+func main() {
+	Utils.PersonalConsts_GL.Init(false)
+
+	var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
+		Device_id:    "Test Device",
+		Device_type:  ULComm.TYPE_DEVICE_DESKTOP,
+		Last_comm:    time.Now().Unix(),
+		System_state: ULComm.SystemState{
+			Connectivity_info: ULComm.ConnectivityInfo{
+				Airplane_mode_enabled: false,
+				Wifi_enabled:          true,
+				Bluetooth_enabled:     false,
+				Mobile_data_enabled:   true,
+				Wifi_networks:         nil,
+				Bluetooth_devices:     nil,
+			},
+			Battery_info:      ULComm.BatteryInfo{
+				Level:           54,
+				Power_connected: true,
+			},
+			Monitor_info:      ULComm.MonitorInfo{
+				Screen_on:  true,
+				Brightness: 30,
+			},
+		},
+	}
+
+	log.Println(device_info.SendInfo())
 }
