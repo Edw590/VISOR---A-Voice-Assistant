@@ -25,10 +25,11 @@ import (
 	"Utils"
 	"fmt"
 	Tcef "github.com/Edw590/TryCatch-go"
+	"log"
 	"net/http"
 )
 
-// Modules Manager //
+// Website Backend //
 
 type _MGIModSpecInfo any
 var (
@@ -65,31 +66,46 @@ func init() {realMain =
 }
 
 func formHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "ParseForm() err: " + err.Error(), http.StatusInternalServerError)
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	}
 
-			return
-		}
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "ParseForm() err: " + err.Error(), http.StatusInternalServerError)
 
-		var type_ string = r.FormValue("type")
-		var text1 string = r.FormValue("text1")
-		var text2 string = r.FormValue("text2")
-		var text3 string = r.FormValue("text3")
-		// Process form data here
-		_, _ = fmt.Fprintf(w, "Received type: %s\ntext1: %s\n text2: %s\n text3: %s\n", type_, text1, text2, text3)
+		return
+	}
 
-		if type_ == "GPT" {
+	var type_ string = r.FormValue("type")
+	var text1 string = r.FormValue("text1")
+	var text2 string = r.FormValue("text2")
+	var text3 string = r.FormValue("text3")
+
+	// Write to the page this below
+	_, _ = fmt.Fprintf(w, "Received type: %s\ntext1: %s\n text2: %s\n text3: %s\n", type_, text1, text2, text3)
+
+	switch type_ {
+		case "GPT":
+			log.Println("GPT")
+			// Text1 is the text to process
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
 				WriteTextFile(text1, false)
-		} else if type_ == "Email" {
+		case "Email":
+			log.Println("Email")
+			// Text1 is the email address to send to
+			// Text2 is the EML file to send
 			_ = Utils.QueueEmailEMAIL(Utils.EmailInfo{
-				Mail_to:    text1,
-				Eml:        text2,
+				Mail_to: text1,
+				Eml: text2,
 			})
-		}
-	} else {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		case "UserLocator":
+			// Text1 is the device ID
+			// Text2 is the JSON data to write
+			log.Println("UserLocator")
+			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", text1 + ".json").
+				WriteTextFile(text2, false)
+		default:
+			// Do nothing
 	}
 }
