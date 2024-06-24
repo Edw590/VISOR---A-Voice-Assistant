@@ -21,12 +21,26 @@
 
 package GPT
 
-// Entry is a struct containing the text and time of a generated text.
+// Entry is a struct containing information of a generated text.
 type Entry struct {
+	// device_id is the device ID of the entry
+	device_id string
 	// text is the text generated
 	text string
 	// time is the Unix time in milliseconds
 	time int64
+}
+
+/*
+GetDeviceID gets the device ID of the entry.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the device ID
+ */
+func (entry Entry) GetDeviceID() string {
+	return entry.device_id
 }
 
 /*

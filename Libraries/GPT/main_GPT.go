@@ -31,8 +31,6 @@ import (
 func main() {
 	Utils.PersonalConsts_GL.Init(false)
 
-	GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
-
 	log.Println(GPT.SendText("hello"))
 	/*for {
 		log.Println(GPT.GetEntry(-1, -1))

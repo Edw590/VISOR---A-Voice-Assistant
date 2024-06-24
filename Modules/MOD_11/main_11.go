@@ -28,6 +28,8 @@ import (
 	"github.com/gordonklaus/portaudio"
 )
 
+// Speech Recognition //
+
 var (
 	in []int16
 	stream *portaudio.Stream

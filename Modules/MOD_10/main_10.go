@@ -35,6 +35,8 @@ import (
 	"strings"
 )
 
+// System State //
+
 const _TIME_SLEEP_S int = 5
 
 type _Battery struct {

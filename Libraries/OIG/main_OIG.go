@@ -28,9 +28,8 @@ import (
 )
 
 func main() {
-	Utils.PersonalConsts_GL.Init()
+	Utils.PersonalConsts_GL.Init(false)
 
-	OIG.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 	log.Println(OIG.GetNews())
 	log.Println(OIG.GetWeather())
 }

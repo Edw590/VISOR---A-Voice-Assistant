@@ -22,9 +22,7 @@
 package main
 
 import (
-	"GPT/GPT"
 	MOD_1 "ModManager"
-	"OIG/OIG"
 	"Utils"
 	"log"
 	"os"
@@ -55,9 +53,6 @@ func init() {realMain =
 
 			return
 		}
-
-		GPT.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
-		OIG.SetWebsiteInfo(Utils.PersonalConsts_GL.WEBSITE_URL, Utils.PersonalConsts_GL.WEBSITE_PW)
 
 		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {

@@ -27,23 +27,6 @@ import (
 	"Utils"
 )
 
-var website_url_GL string = ""
-var website_pw_GL string = ""
-
-/*
-SetWebsiteInfo sets VISOR's website url and password.
-
------------------------------------------------------------
-
-– Params:
-  - url – the website url
-  - pw – the website password
- */
-func SetWebsiteInfo(url string, pw string) {
-	website_url_GL = url
-	website_pw_GL = pw
-}
-
 /*
 GetNews gets the news from the given page contents.
 
@@ -56,7 +39,8 @@ GetNews gets the news from the given page contents.
   - the news separated by " ||| " and each news location separated by "\n"
  */
 func GetNews() string {
-	var page_contents []byte = Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/news.json", website_pw_GL)
+	var page_contents []byte = Utils.GetPageContentsWEBSITE(Utils.PersonalConsts_GL.WEBSITE_URL + "files_EOG/news.json",
+		Utils.PersonalConsts_GL.WEBSITE_PW)
 
 	var news_list []OICNews.News
 	if err := Utils.FromJsonGENERAL(page_contents, &news_list); err != nil {
@@ -97,7 +81,8 @@ Weather data in order:
   - the weather separated by " ||| " and each weather location separated by "\n"
  */
 func GetWeather() string {
-	var page_contents []byte = Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/weather.json", website_pw_GL)
+	var page_contents []byte = Utils.GetPageContentsWEBSITE(Utils.PersonalConsts_GL.WEBSITE_URL + "files_EOG/weather.json",
+		Utils.PersonalConsts_GL.WEBSITE_PW)
 
 	var weather []OICWeather.Weather
 	if err := Utils.FromJsonGENERAL(page_contents, &weather); err != nil {

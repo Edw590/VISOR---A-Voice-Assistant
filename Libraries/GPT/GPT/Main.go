@@ -34,27 +34,13 @@ var website_url_GL string = ""
 var website_pw_GL string = ""
 
 /*
-SetWebsiteInfo sets VISOR's website url and password.
-
------------------------------------------------------------
-
-– Params:
-  - url – the website url
-  - pw – the website password
-*/
-func SetWebsiteInfo(url string, pw string) {
-	website_url_GL = url
-	website_pw_GL = pw
-}
-
-/*
 GetNumEntries gets the number of entries in the text file.
 
 -----------------------------------------------------------
 
 – Returns:
   - the number of entries
- */
+*/
 func GetNumEntries() int {
 	var page_contents string = string(Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/gpt_text.txt", website_pw_GL))
 	var entries []string = strings.Split(page_contents, "[3234_START:")
@@ -82,7 +68,7 @@ parameter.
 
 – Returns:
   - the entry or nil if an error occurred
- */
+*/
 func GetEntry(time int64, num int32) *Entry {
 	var page_contents string = string(Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/gpt_text.txt", website_pw_GL))
 	if page_contents == "" {

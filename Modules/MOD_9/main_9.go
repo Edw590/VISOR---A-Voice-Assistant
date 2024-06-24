@@ -27,6 +27,8 @@ import (
 	"strconv"
 )
 
+// Device Locator //
+
 const _TIME_SLEEP_S int = 5
 
 const _DEFAULT_LOCATION string = "unknown"
