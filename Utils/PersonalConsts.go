@@ -31,6 +31,8 @@ var PersonalConsts_GL PersonalConsts = PersonalConsts{}
 
 // _PersonalConstsEOG is the internal struct with the format of the PersonalConsts_EOG.json file.
 type _PersonalConstsEOG struct {
+	DEVICE_ID string
+
 	VISOR_DIR string
 
 	VISOR_EMAIL_ADDR string
@@ -49,6 +51,9 @@ type _PersonalConstsEOG struct {
 
 // PersonalConsts is a struct containing the constants that are personal to the user.
 type PersonalConsts struct {
+	// DEVICE_ID is the device ID of the current device
+	DEVICE_ID string
+
 	// _VISOR_DIR is the full path to the main directory of VISOR.
 	_VISOR_DIR GPath
 	// VISOR_SERVER is true if the version being used is the server version, false if it's the client version
@@ -98,6 +103,8 @@ func (personalConsts *PersonalConsts) Init(server bool) error {
 
 	// Set the global variables
 
+	personalConsts.DEVICE_ID = struct_file_format.DEVICE_ID
+
 	personalConsts._VISOR_DIR = PathFILESDIRS(true, "", struct_file_format.VISOR_DIR)
 	personalConsts.VISOR_SERVER = server
 
@@ -115,10 +122,10 @@ func (personalConsts *PersonalConsts) Init(server bool) error {
 	personalConsts.PICOVOICE_API_KEY = struct_file_format.PICOVOICE_API_KEY
 
 	if personalConsts.VISOR_SERVER {
-		if !strings.Contains(personalConsts._VISOR_EMAIL_ADDR, "@") || personalConsts._VISOR_EMAIL_PW == "" ||
-				!strings.Contains(personalConsts.USER_EMAIL_ADDR, "@") || !strings.Contains(personalConsts.WEBSITE_URL, "http") ||
-				personalConsts.WEBSITE_PW == "" || personalConsts.WOLFRAM_ALPHA_APPID == "" ||
-				personalConsts.PICOVOICE_API_KEY == "" {
+		if !strings.Contains(personalConsts._VISOR_EMAIL_ADDR, "@") || personalConsts.DEVICE_ID == "" ||
+				personalConsts._VISOR_EMAIL_PW == "" || !strings.Contains(personalConsts.USER_EMAIL_ADDR, "@") ||
+				!strings.Contains(personalConsts.WEBSITE_URL, "http") || personalConsts.WEBSITE_PW == "" ||
+				personalConsts.WOLFRAM_ALPHA_APPID == "" || personalConsts.PICOVOICE_API_KEY == "" {
 			return errors.New("some fields in " + PERSONAL_CONSTS_FILE + " are empty or incorrect - aborting")
 		}
 	} else {
