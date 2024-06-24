@@ -21,10 +21,12 @@
 
 package main
 
+import "C"
 import (
 	MOD_1 "ModManager"
 	"Registry/Registry"
 	"Utils"
+	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
 	"fyne.io/fyne/v2"
@@ -79,6 +81,8 @@ func init() {realMain =
 
 		//////////////////////////////////////////
 		// No terminal window from here on
+
+		ClientRegKeys.RegisterValues()
 
 		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
@@ -180,9 +184,9 @@ func init() {realMain =
 
 		go func() {
 			for {
-				if Registry.GetValue(Registry.K_SHOW_APP_SIG).GetBool(true) {
+				if Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).GetBool(true) {
 					showWindow()
-					Registry.GetValue(Registry.K_SHOW_APP_SIG).SetBool(false, false)
+					Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).SetBool(false, false)
 				}
 
 				time.Sleep(1 * time.Second)

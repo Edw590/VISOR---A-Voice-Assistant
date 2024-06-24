@@ -24,6 +24,7 @@ package MOD_1
 import (
 	"Registry/Registry"
 	"Utils"
+	"VISOR_Client/ClientRegKeys"
 )
 
 // Modules Manager //
@@ -112,7 +113,7 @@ func init() {realMain =
 			// Start the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_start[mod_num] && modules_GL[mod_num].Enabled {
-					var value *Registry.Value = Registry.GetValue(Registry.K_MODULES_ACTIVE)
+					var value *Registry.Value = Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE)
 					value.SetLong(value.GetLong(true) | (1 << mod_num), false)
 					modules_GL[mod_num].Stop = false
 					var start_func = _MAP_MOD_NUM_START[mod_num]
@@ -125,7 +126,7 @@ func init() {realMain =
 			// Stop the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_stop[mod_num] {
-					var value *Registry.Value = Registry.GetValue(Registry.K_MODULES_ACTIVE)
+					var value *Registry.Value = Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE)
 					value.SetLong(value.GetLong(true) & ^(1 << mod_num), false)
 					modules_GL[mod_num].Stop = true
 				}

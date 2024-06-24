@@ -25,7 +25,6 @@ import (
 	MOD_6 "OnlineInfoChk"
 	"Utils"
 	"bufio"
-	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -88,7 +87,7 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				fmt.Print(one_byte_str)
+				//fmt.Print(one_byte_str)
 
 				if writing {
 					if one_byte_str == " " || one_byte_str == "\n" {

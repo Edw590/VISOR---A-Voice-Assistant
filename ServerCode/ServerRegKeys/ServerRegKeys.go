@@ -19,33 +19,23 @@
  * under the License.
  ******************************************************************************/
 
-package Registry
+package ServerRegKeys
+
+import "Registry/Registry"
 
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 
 // Type: string
-const K_LAST_SPEECH string = "LAST_SPEECH"
-
+const K_CURR_USER_LOCATION string = "CURR_USER_LOCATION"
 // Type: bool
-const K_SHOW_APP_SIG string = "SHOW_APP_SIG"
+const K_IS_USER_SLEEPING string = "IS_USER_SLEEPING"
 
-// Type: bool
-const K_BATTERY_PRESENT string = "BATTERY_PRESENT"
-// Type: int32
-const K_BATTERY_PERCENT string = "BATTERY_PERCENT"
-// Type: bool
-const K_POWER_CONNECTED string = "POWER_CONNECTED"
-
-func init() {
-	// Modules Manager
-	RegisterValue(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", TYPE_LONG)
-	// Speech
-	RegisterValue(K_LAST_SPEECH, "Last speech", "The last speech that was said", TYPE_STRING)
-	// Speech Recognition
-	RegisterValue(K_SHOW_APP_SIG, "Show app signal", "Signal to show the app", TYPE_BOOL)
-	// Power Processor
-	//RegisterValue(K_BATTERY_PRESENT, "Battery present", "Whether the battery is present", TYPE_BOOL)
-	//RegisterValue(K_BATTERY_PERCENT, "Battery percentage", "The battery percentage", TYPE_INT)
-	//RegisterValue(K_POWER_CONNECTED, "Power connected", "Whether the power is connected", TYPE_BOOL)
+/*
+RegisterValues registers the server values in the registry.
+ */
+func RegisterValues() {
+	Registry.RegisterValue(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", Registry.TYPE_LONG)
+	Registry.RegisterValue(K_CURR_USER_LOCATION, "Current user location", "The current location of the user", Registry.TYPE_STRING)
+	Registry.RegisterValue(K_IS_USER_SLEEPING, "Is user sleeping", "Whether the user is sleeping", Registry.TYPE_BOOL)
 }

@@ -24,6 +24,7 @@ package main
 import (
 	MOD_1 "ModManager"
 	"Utils"
+	"VISOR_Server/ServerRegKeys"
 	"log"
 	"os"
 	"os/signal"
@@ -53,6 +54,8 @@ func init() {realMain =
 
 			return
 		}
+
+		ServerRegKeys.RegisterValues()
 
 		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
