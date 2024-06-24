@@ -25,6 +25,7 @@ import (
 	MOD_6 "OnlineInfoChk"
 	"Utils"
 	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -65,6 +66,9 @@ func init() {realMain =
 		stdout, _ := cmd.StdoutPipe()
 		_ = cmd.Start()
 
+		// Begin with the server ID (to say the first hello)
+		var device_id string = Utils.PersonalConsts_GL.DEVICE_ID
+
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 		// Start a goroutine to print to the screen and write to a file the output of the LLM model
 		go func() {
@@ -84,7 +88,7 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				//fmt.Print(one_byte_str)
+				fmt.Print(one_byte_str)
 
 				if writing {
 					if one_byte_str == " " || one_byte_str == "\n" {
@@ -102,7 +106,7 @@ func init() {realMain =
 					writing = true
 					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
 
-					_ = gpt_text_txt.WriteTextFile(getStartString(), true)
+					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
 				} else if strings.Contains(last_answer, "[3234_END]") {
 					writing = false
 
@@ -118,15 +122,16 @@ func init() {realMain =
 		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli -m " + modUserInfo.Model_loc + " " +
-			"--in-suffix [3234_START] --color --instruct --ctx-size 0 --temp 0.2 --mlock --prompt \"" +
-			config_str + "\"\n")
-		_, _ = writer.WriteString("hello\n")
+			"--in-suffix [3234_START] --color --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --mlock " +
+			"--prompt \"" + config_str + "\"\n")
 		_ = writer.Flush()
 
 		sendToGPT := func(to_send string) {
 			_, _ = writer.WriteString(Utils.RemoveNonGraphicChars(to_send) + "\n")
 			_ = writer.Flush()
 		}
+
+		sendToGPT("hello")
 
 		// Process the files to input to the LLM model
 		for {
@@ -139,32 +144,36 @@ func init() {realMain =
 
 				var to_process string = *file_path.ReadTextFile()
 				if to_process != "" {
-					if strings.HasPrefix(to_process, "/") {
+					// It comes like: "[device_id]text"
+					device_id = to_process[1:strings.Index(to_process, "]")]
+					var text string = to_process[strings.Index(to_process, "]") + 1:]
+
+					if strings.HasPrefix(text, "/") {
 						// Control commands begin with a slash
-						if to_process == "/clear" || to_process == "/stop" {
+						if text == "/clear" || text == "/stop" {
 							// Clear the context of the LLM model or stop while its writing by stopping the module (the
 							// Manager will restart it)
 							shut_down = true
-						} else if strings.HasPrefix(to_process, ASK_WOLFRAM_ALPHA) {
+						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
 							// Ask Wolfram Alpha the question
-							var question string = to_process[len(ASK_WOLFRAM_ALPHA):]
+							var question string = text[len(ASK_WOLFRAM_ALPHA):]
 							result, direct_result := MOD_6.RetrieveWolframAlpha(question)
 
 							if direct_result {
-								_ = gpt_text_txt.WriteTextFile(getStartString() + "The answer is: " + result + ". " +
-									getEndString(), true)
+								_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
+									". " + getEndString(), true)
 							} else {
 								sendToGPT("Summarize in sentences the following: " + result)
 							}
-						} else if strings.HasPrefix(to_process, SEARCH_WIKIPEDIA) {
+						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
 							// Search for the Wikipedia page title
-							var query string = to_process[len(ASK_WOLFRAM_ALPHA):]
+							var query string = text[len(ASK_WOLFRAM_ALPHA):]
 
-							_ = gpt_text_txt.WriteTextFile(getStartString() + MOD_6.RetrieveWikipedia(query) +
+							_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + MOD_6.RetrieveWikipedia(query) +
 								getEndString(), true)
 						}
 					} else {
-						sendToGPT(to_process)
+						sendToGPT(text)
 					}
 				}
 
@@ -196,8 +205,8 @@ func forceStopLlama() {
 	_, _ = Utils.ExecCmdSHELL([]string{"killall llama-cli"})
 }
 
-func getStartString() string {
-	return "[3234_START:" + strconv.FormatInt(time.Now().UnixMilli(), 10) + "]"
+func getStartString(device_id string) string {
+	return "[3234_START:" + strconv.FormatInt(time.Now().UnixMilli(), 10) + "|" + device_id + "|]"
 }
 
 func getEndString() string {

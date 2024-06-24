@@ -27,33 +27,6 @@ import (
 	"strings"
 )
 
-// GEN_ERROR is the error message for general errors
-const GEN_ERROR string = "3234_ERROR"
-
-var website_url_GL string = ""
-var website_pw_GL string = ""
-
-/*
-GetNumEntries gets the number of entries in the text file.
-
------------------------------------------------------------
-
-– Returns:
-  - the number of entries
-*/
-func GetNumEntries() int {
-	var page_contents string = string(Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/gpt_text.txt", website_pw_GL))
-	var entries []string = strings.Split(page_contents, "[3234_START:")
-
-	for i := 0; i < len(entries); i++ {
-		if entries[i] == "" {
-			Utils.DelElemSLICES(&entries, i)
-		}
-	}
-
-	return len(entries)
-}
-
 /*
 GetEntry gets the entry at the given number or time.
 
@@ -67,27 +40,41 @@ parameter.
   - num – the number of the entry or negative to count from the end
 
 – Returns:
-  - the entry or nil if an error occurred
-*/
+  - the entry or an empty entry with time = -1 if it doesn't exist
+ */
 func GetEntry(time int64, num int32) *Entry {
-	var page_contents string = string(Utils.GetPageContentsWEBSITE(website_url_GL + "files_EOG/gpt_text.txt", website_pw_GL))
+	var page_contents string = string(Utils.GetPageContentsWEBSITE(Utils.PersonalConsts_GL.WEBSITE_URL +
+		"files_EOG/gpt_text.txt", Utils.PersonalConsts_GL.WEBSITE_PW))
 	if page_contents == "" {
-		return nil
+		return &Entry{
+			device_id: "",
+			text: "",
+			time: -1,
+		}
 	}
 	var entries []string = strings.Split(page_contents, "[3234_START:")
 
 	if time != -1 {
 		for _, entry := range entries {
+			if entry == "" {
+				continue
+			}
+
 			if getTimeFromEntry(entry) == time {
 				return &Entry{
-					text: getTextFromEntry(entry),
-					time: getTimeFromEntry(entry),
+					device_id: getDeviceIdFromEntry(entry),
+					text:      getTextFromEntry(entry),
+					time:      getTimeFromEntry(entry),
 				}
 			}
 		}
 	} else {
 		if len(entries) == 0 {
-			return nil
+			return &Entry{
+				device_id: "",
+				text: "",
+				time: -1,
+			}
 		}
 
 		if num < 0 {
@@ -100,20 +87,44 @@ func GetEntry(time int64, num int32) *Entry {
 
 		var entry string = entries[num]
 
-		return &Entry{
-			text: getTextFromEntry(entry),
-			time: getTimeFromEntry(entry),
+		if entry != "" {
+			return &Entry{
+				device_id: getDeviceIdFromEntry(entry),
+				text:      getTextFromEntry(entry),
+				time:      getTimeFromEntry(entry),
+			}
 		}
 	}
 
-	return nil
+	return &Entry{
+		device_id: "",
+		text: "",
+		time: -1,
+	}
 }
 
 func SendText(text string) error {
 	return Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-		Name: "GPT",
-		Text1: text,
+		Type:  "GPT",
+		Text1: "[" + Utils.PersonalConsts_GL.DEVICE_ID + "]" + text,
 	})
+}
+
+/*
+getDeviceIdFromEntry gets the device ID from the entry.
+
+-----------------------------------------------------------
+
+– Params:
+  - entry – the entry
+
+– Returns:
+  - the device ID
+ */
+func getDeviceIdFromEntry(entry string) string {
+	// It comes like: "time|DEVICE_ID|..."
+	entry = entry[strings.Index(entry, "|") + 1:]
+	return entry[:strings.Index(entry, "|")]
 }
 
 /*
@@ -128,16 +139,10 @@ getTimeFromEntry gets the time from the entry.
   - the time
 */
 func getTimeFromEntry(entry string) int64 {
-	// It comes like: "[3234_START:time]text[3234_END]"
-	// Filtered gets it like: "time|text[3234_END]"
-	entry = entry[:strings.Index(entry, "]")] + "|" + entry[strings.Index(entry, "]") + 1:]
-	var parts []string = strings.Split(entry, "|")
+	// It comes like: "time|..."
+	var time_str string = entry[:strings.Index(entry, "|")]
 
-	if len(parts) < 2 {
-		return -1
-	}
-
-	time, err := strconv.ParseInt(parts[0], 10, 64)
+	time, err := strconv.ParseInt(time_str, 10, 64)
 	if err != nil {
 		return -1
 	}
@@ -154,17 +159,13 @@ getTextFromEntry gets the text from the entry.
 
 */
 func getTextFromEntry(entry string) string {
-	entry = entry[:strings.Index(entry, "]")] + "|" + entry[strings.Index(entry, "]") + 1:]
-	var parts []string = strings.Split(entry, "|")
-
-	if len(parts) < 2 {
-		return GEN_ERROR
-	}
+	// It comes like: "...]text[3234_END]"
+	var text string = entry[strings.Index(entry, "]") + 1:]
 
 	// Remove all after END_ENTRY if it exists
-	var end_entry_exists bool = strings.Contains(parts[1], END_ENTRY)
+	var end_entry_exists bool = strings.Contains(text, END_ENTRY)
 
-	parts = strings.Split(parts[1], END_ENTRY)
+	var parts []string = strings.Split(text, END_ENTRY)
 
 	if end_entry_exists {
 		parts[0] += END_ENTRY

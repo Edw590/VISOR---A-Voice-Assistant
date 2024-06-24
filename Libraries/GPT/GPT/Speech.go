@@ -22,6 +22,7 @@
 package GPT
 
 import (
+	"Utils"
 	"strings"
 	"time"
 )
@@ -38,20 +39,19 @@ the function will return END_ENTRY.
 
 In case a new speech is added to the text file, the function will continue the speech it was on until its end.
 
+The function will wait until the time of the next speech is reached.
+
 -----------------------------------------------------------
 
 – Returns:
-  - the next sentence to be spoken; END_ENTRY if the end of the text file is reached; or GEN_ERROR if there's an error
+  - the next sentence to be spoken or END_ENTRY if the end of the text file is reached
  */
 func GetNextSpeechSentence() string {
 	if curr_entry_time == -1 {
 		var curr_time int64 = time.Now().UnixMilli()
 		for {
 			var entry *Entry = GetEntry(-1, -1)
-			if entry == nil {
-				return GEN_ERROR
-			}
-			if entry.GetTime() >= curr_time {
+			if entry.GetTime() >= curr_time && entry.GetDeviceID() == Utils.PersonalConsts_GL.DEVICE_ID {
 				curr_entry_time = entry.GetTime()
 
 				break
@@ -64,15 +64,13 @@ func GetNextSpeechSentence() string {
 	var sentence string = ""
 	for {
 		var entry *Entry = GetEntry(curr_entry_time, -1)
-		if entry == nil {
-			return GEN_ERROR
-		}
 		var text_split []string = strings.Split(entry.GetText(), " ")
 
 		//log.Println("--------------------------")
 		if curr_idx >= len(text_split) {
 			break
 		}
+		//log.Println("len(text_split):", len(text_split))
 		for i := curr_idx; i < len(text_split); i++ {
 			var word string = text_split[i]
 			//log.Println("curr_idx:", i)
@@ -82,15 +80,15 @@ func GetNextSpeechSentence() string {
 				// If the word contains END_ENTRY, remove it and add a period at the end in case there's not already
 				// one. Example: "peers[3234_END]" --> "peers.". Or "peers.[3234_END]" --> "peers.".
 
+				// Add one more to go out of bounds next time the function is called. Will make it break the loop
+				// instantly.
+				curr_idx++
+
 				// But if the word is END_ENTRY alone, just break the loop and return whatever there is - including
 				// nothing, which is taken care of below.
 				if word == END_ENTRY {
 					break
 				}
-
-				// Add one more to go out of bounds next time the function is called. Will make it break the loop
-				// instantly.
-				curr_idx++
 
 				word = strings.Replace(word, END_ENTRY, "", -1)
 				if !strings.HasSuffix(word, ".") && !strings.HasSuffix(word, "!") && !strings.HasSuffix(word, "?") {
@@ -123,6 +121,8 @@ func GetNextSpeechSentence() string {
 
 		time.Sleep(1 * time.Second)
 	}
+
+	//log.Println("sentence: \"" + sentence + "\"")
 
 	if sentence == "" {
 		sentence = END_ENTRY
