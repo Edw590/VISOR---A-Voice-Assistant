@@ -35,6 +35,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // System State //
@@ -66,6 +67,7 @@ func init() {realMain =
 		var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
 			Device_id:    Utils.PersonalConsts_GL.DEVICE_ID,
 		}
+		var last_time_sent int64 = 0
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
@@ -108,7 +110,13 @@ func init() {realMain =
 				Brightness: getBrightness(),
 			}
 
-			_ = device_info.SendInfo()
+			device_info.Last_comm = time.Now().Unix()
+
+			// Send each 30 seconds
+			if last_time_sent == 0 || time.Now().Unix() - last_time_sent >= 30 {
+				_ = device_info.SendInfo()
+				last_time_sent = time.Now().Unix()
+			}
 
 
 			/////////////////////////////////////////////////////////////////

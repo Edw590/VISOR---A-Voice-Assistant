@@ -23,16 +23,9 @@ package ULComm
 
 import "Utils"
 
-const TYPE_DEVICE_PHONE string = "phone"
-const TYPE_DEVICE_TABLET string = "tablet"
-const TYPE_DEVICE_LAPTOP string = "laptop"
-const TYPE_DEVICE_DESKTOP string = "desktop"
-
 type DeviceInfo struct {
 	// Device_id is the unique identifier of the device
 	Device_id string
-	// Device_type is the type of the device
-	Device_type string
 	// Last_comm is the last time the device communicated with the server in Unix time
 	Last_comm int64
 	// System_state is the information about the system state of the device

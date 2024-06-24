@@ -33,7 +33,6 @@ func main() {
 
 	var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
 		Device_id:    "Test Device",
-		Device_type:  ULComm.TYPE_DEVICE_DESKTOP,
 		Last_comm:    time.Now().Unix(),
 		System_state: ULComm.SystemState{
 			Connectivity_info: ULComm.ConnectivityInfo{
@@ -55,5 +54,9 @@ func main() {
 		},
 	}
 
-	log.Println(device_info.SendInfo())
+	log.Println(Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
+		Type:  "UserLocator",
+		Text1: "Test Device",
+		Text2: *Utils.ToJsonGENERAL(device_info),
+	}))
 }
