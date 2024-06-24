@@ -24,10 +24,12 @@ package MOD_10
 import (
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
+	"ULComm/ULComm"
 	"Utils"
 	"github.com/apaxa-go/eval"
 	"github.com/distatus/battery"
 	"github.com/itchyny/volume-go"
+	"github.com/schollz/wifiscan"
 	"github.com/yusufpapurcu/wmi"
 	"log"
 	"runtime"
@@ -61,11 +63,57 @@ func init() {realMain =
 
 		var notifs_were_true []bool = nil
 
+		var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
+			Device_id:    Utils.PersonalConsts_GL.DEVICE_ID,
+		}
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
 				panic(err)
 			}
+
+			var wifi_on bool = true
+			wifi_nets, err := wifiscan.Scan()
+			if err != nil {
+				wifi_on = false
+			}
+			var wifi_networks []ULComm.WifiNetwork = nil
+			for _, wifi_net := range wifi_nets {
+				wifi_networks = append(wifi_networks, ULComm.WifiNetwork{
+					SSID:   wifi_net.SSID,
+					BSSID:  wifi_net.BSSID,
+					Signal: wifi_net.RSSI,
+				})
+			}
+
+			// Connectivity information
+			device_info.System_state.Connectivity_info = ULComm.ConnectivityInfo{
+				Airplane_mode_enabled: false,
+				Wifi_enabled:          wifi_on,
+				Bluetooth_enabled:     false,
+				Mobile_data_enabled:   false,
+				Wifi_networks:         wifi_networks,
+				Bluetooth_devices:     nil,
+			}
+
+			// Battery information
+			device_info.System_state.Battery_info = ULComm.BatteryInfo{
+				Level:           getBatteryInfo().percentage,
+				Power_connected: getBatteryInfo().charging,
+			}
+
+			// Monitor information
+			device_info.System_state.Monitor_info = ULComm.MonitorInfo{
+				Screen_on:  true,
+				Brightness: getBrightness(),
+			}
+
+			_ = device_info.SendInfo()
+
+
+			/////////////////////////////////////////////////////////////////
+			/////////////////////////////////////////////////////////////////
+			// Conditions processing
 
 			if len(notifs_were_true) != len(modUserInfo.Notifications) {
 				notifs_were_true = make([]bool, len(modUserInfo.Notifications))

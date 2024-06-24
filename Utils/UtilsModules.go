@@ -74,9 +74,10 @@ const (
 	NUM_MOD_OnlineInfoChk
 	NUM_MOD_GPTCommunicator
 	NUM_MOD_WebsiteBackend
-	NUM_MOD_DeviceLocator
-	NUM_MOD_SystemState
+	NUM_MOD_UNUSED
+	NUM_MOD_SystemChecker
 	NUM_MOD_SpeechRecognition
+	NUM_MOD_UserLocator
 
 	MODS_ARRAY_SIZE
 )
@@ -91,9 +92,9 @@ var MOD_NUMS_NAMES map[int]string = map[int]string{
 	NUM_MOD_OnlineInfoChk:     "Online Information Checker",
 	NUM_MOD_GPTCommunicator:   "GPT Communicator",
 	NUM_MOD_WebsiteBackend:    "Website Backend",
-	NUM_MOD_DeviceLocator:     "Device Locator",
-	NUM_MOD_SystemState:       "System State",
+	NUM_MOD_SystemChecker:     "System Checker",
 	NUM_MOD_SpeechRecognition: "Speech Recognition",
+	NUM_MOD_UserLocator:       "User Locator",
 }
 
 const (
@@ -113,9 +114,9 @@ var MOD_NUMS_SUPPORT map[int]int = map[int]int{
 	NUM_MOD_OnlineInfoChk:     MOD_SERVER,
 	NUM_MOD_GPTCommunicator:   MOD_SERVER,
 	NUM_MOD_WebsiteBackend:    MOD_SERVER,
-	NUM_MOD_DeviceLocator:     MOD_CLIENT,
-	NUM_MOD_SystemState:       MOD_CLIENT,
+	NUM_MOD_SystemChecker:     MOD_CLIENT,
 	NUM_MOD_SpeechRecognition: MOD_CLIENT,
+	NUM_MOD_UserLocator:       MOD_SERVER,
 }
 
 // _LOOP_TIME_S is the number of seconds to wait for the next timestamp to be registered by a module (must be more than
@@ -709,11 +710,11 @@ func IsModSupportedMODULES(mod_num int) bool {
 			return output.Exit_code == 0
 		case NUM_MOD_WebsiteBackend:
 			return true
-		case NUM_MOD_DeviceLocator:
-			return true
-		case NUM_MOD_SystemState:
+		case NUM_MOD_SystemChecker:
 			return runtime.GOOS == "windows"
 		case NUM_MOD_SpeechRecognition:
+			return true
+		case NUM_MOD_UserLocator:
 			return true
 		default:
 			return false

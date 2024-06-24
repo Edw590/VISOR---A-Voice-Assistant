@@ -12,6 +12,11 @@ require (
 )
 
 require (
+	github.com/schollz/logger v1.2.0 // indirect
+	github.com/schollz/wifiscan v1.1.2-0.20240616123334-6fc669145a0b // indirect
+)
+
+require (
 	github.com/apaxa-go/helper v0.0.0-20180607175117-61d31b1c31c3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/moutend/go-wca v0.2.0 // indirect
