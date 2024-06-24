@@ -54,7 +54,7 @@ func DevMode() fyne.CanvasObject {
 		},
 		OnSubmit: func() {
 			Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-				Name:  form_type_.Text,
+				Type:  form_type_.Text,
 				Text1: form_text1.Text,
 				Text2: form_text2.Text,
 				Text3: form_text3.Text,

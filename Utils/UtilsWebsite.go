@@ -33,8 +33,8 @@ import (
 )
 
 type WebsiteForm struct {
-	// Name is the form name
-	Name string
+	// Type is the form type
+	Type string
 	// Text1 is the first text
 	Text1 string
 	// Text2 is the second text (optional)
@@ -96,7 +96,7 @@ SubmitFormWEBSITE sends a form to the given VISOR's website.
 */
 func SubmitFormWEBSITE(form WebsiteForm) error {
 	formData := url.Values{
-		"type": {form.Name},
+		"type": {form.Type},
 		"text1":  {form.Text1},
 		"text2":  {form.Text2},
 		"text3":  {form.Text3},
