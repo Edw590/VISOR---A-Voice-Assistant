@@ -25,6 +25,7 @@ import (
 	"Registry/Registry"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
+	"VISOR_Client/ClientRegKeys"
 	"time"
 
 	"github.com/Edw590/sapi-go"
@@ -157,7 +158,7 @@ func init() {realMain =
 				}
 
 				if removed_from_queue {
-					Registry.GetValue(Registry.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
+					Registry.GetValue(ClientRegKeys.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
 				}
 
 				curr_speech = nil
