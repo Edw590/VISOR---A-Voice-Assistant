@@ -28,6 +28,7 @@ import (
 	"Utils"
 	"github.com/apaxa-go/eval"
 	"github.com/distatus/battery"
+	"github.com/go-vgo/robotgo"
 	"github.com/itchyny/volume-go"
 	"github.com/schollz/wifiscan"
 	"github.com/yusufpapurcu/wmi"
@@ -42,9 +43,16 @@ import (
 
 const _TIME_SLEEP_S int = 5
 
+var device_info_GL ULComm.DeviceInfo
+
 type _Battery struct {
 	charging bool
 	percentage int
+}
+
+type _MousePosition struct {
+	x int
+	y int
 }
 
 // https://learn.microsoft.com/en-us/windows/win32/wmicoreprov/wmimonitorbrightness
@@ -64,9 +72,10 @@ func init() {realMain =
 
 		var notifs_were_true []bool = nil
 
-		var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
+		device_info_GL = ULComm.DeviceInfo{
 			Device_id:    Utils.PersonalConsts_GL.DEVICE_ID,
 		}
+		var curr_mouse_position _MousePosition
 		var last_time_sent int64 = 0
 		for {
 			var modUserInfo _ModUserInfo
@@ -82,14 +91,14 @@ func init() {realMain =
 			var wifi_networks []ULComm.WifiNetwork = nil
 			for _, wifi_net := range wifi_nets {
 				wifi_networks = append(wifi_networks, ULComm.WifiNetwork{
-					SSID:   wifi_net.SSID,
-					BSSID:  wifi_net.BSSID,
-					Signal: wifi_net.RSSI,
+					SSID:  wifi_net.SSID,
+					BSSID: strings.ToUpper(wifi_net.BSSID),
+					RSSI:  wifi_net.RSSI,
 				})
 			}
 
 			// Connectivity information
-			device_info.System_state.Connectivity_info = ULComm.ConnectivityInfo{
+			device_info_GL.System_state.Connectivity_info = ULComm.ConnectivityInfo{
 				Airplane_mode_enabled: false,
 				Wifi_enabled:          wifi_on,
 				Bluetooth_enabled:     false,
@@ -99,22 +108,31 @@ func init() {realMain =
 			}
 
 			// Battery information
-			device_info.System_state.Battery_info = ULComm.BatteryInfo{
+			device_info_GL.System_state.Battery_info = ULComm.BatteryInfo{
 				Level:           getBatteryInfo().percentage,
 				Power_connected: getBatteryInfo().charging,
 			}
 
 			// Monitor information
-			device_info.System_state.Monitor_info = ULComm.MonitorInfo{
+			device_info_GL.System_state.Monitor_info = ULComm.MonitorInfo{
 				Screen_on:  true,
 				Brightness: getBrightness(),
 			}
 
-			device_info.Last_comm = time.Now().Unix()
+			// Check if the device is being used
+			var x, y int = robotgo.Location()
+			if x != curr_mouse_position.x || y != curr_mouse_position.y {
+				curr_mouse_position.x = x
+				curr_mouse_position.y = y
+
+				device_info_GL.Last_time_used = time.Now().Unix()
+			}
+
+			device_info_GL.Last_comm = time.Now().Unix()
 
 			// Send each 30 seconds
 			if last_time_sent == 0 || time.Now().Unix() - last_time_sent >= 30 {
-				_ = device_info.SendInfo()
+				_ = device_info_GL.SendInfo()
 				last_time_sent = time.Now().Unix()
 			}
 
@@ -145,6 +163,10 @@ func init() {realMain =
 			}
 		}
 	}
+}
+
+func GetDeviceInfoText() string {
+	return *Utils.ToJsonGENERAL(device_info_GL)
 }
 
 func computeCondition(condition string) bool {

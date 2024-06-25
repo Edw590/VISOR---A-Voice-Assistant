@@ -28,6 +28,8 @@ type DeviceInfo struct {
 	Device_id string
 	// Last_comm is the last time the device communicated with the server in Unix time
 	Last_comm int64
+	// Last_time_used is the last time the device was used in Unix time
+	Last_time_used int64
 	// System_state is the information about the system state of the device
 	System_state SystemState
 }
@@ -69,8 +71,8 @@ type WifiNetwork struct {
 	SSID string
 	// BSSID is the address of the Wi-Fi network in the format XX:XX:XX:XX:XX:XX
 	BSSID string
-	// Signal is the signal strength of the Wi-Fi network in dBm
-	Signal int
+	// RSSI is the signal strength of the Wi-Fi network in dBm
+	RSSI int
 }
 
 type BluetoothDevice struct {
@@ -78,8 +80,8 @@ type BluetoothDevice struct {
 	Name string
 	// Address is the address of the bluetooth device in the format XX:XX:XX:XX:XX:XX
 	Address string
-	// Signal is the signal strength of the bluetooth device in dBm
-	Signal int
+	// RSSI is the signal strength of the bluetooth device in dBm
+	RSSI int
 }
 
 type BatteryInfo struct {
