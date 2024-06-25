@@ -22,19 +22,19 @@
 package Screens
 
 import (
-	"Registry/Registry"
+	MOD_10 "SystemState"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"time"
 )
 
-var global_values_canvas_object_GL fyne.CanvasObject = nil
+var system_state_canvas_object_GL fyne.CanvasObject = nil
 
-func GlobalValues() fyne.CanvasObject {
-	Current_screen_GL = global_values_canvas_object_GL
-	if global_values_canvas_object_GL != nil {
-		return global_values_canvas_object_GL
+func SystemState() fyne.CanvasObject {
+	Current_screen_GL = system_state_canvas_object_GL
+	if system_state_canvas_object_GL != nil {
+		return system_state_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -50,8 +50,8 @@ func GlobalValues() fyne.CanvasObject {
 
 	go func() {
 		for {
-			if Current_screen_GL == global_values_canvas_object_GL {
-				registry_text.SetText(Registry.GetRegistryText())
+			if Current_screen_GL == system_state_canvas_object_GL {
+				registry_text.SetText(MOD_10.GetDeviceInfoText())
 			}
 
 			time.Sleep(1 * time.Second)
@@ -71,8 +71,8 @@ func GlobalValues() fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	global_values_canvas_object_GL = main_scroll
-	Current_screen_GL = global_values_canvas_object_GL
+	system_state_canvas_object_GL = main_scroll
+	Current_screen_GL = system_state_canvas_object_GL
 
-	return global_values_canvas_object_GL
+	return system_state_canvas_object_GL
 }

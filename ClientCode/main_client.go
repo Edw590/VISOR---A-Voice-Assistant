@@ -139,6 +139,10 @@ func init() {realMain =
 				content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues()}
 				content_container.Refresh()
 			}),
+			widget.NewButton("System State", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.SystemState()}
+				content_container.Refresh()
+			}),
 		)
 
 		// Create a split container to hold the navigation bar and the content
