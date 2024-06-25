@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,14 +26,14 @@ import (
 )
 
 /*
-IsRootAvailable checks if the device can run root commands.
+IsRootAvailableROOT checks if the device can run root commands.
 
 -----------------------------------------------------------
 
 – Returns:
   - true if the device can run root commands, false otherwise.
 */
-func IsRootAvailable() bool {
+func IsRootAvailableROOT() bool {
 	// The original implementation was gotten from
 	// http://muzikant-android.blogspot.com/2011/02/how-to-get-root-access-and-execute.html, was then adapted to the
 	// app and finally changed to call the executeShellCmd() function.

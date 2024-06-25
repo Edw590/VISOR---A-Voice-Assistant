@@ -75,7 +75,7 @@ func getHTMLReport(disk_partition string) string {
 				if worst <= threshold {
 					// Attribute is on or below threshold
 					output[j] = "<strong style='color:#FF0000;'>" + output[j] + "</strong>"
-				} else if worst - int(float32(threshold)*0.2) <= threshold {
+				} else if worst - int(float64(threshold)*0.2) <= threshold {
 					// Attribute is close to threshold
 					output[j] = "<strong style='color:#FF7800;'>" + output[j] + "</strong>"
 				} else {

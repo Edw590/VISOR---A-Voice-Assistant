@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,29 +22,29 @@
 package UtilsSWA
 
 import (
+	"Utils"
 	"math"
 	"strconv"
 	"strings"
-
-	"Utils"
 )
 
 // Constants to standardize distances inside the app (like maximum distances. Why 4m and not 5m? Unless it's really
 // important to be 4).
-const ABSTR_DISTANCE_1 int32 = 1
-const ABSTR_DISTANCE_5 int32 = 5
-const ABSTR_DISTANCE_10 int32 = 10
-const ABSTR_DISTANCE_50 int32 = 50
-const ABSTR_DISTANCE_100 int32 = 100
-const ABSTR_DISTANCE_INFINITY int32 = 999
+const ABSTR_DISTANCE_1 int = 1
+const ABSTR_DISTANCE_5 int = 5
+const ABSTR_DISTANCE_10 int = 10
+const ABSTR_DISTANCE_50 int = 50
+const ABSTR_DISTANCE_100 int = 100
+const ABSTR_DISTANCE_INFINITY int = 999
+
 /*
-GetAbstrDistanceRSSILOCATIONRELATIVE returns an abstract distance between the 2 devices using the calculated real
+GetAbstrDistanceRSSILOCRELATIVE returns an abstract distance between the 2 devices using the calculated real
 distance.
 
 These distances are solely to standardize values on the app.
 
 Also the distance returned by RSSI calculations may be misleading, so this also discretizes the distances to hopefully
-more precise values. For example, _ABSTR_DISTANCE_1 means the devices are right next to each other. _ABSTR_DISTANCE_5
+more precise values. For example, ABSTR_DISTANCE_1 means the devices are right next to each other. ABSTR_DISTANCE_5
 means they're near. A wall or 2 away at most maybe.
 
 ---CONSTANTS---
@@ -63,8 +63,8 @@ means they're near. A wall or 2 away at most maybe.
 
 – Returns:
   - one of the constants
- */
-func GetAbstrDistanceRSSILOCATIONRELATIVE(real_distance int32) int32 {
+*/
+func GetAbstrDistanceRSSILOCRELATIVE(real_distance int) int {
 	if real_distance <= 1 {
 		return ABSTR_DISTANCE_1
 	} else if real_distance <= 5 {
@@ -83,9 +83,10 @@ func GetAbstrDistanceRSSILOCATIONRELATIVE(real_distance int32) int32 {
 /* For now I don't see use for the tx_power parameter, so I'm passing always the default one. Some other time might
 implement BLE device detection, on which the value is useful since some devices have a value (not BV9500 it
 seems).*/
-const DEFAULT_TX_POWER int32 = -60
+const DEFAULT_TX_POWER int = -60
+
 /*
-GetRealDistanceRSSILOCATIONRELATIVE gets the distance in meters between 2 devices from the transmission signal strength
+GetRealDistanceRSSILOCRELATIVE gets the distance in meters between 2 devices from the transmission signal strength
 between the 2 devices (RSSI) and the transmission power value at 1 meter for the current device.
 
 -----------------------------------------------------------
@@ -96,8 +97,8 @@ between the 2 devices (RSSI) and the transmission power value at 1 meter for the
 
 – Returns:
   - the distance between the 2 devices rounded to the nearest integer
- */
-func GetRealDistanceRSSILOCATIONRELATIVE(rssi int32, tx_power int32) int32 {
+*/
+func GetRealDistanceRSSILOCRELATIVE(rssi int, tx_power int) int {
 	/*
 	Copied from: Dong, Q., & Dargie, W. (2012). Evaluation of the reliability of RSSI for indoor localization. 2012
 	International Conference on Wireless Communications in Underground and Confined Areas, 1-6.
@@ -184,7 +185,7 @@ func GetRealDistanceRSSILOCATIONRELATIVE(rssi int32, tx_power int32) int32 {
 		ret_value = math.Pow(10.0, float64(-(rssi - tx_power)) / (10.0 * 3.88))
 	}
 
-	return int32(math.Round(ret_value))
+	return int(math.Round(ret_value))
 }
 
 /*
@@ -275,7 +276,7 @@ func GetAveragePingRTTLOCATIONRELATIVE(ip string) (float64, error) {
 	// got from the first 5 elements (those 5 decide the fate of the list xD).
 	for i := summed_elements; i < NUM_PACKETS - summed_elements; i++ {
 		value := time_values[i]
-		if !IsOutlierMATH(value, sum, sum_squares, int32(summed_elements), accuracy_parameter) {
+		if !IsOutlierMATH(value, sum, sum_squares, summed_elements, accuracy_parameter) {
 			summed_elements++
 			sum += value
 			sum_squares += value * value

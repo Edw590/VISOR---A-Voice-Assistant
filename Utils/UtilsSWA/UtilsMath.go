@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -43,7 +43,7 @@ The functions does so by checking if the elements is inside a range of mean +- X
   - true if it's an outlier, false otherwise
 
 */
-func IsOutlierMATH(value float64, sum float64, sum_squares float64, n int32, accuracy_parameter float64) bool {
+func IsOutlierMATH(value float64, sum float64, sum_squares float64, n int, accuracy_parameter float64) bool {
 	mean := sum / float64(n)
 	std_dev := math.Sqrt(sum_squares/float64(n) - mean*mean)
 

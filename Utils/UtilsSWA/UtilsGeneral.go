@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -37,6 +37,6 @@ or lower case) and numbers.
 – Returns:
   - the generated string
 */
-func RandStringGENERAL(length int32) string {
-	return Utils.RandStringGENERAL(int(length))
+func RandStringGENERAL(length int) string {
+	return Utils.RandStringGENERAL(length)
 }

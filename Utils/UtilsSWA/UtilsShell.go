@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,22 +22,19 @@
 package UtilsSWA
 
 import (
+	"Utils"
 	"bytes"
 	"encoding/binary"
 	"strings"
-
-	"Utils"
 )
 
-const GENERIC_ERR int32 = int32(Utils.GENERIC_ERR)
+const GENERIC_ERR int = Utils.GENERIC_ERR
 
 // 50 bytes to separate the stdout and stderr in the output of ExecCmdSHELL
 var _OUTPUT_SEP []byte = []byte("(K!5pSqW=.h9s60EA'ryI.jS@6SY&uy),qbo4sFWQ_(%@H&(bC")
 
 /*
 ExecCmdSHELL executes a list of commands in a shell and returns the stdout and stderr.
-
-
 
 -----------------------------------------------------------
 
@@ -62,7 +59,7 @@ func ExecCmdSHELL(attempt_su bool, commands_list string) ([]byte, error) {
 	// https://github.com/Magisk-Modules-Repo/ssh/issues/12)
 	commands_list = "export ANDROID_DATA=/data\n" + commands_list
 
-	if attempt_su && IsRootAvailable() {
+	if attempt_su && IsRootAvailableROOT() {
 		commands_list = "su\n" + commands_list
 	}
 	cmd_output, err := Utils.ExecCmdMainSHELL(strings.Split(commands_list, "\n"), "", ANDROID_SH)
@@ -77,8 +74,8 @@ func ExecCmdSHELL(attempt_su bool, commands_list string) ([]byte, error) {
 	return output, err
 }
 
-func GetExitCodeSHELL(cmd_output []byte) int32 {
-	return int32(binary.BigEndian.Uint32(cmd_output[0:4]))
+func GetExitCodeSHELL(cmd_output []byte) int {
+	return int(binary.BigEndian.Uint32(cmd_output[0:4]))
 }
 
 func GetStdoutSHELL(cmd_output []byte) []byte {

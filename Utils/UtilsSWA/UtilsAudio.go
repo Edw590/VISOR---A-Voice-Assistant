@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -42,7 +42,7 @@ this function is a no-op.
 – Returns:
   - the adjusted audio data
  */
-func AdjustGainBufferAUDIO(audio_bytes[] byte, gain float64, n_bits int32) {
+func AdjustGainBufferAUDIO(audio_bytes[] byte, gain float64, n_bits int) {
 	if gain == 1 {
 		return
 	}
