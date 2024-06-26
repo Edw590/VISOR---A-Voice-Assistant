@@ -121,7 +121,7 @@ func init() {realMain =
 		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli -m " + modUserInfo.Model_loc + " " +
-			"--in-suffix [3234_START] --color --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --mlock " +
+			"--in-suffix [3234_START] --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --mlock " +
 			"--prompt \"" + config_str + "\"\n")
 		_ = writer.Flush()
 
