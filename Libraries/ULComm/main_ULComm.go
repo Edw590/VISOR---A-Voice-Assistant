@@ -53,10 +53,15 @@ func main() {
 			},
 		},
 	}
+	if device_info.Device_id == "" {}
 
-	log.Println(Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
+	/*log.Println(Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
 		Type:  "UserLocator",
 		Text1: "Test Device",
 		Text2: *Utils.ToJsonGENERAL(device_info),
-	}))
+	}))*/
+
+	log.Println(ULComm.CreateDeviceInfo(0, 0, false, false, false, false, 0, -1,
+		"test\x01XX:XX:XX:XX:XX:XX\x01-50\x00test2\x01YY:YY:YY:YY:YY:YY\x01-60\x00",
+		"test\x01XX:XX:XX:XX:XX:XX\x01-23\x00test2\x01YY:YY:YY:YY:YY:YY\x01-14\x00"))
 }

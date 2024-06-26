@@ -39,7 +39,7 @@ PathFILESDIRS returns the path and whether it describes a directory or not.
   - the path and whether it describes a directory or not separated by "|"
 */
 func PathFILESDIRS(describes_dir bool, paths_list string) string {
-	var array1 []string = strings.Split(paths_list, "\000")
+	var array1 []string = strings.Split(paths_list, "\x00")
 	var array2 []any = make([]any, len(array1))
 	for i := 0; i < len(array1); i++ {
 		array2[i] = array1[i]
