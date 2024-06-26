@@ -39,15 +39,15 @@ import (
 	"time"
 )
 
-// System State //
+// System Checker //
 
 const _TIME_SLEEP_S int = 5
 
 var device_info_GL ULComm.DeviceInfo
 
 type _Battery struct {
-	charging bool
-	percentage int
+	power_connected bool
+	level           int
 }
 
 type _MousePosition struct {
@@ -109,8 +109,8 @@ func init() {realMain =
 
 			// Battery information
 			device_info_GL.System_state.Battery_info = ULComm.BatteryInfo{
-				Level:           getBatteryInfo().percentage,
-				Power_connected: getBatteryInfo().charging,
+				Level:           getBatteryInfo().level,
+				Power_connected: getBatteryInfo().power_connected,
 			}
 
 			// Monitor information
@@ -190,8 +190,8 @@ func formatCondition(condition string) string {
 	var sound_volume int = getSoundVolume()
 	var sound_muted bool = getSoundMuted()
 
-	condition = strings.Replace(condition, "power_connected", strconv.FormatBool(battery_info.charging), -1)
-	condition = strings.Replace(condition, "battery_percent", strconv.Itoa(battery_info.percentage), -1)
+	condition = strings.Replace(condition, "power_connected", strconv.FormatBool(battery_info.power_connected), -1)
+	condition = strings.Replace(condition, "battery_percent", strconv.Itoa(battery_info.level), -1)
 	condition = strings.Replace(condition, "brightness", strconv.Itoa(monitor_brightness), -1)
 	condition = strings.Replace(condition, "sound_volume", strconv.Itoa(sound_volume), -1)
 	condition = strings.Replace(condition, "sound_muted", strconv.FormatBool(sound_muted), -1)
@@ -210,8 +210,8 @@ func getBatteryInfo() _Battery {
 	var b *battery.Battery = batteries[0]
 
 	return _Battery{
-		charging:   b.State.Raw != battery.Discharging,
-		percentage: int(b.Current / b.Full * 100),
+		power_connected: b.State.Raw != battery.Discharging,
+		level:           int(b.Current / b.Full * 100),
 	}
 }
 
