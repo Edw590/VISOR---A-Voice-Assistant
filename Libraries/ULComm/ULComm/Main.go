@@ -31,8 +31,8 @@ import (
 CreateDeviceInfo creates a DeviceInfo object with the given parameters.
  */
 func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabled bool, wifi_enabled bool,
-		bluetooth_enabled bool, power_connected bool, battery_level int, monitor_brightness int, wifi_networks string,
-		bluetooth_devices string) *DeviceInfo {
+		bluetooth_enabled bool, power_connected bool, battery_level int, screen_on bool, monitor_brightness int,
+		wifi_networks string, bluetooth_devices string) *DeviceInfo {
 	var wifi_networks_ret []WifiNetwork
 	for _, network := range strings.Split(wifi_networks, "\x00") {
 		if network == "" {
@@ -84,6 +84,7 @@ func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabl
 				Power_connected: power_connected,
 			},
 			Monitor_info: MonitorInfo{
+				Screen_on: screen_on,
 				Brightness: monitor_brightness,
 			},
 		},
