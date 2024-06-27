@@ -41,6 +41,8 @@ const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
 const _TIME_SLEEP_S int = 1
 
+var is_speaking_GL bool = false
+
 type _MGIModSpecInfo any
 var (
 	realMain        Utils.RealMain = nil
@@ -75,7 +77,6 @@ func init() {realMain =
 			buf := bufio.NewReader(stdout)
 			var last_answer string = ""
 			var last_word string = ""
-			var writing bool = true
 			for {
 				var one_byte []byte = make([]byte, 1)
 				n, _ := buf.Read(one_byte)
@@ -89,7 +90,7 @@ func init() {realMain =
 				last_answer += one_byte_str
 				//fmt.Print(one_byte_str)
 
-				if writing {
+				if is_speaking_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
 						if last_word != "[3234_START]" && last_word != "[3234_END]" {
 							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
@@ -102,12 +103,12 @@ func init() {realMain =
 				}
 
 				if strings.Contains(last_answer, "[3234_START]") {
-					writing = true
+					is_speaking_GL = true
 					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
 
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
 				} else if strings.Contains(last_answer, "[3234_END]") {
-					writing = false
+					is_speaking_GL = false
 
 					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
 
@@ -195,6 +196,30 @@ func init() {realMain =
 			}
 		}
 	}
+}
+
+/*
+SpeakOnDevice sends a text to be spoken on a device.
+
+-----------------------------------------------------------
+
+– Params:
+  - device_id – the device ID
+  - text – the text to be spoken
+
+– Returns:
+  - true if the text was sent to be spoken, false if the device is already speaking
+ */
+func SpeakOnDevice(device_id string, text string) bool {
+	if is_speaking_GL {
+		return false
+	}
+
+	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+
+	_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + text + getEndString(), true)
+
+	return true
 }
 
 /*
