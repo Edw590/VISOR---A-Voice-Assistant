@@ -22,9 +22,11 @@
 package MOD_12
 
 import (
+	"Registry/Registry"
 	"ULComm/ULComm"
 	"Utils"
 	"Utils/UtilsSWA"
+	"VISOR_Server/ServerRegKeys"
 	"log"
 	"sort"
 	"time"
@@ -36,12 +38,10 @@ const TIME_SLEEP_S int = 30
 
 const UNKNOWN_LOCATION string = "3234_UNKNOWN"
 
-const TIME_DEVICE_NEAR_S int64 = 5*60
-
 type IntDeviceInfo struct {
-	Device_id string
-	Last_comm int64
-	Last_time_used int64
+	Device_id           string
+	Last_comm           int64
+	Last_time_used      int64
 	Curr_location       string
 	Last_known_location string
 }
@@ -56,7 +56,7 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
-		var device_infos []IntDeviceInfo = nil
+		var device_infos []*IntDeviceInfo = nil
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
@@ -75,7 +75,7 @@ func init() {realMain =
 
 			log.Println("--------------------------------")
 			for _, device_ULComm := range device_infos_ULComm {
-				var device_info IntDeviceInfo
+				var device_info *IntDeviceInfo
 				for _, device_info1 := range device_infos {
 					if device_info1.Device_id == device_ULComm.Device_id {
 						device_info = device_info1
@@ -83,9 +83,9 @@ func init() {realMain =
 						break
 					}
 				}
-				if device_info.Device_id == "" {
-					device_info = IntDeviceInfo{
-						Device_id:      device_ULComm.Device_id,
+				if device_info == nil {
+					device_info = &IntDeviceInfo{
+						Device_id: device_ULComm.Device_id,
 					}
 				}
 
@@ -119,7 +119,8 @@ func init() {realMain =
 						if location_matches {
 							var distance int = UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon.RSSI, UtilsSWA.DEFAULT_TX_POWER)
 
-							if distance <= location_info.Max_distance && device_info.Last_comm + TIME_DEVICE_NEAR_S >= time.Now().Unix() {
+							if distance <= location_info.Max_distance &&
+									device_info.Last_comm + location_info.Last_detection >= time.Now().Unix() {
 								// If the device was near the location and the last communication was recent, then the
 								// user is near the location.
 								device_info.Curr_location = location_info.Location
@@ -131,6 +132,7 @@ func init() {realMain =
 				}
 
 				if device_info.Curr_location != UNKNOWN_LOCATION {
+					log.Println("Curr_location:", device_info.Curr_location)
 					device_info.Last_known_location = device_info.Curr_location
 				}
 
@@ -139,7 +141,12 @@ func init() {realMain =
 				device_infos = append(device_infos, device_info)
 			}
 
-			log.Println("Current user location:", getUserLocation(device_infos))
+			var curr_user_location string = getUserLocation(device_infos)
+			log.Println("Current user location:", curr_user_location)
+			if curr_user_location != UNKNOWN_LOCATION {
+				Registry.GetValue(ServerRegKeys.K_LAST_KNOWN_USER_LOCATION).SetString(curr_user_location, true)
+			}
+			Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).SetString(curr_user_location, true)
 
 			// TODO: Also check if the location changed on some device. The user must be with it then, even if not using
 			//  it.
@@ -151,7 +158,7 @@ func init() {realMain =
 	}
 }
 
-func getUserLocation(devices []IntDeviceInfo) string {
+func getUserLocation(devices []*IntDeviceInfo) string {
 	sortDevicesByLastUsed(devices)
 	var curr_location string = UNKNOWN_LOCATION
 	for _, device := range devices {
@@ -165,7 +172,7 @@ func getUserLocation(devices []IntDeviceInfo) string {
 	return curr_location
 }
 
-func sortDevicesByLastUsed(devices []IntDeviceInfo) {
+func sortDevicesByLastUsed(devices []*IntDeviceInfo) {
 	sort.Slice(devices, func(i, j int) bool {
 		return devices[i].Last_time_used > devices[j].Last_time_used
 	})

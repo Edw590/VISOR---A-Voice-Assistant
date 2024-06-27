@@ -41,7 +41,7 @@ const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
 const _TIME_SLEEP_S int = 1
 
-var is_speaking_GL bool = false
+var is_writing_GL bool = false
 
 type _MGIModSpecInfo any
 var (
@@ -90,7 +90,7 @@ func init() {realMain =
 				last_answer += one_byte_str
 				//fmt.Print(one_byte_str)
 
-				if is_speaking_GL {
+				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
 						if last_word != "[3234_START]" && last_word != "[3234_END]" {
 							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
@@ -103,12 +103,12 @@ func init() {realMain =
 				}
 
 				if strings.Contains(last_answer, "[3234_START]") {
-					is_speaking_GL = true
+					is_writing_GL = true
 					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
 
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
 				} else if strings.Contains(last_answer, "[3234_END]") {
-					is_speaking_GL = false
+					is_writing_GL = false
 
 					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
 
@@ -131,7 +131,7 @@ func init() {realMain =
 			_ = writer.Flush()
 		}
 
-		sendToGPT("hello")
+		//sendToGPT("hello")
 
 		// Process the files to input to the LLM model
 		for {
@@ -211,7 +211,7 @@ SpeakOnDevice sends a text to be spoken on a device.
   - true if the text was sent to be spoken, false if the device is already speaking
  */
 func SpeakOnDevice(device_id string, text string) bool {
-	if is_speaking_GL {
+	if is_writing_GL {
 		return false
 	}
 
