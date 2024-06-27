@@ -63,7 +63,7 @@ func Communicator() fyne.CanvasObject {
 			if Current_screen_GL == comm_canvas_object_GL {
 				var entry *GPT.Entry = GPT.GetEntry(-1, -1)
 				if entry != nil {
-					response_text.SetText(entry.GetText())
+					response_text.SetText(entry.GetDeviceID() + ": " + entry.GetText())
 				} else {
 					response_text.SetText("3234_ERROR")
 				}
