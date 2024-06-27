@@ -31,6 +31,8 @@ var curr_entry_time int64 = -1
 var curr_idx int = 0
 
 const END_ENTRY string = "[3234_END]"
+const ALL_DEVICES_ID string = "3234_ALL"
+
 /*
 GetNextSpeechSentence gets the next sentence to be spoken of the most recent speech.
 
@@ -51,7 +53,8 @@ func GetNextSpeechSentence() string {
 		var curr_time int64 = time.Now().UnixMilli()
 		for {
 			var entry *Entry = GetEntry(-1, -1)
-			if entry.GetTime() >= curr_time && entry.GetDeviceID() == Utils.PersonalConsts_GL.DEVICE_ID {
+			var device_id string = entry.GetDeviceID()
+			if entry.GetTime() >= curr_time && (device_id == Utils.PersonalConsts_GL.DEVICE_ID || device_id == ALL_DEVICES_ID) {
 				curr_entry_time = entry.GetTime()
 
 				break
