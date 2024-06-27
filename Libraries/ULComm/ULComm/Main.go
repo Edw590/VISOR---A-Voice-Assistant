@@ -33,16 +33,16 @@ CreateDeviceInfo creates a DeviceInfo object with the given parameters.
 func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabled bool, wifi_enabled bool,
 		bluetooth_enabled bool, power_connected bool, battery_level int, screen_on bool, monitor_brightness int,
 		wifi_networks string, bluetooth_devices string) *DeviceInfo {
-	var wifi_networks_ret []WifiNetwork
+	var wifi_networks_ret []ExtBeacon
 	for _, network := range strings.Split(wifi_networks, "\x00") {
 		if network == "" {
 			continue
 		}
 
 		var network_info []string = strings.Split(network, "\x01")
-		var wifi_network WifiNetwork = WifiNetwork{
-			SSID: network_info[0],
-			BSSID: network_info[1],
+		var wifi_network ExtBeacon = ExtBeacon{
+			Name: network_info[0],
+			Address: network_info[1],
 		}
 		rssi, _ := strconv.Atoi(network_info[2])
 		wifi_network.RSSI = rssi
@@ -50,14 +50,14 @@ func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabl
 		wifi_networks_ret = append(wifi_networks_ret, wifi_network)
 	}
 
-	var bluetooth_devices_ret []BluetoothDevice
+	var bluetooth_devices_ret []ExtBeacon
 	for _, device := range strings.Split(bluetooth_devices, "\x00") {
 		if device == "" {
 			continue
 		}
 
 		var device_info []string = strings.Split(device, "\x01")
-		var bluetooth_device BluetoothDevice = BluetoothDevice{
+		var bluetooth_device ExtBeacon = ExtBeacon{
 			Name: device_info[0],
 			Address: device_info[1],
 		}

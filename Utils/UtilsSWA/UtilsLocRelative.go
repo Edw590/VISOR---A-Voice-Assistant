@@ -23,6 +23,7 @@ package UtilsSWA
 
 import (
 	"Utils"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -38,7 +39,7 @@ const ABSTR_DISTANCE_100 int = 100
 const ABSTR_DISTANCE_INFINITY int = 999
 
 /*
-GetAbstrDistanceRSSILOCRELATIVE returns an abstract distance between the 2 devices using the calculated real
+GetAbstrDistanceRssiLOCRELATIVE returns an abstract distance between the 2 devices using the calculated real
 distance.
 
 These distances are solely to standardize values on the app.
@@ -64,7 +65,7 @@ means they're near. A wall or 2 away at most maybe.
 – Returns:
   - one of the constants
 */
-func GetAbstrDistanceRSSILOCRELATIVE(real_distance int) int {
+func GetAbstrDistanceRssiLOCRELATIVE(real_distance int) int {
 	if real_distance <= 1 {
 		return ABSTR_DISTANCE_1
 	} else if real_distance <= 5 {
@@ -86,7 +87,7 @@ seems).*/
 const DEFAULT_TX_POWER int = -60
 
 /*
-GetRealDistanceRSSILOCRELATIVE gets the distance in meters between 2 devices from the transmission signal strength
+GetRealDistanceRssiLOCRELATIVE gets the distance in meters between 2 devices from the transmission signal strength
 between the 2 devices (RSSI) and the transmission power value at 1 meter for the current device.
 
 -----------------------------------------------------------
@@ -98,7 +99,7 @@ between the 2 devices (RSSI) and the transmission power value at 1 meter for the
 – Returns:
   - the distance between the 2 devices rounded to the nearest integer
 */
-func GetRealDistanceRSSILOCRELATIVE(rssi int, tx_power int) int {
+func GetRealDistanceRssiLOCRELATIVE(rssi int, tx_power int) int {
 	/*
 	Copied from: Dong, Q., & Dargie, W. (2012). Evaluation of the reliability of RSSI for indoor localization. 2012
 	International Conference on Wireless Communications in Underground and Confined Areas, 1-6.
@@ -189,7 +190,7 @@ func GetRealDistanceRSSILOCRELATIVE(rssi int, tx_power int) int {
 }
 
 /*
-GetAveragePingRTTLOCATIONRELATIVE gets the average round-trip time (RTT) between the current device and the specified IP
+GetAveragePingRttLOCRELATIVE gets the average round-trip time (RTT) between the current device and the specified IP
 address.
 
 This function pings the specified IP address 50 times, eliminates outlier time values, and finally calculates the
@@ -211,7 +212,10 @@ Though it can too return decent results, like 3-4m when it's 3-4m indeed. But th
 – Returns:
   - the average RTT, or -1 if any error occurred
  */
-func GetAveragePingRTTLOCATIONRELATIVE(ip string) (float64, error) {
+func GetAveragePingRttLOCRELATIVE(ip string) (float64, error) {
+
+	// FIXME: Adapt this to Windows. The ping program is different.
+
 	const NUM_PACKETS = 50 // 50 packets, each with 0.5 seconds delay, so 25 seconds of waiting time
 	// 248 + 8 header = 256 bytes each packet
 	command_str := "ping{{EXE}} -c " + strconv.Itoa(NUM_PACKETS) + " -i 0.5 -n -s 248 -t 1 -v " + ip
@@ -230,6 +234,8 @@ func GetAveragePingRTTLOCATIONRELATIVE(ip string) (float64, error) {
 			time_values = append(time_values, time)
 		}
 	}
+
+	log.Println("Time values:", time_values)
 
 	const accuracy_parameter = 2.0 // Accuracy parameter to use with UtilsMath.IsOutlier().
 

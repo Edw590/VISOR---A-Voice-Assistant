@@ -88,11 +88,11 @@ func init() {realMain =
 			if err != nil {
 				wifi_on = false
 			}
-			var wifi_networks []ULComm.WifiNetwork = nil
+			var wifi_networks []ULComm.ExtBeacon = nil
 			for _, wifi_net := range wifi_nets {
-				wifi_networks = append(wifi_networks, ULComm.WifiNetwork{
-					SSID:  wifi_net.SSID,
-					BSSID: strings.ToUpper(wifi_net.BSSID),
+				wifi_networks = append(wifi_networks, ULComm.ExtBeacon{
+					Name:  wifi_net.SSID,
+					Address: strings.ToUpper(wifi_net.BSSID),
 					RSSI:  wifi_net.RSSI,
 				})
 			}
@@ -119,7 +119,7 @@ func init() {realMain =
 				Brightness: getBrightness(),
 			}
 
-			// Check if the device is being used
+			// Check if the device is being used by checking if the mouse is moving
 			var x, y int = robotgo.Location()
 			if x != curr_mouse_position.x || y != curr_mouse_position.y {
 				curr_mouse_position.x = x
@@ -171,7 +171,7 @@ func GetDeviceInfoText() string {
 
 func computeCondition(condition string) bool {
 	condition = formatCondition(condition)
-	log.Println("Condition:", condition)
+	//log.Println("Condition:", condition)
 	expr, err := eval.ParseString(condition, "")
 	if err != nil {
 		log.Println(err)

@@ -61,26 +61,17 @@ type ConnectivityInfo struct {
 	// Mobile_data_enabled is whether the mobile data is enabled
 	Mobile_data_enabled bool
 	// Wifi_info is the information about the Wi-Fi network the device is connected to
-	Wifi_networks []WifiNetwork
+	Wifi_networks []ExtBeacon
 	// Bluetooth_info is the information about the bluetooth devices the device has in range
-	Bluetooth_devices []BluetoothDevice
+	Bluetooth_devices []ExtBeacon
 }
 
-type WifiNetwork struct {
-	// SSID is the name of the Wi-Fi network
-	SSID string
-	// BSSID is the address of the Wi-Fi network in the format XX:XX:XX:XX:XX:XX
-	BSSID string
-	// RSSI is the signal strength of the Wi-Fi network in dBm
-	RSSI int
-}
-
-type BluetoothDevice struct {
-	// Name is the name of the bluetooth device
+type ExtBeacon struct {
+	// Name is the name of the device (bluetooth device name or SSID for Wi-Fi, for example)
 	Name string
-	// Address is the address of the bluetooth device in the format XX:XX:XX:XX:XX:XX
+	// Address is the address of the device (MAC address for bluetooth devices, BSSID for Wi-Fi networks, for example)
 	Address string
-	// RSSI is the signal strength of the bluetooth device in dBm
+	// RSSI is the signal strength of the device in dBm
 	RSSI int
 }
 

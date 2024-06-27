@@ -26,18 +26,24 @@ import (
 	"Utils"
 	"Utils/UtilsSWA"
 	"log"
+	"sort"
+	"time"
 )
 
 // User Locator //
 
 const TIME_SLEEP_S int = 30
 
-type DeviceInfo struct {
+const UNKNOWN_LOCATION string = "3234_UNKNOWN"
+
+const TIME_DEVICE_NEAR_S int64 = 5*60
+
+type IntDeviceInfo struct {
 	Device_id string
 	Last_comm int64
 	Last_time_used int64
-	Distance int
-	Curr_location string
+	Curr_location       string
+	Last_known_location string
 }
 
 type _MGIModSpecInfo any
@@ -50,80 +56,82 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
-		log.Println("--------------------------------")
+		var device_infos []IntDeviceInfo = nil
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
 				panic(err)
 			}
 
-			var devices []ULComm.DeviceInfo = nil
+			var device_infos_ULComm []ULComm.DeviceInfo = nil
 			for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
 				var device ULComm.DeviceInfo
 				if err := Utils.FromJsonGENERAL(file_info.GPath.ReadFile(), &device); err == nil {
-					devices = append(devices, device)
+					device_infos_ULComm = append(device_infos_ULComm, device)
 				} else {
 					log.Println("Error reading device file", file_info.GPath, ":", err)
 				}
 			}
 
-			var device_infos []DeviceInfo = nil
-			for _, device := range devices {
-				var device_info DeviceInfo = DeviceInfo{
-					Device_id: device.Device_id,
-					Last_comm: device.Last_comm,
-					Last_time_used: device.Last_time_used,
-					Distance: -1,
-					Curr_location: "unknown",
+			log.Println("--------------------------------")
+			for _, device_ULComm := range device_infos_ULComm {
+				var device_info IntDeviceInfo
+				for _, device_info1 := range device_infos {
+					if device_info1.Device_id == device_ULComm.Device_id {
+						device_info = device_info1
+
+						break
+					}
+				}
+				if device_info.Device_id == "" {
+					device_info = IntDeviceInfo{
+						Device_id:      device_ULComm.Device_id,
+					}
 				}
 
-				for _, wifi_net := range device.System_state.Connectivity_info.Wifi_networks {
-					for _, location := range modUserInfo.Locs_info {
-						if location.Type == "wifi" {
-							if location.Address != "" {
-								if wifi_net.BSSID == location.Address {
-									device_info.Curr_location = location.Location
-									device_info.Distance = UtilsSWA.GetAbstrDistanceRSSILOCRELATIVE(
-										UtilsSWA.GetRealDistanceRSSILOCRELATIVE(wifi_net.RSSI, UtilsSWA.DEFAULT_TX_POWER))
+				// Update some information
+				device_info.Last_comm = device_ULComm.Last_comm
+				device_info.Last_time_used = device_ULComm.Last_time_used
+				device_info.Curr_location = UNKNOWN_LOCATION
 
-									break
-								}
-							} else {
-								if wifi_net.SSID == location.Name {
-									device_info.Curr_location = location.Location
-									device_info.Distance = UtilsSWA.GetAbstrDistanceRSSILOCRELATIVE(
-										UtilsSWA.GetRealDistanceRSSILOCRELATIVE(wifi_net.RSSI, UtilsSWA.DEFAULT_TX_POWER))
+				for _, location_info := range modUserInfo.Locs_info {
+					var beacon_list []ULComm.ExtBeacon
+					if location_info.Type == "wifi" {
+						beacon_list = device_ULComm.System_state.Connectivity_info.Wifi_networks
+					} else if location_info.Type == "bluetooth" {
+						beacon_list = device_ULComm.System_state.Connectivity_info.Bluetooth_devices
+					} else {
+						continue
+					}
 
-									break
-								}
+					for _, beacon := range beacon_list {
+						var location_matches bool = false
+						if location_info.Address != "" {
+							if beacon.Address == location_info.Address {
+								location_matches = true
 							}
+						} else {
+							if beacon.Name == location_info.Name {
+								location_matches = true
+							}
+						}
+
+						if location_matches {
+							var distance int = UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon.RSSI, UtilsSWA.DEFAULT_TX_POWER)
+
+							if distance <= location_info.Max_distance && device_info.Last_comm + TIME_DEVICE_NEAR_S >= time.Now().Unix() {
+								// If the device was near the location and the last communication was recent, then the
+								// user is near the location.
+								device_info.Curr_location = location_info.Location
+							}
+
+							break
 						}
 					}
 				}
-				for _, bluetooth_device := range device.System_state.Connectivity_info.Bluetooth_devices {
-					for _, location := range modUserInfo.Locs_info {
-						if location.Type == "bluetooth" {
-							if location.Address != "" {
-								if bluetooth_device.Address == location.Address {
-									device_info.Curr_location = location.Location
-									device_info.Distance = UtilsSWA.GetAbstrDistanceRSSILOCRELATIVE(
-										UtilsSWA.GetRealDistanceRSSILOCRELATIVE(bluetooth_device.RSSI,
-											UtilsSWA.DEFAULT_TX_POWER))
 
-									break
-								}
-							} else {
-								if bluetooth_device.Name == location.Name {
-									device_info.Curr_location = location.Location
-									device_info.Distance = UtilsSWA.GetAbstrDistanceRSSILOCRELATIVE(
-										UtilsSWA.GetRealDistanceRSSILOCRELATIVE(bluetooth_device.RSSI,
-											UtilsSWA.DEFAULT_TX_POWER))
-
-									break
-								}
-							}
-						}
-					}
+				if device_info.Curr_location != UNKNOWN_LOCATION {
+					device_info.Last_known_location = device_info.Curr_location
 				}
 
 				log.Println("device_info:", device_info)
@@ -131,18 +139,7 @@ func init() {realMain =
 				device_infos = append(device_infos, device_info)
 			}
 
-			var most_recent_device DeviceInfo = getMostRecentlyUsedDevice(device_infos)
-			if most_recent_device.Device_id != "" {
-				log.Println("Current user location:", most_recent_device.Curr_location)
-			}
-
-			// TODO: If the location is unknown, check the next most recently used device. And check how long ago it was
-			//  used and see if the user may be using that device
-
-			// TODO: Also check the most recent device, how long ago it was used and see if the user may still be using
-			//  it or not. If it was 4 hours ago, may not be of much use
-
-			// TODO: For each location, check the max distance
+			log.Println("Current user location:", getUserLocation(device_infos))
 
 			// TODO: Also check if the location changed on some device. The user must be with it then, even if not using
 			//  it.
@@ -154,15 +151,22 @@ func init() {realMain =
 	}
 }
 
-func getMostRecentlyUsedDevice(devices []DeviceInfo) DeviceInfo {
-	var most_recent_device DeviceInfo
-	var most_recent_time int64 = 0
+func getUserLocation(devices []IntDeviceInfo) string {
+	sortDevicesByLastUsed(devices)
+	var curr_location string = UNKNOWN_LOCATION
 	for _, device := range devices {
-		if device.Last_time_used > most_recent_time {
-			most_recent_device = device
-			most_recent_time = device.Last_time_used
+		if device.Curr_location != UNKNOWN_LOCATION {
+			curr_location = device.Curr_location
+
+			break
 		}
 	}
 
-	return most_recent_device
+	return curr_location
+}
+
+func sortDevicesByLastUsed(devices []IntDeviceInfo) {
+	sort.Slice(devices, func(i, j int) bool {
+		return devices[i].Last_time_used > devices[j].Last_time_used
+	})
 }
