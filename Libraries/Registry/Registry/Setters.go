@@ -29,9 +29,11 @@ import (
 /*
 setInternal sets the internal variables for the value.
  */
-func (value *Value) setInternal() {
-	value.prev_data = value.curr_data
-	value.time_updated_prev = value.time_updated_curr
+func (value *Value) setInternal(new_data string) {
+	if value.curr_data != new_data {
+		value.prev_data = value.curr_data
+		value.time_updated_prev = value.time_updated_curr
+	}
 
 	value.time_updated_curr = time.Now().UnixMilli()
 }
@@ -58,13 +60,15 @@ func (value *Value) SetBool(data bool, update_if_same bool) bool {
 		return false
 	}
 
-	value.setInternal()
-
+	var new_data string
 	if data {
-		value.curr_data = "true"
+		new_data = "true"
 	} else {
-		value.curr_data = "false"
+		new_data = "false"
 	}
+
+	value.setInternal(new_data)
+	value.curr_data = new_data
 
 	return true
 }
@@ -91,9 +95,10 @@ func (value *Value) SetInt(data int, update_if_same bool) bool {
 		return false
 	}
 
-	value.setInternal()
+	var new_data string = strconv.Itoa(data)
 
-	value.curr_data = strconv.Itoa(data)
+	value.setInternal(new_data)
+	value.curr_data = new_data
 
 	return true
 }
@@ -120,9 +125,10 @@ func (value *Value) SetLong(data int64, update_if_same bool) bool {
 		return false
 	}
 
-	value.setInternal()
+	var new_data string = strconv.FormatInt(data, 10)
 
-	value.curr_data = strconv.FormatInt(data, 10)
+	value.setInternal(new_data)
+	value.curr_data = new_data
 
 	return true
 }
@@ -149,9 +155,10 @@ func (value *Value) SetFloat(data float32, update_if_same bool) bool {
 		return false
 	}
 
-	value.setInternal()
+	var new_data string = strconv.FormatFloat(float64(data), 'f', -1, 32)
 
-	value.curr_data = strconv.FormatFloat(float64(data), 'f', -1, 32)
+	value.setInternal(new_data)
+	value.curr_data = new_data
 
 	return true
 }
@@ -178,9 +185,10 @@ func (value *Value) SetDouble(data float64, update_if_same bool) bool {
 		return false
 	}
 
-	value.setInternal()
+	var new_data string = strconv.FormatFloat(data, 'f', -1, 64)
 
-	value.curr_data = strconv.FormatFloat(data, 'f', -1, 64)
+	value.setInternal(new_data)
+	value.curr_data = new_data
 
 	return true
 }
@@ -206,8 +214,7 @@ func (value *Value) SetString(data string, update_if_same bool) bool {
 		return false
 	}
 
-	value.setInternal()
-
+	value.setInternal(data)
 	value.curr_data = data
 
 	return true
