@@ -19,30 +19,29 @@
  * under the License.
  ******************************************************************************/
 
-//go:build server
+package MOD_9
 
-package MOD_1
+// _ModSpecInfo is the format of the custom generated information about this specific module.
+type _ModSpecInfo struct {
+	// Reminders_info maps the reminder ID to the last time it was reminded in minutes
+	Reminders_info map[string]int64
+}
 
-import (
-	MOD_5 "EmailSender"
-	MOD_7 "GPTCommunicator"
-	MOD_6 "OnlineInfoChk"
-	MOD_9 "RemindersManager"
-	MOD_4 "RssFeedNotifier"
-	MOD_2 "SMARTChecker"
-	MOD_12 "UserLocator"
-	"Utils"
-	MOD_8 "WebsiteBackend"
-)
+// _ModUserInfo is the format of the custom information file about this specific module.
+type _ModUserInfo struct {
+	Reminders []Reminder
+}
 
-// Make sure to add the modules support check for each new module too...
-var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
-	Utils.NUM_MOD_SMARTChecker:      MOD_2.Start,
-	Utils.NUM_MOD_RssFeedNotifier:   MOD_4.Start,
-	Utils.NUM_MOD_EmailSender:       MOD_5.Start,
-	Utils.NUM_MOD_OnlineInfoChk:     MOD_6.Start,
-	Utils.NUM_MOD_GPTCommunicator:   MOD_7.Start,
-	Utils.NUM_MOD_WebsiteBackend:    MOD_8.Start,
-	Utils.NUM_MOD_RemindersManager:  MOD_9.Start,
-	Utils.NUM_MOD_UserLocator:       MOD_12.Start,
+// Reminder is the format of a reminder
+type Reminder struct {
+	// Id is the reminder id
+	Id 		    string
+	// Message is the reminder message
+	Message     string
+	// Time is the time in minutes the reminder is set for
+	Time        string
+	// Repeat_each is the time in minutes between each repeatition of the reminder
+	Repeat_each int64
+	// Location is the location of the reminder in case there is any
+	Location    string
 }
