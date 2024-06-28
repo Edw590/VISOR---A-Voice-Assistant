@@ -22,6 +22,7 @@
 package MOD_12
 
 import (
+	"GPT/GPT"
 	"Registry/Registry"
 	"ULComm/ULComm"
 	"Utils"
@@ -34,7 +35,7 @@ import (
 
 // User Locator //
 
-const TIME_SLEEP_S int = 30
+const TIME_SLEEP_S int = 5
 
 const UNKNOWN_LOCATION string = "3234_UNKNOWN"
 
@@ -132,7 +133,6 @@ func init() {realMain =
 				}
 
 				if device_info.Curr_location != UNKNOWN_LOCATION {
-					log.Println("Curr_location:", device_info.Curr_location)
 					device_info.Last_known_location = device_info.Curr_location
 				}
 
@@ -151,6 +151,9 @@ func init() {realMain =
 			// TODO: Also check if the location changed on some device. The user must be with it then, even if not using
 			//  it.
 
+			// TODO: Give priorities to devices. You're always with the phone even if not using it, but not with the
+			//  computer.
+
 			if Utils.WaitWithStopTIMEDATE(module_stop, TIME_SLEEP_S) {
 				return
 			}
@@ -158,11 +161,56 @@ func init() {realMain =
 	}
 }
 
+func IsDeviceActive(device_id string) bool {
+	if device_id == "" {
+		return false
+	}
+
+	var device_infos []*IntDeviceInfo = getIntDeviceInfos()
+	if device_id == GPT.ALL_DEVICES_ID {
+		// Check if any device is active
+		for _, device_info := range device_infos {
+			if time.Now().Unix() - device_info.Last_comm <= 5 {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	for _, device_info := range device_infos {
+		if device_info.Device_id == device_id {
+			return time.Now().Unix() - device_info.Last_comm <= 5
+		}
+	}
+
+	return false
+}
+
+func getIntDeviceInfos() []*IntDeviceInfo {
+	var device_infos []*IntDeviceInfo = nil
+	for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
+		var device ULComm.DeviceInfo
+		if err := Utils.FromJsonGENERAL(file_info.GPath.ReadFile(), &device); err == nil {
+			device_infos = append(device_infos, &IntDeviceInfo{
+				Device_id: device.Device_id,
+				Last_comm: device.Last_comm,
+				Last_time_used: device.Last_time_used,
+				Curr_location: UNKNOWN_LOCATION,
+			})
+		} else {
+			log.Println("Error reading device file", file_info.GPath, ":", err)
+		}
+	}
+
+	return device_infos
+}
+
 func getUserLocation(devices []*IntDeviceInfo) string {
 	sortDevicesByLastUsed(devices)
 	var curr_location string = UNKNOWN_LOCATION
 	for _, device := range devices {
-		if device.Curr_location != UNKNOWN_LOCATION {
+		if device.Curr_location != UNKNOWN_LOCATION && device.Last_time_used + 5*60 >= time.Now().Unix() {
 			curr_location = device.Curr_location
 
 			break

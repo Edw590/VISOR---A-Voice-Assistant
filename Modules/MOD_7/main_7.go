@@ -23,6 +23,7 @@ package MOD_7
 
 import (
 	MOD_6 "OnlineInfoChk"
+	MOD_12 "UserLocator"
 	"Utils"
 	"bufio"
 	"os"
@@ -198,8 +199,19 @@ func init() {realMain =
 	}
 }
 
+const NO_ERRORS int = 0
+const ALREADY_WRITING int = 1
+const DEVICE_NOT_ACTIVE int = 2
 /*
 SpeakOnDevice sends a text to be spoken on a device.
+
+-----CONSTANTS-----
+
+  - NO_ERRORS – no errors
+  - ALREADY_WRITING – VISOR is already generating text to some device
+  - DEVICE_NOT_ACTIVE – the device is not active
+
+-----CONSTANTS-----
 
 -----------------------------------------------------------
 
@@ -208,18 +220,21 @@ SpeakOnDevice sends a text to be spoken on a device.
   - text – the text to be spoken
 
 – Returns:
-  - true if the text was sent to be spoken, false if the device is already speaking
+  - true if the text was sent to be spoken, false if the device is already speaking or the device is not active
  */
-func SpeakOnDevice(device_id string, text string) bool {
+func SpeakOnDevice(device_id string, text string) int {
 	if is_writing_GL {
-		return false
+		return ALREADY_WRITING
+	}
+	if !MOD_12.IsDeviceActive(device_id) {
+		return DEVICE_NOT_ACTIVE
 	}
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
 	_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + text + getEndString(), true)
 
-	return true
+	return NO_ERRORS
 }
 
 /*

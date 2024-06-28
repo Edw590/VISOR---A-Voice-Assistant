@@ -101,14 +101,7 @@ func init() {realMain =
 					}
 
 					if condition {
-						for {
-							// Wait until the warning is sent
-							if !MOD_7.SpeakOnDevice(GPT.ALL_DEVICES_ID, reminder.Message) {
-								time.Sleep(1 * time.Second)
-							} else {
-								break
-							}
-						}
+						sendWarning(reminder.Message)
 
 						log.Println("Reminder! Message: " + reminder.Message)
 					}
@@ -154,14 +147,11 @@ func init() {realMain =
 					}
 				}
 
+				log.Println("condition_time:", condition_time)
+				log.Println("condition_loc:", condition_loc)
+
 				if condition_time && condition_loc {
-					for {
-						if !MOD_7.SpeakOnDevice(GPT.ALL_DEVICES_ID, reminder.Message) {
-							time.Sleep(1 * time.Second)
-						} else {
-							break
-						}
-					}
+					sendWarning(reminder.Message)
 
 					log.Println("Reminder! Message: " + reminder.Message)
 
@@ -188,4 +178,14 @@ func checkLocation(reminder_loc string, location string) bool {
 	}
 
 	return reminder_loc == location
+}
+
+func sendWarning(message string) {
+	for {
+		if MOD_7.SpeakOnDevice(GPT.ALL_DEVICES_ID, message) == MOD_7.NO_ERRORS {
+			break
+		} else {
+			time.Sleep(1 * time.Second)
+		}
+	}
 }
