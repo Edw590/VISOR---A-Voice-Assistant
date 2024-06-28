@@ -30,9 +30,9 @@ type Speech struct {
 	// time is the time the speech was added in milliseconds
 	time int64
 	// priority is the priority of the speech
-	priority int32
+	priority int
 	// mode is the mode of the speech - an OR operation of different mode numbers
-	mode int32
+	mode int
 	// task_id is the task id related to the speech
 	task_id string
 	// interrupted_times is the number of times the speech was interrupted
@@ -83,7 +83,7 @@ GetPriority gets the priority of the speech
 – Returns:
   - the priority of the speech
  */
-func (speech *Speech) GetPriority() int32 {
+func (speech *Speech) GetPriority() int {
 	return speech.priority
 }
 
@@ -95,7 +95,7 @@ GetMode gets the mode of the speech
 – Returns:
   - the mode of the speech
  */
-func (speech *Speech) GetMode() int32 {
+func (speech *Speech) GetMode() int {
 	return speech.mode
 }
 

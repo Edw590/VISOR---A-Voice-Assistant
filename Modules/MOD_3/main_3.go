@@ -86,8 +86,8 @@ func init() {realMain =
 				var speak bool = err_muted != nil || curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL ||
 					(curr_speech.GetMode() & SpeechQueue.MODE1_ALWAYS_NOTIFY != 0)
 
-				var speech_mode int32 = curr_speech.GetMode()
-				var speech_priority int32 = curr_speech.GetPriority()
+				var speech_mode int = curr_speech.GetMode()
+				var speech_priority int = curr_speech.GetPriority()
 
 				var notify bool = false
 				if speech_priority == SpeechQueue.PRIORITY_CRITICAL {
@@ -210,7 +210,7 @@ func init() {realMain =
 	}
 }
 
-func QueueSpeech(to_speak string, priority int32, mode int32) {
+func QueueSpeech(to_speak string, priority int, mode int) {
 	SpeechQueue.AddSpeech(to_speak, time.Now().UnixMilli(), priority, mode, "")
 }
 

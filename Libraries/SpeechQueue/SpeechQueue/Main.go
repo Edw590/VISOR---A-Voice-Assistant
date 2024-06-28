@@ -27,23 +27,23 @@ import (
 	"time"
 )
 
-const PRIORITY_LOW int32 = 0
-const PRIORITY_MEDIUM int32 = 1
-const PRIORITY_USER_ACTION int32 = 2
-const PRIORITY_HIGH int32 = 3
-const PRIORITY_CRITICAL int32 = 4
+const PRIORITY_LOW int = 0
+const PRIORITY_MEDIUM int = 1
+const PRIORITY_USER_ACTION int = 2
+const PRIORITY_HIGH int = 3
+const PRIORITY_CRITICAL int = 4
 
-const NUM_PRIORITIES int32 = PRIORITY_CRITICAL + 1
+const NUM_PRIORITIES int = PRIORITY_CRITICAL + 1
 
 // MODE_DEFAULT represents all default modes. The default of MODE1 is to only notify if he can't speak. The default of
 //MODE2 is to not bypass the sound.
-const MODE_DEFAULT int32 = 0;
+const MODE_DEFAULT int = 0;
 // MODE1_NO_NOTIF doesn't notify even if he can't speak
-const MODE1_NO_NOTIF int32 = 1 << 0;
+const MODE1_NO_NOTIF int = 1 << 0;
 // MODE1_ALWAYS_NOTIFY always notifies, even if he can speak
-const MODE1_ALWAYS_NOTIFY int32 = 1 << 1;
+const MODE1_ALWAYS_NOTIFY int = 1 << 1;
 // MODE2_BYPASS_NO_SND bypasses the no-sound state in case the device is in a no-sound state
-const MODE2_BYPASS_NO_SND int32 = 1 << 2;
+const MODE2_BYPASS_NO_SND int = 1 << 2;
 
 var speech_queue_GL []*Speech = nil
 
@@ -54,6 +54,7 @@ AddSpeech adds a speech to the speech queue.
 
 – Params:
   - text – the text of the speech
+  - millis – the time at which the speech was added in milliseconds
   - priority – the priority of the speech
   - mode – the mode of the speech - an OR operation of different mode numbers
   - task_id – the task id related to the speech
@@ -61,7 +62,7 @@ AddSpeech adds a speech to the speech queue.
 – Returns:
   - the id of the speech
  */
-func AddSpeech(text string, millis int64, priority int32, mode int32, task_id string) string {
+func AddSpeech(text string, millis int64, priority int, mode int, task_id string) string {
 	var id = Utils.RandStringGENERAL(2048)
 
 	if millis == 0 {
@@ -137,7 +138,7 @@ GetNextSpeech gets the next/oldest speech in the speech queue based on the prior
 – Returns:
   - the next speech or nil if there are no speeches with the priority
  */
-func GetNextSpeech(priority int32) *Speech {
+func GetNextSpeech(priority int) *Speech {
 	var oldest_time int64 = math.MaxInt64
 	var oldest_speech *Speech = nil
 	for _, speech := range speech_queue_GL {
