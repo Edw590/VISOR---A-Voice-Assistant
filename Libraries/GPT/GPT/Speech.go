@@ -27,11 +27,24 @@ import (
 	"time"
 )
 
-var curr_entry_time int64 = -1
-var curr_idx int = 0
+var time_begin_GL int64 = -1
+var curr_entry_time_GL int64 = -1
+var curr_idx_GL int = 0
 
 const END_ENTRY string = "[3234_END]"
 const ALL_DEVICES_ID string = "3234_ALL"
+
+/*
+SetTimeBegin sets the time to begin searching for the next speech.
+
+-----------------------------------------------------------
+
+– Params:
+  - time_begin – the time to begin searching for the next speech
+ */
+func SetTimeBegin(time_begin int64) {
+	time_begin_GL = time_begin
+}
 
 /*
 GetNextSpeechSentence gets the next sentence to be spoken of the most recent speech.
@@ -49,13 +62,13 @@ The function will wait until the time of the next speech is reached.
   - the next sentence to be spoken or END_ENTRY if the end of the text file is reached
  */
 func GetNextSpeechSentence() string {
-	if curr_entry_time == -1 {
-		var curr_time int64 = time.Now().UnixMilli()
+	if curr_entry_time_GL == -1 {
 		for {
 			var entry *Entry = GetEntry(-1, -1)
 			var device_id string = entry.GetDeviceID()
-			if entry.GetTime() >= curr_time && (device_id == Utils.PersonalConsts_GL.DEVICE_ID || device_id == ALL_DEVICES_ID) {
-				curr_entry_time = entry.GetTime()
+			if entry.GetTime() >= time_begin_GL && (device_id == Utils.PersonalConsts_GL.DEVICE_ID || device_id == ALL_DEVICES_ID) {
+				curr_entry_time_GL = entry.GetTime()
+				time_begin_GL = curr_entry_time_GL + 1
 
 				break
 			}
@@ -66,15 +79,15 @@ func GetNextSpeechSentence() string {
 
 	var sentence string = ""
 	for {
-		var entry *Entry = GetEntry(curr_entry_time, -1)
+		var entry *Entry = GetEntry(curr_entry_time_GL, -1)
 		var text_split []string = strings.Split(entry.GetText(), " ")
 
 		//log.Println("--------------------------")
-		if curr_idx >= len(text_split) {
+		if curr_idx_GL >= len(text_split) {
 			break
 		}
 		//log.Println("len(text_split):", len(text_split))
-		for i := curr_idx; i < len(text_split); i++ {
+		for i := curr_idx_GL; i < len(text_split); i++ {
 			var word string = text_split[i]
 			//log.Println("curr_idx:", i)
 			//log.Println("word:", word)
@@ -85,7 +98,7 @@ func GetNextSpeechSentence() string {
 
 				// Add one more to go out of bounds next time the function is called. Will make it break the loop
 				// instantly.
-				curr_idx++
+				curr_idx_GL++
 
 				// But if the word is END_ENTRY alone, just break the loop and return whatever there is - including
 				// nothing, which is taken care of below.
@@ -98,7 +111,7 @@ func GetNextSpeechSentence() string {
 					word += "."
 				}
 			} else if word != "" {
-				curr_idx++
+				curr_idx_GL++
 			} else {
 				continue
 			}
@@ -129,8 +142,8 @@ func GetNextSpeechSentence() string {
 
 	if sentence == "" {
 		sentence = END_ENTRY
-		curr_entry_time = -1
-		curr_idx = 0
+		curr_entry_time_GL = -1
+		curr_idx_GL = 0
 	}
 
 	return sentence

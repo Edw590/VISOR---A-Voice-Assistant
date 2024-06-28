@@ -167,8 +167,9 @@ func init() {realMain =
 		}()
 
 		go func() {
+			GPT.SetTimeBegin(time.Now().UnixMilli())
 			for {
-				// Keep getting the next speech to speak from the server
+				// Keep getting the next sentence to speak from the server
 				var speak string = GPT.GetNextSpeechSentence()
 				if speak == GPT.END_ENTRY {
 					continue
