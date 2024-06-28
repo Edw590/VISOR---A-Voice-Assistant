@@ -24,11 +24,11 @@ package MOD_10
 // _ModUserInfo is the format of the custom information file about this specific module.
 type _ModUserInfo struct {
 	// Notifications is the list of notifications
-	Notifications []Notification
+	Notifications []_Notification
 }
 
-// Notification is the format of a notification.
-type Notification struct {
+// _Notification is the format of a notification.
+type _Notification struct {
 	// Condition is the condition for the notification in Go language
 	Condition string
 	// Speak is the text to speak when the condition is met

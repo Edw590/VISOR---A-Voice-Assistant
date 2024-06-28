@@ -27,6 +27,10 @@ type _ModUserInfo struct {
 	Locs_info []_LocInfo
 }
 
+type _DeviceInfo struct {
+
+}
+
 type _LocInfo struct {
 	// Type is the type of the location "detector" (e.g. wifi)
 	Type string

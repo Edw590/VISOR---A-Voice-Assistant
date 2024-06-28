@@ -29,11 +29,11 @@ type _ModSpecInfo struct {
 
 // _ModUserInfo is the format of the custom information file about this specific module.
 type _ModUserInfo struct {
-	Reminders []Reminder
+	Reminders []_Reminder
 }
 
-// Reminder is the format of a reminder
-type Reminder struct {
+// _Reminder is the format of a reminder
+type _Reminder struct {
 	// Id is the reminder id
 	Id 		    string
 	// Message is the reminder message

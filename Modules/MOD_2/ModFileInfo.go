@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,10 +24,10 @@ package MOD_2
 // _ModUserInfo is the format of the custom information file about this specific module.
 type _ModUserInfo struct {
 	// Disks_info is the information about the disks. It maps the disk serial number to the disk information struct.
-	Disks_info map[string]DiskInfo
+	Disks_info map[string]_DiskInfo
 }
 
-type DiskInfo struct {
+type _DiskInfo struct {
 	// Disk label
 	Label string
 	// Is the disk an HDD?

@@ -66,7 +66,7 @@ func init() {realMain =
 		}
 
 		for {
-			var disks_to_chk map[string]DiskInfo
+			var disks_to_chk map[string]_DiskInfo
 
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
