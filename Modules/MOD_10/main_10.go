@@ -76,7 +76,6 @@ func init() {realMain =
 			Device_id:    Utils.PersonalConsts_GL.DEVICE_ID,
 		}
 		var curr_mouse_position _MousePosition
-		var last_time_sent int64 = 0
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
@@ -129,12 +128,7 @@ func init() {realMain =
 			}
 
 			device_info_GL.Last_comm = time.Now().Unix()
-
-			// Send each 30 seconds
-			if last_time_sent == 0 || time.Now().Unix() - last_time_sent >= 30 {
-				_ = device_info_GL.SendInfo()
-				last_time_sent = time.Now().Unix()
-			}
+			_ = device_info_GL.SendInfo()
 
 
 			/////////////////////////////////////////////////////////////////
