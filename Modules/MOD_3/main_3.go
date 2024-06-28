@@ -22,6 +22,7 @@
 package MOD_3
 
 import (
+	"GPT/GPT"
 	"Registry/Registry"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
@@ -162,6 +163,18 @@ func init() {realMain =
 				}
 
 				curr_speech = nil
+			}
+		}()
+
+		go func() {
+			for {
+				// Keep getting the next speech to speak from the server
+				var speak string = GPT.GetNextSpeechSentence()
+				if speak == GPT.END_ENTRY {
+					continue
+				}
+
+				QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 			}
 		}()
 

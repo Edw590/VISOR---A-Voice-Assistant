@@ -23,8 +23,6 @@ package Screens
 
 import (
 	"GPT/GPT"
-	MOD_3 "Speech"
-	"SpeechQueue/SpeechQueue"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -71,17 +69,6 @@ func Communicator() fyne.CanvasObject {
 			scroll_text.SetMinSize(response_text.MinSize())
 
 			time.Sleep(1 * time.Second)
-		}
-	}()
-
-	go func() {
-		for {
-			var speak string = GPT.GetNextSpeechSentence()
-			if speak == GPT.END_ENTRY {
-				continue
-			}
-
-			MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE_DEFAULT)
 		}
 	}()
 
