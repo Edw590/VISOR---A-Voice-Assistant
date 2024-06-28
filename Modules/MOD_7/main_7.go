@@ -132,7 +132,9 @@ func init() {realMain =
 			_ = writer.Flush()
 		}
 
-		//sendToGPT("hello")
+		// Keep this here. Seems it's necessary to say the first hello to Llama3 or it will say it even if we ask
+		// something else.
+		sendToGPT("hello")
 
 		// Process the files to input to the LLM model
 		for {
