@@ -43,7 +43,7 @@ This began as a Python project (in 2020), but even using an IDE got the project 
 - Start the client or the server executables and that's it.
 
 #### Supported OSes
-The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above.
+The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
 
 To change it to run on Windows or Linux (aside from compiling with the Linux or Windows flag), go on the `bin` folder, put all the executable files there and check the JSON file. Constants on it must be modified (including on the first run, to set them since they are empty).
 
