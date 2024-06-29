@@ -696,7 +696,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_RemindersManager:
 			return true
 		case NUM_MOD_SystemChecker:
-			return runtime.GOOS == "windows"
+			return true
 		case NUM_MOD_SpeechRecognition:
 			return true
 		case NUM_MOD_UserLocator:
