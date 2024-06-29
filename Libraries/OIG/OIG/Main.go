@@ -39,7 +39,7 @@ GetNews gets the news from the given page contents.
   - the news separated by " ||| " and each news location separated by "\n"
  */
 func GetNews() string {
-	var page_contents []byte = Utils.GetPageContentsWEBSITE()
+	var page_contents []byte = Utils.GetPageContentsWEBSITE("files_EOG/news.json")
 
 	var news_list []OICNews.News
 	if err := Utils.FromJsonGENERAL(page_contents, &news_list); err != nil {
@@ -80,7 +80,7 @@ Weather data in order:
   - the weather separated by " ||| " and each weather location separated by "\n"
  */
 func GetWeather() string {
-	var page_contents []byte = Utils.GetPageContentsWEBSITE()
+	var page_contents []byte = Utils.GetPageContentsWEBSITE("files_EOG/weather.json")
 
 	var weather []OICWeather.Weather
 	if err := Utils.FromJsonGENERAL(page_contents, &weather); err != nil {

@@ -43,7 +43,7 @@ parameter.
   - the entry or an empty entry with time = -1 if it doesn't exist
  */
 func GetEntry(time int64, num int) *Entry {
-	var page_contents string = string(Utils.GetPageContentsWEBSITE())
+	var page_contents string = string(Utils.GetPageContentsWEBSITE("files_EOG/gpt_text.txt"))
 	if page_contents == "" {
 		return &Entry{
 			device_id: "",
@@ -123,6 +123,7 @@ getDeviceIdFromEntry gets the device ID from the entry.
 func getDeviceIdFromEntry(entry string) string {
 	// It comes like: "time|DEVICE_ID|..."
 	entry = entry[strings.Index(entry, "|") + 1:]
+
 	return entry[:strings.Index(entry, "|")]
 }
 
