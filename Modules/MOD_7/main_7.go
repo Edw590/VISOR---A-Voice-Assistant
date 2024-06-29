@@ -107,6 +107,7 @@ func init() {realMain =
 					is_writing_GL = true
 					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
 
+					reduceGptTextTxt(gpt_text_txt)
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
 				} else if strings.Contains(last_answer, "[3234_END]") {
 					is_writing_GL = false
@@ -233,10 +234,31 @@ func SpeakOnDevice(device_id string, text string) int {
 	}
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+	reduceGptTextTxt(gpt_text_txt)
 
 	_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + text + getEndString(), true)
 
 	return NO_ERRORS
+}
+
+/*
+reduceGptTextTxt reduces the GPT text file to the last 5 entries.
+
+-----------------------------------------------------------
+
+– Params:
+  - gpt_text_txt – the GPT text file
+ */
+func reduceGptTextTxt(gpt_text_txt Utils.GPath) {
+	var text string = *gpt_text_txt.ReadTextFile()
+	var entries []string = strings.Split(text, "[3234_START:")
+	if len(entries) > 5 {
+		_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[len(entries)-5], false)
+
+		for i := len(entries) - 4; i < len(entries); i++ {
+			_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[i], true)
+		}
+	}
 }
 
 /*
