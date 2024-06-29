@@ -141,7 +141,7 @@ func init() {realMain =
 				device_infos = append(device_infos, device_info)
 			}
 
-			var curr_user_location string = getUserLocation(device_infos)
+			var curr_user_location string = getUserLocation(modUserInfo, device_infos)
 			log.Println("Current user location:", curr_user_location)
 			if curr_user_location != UNKNOWN_LOCATION {
 				Registry.GetValue(ServerRegKeys.K_LAST_KNOWN_USER_LOCATION).SetString(curr_user_location, true)
@@ -206,7 +206,16 @@ func getIntDeviceInfos() []*IntDeviceInfo {
 	return device_infos
 }
 
-func getUserLocation(devices []*IntDeviceInfo) string {
+func getUserLocation(modUserInfo _ModUserInfo, devices []*IntDeviceInfo) string {
+	if modUserInfo.Devices_info.AlwaysWith_device_id != "" {
+		for _, device := range devices {
+			if device.Device_id == modUserInfo.Devices_info.AlwaysWith_device_id &&
+					device.Curr_location != UNKNOWN_LOCATION {
+				return device.Curr_location
+			}
+		}
+	}
+
 	sortDevicesByLastUsed(devices)
 	var curr_location string = UNKNOWN_LOCATION
 	for _, device := range devices {

@@ -23,12 +23,15 @@ package MOD_12
 
 // _ModUserInfo is the format of the custom information file about this specific module.
 type _ModUserInfo struct {
+	// Devices_info is the information about the devices
+	Devices_info _DevicesInfo
 	// Locs_info is the information about the locations
 	Locs_info []_LocInfo
 }
 
-type _DeviceInfo struct {
-
+type _DevicesInfo struct {
+	// AlwaysWith_device_id is the device id of the device that is always with the user
+	AlwaysWith_device_id string
 }
 
 type _LocInfo struct {
