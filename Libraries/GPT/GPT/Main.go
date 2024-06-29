@@ -43,8 +43,7 @@ parameter.
   - the entry or an empty entry with time = -1 if it doesn't exist
  */
 func GetEntry(time int64, num int) *Entry {
-	var page_contents string = string(Utils.GetPageContentsWEBSITE(Utils.PersonalConsts_GL.WEBSITE_URL +
-		"files_EOG/gpt_text.txt", Utils.PersonalConsts_GL.WEBSITE_PW))
+	var page_contents string = string(Utils.GetPageContentsWEBSITE())
 	if page_contents == "" {
 		return &Entry{
 			device_id: "",

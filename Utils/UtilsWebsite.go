@@ -26,12 +26,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 )
 
+// WebsiteForm represents a form to be submitted to VISOR's website
 type WebsiteForm struct {
 	// Type is the form type
 	Type string
@@ -58,22 +58,18 @@ PersonalConsts_GL).
 – Returns:
   - the page contents or nil if an error occurred
 */
-func GetPageContentsWEBSITE(website string, passwd string) []byte {
+func GetPageContentsWEBSITE() []byte {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", website, nil)
+	req, err := http.NewRequest("GET", PersonalConsts_GL.WEBSITE_URL, nil)
 	if err != nil {
-		log.Println(err)
-
 		return nil
 	}
-	req.SetBasicAuth("VISOR", passwd)
+	req.SetBasicAuth("VISOR", PersonalConsts_GL.WEBSITE_PW)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println(err)
-
 		return nil
 	}
 	bodyText, _ := io.ReadAll(resp.Body)
