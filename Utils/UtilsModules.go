@@ -657,7 +657,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 			return true
 		case NUM_MOD_SMARTChecker:
 			// Check if the command "smartctl" is available
-			output, err := ExecCmdSHELL([]string{"smartctl{{EXE}} -h"})
+			output, err := ExecCmdSHELL([]string{"smartctl{{EXE}} --version"})
 			if err != nil {
 				return false
 			}
@@ -669,7 +669,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 			return true
 		case NUM_MOD_EmailSender:
 			// Check if the command "curl" is available
-			output, err := ExecCmdSHELL([]string{"curl{{EXE}} -h"})
+			output, err := ExecCmdSHELL([]string{"curl{{EXE}} --version"})
 			if err != nil {
 				return false
 			}
@@ -681,7 +681,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 			}
 
 			// Check if the command "/usr/bin/chromedriver" is available
-			output, err := ExecCmdSHELL([]string{"/usr/bin/chromedriver{{EXE}} -h"})
+			output, err := ExecCmdSHELL([]string{"chromedriver{{EXE}} --version"})
 			if err != nil {
 				return false
 			}
