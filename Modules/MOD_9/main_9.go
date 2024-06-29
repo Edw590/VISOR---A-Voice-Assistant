@@ -117,8 +117,8 @@ func init() {realMain =
 
 				var curr_time int64 = time.Now().Unix() / 60
 				var reminder_time string = reminder.Time
-				var format = time.RFC3339
-				t, _ := time.Parse(format, reminder_time)
+				var format string = "2006-01-02 -- 15:04:05"
+				t, _ := time.ParseInLocation(format, reminder_time, time.Local)
 				var test_time int64 = t.Unix() / 60
 				if reminder.Repeat_each > 0 {
 					var repeat_each int64 = reminder.Repeat_each
@@ -146,9 +146,6 @@ func init() {realMain =
 						condition_loc = checkLocation(reminder.Location, curr_user_loc)
 					}
 				}
-
-				log.Println("condition_time:", condition_time)
-				log.Println("condition_loc:", condition_loc)
 
 				if condition_time && condition_loc {
 					sendWarning(reminder.Message)
