@@ -91,8 +91,10 @@ func RegisterValue(key string, pretty_name string, description string, value_typ
 		case TYPE_LONG: fallthrough
 		case TYPE_FLOAT: fallthrough
 		case TYPE_DOUBLE:
-			value.prev_data = "0"
-			value.curr_data = "0"
+			value.prev_data = "-1"
+			value.curr_data = "-1"
+		case TYPE_STRING:
+			value.prev_data = ""
 	}
 
 
