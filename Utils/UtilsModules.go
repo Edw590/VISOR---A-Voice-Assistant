@@ -676,11 +676,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 
 			return output.Exit_code == 0
 		case NUM_MOD_OnlineInfoChk:
-			if runtime.GOOS == "windows" {
-				return false
-			}
-
-			// Check if the command "/usr/bin/chromedriver" is available
+			// Check if the command "chromedriver" is available
 			output, err := ExecCmdSHELL([]string{"chromedriver{{EXE}} --version"})
 			if err != nil {
 				return false

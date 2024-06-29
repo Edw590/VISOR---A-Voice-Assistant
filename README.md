@@ -17,7 +17,7 @@ This is the server version of my in-development assistant, V.I.S.O.R.. It runs 2
 - **Speech (3)** (Client) \[Windows only\] - This is VISOR's speech module. It speaks or queues a notification about anything that needs to be spoken.
 - **RSS Feed Notifier (4)** (Server) – Checks RSS feeds and queues an email about any news. Currently it's tested on YouTube channels *and playlists* (something YouTube didn't do nor does), and on StackExchange feeds. May work in others, but I didn't test (haven't needed so far).
 - **Email Sender (5)** (Server) – Sends the emails that are queued for it to send. It works with cURL (the `curl` command), so it must be installed on the system and be on the PATH. It also works by sending an EML file containing the raw email information.
-- **Online Information Checker (6)** (Server) \[Linux only\] – Checks the Internet for information like weather and news and updates a file with the information it got. This file can then be read by apps to get the information back, already ready for usage.
+- **Online Information Checker (6)** (Server) – Checks the Internet for information like weather and news and updates a file with the information it got. This file can then be read by apps to get the information back, already ready for usage.
 - **GPT Communicator (7)** (Server) - Sends and receives text to and from a local LLM (Large Language Model), like Llama 3 through the llama.cpp project.
 - **Website Backend (8)** (Server) - It's the backend of VISOR's website. It is responsible for handling the requests from the frontend.
 - **Reminders Manager (9)** (Server) – Manages reminders set by the user and sends text to be spoken by all devices whenever a reminder is triggered.
