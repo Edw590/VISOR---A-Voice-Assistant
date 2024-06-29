@@ -25,12 +25,35 @@ import (
 	"strconv"
 )
 
+/*
+GetTimeUpdated returns the time the data was updated in milliseconds.
+
+-----------------------------------------------------------
+
+– Params:
+  - curr_data – true to get the current data, false to get the previous data
+
+– Returns:
+  - the time the data was updated in milliseconds
+ */
 func (value *Value) GetTimeUpdated(curr_data bool) int64 {
 	if curr_data {
 		return value.time_updated_curr
 	} else {
 		return value.time_updated_prev
 	}
+}
+
+/*
+GetType returns the type of the Value.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the type of the Value
+ */
+func (value *Value) GetType() string {
+	return value.type_
 }
 
 /*
