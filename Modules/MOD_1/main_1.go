@@ -46,6 +46,8 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
+		Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE).SetData(int64(0), false)
+
 		// Check all modules' support and put on a list to later warn if there were changes of support or not.
 		var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
 		for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
