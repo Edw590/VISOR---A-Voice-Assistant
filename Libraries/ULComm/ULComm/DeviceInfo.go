@@ -49,6 +49,8 @@ type SystemState struct {
 	Battery_info BatteryInfo
 	// Monitor_info is the information about the main monitor of the device
 	Monitor_info MonitorInfo
+	// Sound_info is the information about the sound of the device
+	Sound_info SoundInfo
 }
 
 type ConnectivityInfo struct {
@@ -87,4 +89,11 @@ type MonitorInfo struct {
 	Screen_on bool
 	// Brightness is the brightness of the screen in percentage
 	Brightness int
+}
+
+type SoundInfo struct {
+	// Volume is the volume of the sound in percentage
+	Volume int
+	// Muted is whether the sound is muted
+	Muted bool
 }

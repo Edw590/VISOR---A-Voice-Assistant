@@ -27,12 +27,23 @@ import (
 	"strings"
 )
 
+func GetUserLocation() *UserLocation {
+	var page_contents []byte = Utils.GetPageContentsWEBSITE("files_EOG/user_location.json")
+
+	var user_location UserLocation
+	if err := Utils.FromJsonGENERAL(page_contents, &user_location); err != nil {
+		return nil
+	}
+
+	return &user_location
+}
+
 /*
 CreateDeviceInfo creates a DeviceInfo object with the given parameters.
  */
 func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabled bool, wifi_enabled bool,
 		bluetooth_enabled bool, power_connected bool, battery_level int, screen_on bool, monitor_brightness int,
-		wifi_networks string, bluetooth_devices string) *DeviceInfo {
+		wifi_networks string, bluetooth_devices string, sound_volume int, sound_muted bool) *DeviceInfo {
 	var wifi_networks_ret []ExtBeacon
 	for _, network := range strings.Split(wifi_networks, "\x00") {
 		if network == "" {
@@ -86,6 +97,10 @@ func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabl
 			Monitor_info: MonitorInfo{
 				Screen_on: screen_on,
 				Brightness: monitor_brightness,
+			},
+			Sound_info: SoundInfo{
+				Volume: sound_volume,
+				Muted: sound_muted,
 			},
 		},
 	}
