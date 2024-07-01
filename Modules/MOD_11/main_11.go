@@ -76,7 +76,7 @@ func init() {realMain =
 		for {
 			keywordIndex, _ := porcupine_.Process(getNextFrameAudio())
 			if keywordIndex >= 0 {
-				Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).SetBool(true, false)
+				Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).SetData(true, false)
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 0) {

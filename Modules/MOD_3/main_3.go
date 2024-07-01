@@ -159,7 +159,7 @@ func init() {realMain =
 				}
 
 				if removed_from_queue {
-					Registry.GetValue(ClientRegKeys.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
+					Registry.GetValue(ClientRegKeys.K_LAST_SPEECH).SetData(curr_speech.GetText(), true)
 				}
 
 				curr_speech = nil

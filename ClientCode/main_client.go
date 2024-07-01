@@ -188,9 +188,9 @@ func init() {realMain =
 
 		go func() {
 			for {
-				if Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).GetBool(true) {
+				if Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
 					showWindow()
-					Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).SetBool(false, false)
+					Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
 				}
 
 				time.Sleep(1 * time.Second)
