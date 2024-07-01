@@ -52,7 +52,11 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
-		var user_location ULComm.UserLocation = *ULComm.GetUserLocation()
+		var p_user_location *ULComm.UserLocation = ULComm.GetUserLocation()
+		var user_location ULComm.UserLocation
+		if p_user_location != nil {
+			user_location = *p_user_location
+		}
 
 		var notifs_were_true map[string]bool = make(map[string]bool)
 
@@ -83,7 +87,10 @@ func init() {realMain =
 			}
 
 			// Location trigger - if the user location changed, check if any reminder is triggered
-			user_location = *ULComm.GetUserLocation()
+			p_user_location = ULComm.GetUserLocation()
+			if p_user_location != nil {
+				user_location = *p_user_location
+			}
 			var curr_last_known_user_loc string = user_location.Curr_location
 			var prev_last_known_user_loc string = user_location.Prev_location
 			if curr_last_known_user_loc != prev_curr_last_known_user_loc || prev_last_known_user_loc != prev_prev_last_known_user_loc {
