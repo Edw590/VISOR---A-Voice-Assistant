@@ -22,13 +22,16 @@
 package MOD_9
 
 import (
-	"GPT/GPT"
-	MOD_7 "GPTCommunicator"
 	"Registry/Registry"
+	MOD_3 "Speech"
+	"SpeechQueue/SpeechQueue"
+	"ULComm/ULComm"
 	MOD_12 "UserLocator"
 	"Utils"
-	"VISOR_Server/ServerRegKeys"
+	"VISOR_Client/ClientRegKeys"
+	"github.com/apaxa-go/eval"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -36,6 +39,8 @@ import (
 // Reminders Manager //
 
 const TIME_SLEEP_S int = 1
+
+// TODO: Use the new Command attribute of _ModUserInfo
 
 type _MGIModSpecInfo _ModSpecInfo
 var (
@@ -47,8 +52,12 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
-		var prev_curr_last_known_user_loc string = Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).GetString(true)
-		var prev_prev_last_known_user_loc string = Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).GetString(false)
+		var user_location ULComm.UserLocation = *ULComm.GetUserLocation()
+
+		var notifs_were_true map[string]bool = make(map[string]bool)
+
+		var prev_curr_last_known_user_loc string = user_location.Curr_location
+		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
@@ -74,84 +83,125 @@ func init() {realMain =
 			}
 
 			// Location trigger - if the user location changed, check if any reminder is triggered
-			var curr_last_known_user_loc string = Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).GetString(true)
-			var prev_last_known_user_loc string = Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).GetString(false)
+			user_location = *ULComm.GetUserLocation()
+			var curr_last_known_user_loc string = user_location.Curr_location
+			var prev_last_known_user_loc string = user_location.Prev_location
 			if curr_last_known_user_loc != prev_curr_last_known_user_loc || prev_last_known_user_loc != prev_prev_last_known_user_loc {
 				prev_curr_last_known_user_loc = curr_last_known_user_loc
 				prev_prev_last_known_user_loc = prev_last_known_user_loc
 
 				for _, reminder := range modUserInfo.Reminders {
 					// If the reminder has a time set or has no location, skip it
-					if reminder.Time != "" || reminder.Location == "" {
+					if reminder.Time != "" || reminder.User_location == "" {
 						continue
 					}
 
 					// In case there's a "+", the user must have arrived at the location. If there's a "-", the user
 					// must have left the location.
-					var condition bool
-					if strings.HasPrefix(reminder.Location, "+") {
-						var rem_loc string = reminder.Location[1:]
-						condition = checkLocation(rem_loc, curr_last_known_user_loc)
-					} else if strings.HasPrefix(reminder.Location, "-") {
-						var rem_loc string = reminder.Location[1:]
-						condition = checkLocation(rem_loc, prev_last_known_user_loc)
+					var condition_loc bool
+					if strings.HasPrefix(reminder.User_location, "+") {
+						var rem_loc string = reminder.User_location[1:]
+						condition_loc = checkLocation(rem_loc, curr_last_known_user_loc)
+					} else if strings.HasPrefix(reminder.User_location, "-") {
+						var rem_loc string = reminder.User_location[1:]
+						condition_loc = checkLocation(rem_loc, prev_last_known_user_loc)
 					} else {
 						// Nothing to do
 						continue
 					}
 
-					if condition {
-						sendWarning(reminder.Message)
+					var condition bool = false
+					if reminder.Device_condition != "" {
+						if ok := notifs_were_true[reminder.Id]; !ok {
+							notifs_were_true[reminder.Id] = false
+						}
+
+						if computeCondition(reminder.Device_condition) {
+							if !notifs_were_true[reminder.Id] {
+								notifs_were_true[reminder.Id] = true
+
+								condition = true
+							}
+						} else {
+							notifs_were_true[reminder.Id] = false
+						}
+					} else {
+						condition = true
+					}
+
+					if condition_loc && condition {
+						MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 						log.Println("Reminder! Message: " + reminder.Message)
 					}
 				}
 			}
 
-			// Time trigger - if the time changed (it always does), check if any reminder is triggered
+			// Time/condition trigger - if the time changed (it always does), check if any reminder is triggered
 			for _, reminder := range modUserInfo.Reminders {
+				var condition_time bool = false
+				var test_time int64 = 0
 				// If the reminder has no time set, skip it
-				if reminder.Time == "" {
-					continue
-				}
-
-				var curr_time int64 = time.Now().Unix() / 60
-				var reminder_time string = reminder.Time
-				var format string = "2006-01-02 -- 15:04:05"
-				t, _ := time.ParseInLocation(format, reminder_time, time.Local)
-				var test_time int64 = t.Unix() / 60
-				if reminder.Repeat_each > 0 {
-					var repeat_each int64 = reminder.Repeat_each
-					for {
-						if test_time + repeat_each <= curr_time {
-							test_time += repeat_each
-						} else {
-							break
+				if reminder.Time != "" {
+					var curr_time int64 = time.Now().Unix() / 60
+					var reminder_time string = reminder.Time
+					var format string = "2006-01-02 -- 15:04:05"
+					t, _ := time.ParseInLocation(format, reminder_time, time.Local)
+					test_time = t.Unix() / 60
+					if reminder.Repeat_each > 0 {
+						var repeat_each int64 = reminder.Repeat_each
+						for {
+							if test_time + repeat_each <= curr_time {
+								test_time += repeat_each
+							} else {
+								break
+							}
 						}
 					}
+
+					condition_time  = curr_time >= test_time && reminders_info_list[reminder.Id] != test_time
+				} else {
+					condition_time = true
 				}
 
-				// Check if the reminder is due
-				var condition1 bool = curr_time >= test_time
-				// Check if the reminder was already reminded
-				var condition2 bool = reminders_info_list[reminder.Id] != test_time
+				// Check if the reminder is due and if it was already reminded
 
-				var condition_time bool = condition1 && condition2
-
-				var condition_loc bool = true
-				if reminder.Location != "" {
+				var condition_loc bool = false
+				if reminder.User_location != "" {
 					// Check if the reminder has a location and the user is at that location.
-					var curr_user_loc string = Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).GetString(true)
+					var curr_user_loc string = user_location.Curr_location
 					if curr_user_loc != MOD_12.UNKNOWN_LOCATION {
-						condition_loc = checkLocation(reminder.Location, curr_user_loc)
+						condition_loc = checkLocation(reminder.User_location, curr_user_loc)
 					}
+				} else {
+					condition_loc = true
 				}
 
-				if condition_time && condition_loc {
-					sendWarning(reminder.Message)
+				var condition bool = false
+				if reminder.Device_condition != "" {
+					if ok := notifs_were_true[reminder.Id]; !ok {
+						notifs_were_true[reminder.Id] = false
+					}
+
+					if computeCondition(reminder.Device_condition) {
+						if !notifs_were_true[reminder.Id] {
+							notifs_were_true[reminder.Id] = true
+
+							condition = true
+						}
+					} else {
+						notifs_were_true[reminder.Id] = false
+					}
+				} else {
+					condition = true
+				}
+
+				if condition_time && condition_loc && condition {
+					MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 					log.Println("Reminder! Message: " + reminder.Message)
 
+					// Set the last reminded time to the test time
 					reminders_info_list[reminder.Id] = test_time
 
 					_ = moduleInfo_GL.UpdateGenInfo()
@@ -177,12 +227,33 @@ func checkLocation(reminder_loc string, location string) bool {
 	return reminder_loc == location
 }
 
-func sendWarning(message string) {
-	for {
-		if MOD_7.SpeakOnDevice(GPT.ALL_DEVICES_ID, message) == MOD_7.NO_ERRORS {
-			break
-		} else {
-			time.Sleep(1 * time.Second)
-		}
+func computeCondition(condition string) bool {
+	condition = formatCondition(condition)
+	//log.Println("Condition:", condition)
+	expr, err := eval.ParseString(condition, "")
+	if err != nil {
+		log.Println(err)
 	}
+	r, err := expr.EvalToInterface(nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return r.(bool)
+}
+
+func formatCondition(condition string) string {
+	var power_connected bool = Registry.GetValue(ClientRegKeys.K_POWER_CONNECTED).GetData(true, nil).(bool)
+	var battery_level int = Registry.GetValue(ClientRegKeys.K_BATTERY_LEVEL).GetData(true, nil).(int)
+	var screen_brightness int = Registry.GetValue(ClientRegKeys.K_SCREEN_BRIGHTNESS).GetData(true, nil).(int)
+	var sound_volume int = Registry.GetValue(ClientRegKeys.K_SOUND_VOLUME).GetData(true, nil).(int)
+	var sound_muted bool = Registry.GetValue(ClientRegKeys.K_SOUND_MUTED).GetData(true, nil).(bool)
+
+	condition = strings.Replace(condition, "power_connected", strconv.FormatBool(power_connected), -1)
+	condition = strings.Replace(condition, "battery_level", strconv.Itoa(battery_level), -1)
+	condition = strings.Replace(condition, "screen_brightness", strconv.Itoa(screen_brightness), -1)
+	condition = strings.Replace(condition, "sound_volume", strconv.Itoa(sound_volume), -1)
+	condition = strings.Replace(condition, "sound_muted", strconv.FormatBool(sound_muted), -1)
+
+	return condition
 }

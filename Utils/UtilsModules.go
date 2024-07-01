@@ -74,7 +74,7 @@ const (
 	NUM_MOD_OnlineInfoChk
 	NUM_MOD_GPTCommunicator
 	NUM_MOD_WebsiteBackend
-	NUM_MOD_RemindersManager
+	NUM_MOD_RemindersReminder
 	NUM_MOD_SystemChecker
 	NUM_MOD_SpeechRecognition
 	NUM_MOD_UserLocator
@@ -92,7 +92,7 @@ var MOD_NUMS_NAMES map[int]string = map[int]string{
 	NUM_MOD_OnlineInfoChk:     "Online Information Checker",
 	NUM_MOD_GPTCommunicator:   "GPT Communicator",
 	NUM_MOD_WebsiteBackend:    "Website Backend",
-	NUM_MOD_RemindersManager:  "Reminders Manager",
+	NUM_MOD_RemindersReminder: "Reminders Reminder",
 	NUM_MOD_SystemChecker:     "System Checker",
 	NUM_MOD_SpeechRecognition: "Speech Recognition",
 	NUM_MOD_UserLocator:       "User Locator",
@@ -115,7 +115,7 @@ var MOD_NUMS_SUPPORT map[int]int = map[int]int{
 	NUM_MOD_OnlineInfoChk:     MOD_SERVER,
 	NUM_MOD_GPTCommunicator:   MOD_SERVER,
 	NUM_MOD_WebsiteBackend:    MOD_SERVER,
-	NUM_MOD_RemindersManager:  MOD_SERVER,
+	NUM_MOD_RemindersReminder: MOD_CLIENT,
 	NUM_MOD_SystemChecker:     MOD_CLIENT,
 	NUM_MOD_SpeechRecognition: MOD_CLIENT,
 	NUM_MOD_UserLocator:       MOD_SERVER,
@@ -693,7 +693,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 			return output.Exit_code == 0
 		case NUM_MOD_WebsiteBackend:
 			return true
-		case NUM_MOD_RemindersManager:
+		case NUM_MOD_RemindersReminder:
 			return true
 		case NUM_MOD_SystemChecker:
 			return true

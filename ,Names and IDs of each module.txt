@@ -7,7 +7,7 @@
 6 = Online Information Checker (server)        [Linux only]
 7 = GPT Communicator           (server)
 8 = Website Backend            (server)
-9 = Reminders Manager          (server)
+9 = Reminders Reminder         (client)
 10 = System Checker            (client)        [Windows only]
 11 = Speech Recognition        (client)
 12 = User Locator              (server)
