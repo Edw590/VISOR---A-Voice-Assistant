@@ -219,3 +219,35 @@ func (value *Value) SetString(data string, update_if_same bool) bool {
 
 	return true
 }
+
+/*
+SetData sets the value and converts it to the right type automatically.
+
+-----------------------------------------------------------
+
+- Params:
+  - data – the data to set
+  - update_if_same – whether to still update if the data is the same
+
+- Returns:
+  - whether the data was set
+ */
+func (value *Value) SetData(data any, update_if_same bool) bool {
+	switch value.type_ {
+		case TYPE_BOOL:
+			return value.SetBool(data.(bool), update_if_same)
+		case TYPE_INT:
+			return value.SetInt(data.(int), update_if_same)
+		case TYPE_LONG:
+			return value.SetLong(data.(int64), update_if_same)
+		case TYPE_FLOAT:
+			return value.SetFloat(data.(float32), update_if_same)
+		case TYPE_DOUBLE:
+			return value.SetDouble(data.(float64), update_if_same)
+		case TYPE_STRING:
+			return value.SetString(data.(string), update_if_same)
+	}
+
+	// Won't happen
+	return false
+}

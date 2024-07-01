@@ -26,6 +26,35 @@ import (
 )
 
 /*
+getInternal returns whether the data is internal and the data to return.
+
+-----------------------------------------------------------
+
+– Params:
+  - curr_data – true to get the current data, false to get the previous data
+  - no_data – the data to return if there's no data or nil to return the default values
+
+– Returns:
+  - whether the no_data parameter was used
+  - the data to return
+ */
+func (value *Value) getInternal(curr_data bool, no_data any) (bool, any) {
+	if no_data != nil {
+		if curr_data {
+			if value.time_updated_curr == 0 {
+				return true, no_data
+			}
+		} else {
+			if value.time_updated_prev == 0 {
+				return true, no_data
+			}
+		}
+	}
+
+	return false, nil
+}
+
+/*
 GetTimeUpdated returns the time the data was updated in milliseconds.
 
 -----------------------------------------------------------
@@ -208,4 +237,38 @@ func (value *Value) GetString(curr_data bool) string {
 	} else {
 		return value.prev_data
 	}
+}
+
+/*
+GetData returns the data of the Value.
+
+-----------------------------------------------------------
+
+– Params:
+  - curr_data – true to get the current data, false to get the previous data
+  - no_data – the data to return if there's no data or nil to return the default values
+ */
+func (value *Value) GetData(curr_data bool, no_data any) any {
+	no_data_used, no_data_ret := value.getInternal(curr_data, no_data)
+	if no_data_used {
+		return no_data_ret
+	}
+
+	switch value.type_ {
+		case TYPE_BOOL:
+			return value.GetBool(curr_data)
+		case TYPE_INT:
+			return value.GetInt(curr_data)
+		case TYPE_LONG:
+			return value.GetLong(curr_data)
+		case TYPE_FLOAT:
+			return value.GetFloat(curr_data)
+		case TYPE_DOUBLE:
+			return value.GetDouble(curr_data)
+		case TYPE_STRING:
+			return value.GetString(curr_data)
+	}
+
+	// Won't happen
+	return nil
 }
