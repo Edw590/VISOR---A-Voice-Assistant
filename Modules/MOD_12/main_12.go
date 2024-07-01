@@ -23,11 +23,9 @@ package MOD_12
 
 import (
 	"GPT/GPT"
-	"Registry/Registry"
 	"ULComm/ULComm"
 	"Utils"
 	"Utils/UtilsSWA"
-	"VISOR_Server/ServerRegKeys"
 	"log"
 	"sort"
 	"time"
@@ -39,7 +37,9 @@ const TIME_SLEEP_S int = 5
 
 const UNKNOWN_LOCATION string = "3234_UNKNOWN"
 
-type IntDeviceInfo struct {
+var Device_infos_ULComm_GL []ULComm.DeviceInfo = nil
+
+type _IntDeviceInfo struct {
 	Device_id           string
 	Last_comm           int64
 	Last_time_used      int64
@@ -57,26 +57,32 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
-		var device_infos []*IntDeviceInfo = nil
+		var user_location ULComm.UserLocation
+		var user_location_json Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "user_location.json")
+		if user_location_json.Exists() {
+			_ = Utils.FromJsonGENERAL(user_location_json.ReadFile(), &user_location)
+		}
+
+		var device_infos []*_IntDeviceInfo = nil
 		for {
 			var modUserInfo _ModUserInfo
 			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
 				panic(err)
 			}
 
-			var device_infos_ULComm []ULComm.DeviceInfo = nil
+			Device_infos_ULComm_GL = nil
 			for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
 				var device ULComm.DeviceInfo
 				if err := Utils.FromJsonGENERAL(file_info.GPath.ReadFile(), &device); err == nil {
-					device_infos_ULComm = append(device_infos_ULComm, device)
+					Device_infos_ULComm_GL = append(Device_infos_ULComm_GL, device)
 				} else {
 					log.Println("Error reading device file", file_info.GPath, ":", err)
 				}
 			}
 
 			log.Println("--------------------------------")
-			for _, device_ULComm := range device_infos_ULComm {
-				var device_info *IntDeviceInfo
+			for _, device_ULComm := range Device_infos_ULComm_GL {
+				var device_info *_IntDeviceInfo
 				for _, device_info1 := range device_infos {
 					if device_info1.Device_id == device_ULComm.Device_id {
 						device_info = device_info1
@@ -85,7 +91,7 @@ func init() {realMain =
 					}
 				}
 				if device_info == nil {
-					device_info = &IntDeviceInfo{
+					device_info = &_IntDeviceInfo{
 						Device_id: device_ULComm.Device_id,
 					}
 				}
@@ -96,6 +102,12 @@ func init() {realMain =
 				device_info.Curr_location = UNKNOWN_LOCATION
 
 				for _, location_info := range modUserInfo.Locs_info {
+					if location_info.Last_detection < int64(TIME_SLEEP_S) * 2 {
+						// There must be a minimum. That minimum is the time it takes for the devices to update their
+						// status, but double it to be sure they communicated.
+						location_info.Last_detection = int64(TIME_SLEEP_S) * 2
+					}
+
 					var beacon_list []ULComm.ExtBeacon
 					if location_info.Type == "wifi" {
 						beacon_list = device_ULComm.System_state.Connectivity_info.Wifi_networks
@@ -143,10 +155,8 @@ func init() {realMain =
 
 			var curr_user_location string = getUserLocation(modUserInfo, device_infos)
 			log.Println("Current user location:", curr_user_location)
-			if curr_user_location != UNKNOWN_LOCATION {
-				Registry.GetValue(ServerRegKeys.K_LAST_KNOWN_USER_LOCATION).SetString(curr_user_location, true)
-			}
-			Registry.GetValue(ServerRegKeys.K_CURR_USER_LOCATION).SetString(curr_user_location, true)
+			updateUserLocation(&user_location, curr_user_location)
+			_ = user_location_json.WriteTextFile(*Utils.ToJsonGENERAL(user_location), false)
 
 			// TODO: Also check if the location changed on some device. The user must be with it then, even if not using
 			//  it.
@@ -166,11 +176,11 @@ func IsDeviceActive(device_id string) bool {
 		return false
 	}
 
-	var device_infos []*IntDeviceInfo = getIntDeviceInfos()
+	var device_infos []*_IntDeviceInfo = getIntDeviceInfos()
 	if device_id == GPT.ALL_DEVICES_ID {
 		// Check if any device is active
 		for _, device_info := range device_infos {
-			if time.Now().Unix() - device_info.Last_comm <= 5 {
+			if time.Now().Unix() - device_info.Last_comm <= 10 {
 				return true
 			}
 		}
@@ -180,19 +190,19 @@ func IsDeviceActive(device_id string) bool {
 
 	for _, device_info := range device_infos {
 		if device_info.Device_id == device_id {
-			return time.Now().Unix() - device_info.Last_comm <= 5
+			return time.Now().Unix() - device_info.Last_comm <= 10
 		}
 	}
 
 	return false
 }
 
-func getIntDeviceInfos() []*IntDeviceInfo {
-	var device_infos []*IntDeviceInfo = nil
+func getIntDeviceInfos() []*_IntDeviceInfo {
+	var device_infos []*_IntDeviceInfo = nil
 	for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
 		var device ULComm.DeviceInfo
 		if err := Utils.FromJsonGENERAL(file_info.GPath.ReadFile(), &device); err == nil {
-			device_infos = append(device_infos, &IntDeviceInfo{
+			device_infos = append(device_infos, &_IntDeviceInfo{
 				Device_id: device.Device_id,
 				Last_comm: device.Last_comm,
 				Last_time_used: device.Last_time_used,
@@ -206,7 +216,7 @@ func getIntDeviceInfos() []*IntDeviceInfo {
 	return device_infos
 }
 
-func getUserLocation(modUserInfo _ModUserInfo, devices []*IntDeviceInfo) string {
+func getUserLocation(modUserInfo _ModUserInfo, devices []*_IntDeviceInfo) string {
 	if modUserInfo.Devices_info.AlwaysWith_device_id != "" {
 		for _, device := range devices {
 			if device.Device_id == modUserInfo.Devices_info.AlwaysWith_device_id &&
@@ -229,8 +239,22 @@ func getUserLocation(modUserInfo _ModUserInfo, devices []*IntDeviceInfo) string 
 	return curr_location
 }
 
-func sortDevicesByLastUsed(devices []*IntDeviceInfo) {
+func sortDevicesByLastUsed(devices []*_IntDeviceInfo) {
 	sort.Slice(devices, func(i, j int) bool {
 		return devices[i].Last_time_used > devices[j].Last_time_used
 	})
+}
+
+func updateUserLocation(user_location *ULComm.UserLocation, new_location string) {
+	if new_location != UNKNOWN_LOCATION {
+		user_location.Last_known_location = user_location.Curr_location
+	}
+
+	if new_location != user_location.Curr_location {
+		user_location.Prev_location = user_location.Curr_location
+		user_location.Prev_last_time_checked = user_location.Last_time_checked
+
+		user_location.Curr_location = new_location
+	}
+	user_location.Last_time_checked = time.Now().Unix()
 }
