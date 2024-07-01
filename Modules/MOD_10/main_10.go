@@ -22,19 +22,16 @@
 package MOD_10
 
 import (
-	MOD_3 "Speech"
-	"SpeechQueue/SpeechQueue"
+	"Registry/Registry"
 	"ULComm/ULComm"
 	"Utils"
-	"github.com/apaxa-go/eval"
+	"VISOR_Client/ClientRegKeys"
 	"github.com/distatus/battery"
 	"github.com/go-vgo/robotgo"
 	"github.com/itchyny/volume-go"
 	"github.com/schollz/wifiscan"
 	"github.com/yusufpapurcu/wmi"
-	"log"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -70,8 +67,6 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
-		var notifs_were_true []bool = nil
-
 		device_info_GL = ULComm.DeviceInfo{
 			Device_id:    Utils.PersonalConsts_GL.DEVICE_ID,
 		}
@@ -82,19 +77,7 @@ func init() {realMain =
 				panic(err)
 			}
 
-			var wifi_on bool = true
-			wifi_nets, err := wifiscan.Scan()
-			if err != nil {
-				wifi_on = false
-			}
-			var wifi_networks []ULComm.ExtBeacon = nil
-			for _, wifi_net := range wifi_nets {
-				wifi_networks = append(wifi_networks, ULComm.ExtBeacon{
-					Name:  wifi_net.SSID,
-					Address: strings.ToUpper(wifi_net.BSSID),
-					RSSI:  wifi_net.RSSI,
-				})
-			}
+			wifi_on, wifi_networks := getWifiNetworks()
 
 			// Connectivity information
 			device_info_GL.System_state.Connectivity_info = ULComm.ConnectivityInfo{
@@ -107,15 +90,34 @@ func init() {realMain =
 			}
 
 			// Battery information
+			var battery_level int = getBatteryInfo().level
+			var power_connected bool = getBatteryInfo().power_connected
+			Registry.GetValue(ClientRegKeys.K_BATTERY_LEVEL).SetData(battery_level, false)
+			Registry.GetValue(ClientRegKeys.K_POWER_CONNECTED).SetData(power_connected, false)
+
 			device_info_GL.System_state.Battery_info = ULComm.BatteryInfo{
-				Level:           getBatteryInfo().level,
-				Power_connected: getBatteryInfo().power_connected,
+				Level:           battery_level,
+				Power_connected: power_connected,
 			}
 
 			// Monitor information
+			var screen_brightness int = getBrightness()
+			Registry.GetValue(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetData(screen_brightness, false)
+
 			device_info_GL.System_state.Monitor_info = ULComm.MonitorInfo{
 				Screen_on:  true,
-				Brightness: getBrightness(),
+				Brightness: screen_brightness,
+			}
+
+			// Sound information
+			var sound_volume int = getSoundVolume()
+			var sound_muted bool = getSoundMuted()
+			Registry.GetValue(ClientRegKeys.K_SOUND_VOLUME).SetData(sound_volume, false)
+			Registry.GetValue(ClientRegKeys.K_SOUND_MUTED).SetData(sound_muted, false)
+
+			device_info_GL.System_state.Sound_info = ULComm.SoundInfo{
+				Volume: sound_volume,
+				Muted:  sound_muted,
 			}
 
 			// Check if the device is being used by checking if the mouse is moving
@@ -130,28 +132,6 @@ func init() {realMain =
 			device_info_GL.Last_comm = time.Now().Unix()
 			_ = device_info_GL.SendInfo()
 
-
-			/////////////////////////////////////////////////////////////////
-			/////////////////////////////////////////////////////////////////
-			// Conditions processing
-
-			if len(notifs_were_true) != len(modUserInfo.Notifications) {
-				notifs_were_true = make([]bool, len(modUserInfo.Notifications))
-			}
-
-			for i, notification := range modUserInfo.Notifications {
-				if computeCondition(notification.Condition) {
-					if !notifs_were_true[i] {
-						notifs_were_true[i] = true
-
-						log.Println(notification.Speak)
-						MOD_3.QueueSpeech(notification.Speak, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
-					}
-				} else {
-					notifs_were_true[i] = false
-				}
-			}
-
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
 			}
@@ -163,41 +143,9 @@ func GetDeviceInfoText() string {
 	return *Utils.ToJsonGENERAL(device_info_GL)
 }
 
-func computeCondition(condition string) bool {
-	condition = formatCondition(condition)
-	//log.Println("Condition:", condition)
-	expr, err := eval.ParseString(condition, "")
-	if err != nil {
-		log.Println(err)
-	}
-	r, err := expr.EvalToInterface(nil)
-	if err != nil {
-		log.Println(err)
-	}
-
-	return r.(bool)
-}
-
-func formatCondition(condition string) string {
-	var battery_info _Battery = getBatteryInfo()
-	var monitor_brightness int = getBrightness()
-	var sound_volume int = getSoundVolume()
-	var sound_muted bool = getSoundMuted()
-
-	condition = strings.Replace(condition, "power_connected", strconv.FormatBool(battery_info.power_connected), -1)
-	condition = strings.Replace(condition, "battery_percent", strconv.Itoa(battery_info.level), -1)
-	condition = strings.Replace(condition, "brightness", strconv.Itoa(monitor_brightness), -1)
-	condition = strings.Replace(condition, "sound_volume", strconv.Itoa(sound_volume), -1)
-	condition = strings.Replace(condition, "sound_muted", strconv.FormatBool(sound_muted), -1)
-
-	return condition
-}
-
 func getBatteryInfo() _Battery {
 	batteries, err := battery.GetAll()
 	if err != nil || len(batteries) == 0 {
-		// TODO: handle error
-
 		return _Battery{}
 	}
 
@@ -243,4 +191,28 @@ func getSoundMuted() bool {
 	}
 
 	return muted
+}
+
+func getWifiNetworks() (bool, []ULComm.ExtBeacon) {
+	for i := 0; i < 20; i++ {
+		wifi_nets, err := wifiscan.Scan()
+		if err != nil {
+			return false, nil
+		}
+
+		var wifi_networks []ULComm.ExtBeacon = nil
+		for _, wifi_net := range wifi_nets {
+			wifi_networks = append(wifi_networks, ULComm.ExtBeacon{
+				Name:    wifi_net.SSID,
+				Address: strings.ToUpper(wifi_net.BSSID),
+				RSSI:    wifi_net.RSSI,
+			})
+		}
+
+		if len(wifi_networks) != 0 {
+			return true, wifi_networks
+		}
+	}
+
+	return true, nil
 }

@@ -26,17 +26,9 @@ import "Registry/Registry"
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 
-// Type: string, always update
-const K_CURR_USER_LOCATION string = "CURR_USER_LOCATION"
-// Type: string, always update
-const K_LAST_KNOWN_USER_LOCATION string = "LAST_KNOWN_USER_LOCATION"
-
 /*
 RegisterValues registers the server values in the registry.
  */
 func RegisterValues() {
 	Registry.RegisterValue(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", Registry.TYPE_LONG)
-
-	Registry.RegisterValue(K_CURR_USER_LOCATION, "Current user location", "The current location of the user", Registry.TYPE_STRING)
-	Registry.RegisterValue(K_LAST_KNOWN_USER_LOCATION, "Last known user location", "The last known location of the user", Registry.TYPE_STRING)
 }
