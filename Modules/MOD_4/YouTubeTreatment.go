@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -152,7 +152,7 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 
 	var msg_subject string = _GEN_ERROR
 	if feedType.type_2 == _TYPE_2_YT_CHANNEL {
-		if _VID_TIME_LIVE == things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL] {
+		if things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL] == _VID_TIME_LIVE {
 			// Live video
 			msg_subject = "🔴 " + things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " está agora em direto: " + vid_title + "!"
 			things_replace[Utils.MODEL_YT_VIDEO_HTML_TITLE_EMAIL] = "Em direto no YouTube: " + things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " – " + vid_title + "!"
@@ -200,7 +200,7 @@ The format returned is the same as the one from the SecondsToTimeStr() function.
 */
 func getVideoDuration(video_url string) string {
 	var p_page_html *string = Utils.GetPageHtmlWEBPAGES(video_url)
-	if nil == p_page_html {
+	if p_page_html == nil {
 		return _VID_TIME_DEF
 	}
 	var page_html string = *p_page_html
@@ -257,7 +257,7 @@ getChannelImageUrl gets the URL of the channel image of by getting the channel's
 */
 func getChannelImageUrl(channel_code string) string {
 	var p_page_html *string = Utils.GetPageHtmlWEBPAGES("https://www.youtube.com/channel/" + channel_code)
-	if nil == p_page_html {
+	if p_page_html == nil {
 		return _GEN_ERROR
 	}
 	var page_html string = *p_page_html
@@ -298,7 +298,7 @@ func isShort(video_texts []string, video_len string) bool {
 		}
 	}
 
-	if _VID_TIME_DEF == video_len {
+	if video_len == _VID_TIME_DEF {
 		// If the video length was not found, mark as not Short (can't know, better safe than sorry).
 		return false
 	}

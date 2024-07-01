@@ -97,7 +97,7 @@ func FindAllIndexesGENERAL(s string, substr string) []int {
 	var s_len int = len(s)
 	for i := 0; i < s_len; i++ {
 		var idx int = strings.Index(s[chars_processed:], substr)
-		if -1 == idx {
+		if idx == -1 {
 			break
 		}
 
@@ -153,7 +153,7 @@ func ToJsonGENERAL(v any) *string {
 	}
 
 	var dst bytes.Buffer
-	if nil == json.Indent(&dst, json_data, "", "\t") {
+	if json.Indent(&dst, json_data, "", "\t") == nil {
 		json_data = dst.Bytes()
 	}
 
@@ -180,14 +180,14 @@ invalid).
   - true if the data was parsed correctly, false otherwise
 */
 func FromJsonGENERAL(json_data []byte, parsed_data any) error {
-	if nil == json_data {
+	if json_data == nil {
 		return errors.New("the JSON data is nil")
 	}
 
 	var json_final []byte = json_data
 	for {
 		var json_min, err = jsmin.Minify(json_final)
-		if nil == err {
+		if err == nil {
 			json_final = json_min
 		} else {
 			// If the minifier fails, try to parse the original JSON (probably won't work, but I'll let Unmarshal()

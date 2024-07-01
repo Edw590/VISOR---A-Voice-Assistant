@@ -1,5 +1,3 @@
-//go:build linux
-
 /*******************************************************************************
  * Copyright 2023-2024 Edw590
  *
@@ -21,6 +19,8 @@
  * under the License.
  ******************************************************************************/
 
+//go:build linux
+
 package Utils
 
 import (
@@ -41,7 +41,7 @@ func RunningAsAdminPROCESSES() bool {
 		return false
 	}
 
-	if 0 != stdOutErrCmd.Exit_code {
+	if stdOutErrCmd.Exit_code != 0 {
 		return false
 	}
 

@@ -458,10 +458,10 @@ func (moduleInfo *ModuleInfo[T]) getGenInfo() error {
 	// Get information from the existing mod_gen_info.json file
 	// Check first if the temporary file exists
 	var p_info []byte = moduleInfo.ModDirsInfo.UserData.Add2(false, _MOD_GEN_INFO_JSON_TMP).ReadFile()
-	if nil == p_info {
+	if p_info == nil {
 		// If not, check if the main file exists
 		p_info = moduleInfo.ModDirsInfo.UserData.Add2(false, _MOD_GEN_INFO_JSON).ReadFile()
-		if nil == p_info {
+		if p_info == nil {
 			// If not, empty struct (new file)
 
 			goto new_file

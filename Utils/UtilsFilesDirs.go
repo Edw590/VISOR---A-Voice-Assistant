@@ -164,7 +164,7 @@ func (gPath GPath) Add(describes_dir bool, separator rune, sub_paths ...any) GPa
 	var tmp []any = append([]any{gPath}, sub_paths...)
 
 	var separator_tmp string = string(separator)
-	if 0xFF == separator {
+	if separator == 0xFF {
 		separator_tmp = ""
 	}
 	return PathFILESDIRS(describes_dir, separator_tmp, tmp...)
@@ -336,7 +336,7 @@ doesn't is a file.
  */
 func (gPath GPath) DescribesDir() bool {
 	file_info, err := os.Stat(gPath.p)
-	if nil == err {
+	if err == nil {
 		return file_info.IsDir()
 	}
 
@@ -357,7 +357,7 @@ func (gPath GPath) Exists() bool {
 	}
 
 	_, err := os.Stat(gPath.p)
-	return nil == err
+	return err == nil
 }
 
 /*
@@ -400,7 +400,7 @@ func (gPath GPath) Create(create_file bool) error {
 			current_path.p += sub_path + gPath.s
 
 			if !current_path.Exists() {
-				if err := os.Mkdir(current_path.p, 0o777); nil == err {
+				if err := os.Mkdir(current_path.p, 0o777); err == nil {
 					_ = os.Chmod(current_path.p, 0o777)
 				} else {
 					return err

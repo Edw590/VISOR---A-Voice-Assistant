@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -39,10 +39,10 @@ GetPageHtmlWEBPAGES gets the HTML of a page.
 */
 func GetPageHtmlWEBPAGES(url string) *string {
 	resp, err := http.Get(url)
-	if nil == err {
+	if err == nil {
 		body, err := io.ReadAll(resp.Body)
 		_ = resp.Body.Close()
-		if resp.StatusCode <= 299 && nil == err {
+		if resp.StatusCode <= 299 && err == nil {
 			var ret string = string(body)
 
 			return &ret

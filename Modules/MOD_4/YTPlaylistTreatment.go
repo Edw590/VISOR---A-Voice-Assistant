@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -74,7 +74,7 @@ func ytPlaylistScraping(playlist_id string, item_num int, item_count int) _Video
 	if playlistPage_GL.id != playlist_id {
 		var playlist_url string = "https://www.youtube.com/playlist?list=" + playlist_id
 		var page_html *string = Utils.GetPageHtmlWEBPAGES(playlist_url)
-		if nil == page_html {
+		if page_html == nil {
 			playlistPage_GL.id = ""
 
 			return videoInfo
@@ -190,7 +190,7 @@ func scrapingNeeded(parsed_feed *gofeed.Feed) bool {
 	if num_items >= 2 && num_items >= 15 {
 		first_date, err1 := time.Parse(_YT_TIME_DATE_FORMAT, parsed_feed.Items[0].Published)
 		last_date, err2 := time.Parse(_YT_TIME_DATE_FORMAT, parsed_feed.Items[num_items-1].Published)
-		if nil == err1 && nil == err2 {
+		if err1 == nil && err2 == nil {
 			// If the first date is before the last date, the playlist is in ascending order - need to scrape.
 			return first_date.Before(last_date)
 		} else {

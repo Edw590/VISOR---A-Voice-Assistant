@@ -99,7 +99,7 @@ func init() {realMain =
 			}
 
 			for _, feedInfo := range modUserInfo.Feeds_info {
-				// if 8 != feedInfo.Feed_num {
+				// if feedInfo.Feed_num != 8 {
 				//	continue
 				// }
 				//log.Println("__________________________BEGINNING__________________________")
@@ -113,12 +113,12 @@ func init() {realMain =
 					continue
 				}
 
-				if _TYPE_1_YOUTUBE == feedType.type_1 {
+				if feedType.type_1 == _TYPE_1_YOUTUBE {
 					// If the feed is a YouTube feed, the feed URL is the channel or playlist ID, so we need to change it to
 					// the correct URL.
-					if _TYPE_2_YT_CHANNEL == feedType.type_2 {
+					if feedType.type_2 == _TYPE_2_YT_CHANNEL {
 						feedInfo.Feed_url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + feedInfo.Feed_url
-					} else if _TYPE_2_YT_PLAYLIST == feedType.type_2 {
+					} else if feedType.type_2 == _TYPE_2_YT_PLAYLIST {
 						feedInfo.Feed_url = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + feedInfo.Feed_url
 					}
 				}
@@ -139,7 +139,7 @@ func init() {realMain =
 				}
 
 				var new_feed bool = false
-				if 0 == len(newsInfo_list) {
+				if len(newsInfo_list) == 0 {
 					new_feed = true
 				}
 
@@ -160,7 +160,7 @@ func init() {realMain =
 					// those may need the order of the items reversed and so the ones got from this loop are wrong. Or if it
 					// is playlist, then only if the feed item ordering is correct (no scraping needed).
 					// This is also here and not just in the end to prevent useless item processing (optimized).
-					if _TYPE_2_YT_PLAYLIST != feedType.type_2 || !scrapingNeeded(parsed_feed) {
+					if feedType.type_2 != _TYPE_2_YT_PLAYLIST || !scrapingNeeded(parsed_feed) {
 						check_skipping_later = false
 						if !isNewNews(newsInfo_list, item.Title, item.Link) {
 							// If the news is not new, don't notify.

@@ -81,7 +81,7 @@ func init() {realMain =
 				//log.Println("Sending email file " + file_to_send.Name + " to " + mail_to + "...")
 
 				if !reachedMaxEmailsHour() {
-					if err := Utils.SendEmailEMAIL(*file_to_send.GPath.ReadTextFile(), mail_to, false); nil == err {
+					if err := Utils.SendEmailEMAIL(*file_to_send.GPath.ReadTextFile(), mail_to, false); err == nil {
 						if time.Now().Hour() != moduleInfo_GL.ModGenInfo.ModSpecInfo.Hour {
 							moduleInfo_GL.ModGenInfo.ModSpecInfo.Hour = time.Now().Hour()
 							moduleInfo_GL.ModGenInfo.ModSpecInfo.Num_emails_hour = 0
@@ -95,7 +95,7 @@ func init() {realMain =
 
 						// Remove the file
 						Utils.DelElemSLICES(&files_to_send, idx_to_remove)
-						if nil == os.Remove(file_to_send.GPath.GPathToStringConversion()) {
+						if os.Remove(file_to_send.GPath.GPathToStringConversion()) == nil {
 							//log.Println("File deleted successfully.")
 						} else {
 							//log.Println("Error deleting file.")
