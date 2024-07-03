@@ -103,10 +103,12 @@ func GetEntry(time int64, num int) *Entry {
 }
 
 func SendText(text string) error {
-	return Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
+	_, err := Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
 		Type:  "GPT",
 		Text1: "[" + Utils.PersonalConsts_GL.DEVICE_ID + "]" + text,
 	})
+
+	return err
 }
 
 /*

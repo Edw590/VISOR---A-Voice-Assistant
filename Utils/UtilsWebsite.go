@@ -78,7 +78,35 @@ func GetPageContentsWEBSITE(partial_url string) []byte {
 }
 
 /*
-SubmitFormWEBSITE sends a form to the given VISOR's website.
+GetFileContentsWEBSITE gets the file contents from the given VISOR's website URL.
+
+-----------------------------------------------------------
+
+– Params:
+  - partial_path – the partial path of the file to get the contents from. Example: gpt_text.txt to get from
+	https://www.visor.com/files_EOG/gpt_text.txt
+  - md5_hash – true if the MD5 hash of the file is to be retrieved, false if the file contents are to be retrieved
+
+– Returns:
+  - the file contents or the MD5 hash, or nil if an error occurred
+ */
+func GetFileContentsWEBSITE(partial_path string, md5_hash bool) []byte {
+	// Get the file contents
+	file_contents, err := SubmitFormWEBSITE(WebsiteForm{
+		Type:  "GET",
+		Text1: strconv.FormatBool(!md5_hash),
+		Text2: partial_path,
+		Text3: "",
+	})
+	if err != nil {
+		return nil
+	}
+
+	return file_contents
+}
+
+/*
+SubmitFormWEBSITE sends a form to the given VISOR's webserver and receives its response.
 
 -----------------------------------------------------------
 
@@ -90,7 +118,7 @@ SubmitFormWEBSITE sends a form to the given VISOR's website.
 – Returns:
   - true if the form was submitted successfully, false otherwise
 */
-func SubmitFormWEBSITE(form WebsiteForm) error {
+func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
 	formData := url.Values{
 		"type": {form.Type},
 		"text1":  {form.Text1},
@@ -104,7 +132,7 @@ func SubmitFormWEBSITE(form WebsiteForm) error {
 	// Create a new POST request with the form data
 	req, err := http.NewRequest("POST", PersonalConsts_GL.WEBSITE_URL + "submit-form", bytes.NewBufferString(formDataEncoded))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req.SetBasicAuth("VISOR", PersonalConsts_GL.WEBSITE_PW)
 
@@ -118,14 +146,19 @@ func SubmitFormWEBSITE(form WebsiteForm) error {
 	client := &http.Client{Transport: tr}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	// Check the response status
 	if resp.StatusCode != http.StatusOK {
-		return errors.New("response status code: " + strconv.Itoa(resp.StatusCode))
+		return nil, errors.New("response status code: " + strconv.Itoa(resp.StatusCode))
 	}
 
-	return nil
+	var body []byte
+	if resp.Body != nil {
+		body, err = io.ReadAll(resp.Body)
+	}
+
+	return body, err
 }

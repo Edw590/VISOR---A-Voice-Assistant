@@ -181,11 +181,13 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 			}
 		}
 	} else {
-		return SubmitFormWEBSITE(WebsiteForm{
+		_, err := SubmitFormWEBSITE(WebsiteForm{
 			Type:  "Email",
 			Text1: emailInfo.Mail_to,
 			Text2: message_eml,
 		})
+
+		return err
 	}
 }
 

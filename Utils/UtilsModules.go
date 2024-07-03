@@ -147,10 +147,15 @@ type ModuleInfo[T any] struct {
 }
 
 type Module struct {
+	// Num is the number of the module.
 	Num int
+	// Name is the name of the module.
 	Name string
+	// Stop is set to true if the module should stop.
 	Stop    bool
+	// Stopped is set to true if the module has stopped.
 	Stopped bool
+	// Enabled is set to true if the module is enabled.
 	Enabled bool
 }
 
@@ -172,15 +177,14 @@ type RealMain func(module_stop *bool, moduleInfo_any any)
 ModStartup does the startup routine for a module and executes its realMain() function, catching any fatal errors and
 sending an email with them.
 
-Call this as the ONLY thing in the main() function of a module.
+Call this as the ONLY thing in the Start() function of a module.
 
 -----------------------------------------------------------
 
 – Generic params:
-  - T – the type of the ModuleInfo.ModGenInfo.ModSpecInfo field of the requested type by the module
+  - T – the type of the ModuleInfo.ModGenInfo field of the requested type by the module
 
 – Params:
-  - mod_num – the number of the module
   - realMain – a pointer to the realMain() function of the module
   - module – a pointer to the Module struct of the module
 */
