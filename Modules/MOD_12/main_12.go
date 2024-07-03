@@ -37,6 +37,8 @@ const TIME_SLEEP_S int = 5
 
 const UNKNOWN_LOCATION string = "3234_UNKNOWN"
 
+const LAST_COMM_MAX int64 = 20
+
 var Device_infos_ULComm_GL []ULComm.DeviceInfo = nil
 
 type _IntDeviceInfo struct {
@@ -180,7 +182,7 @@ func IsDeviceActive(device_id string) bool {
 	if device_id == GPT.ALL_DEVICES_ID {
 		// Check if any device is active
 		for _, device_info := range device_infos {
-			if time.Now().Unix() - device_info.Last_comm <= 10 {
+			if time.Now().Unix() - device_info.Last_comm <= LAST_COMM_MAX {
 				return true
 			}
 		}
@@ -190,7 +192,7 @@ func IsDeviceActive(device_id string) bool {
 
 	for _, device_info := range device_infos {
 		if device_info.Device_id == device_id {
-			return time.Now().Unix() - device_info.Last_comm <= 10
+			return time.Now().Unix() - device_info.Last_comm <= LAST_COMM_MAX
 		}
 	}
 
