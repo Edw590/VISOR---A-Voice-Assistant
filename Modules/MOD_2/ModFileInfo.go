@@ -34,8 +34,8 @@ type _DiskInfo struct {
 	Is_HDD bool
 }
 
-// _ModSpecInfo is the format of the custom generated information about this specific module.
-type _ModSpecInfo struct {
+// _ModGenInfo is the format of the custom generated information about this specific module.
+type _ModGenInfo struct {
 	// Disks_info is the information about the disks. It maps the disk serial number to an array with the first element
 	// being the last short test timestamp and the second element being the last long test timestamp. The timestamps are
 	// in seconds.

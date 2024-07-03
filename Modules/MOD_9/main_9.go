@@ -22,6 +22,7 @@
 package MOD_9
 
 import (
+	"RRComm/RRComm"
 	"Registry/Registry"
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
@@ -42,15 +43,15 @@ const TIME_SLEEP_S int = 1
 
 // TODO: Use the new Command attribute of _ModUserInfo
 
-type _MGIModSpecInfo _ModSpecInfo
+type _MGI _ModGenInfo
 var (
 	realMain Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGIModSpecInfo]
+	moduleInfo_GL Utils.ModuleInfo[_MGI]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
 
 		var p_user_location *ULComm.UserLocation = ULComm.GetUserLocation()
 		var user_location ULComm.UserLocation
@@ -63,20 +64,19 @@ func init() {realMain =
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
+			updateLocalReminders()
+
+			var reminders []RRComm.Reminder = moduleInfo_GL.ModGenInfo.Reminders
 
 			// Add each reminder to the internal reminders list
 			var list_modified bool = false
-			var reminders_info_list map[string]int64 = moduleInfo_GL.ModGenInfo.ModSpecInfo.Reminders_info
+			var reminders_info_list map[string]int64 = moduleInfo_GL.ModGenInfo.Reminders_info
 			if reminders_info_list == nil {
 				reminders_info_list = make(map[string]int64)
-				moduleInfo_GL.ModGenInfo.ModSpecInfo.Reminders_info = reminders_info_list
+				moduleInfo_GL.ModGenInfo.Reminders_info = reminders_info_list
 				list_modified = true
 			}
-			for _, reminder := range modUserInfo.Reminders {
+			for _, reminder := range reminders {
 				if _, ok := reminders_info_list[reminder.Id]; !ok {
 					reminders_info_list[reminder.Id] = 0
 					list_modified = true
@@ -97,7 +97,7 @@ func init() {realMain =
 				prev_curr_last_known_user_loc = curr_last_known_user_loc
 				prev_prev_last_known_user_loc = prev_last_known_user_loc
 
-				for _, reminder := range modUserInfo.Reminders {
+				for _, reminder := range reminders {
 					// If the reminder has a time set or has no location, skip it
 					if reminder.Time != "" || reminder.User_location == "" {
 						continue
@@ -145,7 +145,7 @@ func init() {realMain =
 			}
 
 			// Time/condition trigger - if the time changed (it always does), check if any reminder is triggered
-			for _, reminder := range modUserInfo.Reminders {
+			for _, reminder := range reminders {
 				var condition_time bool = false
 				var test_time int64 = 0
 				// If the reminder has no time set, skip it
@@ -263,4 +263,14 @@ func formatCondition(condition string) string {
 	condition = strings.Replace(condition, "sound_muted", strconv.FormatBool(sound_muted), -1)
 
 	return condition
+}
+
+func updateLocalReminders() {
+	var p_reminders *[]RRComm.Reminder = RRComm.GetRemindersList()
+	if p_reminders == nil {
+		return
+	}
+
+	moduleInfo_GL.ModGenInfo.Reminders = *p_reminders
+	_ = moduleInfo_GL.UpdateGenInfo()
 }

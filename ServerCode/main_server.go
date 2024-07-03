@@ -32,10 +32,10 @@ import (
 	"syscall"
 )
 
-type _MGIModSpecInfo any
+type _MGI any
 var (
 	realMain        Utils.RealMain = nil
-	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
+	moduleInfo_GL   Utils.ModuleInfo[_MGI]
 )
 func main() {
 	var module Utils.Module = Utils.Module{
@@ -45,7 +45,7 @@ func main() {
 		Stopped: false,
 		Enabled: true,
 	}
-	Utils.ModStartup2[_MGIModSpecInfo](realMain, &module, true)
+	Utils.ModStartup2[_MGI](realMain, &module, true)
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {

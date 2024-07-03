@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,8 +21,8 @@
 
 package MOD_5
 
-// _ModSpecInfo is the format of the custom generated information about this specific module.
-type _ModSpecInfo struct {
+// _ModGenInfo is the format of the custom generated information about this specific module.
+type _ModGenInfo struct {
 	// Hour is the hour of the day when the last email was sent
 	Hour            int
 	// Num_emails_hour is the number of emails sent this hour

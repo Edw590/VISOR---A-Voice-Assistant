@@ -38,15 +38,15 @@ const _SHORT_TEST_EACH_S int64 = 5*60*60*99999999999 // oo hours (test disabled)
 
 const _TIME_SLEEP_S int = 60
 
-type _MGIModSpecInfo _ModSpecInfo
+type _MGI _ModGenInfo
 var (
 	realMain        Utils.RealMain = nil
-	moduleInfo_GL   Utils.ModuleInfo[_MGIModSpecInfo]
+	moduleInfo_GL   Utils.ModuleInfo[_MGI]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
 
 		if !Utils.RunningAsAdminPROCESSES() {
 			panic(errors.New("this program must be run as administrator/root"))
@@ -99,17 +99,17 @@ func init() {realMain =
 				}
 
 				// Fill the map with spots for the 2 elements that must be in them
-				if moduleInfo_GL.ModGenInfo.ModSpecInfo.Disks_info == nil {
-					moduleInfo_GL.ModGenInfo.ModSpecInfo.Disks_info = make(map[string][]int64, 2)
+				if moduleInfo_GL.ModGenInfo.Disks_info == nil {
+					moduleInfo_GL.ModGenInfo.Disks_info = make(map[string][]int64, 2)
 				}
 
 				// Check which test to execute, or execute none if the time hasn't passed yet.
-				var disk_gen_info []int64 = moduleInfo_GL.ModGenInfo.ModSpecInfo.Disks_info[disk_serial]
+				var disk_gen_info []int64 = moduleInfo_GL.ModGenInfo.Disks_info[disk_serial]
 				if disk_gen_info == nil {
 					disk_gen_info = make([]int64, 2)
 					disk_gen_info[SHORT_TEST] = 0
 					disk_gen_info[LONG_TEST] = 0
-					moduleInfo_GL.ModGenInfo.ModSpecInfo.Disks_info[disk_serial] = disk_gen_info
+					moduleInfo_GL.ModGenInfo.Disks_info[disk_serial] = disk_gen_info
 				}
 				var test_type int = NO_TEST
 				if !no_test {

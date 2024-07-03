@@ -43,15 +43,15 @@ type emailSent struct {
 	time_s int64
 }
 
-type _MGIModSpecInfo _ModSpecInfo
+type _MGI _ModGenInfo
 var (
 	realMain        Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGIModSpecInfo]
+	moduleInfo_GL Utils.ModuleInfo[_MGI]
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGIModSpecInfo](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
 
 		var to_send_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(true, Utils.TO_SEND_REL_FOLDER)
 
@@ -82,11 +82,11 @@ func init() {realMain =
 
 				if !reachedMaxEmailsHour() {
 					if err := Utils.SendEmailEMAIL(*file_to_send.GPath.ReadTextFile(), mail_to, false); err == nil {
-						if time.Now().Hour() != moduleInfo_GL.ModGenInfo.ModSpecInfo.Hour {
-							moduleInfo_GL.ModGenInfo.ModSpecInfo.Hour = time.Now().Hour()
-							moduleInfo_GL.ModGenInfo.ModSpecInfo.Num_emails_hour = 0
+						if time.Now().Hour() != moduleInfo_GL.ModGenInfo.Hour {
+							moduleInfo_GL.ModGenInfo.Hour = time.Now().Hour()
+							moduleInfo_GL.ModGenInfo.Num_emails_hour = 0
 						}
-						moduleInfo_GL.ModGenInfo.ModSpecInfo.Num_emails_hour++
+						moduleInfo_GL.ModGenInfo.Num_emails_hour++
 						_ = moduleInfo_GL.UpdateGenInfo()
 						//log.Println("Email sent successfully.")
 
@@ -136,6 +136,6 @@ reachedMaxEmailsHour returns true if the maximum number of emails per hour has b
   - true if the maximum number of emails per hour has been reached, false otherwise.
  */
 func reachedMaxEmailsHour() bool {
-	return moduleInfo_GL.ModGenInfo.ModSpecInfo.Num_emails_hour >= _MAX_EMAILS_HOUR &&
-		time.Now().Hour() == moduleInfo_GL.ModGenInfo.ModSpecInfo.Hour
+	return moduleInfo_GL.ModGenInfo.Num_emails_hour >= _MAX_EMAILS_HOUR &&
+		time.Now().Hour() == moduleInfo_GL.ModGenInfo.Hour
 }
