@@ -120,7 +120,7 @@ func init() {realMain =
 
 			////////////////////////////////
 			// Prepare the browser
-			service, err := selenium.NewChromeDriverService("/usr/bin/chromedriver", 4444)
+			service, err := selenium.NewChromeDriverService("chromedriver", 4444)
 			if err != nil {
 				return
 			}
