@@ -30,6 +30,7 @@ import (
 	MOD_12 "UserLocator"
 	"Utils"
 	"VISOR_Client/ClientRegKeys"
+	"bytes"
 	"github.com/apaxa-go/eval"
 	"log"
 	"strconv"
@@ -37,7 +38,7 @@ import (
 	"time"
 )
 
-// Reminders Manager //
+// Reminders Reminder //
 
 const TIME_SLEEP_S int = 1
 
@@ -61,10 +62,16 @@ func init() {realMain =
 
 		var notifs_were_true map[string]bool = make(map[string]bool)
 
+		var last_md5 []byte = nil
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			updateLocalReminders()
+			var new_md5 []byte = Utils.GetFileContentsWEBSITE("reminders.json", true)
+			if new_md5 != nil && !bytes.Equal(new_md5, last_md5) {
+				updateLocalReminders()
+
+				last_md5 = new_md5
+			}
 
 			var reminders []RRComm.Reminder = moduleInfo_GL.ModGenInfo.Reminders
 
@@ -117,24 +124,7 @@ func init() {realMain =
 						continue
 					}
 
-					var condition bool = false
-					if reminder.Device_condition != "" {
-						if ok := notifs_were_true[reminder.Id]; !ok {
-							notifs_were_true[reminder.Id] = false
-						}
-
-						if computeCondition(reminder.Device_condition) {
-							if !notifs_were_true[reminder.Id] {
-								notifs_were_true[reminder.Id] = true
-
-								condition = true
-							}
-						} else {
-							notifs_were_true[reminder.Id] = false
-						}
-					} else {
-						condition = true
-					}
+					var condition bool = checkCondition(reminder, notifs_were_true)
 
 					if condition_loc && condition {
 						MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
@@ -184,24 +174,7 @@ func init() {realMain =
 					condition_loc = true
 				}
 
-				var condition bool = false
-				if reminder.Device_condition != "" {
-					if ok := notifs_were_true[reminder.Id]; !ok {
-						notifs_were_true[reminder.Id] = false
-					}
-
-					if computeCondition(reminder.Device_condition) {
-						if !notifs_were_true[reminder.Id] {
-							notifs_were_true[reminder.Id] = true
-
-							condition = true
-						}
-					} else {
-						notifs_were_true[reminder.Id] = false
-					}
-				} else {
-					condition = true
-				}
+				var condition bool = checkCondition(reminder, notifs_were_true)
 
 				if condition_time && condition_loc && condition {
 					MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
@@ -239,11 +212,11 @@ func computeCondition(condition string) bool {
 	//log.Println("Condition:", condition)
 	expr, err := eval.ParseString(condition, "")
 	if err != nil {
-		log.Println(err)
+		return false
 	}
 	r, err := expr.EvalToInterface(nil)
 	if err != nil {
-		log.Println(err)
+		return false
 	}
 
 	return r.(bool)
@@ -261,6 +234,29 @@ func formatCondition(condition string) string {
 	condition = strings.Replace(condition, "screen_brightness", strconv.Itoa(screen_brightness), -1)
 	condition = strings.Replace(condition, "sound_volume", strconv.Itoa(sound_volume), -1)
 	condition = strings.Replace(condition, "sound_muted", strconv.FormatBool(sound_muted), -1)
+
+	return condition
+}
+
+func checkCondition(reminder RRComm.Reminder, notifs_were_true map[string]bool) bool {
+	var condition bool = false
+	if reminder.Device_condition != "" {
+		if ok := notifs_were_true[reminder.Id]; !ok {
+			notifs_were_true[reminder.Id] = false
+		}
+
+		if computeCondition(reminder.Device_condition) {
+			if !notifs_were_true[reminder.Id] {
+				notifs_were_true[reminder.Id] = true
+
+				condition = true
+			}
+		} else {
+			notifs_were_true[reminder.Id] = false
+		}
+	} else {
+		condition = true
+	}
 
 	return condition
 }
