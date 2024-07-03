@@ -24,12 +24,9 @@ package MOD_8
 import (
 	"Utils"
 	"crypto/md5"
-	"encoding/hex"
-	"fmt"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"log"
 	"net/http"
-	"strings"
 )
 
 // Website Backend //
@@ -113,7 +110,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write(file_bytes)
 			} else {
 				var hash [16]byte = md5.Sum(file_bytes)
-				_, _ = fmt.Fprintf(w, strings.ToUpper(hex.EncodeToString(hash[:])))
+				_, _ = w.Write(hash[:])
 			}
 		default:
 			// Do nothing
