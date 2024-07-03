@@ -22,6 +22,7 @@ gomobile bind^
  "GPT/GPT"^
  "Registry/Registry"^
  "SpeechQueue/SpeechQueue"^
- "ULComm/ULComm"
+ "ULComm/ULComm"^
+ "RRComm/RRComm"
 
 echo Error code: %ERRORLEVEL%

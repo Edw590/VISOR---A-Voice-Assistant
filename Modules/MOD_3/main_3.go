@@ -49,6 +49,7 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGIModSpecInfo])
 
 		_ = ole.CoInitialize(0)
+		defer ole.CoUninitialize()
 
 		if tts, err := sapi.NewSapi(); err != nil {
 			panic(err)

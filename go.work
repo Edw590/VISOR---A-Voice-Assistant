@@ -10,6 +10,7 @@ use (
 	Libraries/Registry
 	Libraries/SpeechQueue
 	Libraries/ULComm
+	Libraries/RRComm
 	Modules/MOD_1
 	Modules/MOD_2
 	Modules/MOD_3
