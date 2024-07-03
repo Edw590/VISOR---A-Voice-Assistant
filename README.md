@@ -13,6 +13,9 @@ The client one needs a bit more development to let it keep running on my compute
 
 The server one runs 24/7 on my Raspberry Pi (but it can run on Windows too. It's supported on both). This is supposed to be VISOR's "operations center", where all 24/7 things run. As an example, the RSS Feed Notifier and Email Sender modules. The notifier checks for news on the feeds and the sender sends the emails that the notifier queues on it. All always running.
 
+## Questions
+Feel free to create an Issue or a Discussion with any questions you have about this. I'm trying to make it as generic as possible for anyone to be able to use it, but I may forget to document things or something, so if you need anything, feel free to ask about it.
+
 ## Modules
 | Number | Name | Client/Server | Description |
 |-|-|-|-|
