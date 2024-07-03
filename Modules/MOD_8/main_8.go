@@ -23,10 +23,13 @@ package MOD_8
 
 import (
 	"Utils"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Website Backend //
@@ -80,10 +83,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 	var type_ string = r.FormValue("type")
 	var text1 string = r.FormValue("text1")
 	var text2 string = r.FormValue("text2")
-	var text3 string = r.FormValue("text3")
-
-	// Write to the page this below
-	_, _ = fmt.Fprintf(w, "Received type: %s\ntext1: %s\n text2: %s\n text3: %s\n", type_, text1, text2, text3)
+	//var text3 string = r.FormValue("text3")
 
 	switch type_ {
 		case "GPT":
@@ -105,6 +105,16 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("UserLocator")
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", text1 + ".json").
 				WriteTextFile(text2, false)
+		case "GET":
+			// Text1 is true if it's to get a file, false if it's to get its MD5 hash
+			// Text2 is the file path
+			var file_bytes []byte = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, text2).ReadFile()
+			if text1 == "true" {
+				_, _ = w.Write(file_bytes)
+			} else {
+				var hash [16]byte = md5.Sum(file_bytes)
+				_, _ = fmt.Fprintf(w, strings.ToUpper(hex.EncodeToString(hash[:])))
+			}
 		default:
 			// Do nothing
 	}
