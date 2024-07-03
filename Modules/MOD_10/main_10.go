@@ -194,7 +194,7 @@ func getSoundMuted() bool {
 }
 
 func getWifiNetworks() (bool, []ULComm.ExtBeacon) {
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		wifi_nets, err := wifiscan.Scan()
 		if err != nil {
 			return false, nil
