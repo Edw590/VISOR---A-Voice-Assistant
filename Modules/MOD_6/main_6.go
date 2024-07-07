@@ -189,7 +189,7 @@ RetrieveWolframAlpha retrieves the information from the given query using Wolfra
 func RetrieveWolframAlpha(query string) (string, bool) {
 	//Initialize a new client
 	c := &wolfram.Client{
-		AppID: Utils.PersonalConsts_GL.WOLFRAM_ALPHA_APPID,
+		AppID: Utils.User_settings_GL.PersonalConsts.WolframAlpha_AppID,
 	}
 
 	//Get a result without additional parameters

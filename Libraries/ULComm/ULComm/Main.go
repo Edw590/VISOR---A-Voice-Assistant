@@ -79,7 +79,7 @@ func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabl
 	}
 
 	return &DeviceInfo{
-		Device_id: Utils.PersonalConsts_GL.DEVICE_ID,
+		Device_id: Utils.User_settings_GL.PersonalConsts.Device_ID,
 		Last_comm: last_comm,
 		Last_time_used: last_time_used,
 		System_state: SystemState{

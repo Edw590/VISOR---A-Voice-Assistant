@@ -69,7 +69,7 @@ func init() {realMain =
 		_ = cmd.Start()
 
 		// Begin with the server ID (to say the first hello)
-		var device_id string = Utils.PersonalConsts_GL.DEVICE_ID
+		var device_id string = Utils.User_settings_GL.PersonalConsts.Device_ID
 
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 		// Start a goroutine to print to the screen and write to a file the output of the LLM model

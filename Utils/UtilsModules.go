@@ -208,10 +208,21 @@ func ModStartup2[T any](realMain RealMain, module *Module, server bool) {
 	if mod_num == NUM_MOD_VISOR {
 		printStartupSequenceMODULES(mod_name)
 
-		err := PersonalConsts_GL.Init(server)
-		if err != nil {
-			log.Fatal("CRITICAL ERROR: " + GetFullErrorMsgGENERAL(err))
+		if !getUserSettings() {
+			panic(errors.New("CRITICAL ERROR: Error obtaining user settings - aborting"))
 		}
+
+		// Set the internal VISOR_server UserSettings attribute
+		User_settings_GL.PersonalConsts.VISOR_server = server
+
+		go func() {
+			// Keep updating the user settings global variable in case it's MOD_0 that's running
+			for {
+				getUserSettings()
+
+				time.Sleep(5 * time.Second)
+			}
+		}()
 	}
 
 	if !IsModSupportedMODULES(mod_num) {
@@ -411,7 +422,7 @@ signalledToStop checks if the module was signalled to stop.
 func (moduleInfo *ModuleInfo[T]) signalledToStop() bool {
 	var stop_file_1_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP")
 	var stop_file_2_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP_p")
-	var stop_file_3_path GPath = PersonalConsts_GL._VISOR_DIR.Add2(false, _USER_DATA_REL_DIR, "STOP")
+	var stop_file_3_path GPath = getVISORDirFILESDIRS().Add2(false, _USER_DATA_REL_DIR, "STOP")
 	if stop_file_1_path.Exists() {
 		err := stop_file_1_path.Remove()
 		if nil != err {
@@ -474,6 +485,28 @@ func (moduleInfo *ModuleInfo[T]) getGenInfo() error {
 }
 
 /*
+getUserSettings gets the user settings from the UserSettings_EOG.json file.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the user settings were obtained successfully, false otherwise
+ */
+func getUserSettings() bool {
+	const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
+	bytes, err := os.ReadFile(USER_SETTINGS_FILE)
+	if err != nil {
+		return false
+	}
+
+	if err = FromJsonGENERAL(bytes, &User_settings_GL); err != nil {
+		return false
+	}
+
+	return true
+}
+
+/*
 printStartupSequenceMODULES prints the startup sequence of a module.
 
 -----------------------------------------------------------
@@ -522,7 +555,7 @@ getProgramDataDirMODULES gets the full path to the program data directory of a m
   - the full path to the program data directory of the module
 */
 func getProgramDataDirMODULES(mod_num int) GPath {
-	return PersonalConsts_GL._VISOR_DIR.Add2(true, _PROGRAM_DATA_REL_DIR, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
+	return getVISORDirFILESDIRS().Add2(true, _PROGRAM_DATA_REL_DIR, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
 }
 
 /*
@@ -537,7 +570,7 @@ GetUserDataDirMODULES gets the full path to the private user data directory of a
   - the full path to the private data directory of the module
 */
 func GetUserDataDirMODULES(mod_num int) GPath {
-	return PersonalConsts_GL._VISOR_DIR.Add2(true, _USER_DATA_REL_DIR, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
+	return getVISORDirFILESDIRS().Add2(true, _USER_DATA_REL_DIR, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
 }
 
 /*
@@ -552,7 +585,7 @@ getModTempDirMODULES gets the full path to the private temporary directory of a 
   - the full path to the private temporary directory of the module
 */
 func getModTempDirMODULES(mod_num int) GPath {
-	return PersonalConsts_GL._VISOR_DIR.Add2(true, _TEMP_FOLDER, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
+	return getVISORDirFILESDIRS().Add2(true, _TEMP_FOLDER, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
 }
 
 /*

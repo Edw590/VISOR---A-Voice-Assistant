@@ -66,7 +66,7 @@ func GetNextSpeechSentence() string {
 		for {
 			var entry *Entry = GetEntry(-1, -1)
 			var device_id string = entry.GetDeviceID()
-			if entry.GetTime() >= time_begin_GL && (device_id == Utils.PersonalConsts_GL.DEVICE_ID || device_id == ALL_DEVICES_ID) {
+			if entry.GetTime() >= time_begin_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
 				curr_entry_time_GL = entry.GetTime()
 				time_begin_GL = curr_entry_time_GL + 1
 

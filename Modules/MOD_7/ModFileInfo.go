@@ -25,4 +25,6 @@ package MOD_7
 type _ModUserInfo struct {
 	// Model_loc is the location of the model file
 	Model_loc string
+	// Config_str is the LLM configuration string
+	Config_str string
 }

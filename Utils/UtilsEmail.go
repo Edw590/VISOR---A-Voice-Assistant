@@ -133,7 +133,7 @@ func GetModelFileEMAIL(file_name string, things_replace map[string]string) Email
 
 	return EmailInfo{
 		Sender:     sender,
-		Mail_to:    PersonalConsts_GL.USER_EMAIL_ADDR,
+		Mail_to:    User_settings_GL.PersonalConsts.User_email_addr,
 		Subject:    "",
 		Html:       msg_html,
 		Multiparts: nil,
@@ -165,7 +165,7 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 		message_eml = eml
 	}
 
-	if PersonalConsts_GL.VISOR_SERVER {
+	if User_settings_GL.PersonalConsts.VISOR_server {
 		// Keep trying to create a file with a unique name.
 		var file_name string = ""
 		var to_send_dir GPath = GetUserDataDirMODULES(NUM_MOD_EmailSender).Add2(true, TO_SEND_REL_FOLDER)
@@ -318,7 +318,7 @@ func getCurlStringEMAIL(mail_to string, emergency_email bool) string {
 	}
 
 	return "curl{{EXE}} --location --connect-timeout " + timeout + " --verbose \"smtp://smtp.gmail.com:587\" --user \"" +
-		PersonalConsts_GL._VISOR_EMAIL_ADDR + ":" + PersonalConsts_GL._VISOR_EMAIL_PW + "\" --mail-rcpt \"" + mail_to +
-		"\" --upload-file \"" + getModTempDirMODULES(NUM_MOD_EmailSender).Add2(false, _TEMP_EML_FILE).GPathToStringConversion() +
-		"\" --ssl-reqd"
+		User_settings_GL.PersonalConsts.VISOR_email_addr + ":" + User_settings_GL.PersonalConsts.VISOR_email_pw +
+		"\" --mail-rcpt \"" + mail_to + "\" --upload-file \"" +
+		getModTempDirMODULES(NUM_MOD_EmailSender).Add2(false, _TEMP_EML_FILE).GPathToStringConversion() + "\" --ssl-reqd"
 }

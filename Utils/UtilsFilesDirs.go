@@ -534,6 +534,18 @@ func GetOldestFileFILESDIRS(files_info []FileInfo) (FileInfo, int) {
 }
 
 /*
+getVISORDirFILESDIRS gets the full path to the VISOR directory.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the full path to the VISOR directory
+ */
+func getVISORDirFILESDIRS() GPath {
+	return PathFILESDIRS(true, "", User_settings_GL.PersonalConsts.VISOR_dir)
+}
+
+/*
 GetBinDirFILESDIRS gets the full path to the directory of the binaries.
 
 -----------------------------------------------------------
@@ -542,7 +554,7 @@ GetBinDirFILESDIRS gets the full path to the directory of the binaries.
   - the full path to the directory of the binaries
 */
 func GetBinDirFILESDIRS() GPath {
-	return PersonalConsts_GL._VISOR_DIR.Add2(true, _BIN_REL_DIR)
+	return getVISORDirFILESDIRS().Add2(true, _BIN_REL_DIR)
 }
 
 /*
@@ -554,5 +566,5 @@ GetWebsiteFilesDirFILESDIRS gets the full path to the website files directory.
   - the full path to the website files directory
 */
 func GetWebsiteFilesDirFILESDIRS() GPath {
-	return PersonalConsts_GL._WEBSITE_DIR.Add2(true, _WEBSITE_FILES_REL_DIR)
+	return PathFILESDIRS(true, "", User_settings_GL.PersonalConsts.Website_dir, _WEBSITE_FILES_REL_DIR)
 }

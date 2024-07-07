@@ -68,7 +68,7 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
 
 		device_info_GL = ULComm.DeviceInfo{
-			Device_id:    Utils.PersonalConsts_GL.DEVICE_ID,
+			Device_id:    Utils.User_settings_GL.PersonalConsts.Device_ID,
 		}
 		var curr_mouse_position _MousePosition
 		for {

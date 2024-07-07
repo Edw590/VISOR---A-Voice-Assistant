@@ -63,11 +63,11 @@ func GetPageContentsWEBSITE(partial_url string) []byte {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", PersonalConsts_GL.WEBSITE_URL + partial_url, nil)
+	req, err := http.NewRequest("GET", User_settings_GL.PersonalConsts.Website_url + "/" + partial_url, nil)
 	if err != nil {
 		return nil
 	}
-	req.SetBasicAuth("VISOR", PersonalConsts_GL.WEBSITE_PW)
+	req.SetBasicAuth("VISOR", User_settings_GL.PersonalConsts.Website_pw)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil
@@ -130,11 +130,11 @@ func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
 	formDataEncoded := formData.Encode()
 
 	// Create a new POST request with the form data
-	req, err := http.NewRequest("POST", PersonalConsts_GL.WEBSITE_URL + "submit-form", bytes.NewBufferString(formDataEncoded))
+	req, err := http.NewRequest("POST", User_settings_GL.PersonalConsts.Website_url + "/submit-form", bytes.NewBufferString(formDataEncoded))
 	if err != nil {
 		return nil, err
 	}
-	req.SetBasicAuth("VISOR", PersonalConsts_GL.WEBSITE_PW)
+	req.SetBasicAuth("VISOR", User_settings_GL.PersonalConsts.Website_pw)
 
 	// Set the appropriate headers
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")

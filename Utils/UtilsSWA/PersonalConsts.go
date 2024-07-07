@@ -34,7 +34,7 @@ InitPersonalConsts initializes the personal constants.
   - website_pw – the password of VISOR's website
  */
 func InitPersonalConsts(device_id string, website_url string, website_pw string) {
-	Utils.PersonalConsts_GL.DEVICE_ID = device_id
-	Utils.PersonalConsts_GL.WEBSITE_URL = website_url
-	Utils.PersonalConsts_GL.WEBSITE_PW = website_pw
+	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
+	Utils.User_settings_GL.PersonalConsts.Website_url = website_url
+	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
 }

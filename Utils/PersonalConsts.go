@@ -27,7 +27,7 @@ import (
 	"strings"
 )
 
-var PersonalConsts_GL PersonalConsts = PersonalConsts{}
+var PersonalConsts_GLa PersonalConsts = PersonalConsts{}
 
 // _PersonalConstsEOG is the internal struct with the format of the PersonalConsts_EOG.json file.
 type _PersonalConstsEOG struct {

@@ -37,7 +37,7 @@ type DeviceInfo struct {
 func (device_info *DeviceInfo) SendInfo() error {
 	_, err := Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
 		Type:  "UserLocator",
-		Text1: Utils.PersonalConsts_GL.DEVICE_ID,
+		Text1: Utils.User_settings_GL.PersonalConsts.Device_ID,
 		Text2: *Utils.ToJsonGENERAL(device_info),
 	})
 
