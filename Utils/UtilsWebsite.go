@@ -128,3 +128,28 @@ func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
 
 	return body, err
 }
+
+/*
+CheckFileChangedWEBSITE checks if the file has changed by comparing the MD5 hash of the file with the given MD5 hash.
+
+-----------------------------------------------------------
+
+– Params:
+  - old_md5 – the old MD5 hash
+  - file_path – the file path
+
+– Returns:
+  - the new MD5 hash if the file has changed, nil otherwise
+*/
+func CheckFileChangedWEBSITE(old_md5 []byte, file_path string) []byte {
+	var new_md5 []byte = GetFileContentsWEBSITE(file_path, true)
+	if new_md5 == nil {
+		return nil
+	}
+
+	if !bytes.Equal(new_md5, old_md5) {
+		return new_md5
+	}
+
+	return nil
+}

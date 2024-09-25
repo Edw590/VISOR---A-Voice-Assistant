@@ -29,7 +29,7 @@ import (
 )
 
 func main() {
-	Utils.PersonalConsts_GL.Init(false)
+	Utils.LoadUserSettings(false)
 
 	log.Println(GPT.SendText("hello"))
 	/*for {

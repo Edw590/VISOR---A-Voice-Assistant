@@ -31,7 +31,6 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"VISOR_Client/ClientRegKeys"
-	"bytes"
 	"github.com/apaxa-go/eval"
 	"log"
 	"strconv"
@@ -68,11 +67,11 @@ func init() {realMain =
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			var new_md5 []byte = Utils.GetFileContentsWEBSITE("reminders.json", true)
-			if new_md5 != nil && !bytes.Equal(new_md5, last_md5) {
-				updateLocalReminders()
-
+			var new_md5 []byte = Utils.CheckFileChangedWEBSITE(last_md5, "reminders.json")
+			if new_md5 != nil {
 				last_md5 = new_md5
+
+				updateLocalReminders()
 			}
 
 			var reminders []ModsFileInfo.Reminder = modGenInfo_GL.Reminders

@@ -191,7 +191,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 	if mod_num == NUM_MOD_VISOR {
 		printStartupSequenceMODULES(mod_name)
 
-		if err := loadUserSettings(server); err != nil {
+		if err := LoadUserSettings(server); err != nil {
 			log.Println("CRITICAL ERROR: Error obtaining user settings - aborting")
 			panic(err)
 		}
@@ -207,7 +207,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 			// Keep reloading the user settings and saving the generated settings global variables in case it's MOD_0
 			// that's running.
 			for {
-				err := loadUserSettings(server)
+				err := LoadUserSettings(server)
 				if err != nil {
 					module.Stop = true
 

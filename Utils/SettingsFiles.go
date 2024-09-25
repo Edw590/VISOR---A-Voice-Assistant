@@ -85,9 +85,9 @@ type _PersonalConsts struct {
 }
 
 /*
-loadUserSettings is the function that initializes the global variables of the UserSettings struct.
+LoadUserSettings is the function that initializes the global variables of the UserSettings struct.
 */
-func loadUserSettings(server bool) error {
+func LoadUserSettings(server bool) error {
 	bytes, err := os.ReadFile(USER_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
