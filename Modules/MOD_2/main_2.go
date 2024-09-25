@@ -22,6 +22,7 @@
 package MOD_2
 
 import (
+	"Utils/ModsFileInfo"
 	"errors"
 	"os"
 	"strconv"
@@ -38,15 +39,18 @@ const _SHORT_TEST_EACH_S int64 = 5*60*60*99999999999 // oo hours (test disabled)
 
 const _TIME_SLEEP_S int = 60
 
-type _MGI _ModGenInfo
 var (
 	realMain        Utils.RealMain = nil
-	moduleInfo_GL   Utils.ModuleInfo[_MGI]
+	moduleInfo_GL   Utils.ModuleInfo
+	modGenInfo_GL   *ModsFileInfo.Mod2GenInfo
+	modUserInfo_GL  *ModsFileInfo.Mod2UserInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_2
+		modUserInfo_GL = &Utils.User_settings_GL.MOD_2
 
 		if !Utils.RunningAsAdminPROCESSES() {
 			panic(errors.New("this program must be run as administrator/root"))
@@ -66,14 +70,7 @@ func init() {realMain =
 		}
 
 		for {
-			var disks_to_chk map[string]_DiskInfo
-
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
-
-			disks_to_chk = modUserInfo.Disks_info
+			var disks_to_chk map[string]ModsFileInfo.DiskInfo = modUserInfo_GL.Disks_info
 			if len(disks_to_chk) == 0 {
 				//log.Println("No disks to check.")
 
@@ -99,17 +96,17 @@ func init() {realMain =
 				}
 
 				// Fill the map with spots for the 2 elements that must be in them
-				if moduleInfo_GL.ModGenInfo.Disks_info == nil {
-					moduleInfo_GL.ModGenInfo.Disks_info = make(map[string][]int64, 2)
+				if modGenInfo_GL.Disks_info == nil {
+					modGenInfo_GL.Disks_info = make(map[string][]int64, 2)
 				}
 
 				// Check which test to execute, or execute none if the time hasn't passed yet.
-				var disk_gen_info []int64 = moduleInfo_GL.ModGenInfo.Disks_info[disk_serial]
+				var disk_gen_info []int64 = modGenInfo_GL.Disks_info[disk_serial]
 				if disk_gen_info == nil {
 					disk_gen_info = make([]int64, 2)
 					disk_gen_info[SHORT_TEST] = 0
 					disk_gen_info[LONG_TEST] = 0
-					moduleInfo_GL.ModGenInfo.Disks_info[disk_serial] = disk_gen_info
+					modGenInfo_GL.Disks_info[disk_serial] = disk_gen_info
 				}
 				var test_type int = NO_TEST
 				if !no_test {
@@ -216,7 +213,6 @@ func init() {realMain =
 					} else {
 						disk_gen_info[LONG_TEST] = time.Now().Unix()
 					}
-					moduleInfo_GL.UpdateGenInfo()
 				}
 
 				html_report := getHTMLReport(disk_partition)

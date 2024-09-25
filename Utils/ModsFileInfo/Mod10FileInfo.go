@@ -19,24 +19,18 @@
  * under the License.
  ******************************************************************************/
 
-package RRComm
+package ModsFileInfo
 
-// Reminder is the format of a reminder
-type Reminder struct {
-	// Id is the reminder ID
-	Id 		    string
-	// Devices is the devices the reminder is set for
-	Devices     []string
-	// Message is the reminder message
-	Message     string
-	// Command is the command to be executed when the reminder is triggered on the chosen Devices
-	Command     string
-	// Time is the time in minutes the reminder is set for
-	Time        string
-	// Repeat_each is the time in minutes between each repeatition of the reminder
-	Repeat_each int64
-	// User_location is the location the user must be in for the reminder to be triggered
-	User_location string
-	// Device_condition is an additional "advanced" condition for the reminder in Go language
-	Device_condition string
+// Mod10UserInfo is the format of the custom information file about this specific module.
+type Mod10UserInfo struct {
+	// Notifications is the list of notifications
+	Notifications []_Notification
+}
+
+// _Notification is the format of a notification.
+type _Notification struct {
+	// Condition is the condition for the notification in Go language
+	Condition string
+	// Speak is the text to speak when the condition is met
+	Speak     string
 }

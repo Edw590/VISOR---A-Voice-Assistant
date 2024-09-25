@@ -74,6 +74,10 @@ func GetPageContentsWEBSITE(partial_url string) []byte {
 	}
 	bodyText, _ := io.ReadAll(resp.Body)
 
+	if resp.StatusCode != http.StatusOK {
+		return nil
+	}
+
 	return bodyText
 }
 

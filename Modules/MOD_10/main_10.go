@@ -57,26 +57,21 @@ type WmiMonitorBrightness struct {
 	CurrentBrightness uint8
 }
 
-type _MGI any
 var (
-	realMain        Utils.RealMain = nil
-	moduleInfo_GL   Utils.ModuleInfo[_MGI]
+	realMain      Utils.RealMain = nil
+	moduleInfo_GL Utils.ModuleInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		device_info_GL = ULComm.DeviceInfo{
 			Device_id:    Utils.User_settings_GL.PersonalConsts.Device_ID,
 		}
 		var curr_mouse_position _MousePosition
-		for {
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
 
+		for {
 			wifi_on, wifi_networks := getWifiNetworks()
 
 			// Connectivity information

@@ -36,15 +36,14 @@ var (
 	stream *portaudio.Stream
 )
 
-type _MGI any
 var (
-	realMain        Utils.RealMain = nil
-	moduleInfo_GL   Utils.ModuleInfo[_MGI]
+	realMain      Utils.RealMain = nil
+	moduleInfo_GL Utils.ModuleInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		porcupine_ := porcupine.Porcupine{
 			AccessKey: Utils.User_settings_GL.PersonalConsts.Picovoice_API_key, // from Picovoice Console (https://console.picovoice.ai/)

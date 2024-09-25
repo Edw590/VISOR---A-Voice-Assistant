@@ -19,25 +19,14 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_2
+package ModsFileInfo
 
-// _ModUserInfo is the format of the custom information file about this specific module.
-type _ModUserInfo struct {
-	// Disks_info is the information about the disks. It maps the disk serial number to the disk information struct.
-	Disks_info map[string]_DiskInfo
-}
+import "OnlineInfoChk/OICNews"
 
-type _DiskInfo struct {
-	// Disk label
-	Label string
-	// Is the disk an HDD?
-	Is_HDD bool
-}
-
-// _ModGenInfo is the format of the custom generated information about this specific module.
-type _ModGenInfo struct {
-	// Disks_info is the information about the disks. It maps the disk serial number to an array with the first element
-	// being the last short test timestamp and the second element being the last long test timestamp. The timestamps are
-	// in seconds.
-	Disks_info map[string][]int64
+// Mod6UserInfo is the format of the custom information file about this specific module.
+type Mod6UserInfo struct {
+	// Temp_locs is the locations to get the weather from
+	Temp_locs   []string
+	// News_locs is the locations to get the news from
+	News_locs []OICNews.NewsLocs
 }

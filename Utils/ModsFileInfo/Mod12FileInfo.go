@@ -19,10 +19,10 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_12
+package ModsFileInfo
 
-// _ModUserInfo is the format of the custom information file about this specific module.
-type _ModUserInfo struct {
+// Mod12UserInfo is the format of the custom information file about this specific module.
+type Mod12UserInfo struct {
 	// Devices_info is the information about the devices
 	Devices_info _DevicesInfo
 	// Locs_info is the information about the locations

@@ -25,6 +25,7 @@ import (
 	"OnlineInfoChk/OICNews"
 	"OnlineInfoChk/OICWeather"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"fmt"
 	"github.com/Krognol/go-wolfram"
 	"github.com/tebeka/selenium"
@@ -35,10 +36,9 @@ import (
 
 // Online Information Checker //
 
-type _MGI any
 var (
-	realMain        Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGI]
+	realMain      Utils.RealMain = nil
+	moduleInfo_GL Utils.ModuleInfo
 )
 
 const _TIME_SLEEP_S int = 15*60
@@ -107,17 +107,14 @@ const _TIME_SLEEP_S int = 15*60
 // Firefox: log.Sprintf("http://localhost:%d", port)
 // Chrome: log.Sprintf("http://127.0.0.1:%d/wd/hub", port) - default
 
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+
+		var modUserInfo *ModsFileInfo.Mod6UserInfo = &Utils.User_settings_GL.MOD_6
 
 		for {
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
-
 			////////////////////////////////
 			// Prepare the browser
 			service, err := selenium.NewChromeDriverService("chromedriver", 4444)

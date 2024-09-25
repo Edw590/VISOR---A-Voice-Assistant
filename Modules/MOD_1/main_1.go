@@ -33,18 +33,17 @@ const _TIME_SLEEP_S int = 5
 
 var modules_GL []Utils.Module
 
-type _MGI any
 var (
-	realMain Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGI]
+	realMain      Utils.RealMain = nil
+	moduleInfo_GL Utils.ModuleInfo
 )
 func Start(modules []Utils.Module) {
 	modules_GL = modules
-	Utils.ModStartup[_MGI](realMain, &modules_GL[Utils.NUM_MOD_ModManager])
+	Utils.ModStartup(realMain, &modules_GL[Utils.NUM_MOD_ModManager])
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE).SetData(int64(0), false)
 

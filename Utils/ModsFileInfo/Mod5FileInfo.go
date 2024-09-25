@@ -19,12 +19,12 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_7
+package ModsFileInfo
 
-// _ModUserInfo is the format of the custom information file about this specific module.
-type _ModUserInfo struct {
-	// Model_loc is the location of the model file
-	Model_loc string
-	// Config_str is the LLM configuration string
-	Config_str string
+// Mod5GenInfo is the format of the custom generated information about this specific module.
+type Mod5GenInfo struct {
+	// Hour is the hour of the day when the last email was sent
+	Hour            int
+	// Num_emails_hour is the number of emails sent this hour
+	Num_emails_hour int
 }

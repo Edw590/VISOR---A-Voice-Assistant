@@ -19,18 +19,25 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_10
+package ModsFileInfo
 
-// _ModUserInfo is the format of the custom information file about this specific module.
-type _ModUserInfo struct {
-	// Notifications is the list of notifications
-	Notifications []_Notification
+// Mod2UserInfo is the format of the custom information file about this specific module.
+type Mod2UserInfo struct {
+	// Disks_info is the information about the disks. It maps the disk serial number to the disk information struct.
+	Disks_info map[string]DiskInfo
 }
 
-// _Notification is the format of a notification.
-type _Notification struct {
-	// Condition is the condition for the notification in Go language
-	Condition string
-	// Speak is the text to speak when the condition is met
-	Speak     string
+type DiskInfo struct {
+	// Disk label
+	Label string
+	// Is the disk an HDD?
+	Is_HDD bool
+}
+
+// Mod2GenInfo is the format of the custom generated information about this specific module.
+type Mod2GenInfo struct {
+	// Disks_info is the information about the disks. It maps the disk serial number to an array with the first element
+	// being the last short test timestamp and the second element being the last long test timestamp. The timestamps are
+	// in seconds.
+	Disks_info map[string][]int64
 }

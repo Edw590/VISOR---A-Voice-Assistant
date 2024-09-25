@@ -45,10 +45,9 @@ import (
 var my_app_GL fyne.App = nil
 var my_window_GL fyne.Window = nil
 
-type _MGI any
 var (
 	realMain        Utils.RealMain = nil
-	moduleInfo_GL   Utils.ModuleInfo[_MGI]
+	moduleInfo_GL   Utils.ModuleInfo
 )
 func main() {
 	var module Utils.Module = Utils.Module{
@@ -58,7 +57,7 @@ func main() {
 		Stopped: false,
 		Enabled: true,
 	}
-	Utils.ModStartup2[_MGI](realMain, &module, false)
+	Utils.ModStartup2(realMain, &module, false)
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {

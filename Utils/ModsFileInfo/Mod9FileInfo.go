@@ -19,14 +19,32 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_9
+package ModsFileInfo
 
-import "RRComm/RRComm"
-
-// _ModGenInfo is the format of the custom generated information about this specific module.
-type _ModGenInfo struct {
+// Mod9GenInfo is the format of the custom generated information about this specific module.
+type Mod9GenInfo struct {
 	// Reminders_info maps the reminder ID to the last time the reminder was reminded in Unix minutes
 	Reminders_info map[string]int64
 	// Reminders is the list of all reminders
-	Reminders []RRComm.Reminder
+	Reminders []Reminder
+}
+
+// Reminder is the format of a reminder
+type Reminder struct {
+	// Id is the reminder ID
+	Id 		    string
+	// Devices is the devices the reminder is set for
+	Devices     []string
+	// Message is the reminder message
+	Message     string
+	// Command is the command to be executed when the reminder is triggered on the chosen Devices
+	Command     string
+	// Time is the time in minutes the reminder is set for
+	Time        string
+	// Repeat_each is the time in minutes between each repeatition of the reminder
+	Repeat_each int64
+	// User_location is the location the user must be in for the reminder to be triggered
+	User_location string
+	// Device_condition is an additional "advanced" condition for the reminder in Go language
+	Device_condition string
 }

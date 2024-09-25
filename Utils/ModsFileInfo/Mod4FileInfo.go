@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,10 +19,10 @@
  * under the License.
  ******************************************************************************/
 
-package MOD_4
+package ModsFileInfo
 
-// _ModUserInfo is the format of the custom information file about this specific module.
-type _ModUserInfo struct {
+// Mod4UserInfo is the format of the custom information file about this specific module.
+type Mod4UserInfo struct {
 	// Mails_info is the information about the mails to send the feeds info to
 	Mails_to   []string
 	// Feed_info is the information about the feeds

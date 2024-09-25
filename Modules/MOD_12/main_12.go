@@ -25,6 +25,7 @@ import (
 	"GPT/GPT"
 	"ULComm/ULComm"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"log"
 	"sort"
@@ -49,15 +50,16 @@ type _IntDeviceInfo struct {
 	Last_known_location string
 }
 
-type _MGI any
 var (
-	realMain Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGI]
+	realMain      Utils.RealMain = nil
+	moduleInfo_GL Utils.ModuleInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+
+		var modUserInfo *ModsFileInfo.Mod12UserInfo = &Utils.User_settings_GL.MOD_12
 
 		var user_location ULComm.UserLocation
 		var user_location_json Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "user_location.json")
@@ -67,11 +69,6 @@ func init() {realMain =
 
 		var device_infos []*_IntDeviceInfo = nil
 		for {
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
-
 			Device_infos_ULComm_GL = nil
 			for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
 				var device ULComm.DeviceInfo
@@ -155,7 +152,7 @@ func init() {realMain =
 				device_infos = append(device_infos, device_info)
 			}
 
-			var curr_user_location string = getUserLocation(modUserInfo, device_infos)
+			var curr_user_location string = getUserLocation(*modUserInfo, device_infos)
 			log.Println("Current user location:", curr_user_location)
 			updateUserLocation(&user_location, curr_user_location)
 			_ = user_location_json.WriteTextFile(*Utils.ToJsonGENERAL(user_location), false)
@@ -218,7 +215,7 @@ func getIntDeviceInfos() []*_IntDeviceInfo {
 	return device_infos
 }
 
-func getUserLocation(modUserInfo _ModUserInfo, devices []*_IntDeviceInfo) string {
+func getUserLocation(modUserInfo ModsFileInfo.Mod12UserInfo, devices []*_IntDeviceInfo) string {
 	if modUserInfo.Devices_info.AlwaysWith_device_id != "" {
 		for _, device := range devices {
 			if device.Device_id == modUserInfo.Devices_info.AlwaysWith_device_id &&

@@ -22,6 +22,7 @@
 package MOD_4
 
 import (
+	"Utils/ModsFileInfo"
 	"context"
 	"strconv"
 	"strings"
@@ -82,21 +83,18 @@ const _MAX_URLS_STORED int = 100
 
 const _TIME_SLEEP_S int = 2*60
 
-type _MGI any
 var (
-	realMain Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGI]
+	realMain      Utils.RealMain = nil
+	moduleInfo_GL Utils.ModuleInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+
+		var modUserInfo *ModsFileInfo.Mod4UserInfo = &Utils.User_settings_GL.MOD_4
 
 		for {
-			var modUserInfo _ModUserInfo
-			if err := moduleInfo_GL.GetModUserInfo(&modUserInfo); err != nil {
-				panic(err)
-			}
 
 			for _, feedInfo := range modUserInfo.Feeds_info {
 				// if feedInfo.Feed_num != 8 {

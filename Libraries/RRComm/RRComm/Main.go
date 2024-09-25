@@ -23,6 +23,7 @@ package RRComm
 
 import (
 	"Utils"
+	"Utils/ModsFileInfo"
 )
 
 /*
@@ -33,10 +34,10 @@ GetRemindersList returns a list of all reminders.
 – Returns:
   - a list of all reminders
  */
-func GetRemindersList() *[]Reminder {
+func GetRemindersList() *[]ModsFileInfo.Reminder {
 	var page_contents []byte = Utils.GetPageContentsWEBSITE("files_EOG/reminders.json")
 
-	var reminders []Reminder
+	var reminders []ModsFileInfo.Reminder
 	if err := Utils.FromJsonGENERAL(page_contents, &reminders); err != nil {
 		return nil
 	}
@@ -55,7 +56,7 @@ GetIdsList returns a list of all reminders' IDs.
 func GetIdsList() string {
 	var page_contents []byte = Utils.GetPageContentsWEBSITE("files_EOG/reminders.json")
 
-	var user_location []Reminder
+	var user_location []ModsFileInfo.Reminder
 	if err := Utils.FromJsonGENERAL(page_contents, &user_location); err != nil {
 		return ""
 	}
@@ -79,8 +80,8 @@ GetReminderById returns a reminder by its ID.
 – Returns:
   - the reminder or nil if the reminder was not found
  */
-func GetReminderById(id string) *Reminder {
-	var p_reminders *[]Reminder = GetRemindersList()
+func GetReminderById(id string) *ModsFileInfo.Reminder {
+	var p_reminders *[]ModsFileInfo.Reminder = GetRemindersList()
 	if p_reminders == nil {
 		return nil
 	}

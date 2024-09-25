@@ -29,6 +29,7 @@ import (
 	"ULComm/ULComm"
 	MOD_12 "UserLocator"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"VISOR_Client/ClientRegKeys"
 	"bytes"
 	"github.com/apaxa-go/eval"
@@ -44,15 +45,16 @@ const TIME_SLEEP_S int = 1
 
 // TODO: Use the new Command attribute of _ModUserInfo
 
-type _MGI _ModGenInfo
 var (
-	realMain Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo[_MGI]
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod9GenInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup[_MGI](realMain, module)}
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo[_MGI])
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_9
 
 		var p_user_location *ULComm.UserLocation = ULComm.GetUserLocation()
 		var user_location ULComm.UserLocation
@@ -73,24 +75,18 @@ func init() {realMain =
 				last_md5 = new_md5
 			}
 
-			var reminders []RRComm.Reminder = moduleInfo_GL.ModGenInfo.Reminders
+			var reminders []ModsFileInfo.Reminder = modGenInfo_GL.Reminders
 
 			// Add each reminder to the internal reminders list
-			var list_modified bool = false
-			var reminders_info_list map[string]int64 = moduleInfo_GL.ModGenInfo.Reminders_info
+			var reminders_info_list map[string]int64 = modGenInfo_GL.Reminders_info
 			if reminders_info_list == nil {
 				reminders_info_list = make(map[string]int64)
-				moduleInfo_GL.ModGenInfo.Reminders_info = reminders_info_list
-				list_modified = true
+				modGenInfo_GL.Reminders_info = reminders_info_list
 			}
 			for _, reminder := range reminders {
 				if _, ok := reminders_info_list[reminder.Id]; !ok {
 					reminders_info_list[reminder.Id] = 0
-					list_modified = true
 				}
-			}
-			if list_modified {
-				_ = moduleInfo_GL.UpdateGenInfo()
 			}
 
 			// Location trigger - if the user location changed, check if any reminder is triggered
@@ -183,8 +179,6 @@ func init() {realMain =
 
 					// Set the last reminded time to the test time
 					reminders_info_list[reminder.Id] = test_time
-
-					_ = moduleInfo_GL.UpdateGenInfo()
 				}
 			}
 
@@ -238,7 +232,7 @@ func formatCondition(condition string) string {
 	return condition
 }
 
-func checkCondition(reminder RRComm.Reminder, notifs_were_true map[string]bool) bool {
+func checkCondition(reminder ModsFileInfo.Reminder, notifs_were_true map[string]bool) bool {
 	var condition bool = false
 	if reminder.Device_condition != "" {
 		if ok := notifs_were_true[reminder.Id]; !ok {
@@ -262,11 +256,10 @@ func checkCondition(reminder RRComm.Reminder, notifs_were_true map[string]bool) 
 }
 
 func updateLocalReminders() {
-	var p_reminders *[]RRComm.Reminder = RRComm.GetRemindersList()
+	var p_reminders *[]ModsFileInfo.Reminder = RRComm.GetRemindersList()
 	if p_reminders == nil {
 		return
 	}
 
-	moduleInfo_GL.ModGenInfo.Reminders = *p_reminders
-	_ = moduleInfo_GL.UpdateGenInfo()
+	modGenInfo_GL.Reminders = *p_reminders
 }
