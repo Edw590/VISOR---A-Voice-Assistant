@@ -1,10 +1,10 @@
-# V.I.S.O.R. - A Virtual Assistant
+# V.I.S.O.R. - A Voice Assistant
 V.I.S.O.R., my in-development assistant, written in Go
 
 ## Notice
 This project is a part of a bigger project, consisting of the following:
 -   [V.I.S.O.R. - Android Version Assistant](https://github.com/DADi590/VISOR---A-better-Android-assistant)
--   [V.I.S.O.R. - A Virtual Assistant](https://github.com/Edw590/VISOR---A-Virtual-Assistant)
+-   [V.I.S.O.R. - A Voice Assistant](https://github.com/Edw590/VISOR---A-Voice-Assistant)
 
 ## Introduction
 These are the desktop client and server versions of my in-development assistant, V.I.S.O.R. (the Android version is just above on the link).
