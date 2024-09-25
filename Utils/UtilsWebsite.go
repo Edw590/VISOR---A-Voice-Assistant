@@ -44,44 +44,6 @@ type WebsiteForm struct {
 }
 
 /*
-GetPageContentsWEBSITE gets the page contents from the given VISOR's website page.
-
-This function can be used in libraries (requests the website URL and the password instead of getting them from
-PersonalConsts_GL).
-
------------------------------------------------------------
-
-– Params:
-  - partial_url – the partial URL of the page to get the contents from. Example: files_EOG/gpt_text.txt to get from,
-    for example, https://www.visor.com/files_EOG/gpt_text.txt
-
-– Returns:
-  - the page contents or nil if an error occurred
-*/
-func GetPageContentsWEBSITE(partial_url string) []byte {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", User_settings_GL.PersonalConsts.Website_url + "/" + partial_url, nil)
-	if err != nil {
-		return nil
-	}
-	req.SetBasicAuth("VISOR", User_settings_GL.PersonalConsts.Website_pw)
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil
-	}
-	bodyText, _ := io.ReadAll(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil
-	}
-
-	return bodyText
-}
-
-/*
 GetFileContentsWEBSITE gets the file contents from the given VISOR's website URL.
 
 -----------------------------------------------------------

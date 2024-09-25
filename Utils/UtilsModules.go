@@ -55,16 +55,6 @@ const _MOD_FOLDER_PREFFIX string = "MOD_"
 const _MOD_GEN_ERROR_CODE int = 3234
 
 const (
-	// _MOD_GEN_INFO_JSON is the name of the file containing the module-generated information
-	_MOD_GEN_INFO_JSON string = "mod_gen_info.json"
-	// _MOD_GEN_INFO_JSON_TMP is the name of the temporary file containing the module-generated information
-	_MOD_GEN_INFO_JSON_TMP string = "mod_gen_info.json_tmp"
-	// _MOD_USER_INFO_JSON is the name of the file containing the user-given module information (read-only by the
-	// module)
-	_MOD_USER_INFO_JSON string = "mod_user_info.json"
-)
-
-const (
 	NUM_MOD_VISOR           int = iota // This is a special one. Includes both the client and the server version main apps
 	NUM_MOD_ModManager
 	NUM_MOD_SMARTChecker
