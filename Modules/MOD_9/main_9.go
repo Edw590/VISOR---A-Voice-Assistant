@@ -63,13 +63,13 @@ func init() {realMain =
 
 		var notifs_were_true map[string]bool = make(map[string]bool)
 
-		var last_md5 []byte = nil
+		var last_crc16 []byte = nil
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			var new_md5 []byte = Utils.CheckFileChangedWEBSITE(last_md5, "reminders.json")
-			if new_md5 != nil {
-				last_md5 = new_md5
+			var new_crc16 []byte = Utils.CheckFileChangedWEBSITE(last_crc16, "reminders.json")
+			if new_crc16 != nil {
+				last_crc16 = new_crc16
 
 				updateLocalReminders()
 			}

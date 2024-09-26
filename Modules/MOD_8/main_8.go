@@ -23,8 +23,8 @@ package MOD_8
 
 import (
 	"Utils"
-	"crypto/md5"
 	Tcef "github.com/Edw590/TryCatch-go"
+	"github.com/yousifnimah/Cryptx/CRC16"
 	"log"
 	"net/http"
 )
@@ -102,14 +102,17 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", text1 + ".json").
 				WriteTextFile(text2, false)
 		case "GET":
-			// Text1 is true if it's to get a file, false if it's to get its MD5 hash
+			// Text1 is true if it's to get a file, false if it's to get its CRC16 checksum
 			// Text2 is the file path
 			var file_bytes []byte = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, text2).ReadFile()
 			if text1 == "true" {
 				_, _ = w.Write(file_bytes)
 			} else {
-				var hash [16]byte = md5.Sum(file_bytes)
-				_, _ = w.Write(hash[:])
+				var crc16 uint16 = CRC16.Result(file_bytes, "CCIT_ZERO")
+				var crc16_bytes []byte = make([]byte, 2)
+				crc16_bytes[0] = byte(crc16 >> 8)
+				crc16_bytes[1] = byte(crc16)
+				_, _ = w.Write(crc16_bytes)
 			}
 		default:
 			// Do nothing

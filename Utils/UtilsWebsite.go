@@ -51,16 +51,16 @@ GetFileContentsWEBSITE gets the file contents from the given VISOR's website URL
 – Params:
   - partial_path – the partial path of the file to get the contents from. Example: gpt_text.txt to get from
 	https://www.visor.com/files_EOG/gpt_text.txt
-  - md5_hash – true if the MD5 hash of the file is to be retrieved, false if the file contents are to be retrieved
+  - get_crc16 – true if the CRC16 checksum of the file is to be retrieved, false if the file contents are to be retrieved
 
 – Returns:
-  - the file contents or the MD5 hash, or nil if an error occurred
+  - the file contents or the CRC16 checksum, or nil if an error occurred
  */
-func GetFileContentsWEBSITE(partial_path string, md5_hash bool) []byte {
+func GetFileContentsWEBSITE(partial_path string, get_crc16 bool) []byte {
 	// Get the file contents
 	file_contents, err := SubmitFormWEBSITE(WebsiteForm{
 		Type:  "GET",
-		Text1: strconv.FormatBool(!md5_hash),
+		Text1: strconv.FormatBool(!get_crc16),
 		Text2: partial_path,
 		Text3: "",
 	})
@@ -130,25 +130,26 @@ func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
 }
 
 /*
-CheckFileChangedWEBSITE checks if the file has changed by comparing the MD5 hash of the file with the given MD5 hash.
+CheckFileChangedWEBSITE checks if the file has changed by comparing the CRC16 checksum of the file with the given CRC16
+checksum.
 
 -----------------------------------------------------------
 
 – Params:
-  - old_md5 – the old MD5 hash
+  - old_crc16 – the old CRC16 checksum
   - file_path – the file path
 
 – Returns:
-  - the new MD5 hash if the file has changed, nil otherwise
+  - the new CRC16 checksum if the file has changed, nil otherwise
 */
-func CheckFileChangedWEBSITE(old_md5 []byte, file_path string) []byte {
-	var new_md5 []byte = GetFileContentsWEBSITE(file_path, true)
-	if new_md5 == nil {
+func CheckFileChangedWEBSITE(old_crc16 []byte, file_path string) []byte {
+	var new_crc16 []byte = GetFileContentsWEBSITE(file_path, true)
+	if new_crc16 == nil {
 		return nil
 	}
 
-	if !bytes.Equal(new_md5, old_md5) {
-		return new_md5
+	if !bytes.Equal(new_crc16, old_crc16) {
+		return new_crc16
 	}
 
 	return nil

@@ -30,7 +30,7 @@ import (
 var time_begin_GL int64 = -1
 var curr_entry_time_GL int64 = -1
 var curr_idx_GL int = 0
-var last_md5_GL []byte = nil
+var last_crc16_GL []byte = nil
 
 const END_ENTRY string = "[3234_END]"
 const ALL_DEVICES_ID string = "3234_ALL"
@@ -65,9 +65,9 @@ The function will wait until the time of the next speech is reached.
 func GetNextSpeechSentence() string {
 	if curr_entry_time_GL == -1 {
 		for {
-			var new_md5 []byte = Utils.CheckFileChangedWEBSITE(last_md5_GL, "gpt_text.txt")
-			if new_md5 != nil {
-				last_md5_GL = new_md5
+			var new_crc16 []byte = Utils.CheckFileChangedWEBSITE(last_crc16_GL, "gpt_text.txt")
+			if new_crc16 != nil {
+				last_crc16_GL = new_crc16
 				var entry *Entry = GetEntry(-1, -1)
 				var device_id string = entry.GetDeviceID()
 				if entry.GetTime() >= time_begin_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
