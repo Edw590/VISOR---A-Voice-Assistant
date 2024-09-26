@@ -29,7 +29,7 @@ import (
 )
 
 func main() {
-	Utils.PersonalConsts_GL.Init(false)
+	Utils.LoadUserSettings(false)
 
 	var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
 		Device_id:    "Test Device",
@@ -51,6 +51,10 @@ func main() {
 				Screen_on:  true,
 				Brightness: 30,
 			},
+			Sound_info:        ULComm.SoundInfo{
+				Volume:  50,
+				Muted:   false,
+			},
 		},
 	}
 	if device_info.Device_id == "" {}
@@ -61,7 +65,8 @@ func main() {
 		Text2: *Utils.ToJsonGENERAL(device_info),
 	}))*/
 
-	log.Println(ULComm.CreateDeviceInfo(0, 0, false, false, false, false, 0, false, -1,
+	var device_info2 *ULComm.DeviceInfo = ULComm.CreateDeviceInfo(0, 0, false, false, false, false, 0, false, -1,
 		"test\x01XX:XX:XX:XX:XX:XX\x01-50\x00test2\x01YY:YY:YY:YY:YY:YY\x01-60\x00",
-		"test\x01XX:XX:XX:XX:XX:XX\x01-23\x00test2\x01YY:YY:YY:YY:YY:YY\x01-14\x00"))
+		"test\x01XX:XX:XX:XX:XX:XX\x01-23\x00test2\x01YY:YY:YY:YY:YY:YY\x01-14\x00", 100, false)
+	log.Println(*device_info2)
 }

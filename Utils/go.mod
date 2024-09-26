@@ -6,6 +6,7 @@ go 1.20
 
 require (
 	github.com/Edw590/TryCatch-go v0.0.0-20240613114733-8e01c7b01734
+	github.com/andybalholm/brotli v1.1.0
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a
 	github.com/dchest/jsmin v0.0.0-20220218165748-59f39799265f
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e
