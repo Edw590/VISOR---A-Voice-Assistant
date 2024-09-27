@@ -119,7 +119,7 @@ func init() {realMain =
 				content_container.Refresh()
 			}),
 			widget.NewButton("Dev Mode", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.DevMode()}
+				content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
 				content_container.Refresh()
 			}),
 			widget.NewButton("Communicator", func() {

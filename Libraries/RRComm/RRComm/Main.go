@@ -35,7 +35,7 @@ GetRemindersList returns a list of all reminders.
   - a list of all reminders
  */
 func GetRemindersList() *[]ModsFileInfo.Reminder {
-	var page_contents []byte = Utils.GetFileContentsWEBSITE("reminders.json", false)
+	var page_contents []byte = Utils.GetFileContentsWEBSITE("reminders.json", true)
 
 	var reminders []ModsFileInfo.Reminder
 	if err := Utils.FromJsonGENERAL(page_contents, &reminders); err != nil {
@@ -54,7 +54,7 @@ GetIdsList returns a list of all reminders' IDs.
   - a list of all reminders' IDs separated by "|"
  */
 func GetIdsList() string {
-	var page_contents []byte = Utils.GetFileContentsWEBSITE("reminders.json", false)
+	var page_contents []byte = Utils.GetFileContentsWEBSITE("reminders.json", true)
 
 	var user_location []ModsFileInfo.Reminder
 	if err := Utils.FromJsonGENERAL(page_contents, &user_location); err != nil {

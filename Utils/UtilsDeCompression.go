@@ -19,13 +19,12 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package Utils
 
 import (
 	"bytes"
 	"github.com/andybalholm/brotli"
 	"io"
-	"log"
 )
 
 /*
@@ -37,7 +36,7 @@ CompressString compresses a string.
 	- to_compress – the string to compress
 
 – Returns:
-	- the compressed string
+	- the compressed string or nil if an error occurred
  */
 func CompressString(to_compress string) []byte {
 	var buffer bytes.Buffer
@@ -47,10 +46,10 @@ func CompressString(to_compress string) []byte {
 	// Reset the compressor and encode from some input stream.
 	writer.Reset(&buffer)
 	if _, err := io.WriteString(writer, to_compress); err != nil {
-		log.Fatal(err)
+		return nil
 	}
 	if err := writer.Close(); err != nil {
-		log.Fatal(err)
+		return nil
 	}
 
 	return buffer.Bytes()
@@ -65,14 +64,14 @@ DecompressString decompresses a string.
 	- to_decompress – the string to decompress
 
 – Returns:
-	- the decompressed string
+	- the decompressed string or an empty string if an error occurred
  */
 func DecompressString(to_decompress []byte) string {
 	reader := brotli.NewReader(bytes.NewReader(to_decompress))
 
 	var buffer bytes.Buffer
 	if _, err := io.Copy(&buffer, reader); err != nil {
-		log.Fatal(err)
+		return ""
 	}
 
 	return buffer.String()

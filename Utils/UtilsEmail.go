@@ -184,7 +184,7 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 		_, err := SubmitFormWEBSITE(WebsiteForm{
 			Type:  "Email",
 			Text1: emailInfo.Mail_to,
-			Text2: message_eml,
+			File:  CompressString(message_eml),
 		})
 
 		return err

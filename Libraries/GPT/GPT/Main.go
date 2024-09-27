@@ -43,7 +43,7 @@ parameter.
   - the entry or an empty entry with time = -1 if it doesn't exist
  */
 func GetEntry(time int64, num int) *Entry {
-	var page_contents string = string(Utils.GetFileContentsWEBSITE("gpt_text.txt", false))
+	var page_contents string = string(Utils.GetFileContentsWEBSITE("gpt_text.txt", true))
 	if page_contents == "" {
 		return &Entry{
 			device_id: "",
@@ -104,8 +104,8 @@ func GetEntry(time int64, num int) *Entry {
 
 func SendText(text string) error {
 	_, err := Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-		Type:  "GPT",
-		Text1: "[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text,
+		Type: "GPT",
+		File: Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text),
 	})
 
 	return err

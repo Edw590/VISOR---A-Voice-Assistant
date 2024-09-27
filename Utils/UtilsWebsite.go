@@ -26,8 +26,8 @@ import (
 	"crypto/tls"
 	"errors"
 	"io"
+	"mime/multipart"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -39,8 +39,8 @@ type WebsiteForm struct {
 	Text1 string
 	// Text2 is the second text (optional)
 	Text2 string
-	// Text3 is the third text (optional)
-	Text3 string
+	// File is the file bytes to be submitted (optional)
+	File []byte
 }
 
 /*
@@ -51,24 +51,27 @@ GetFileContentsWEBSITE gets the file contents from the given VISOR's website URL
 – Params:
   - partial_path – the partial path of the file to get the contents from. Example: gpt_text.txt to get from
 	https://www.visor.com/files_EOG/gpt_text.txt
-  - get_crc16 – true if the CRC16 checksum of the file is to be retrieved, false if the file contents are to be retrieved
+  - get_crc16 – true if the file contents are to be retrieved, false if the CRC16 checksum of the file is to be retrieved
 
 – Returns:
   - the file contents or the CRC16 checksum, or nil if an error occurred
  */
-func GetFileContentsWEBSITE(partial_path string, get_crc16 bool) []byte {
+func GetFileContentsWEBSITE(partial_path string, get_file bool) []byte {
 	// Get the file contents
-	file_contents, err := SubmitFormWEBSITE(WebsiteForm{
+	received_bytes, err := SubmitFormWEBSITE(WebsiteForm{
 		Type:  "GET",
-		Text1: strconv.FormatBool(!get_crc16),
+		Text1: strconv.FormatBool(get_file),
 		Text2: partial_path,
-		Text3: "",
 	})
 	if err != nil {
 		return nil
 	}
 
-	return file_contents
+	if get_file {
+		return []byte(DecompressString(received_bytes))
+	} else {
+		return received_bytes
+	}
 }
 
 /*
@@ -85,25 +88,42 @@ SubmitFormWEBSITE sends a form to the given VISOR's webserver and receives its r
   - true if the form was submitted successfully, false otherwise
 */
 func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
-	formData := url.Values{
-		"type": {form.Type},
-		"text1":  {form.Text1},
-		"text2":  {form.Text2},
-		"text3":  {form.Text3},
+	// Create a buffer to hold the multipart form data
+	var buffer bytes.Buffer
+	writer := multipart.NewWriter(&buffer)
+
+	// Add the form fields
+	_ = writer.WriteField("type", form.Type)
+	_ = writer.WriteField("text1", form.Text1)
+	_ = writer.WriteField("text2", form.Text2)
+
+	// Add the file
+	if form.File != nil {
+		part, err := writer.CreateFormFile("file", "file")
+		if err != nil {
+			return nil, err
+		}
+		_, err = part.Write(form.File)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// Convert form data to a format suitable for HTTP requests
-	formDataEncoded := formData.Encode()
+	// Close the writer to finalize the form data
+	err := writer.Close()
+	if err != nil {
+		return nil, err
+	}
 
 	// Create a new POST request with the form data
-	req, err := http.NewRequest("POST", User_settings_GL.PersonalConsts.Website_url + "/submit-form", bytes.NewBufferString(formDataEncoded))
+	req, err := http.NewRequest("POST", User_settings_GL.PersonalConsts.Website_url + "/submit-form", &buffer)
 	if err != nil {
 		return nil, err
 	}
 	req.SetBasicAuth("VISOR", User_settings_GL.PersonalConsts.Website_pw)
 
 	// Set the appropriate headers
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	// Create an HTTP client and send the request
 	tr := &http.Transport{
@@ -143,7 +163,7 @@ checksum.
   - the new CRC16 checksum if the file has changed, nil otherwise
 */
 func CheckFileChangedWEBSITE(old_crc16 []byte, file_path string) []byte {
-	var new_crc16 []byte = GetFileContentsWEBSITE(file_path, true)
+	var new_crc16 []byte = GetFileContentsWEBSITE(file_path, false)
 	if new_crc16 == nil {
 		return nil
 	}

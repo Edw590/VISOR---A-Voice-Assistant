@@ -28,7 +28,7 @@ import (
 )
 
 func GetUserLocation() *UserLocation {
-	var page_contents []byte = Utils.GetFileContentsWEBSITE("user_location.json", false)
+	var page_contents []byte = Utils.GetFileContentsWEBSITE("user_location.json", true)
 
 	var user_location UserLocation
 	if err := Utils.FromJsonGENERAL(page_contents, &user_location); err != nil {

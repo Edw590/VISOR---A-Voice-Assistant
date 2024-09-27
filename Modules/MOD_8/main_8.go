@@ -66,11 +66,13 @@ func init() {realMain =
 
 func formHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		log.Println("Invalid request metho: " + r.Method)
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
 
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
+		log.Println("ParseForm() err: " + err.Error())
 		http.Error(w, "ParseForm() err: " + err.Error(), http.StatusInternalServerError)
 
 		return
@@ -79,36 +81,58 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 	var type_ string = r.FormValue("type")
 	var text1 string = r.FormValue("text1")
 	var text2 string = r.FormValue("text2")
-	//var text3 string = r.FormValue("text3")
+	file, file_header, err := r.FormFile("file")
+
+	//log.Println("Form:", r)
+	//log.Println("Type: " + type_)
+	//log.Println("Text1: " + text1)
+	//log.Println("Text2: " + text2)
+
+	var file_bytes []byte = nil
+	if err == nil {
+		file_bytes = make([]byte, file_header.Size)
+		_, _ = file.Read(file_bytes)
+	}
+	//log.Println("File:", file_bytes)
 
 	switch type_ {
 		case "GPT":
 			log.Println("GPT")
-			// Text1 is the text to process
+			// File: the text to process, compressed
+			// Returns: nothing
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
-				WriteTextFile(text1, false)
+				WriteTextFile(Utils.DecompressString(file_bytes), false)
 		case "Email":
 			log.Println("Email")
-			// Text1 is the email address to send to
-			// Text2 is the EML file to send
+			// Text1: the email address to send to
+			// File: the EML file to send, compressed
+			// Returns: nothing
 			_ = Utils.QueueEmailEMAIL(Utils.EmailInfo{
 				Mail_to: text1,
-				Eml: text2,
+				Eml:     Utils.DecompressString(file_bytes),
 			})
 		case "UserLocator":
-			// Text1 is the device ID
-			// Text2 is the JSON data to write
+			// Text1: the device ID
+			// File: the JSON data to write, compressed
+			// Returns: nothing
 			log.Println("UserLocator")
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", text1 + ".json").
-				WriteTextFile(text2, false)
+				WriteTextFile(Utils.DecompressString(file_bytes), false)
 		case "GET":
-			// Text1 is true if it's to get a file, false if it's to get its CRC16 checksum
-			// Text2 is the file path
-			var file_bytes []byte = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, text2).ReadFile()
+			// Text1: true if it's to get a file, false if it's to get its CRC16 checksum
+			// Text2: the file path
+			// Returns: the file contents compressed or the CRC16 checksum
+			var p_file_contents *string = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, text2).ReadTextFile()
+			if p_file_contents == nil {
+				http.Error(w, "File not found", http.StatusNotFound)
+
+				return
+			}
+
 			if text1 == "true" {
-				_, _ = w.Write(file_bytes)
+				_, _ = w.Write(Utils.CompressString(*p_file_contents))
 			} else {
-				var crc16 uint16 = CRC16.Result(file_bytes, "CCIT_ZERO")
+				var crc16 uint16 = CRC16.Result([]byte(*p_file_contents), "CCIT_ZERO")
 				var crc16_bytes []byte = make([]byte, 2)
 				crc16_bytes[0] = byte(crc16 >> 8)
 				crc16_bytes[1] = byte(crc16)

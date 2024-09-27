@@ -21,7 +21,9 @@
 
 package ULComm
 
-import "Utils"
+import (
+	"Utils"
+)
 
 type DeviceInfo struct {
 	// Device_id is the unique identifier of the device
@@ -38,7 +40,7 @@ func (device_info *DeviceInfo) SendInfo() error {
 	_, err := Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
 		Type:  "UserLocator",
 		Text1: Utils.User_settings_GL.PersonalConsts.Device_ID,
-		Text2: *Utils.ToJsonGENERAL(device_info),
+		File:  Utils.CompressString(*Utils.ToJsonGENERAL(device_info)),
 	})
 
 	return err

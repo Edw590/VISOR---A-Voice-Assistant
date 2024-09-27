@@ -62,7 +62,7 @@ func main() {
 	/*log.Println(Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
 		Type:  "UserLocator",
 		Text1: "Test Device",
-		Text2: *Utils.ToJsonGENERAL(device_info),
+		File:  UtilsSWA.CompressString(*Utils.ToJsonGENERAL(device_info)),
 	}))*/
 
 	var device_info2 *ULComm.DeviceInfo = ULComm.CreateDeviceInfo(0, 0, false, false, false, false, 0, false, -1,

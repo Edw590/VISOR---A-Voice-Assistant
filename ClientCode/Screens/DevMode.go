@@ -27,12 +27,15 @@ import (
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 )
 
+var file_path_GL string = ""
+
 var dev_mode_canvas_object_GL fyne.CanvasObject = nil
 
-func DevMode() fyne.CanvasObject {
+func DevMode(window fyne.Window) fyne.CanvasObject {
 	Current_screen_GL = dev_mode_canvas_object_GL
 	if dev_mode_canvas_object_GL != nil {
 		return dev_mode_canvas_object_GL
@@ -40,24 +43,26 @@ func DevMode() fyne.CanvasObject {
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// Form section
-	var form_type_ *widget.Entry = widget.NewEntry()
+	var form_type *widget.Entry = widget.NewEntry()
 	var form_text1 *widget.Entry = widget.NewEntry()
 	var form_text2 *widget.Entry = widget.NewEntry()
-	var form_text3 *widget.Entry = widget.NewEntry()
+	var file_button *widget.Button = widget.NewButton("File", func() {
+		showFilePicker(window)
+	})
 
 	var form *widget.Form = &widget.Form{
 		Items: []*widget.FormItem{
-			{Text: "Type",  Widget: form_type_},
+			{Text: "Type",  Widget: form_type},
 			{Text: "Text1", Widget: form_text1},
 			{Text: "Text2", Widget: form_text2},
-			{Text: "Text3", Widget: form_text3},
+			{Text: "File",  Widget: file_button},
 		},
 		OnSubmit: func() {
 			Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-				Type:  form_type_.Text,
+				Type:  form_type.Text,
 				Text1: form_text1.Text,
 				Text2: form_text2.Text,
-				Text3: form_text3.Text,
+				File:  Utils.CompressString(*Utils.PathFILESDIRS(false, "", file_path_GL).ReadTextFile()),
 			})
 		},
 	}
@@ -98,4 +103,18 @@ func DevMode() fyne.CanvasObject {
 	Current_screen_GL = dev_mode_canvas_object_GL
 
 	return dev_mode_canvas_object_GL
+}
+
+func showFilePicker(w fyne.Window) {
+	dialog.ShowFileOpen(func(f fyne.URIReadCloser, err error) {
+		file_path_GL = ""
+		if err != nil {
+			dialog.ShowError(err, w)
+			return
+		}
+		if f == nil {
+			return
+		}
+		file_path_GL = f.URI().Path()
+	}, w)
 }
