@@ -22,8 +22,8 @@
 package MOD_1
 
 import (
-	"Registry/Registry"
 	"Utils"
+	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 )
 
@@ -45,7 +45,7 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE).SetData(int64(0), false)
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE).SetData(int64(0), false)
 
 		// Check all modules' support and put on a list to later warn if there were changes of support or not.
 		var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
@@ -114,7 +114,7 @@ func init() {realMain =
 			// Start the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_start[mod_num] && modules_GL[mod_num].Enabled {
-					var value *Registry.Value = Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE)
+					var value *Utils.Value = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE)
 					value.SetLong(value.GetLong(true) | (1 << mod_num), false)
 					modules_GL[mod_num].Stop = false
 					var start_func = _MAP_MOD_NUM_START[mod_num]
@@ -127,7 +127,7 @@ func init() {realMain =
 			// Stop the modules
 			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
 				if modules_to_stop[mod_num] {
-					var value *Registry.Value = Registry.GetValue(ClientRegKeys.K_MODULES_ACTIVE)
+					var value *Utils.Value = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE)
 					value.SetLong(value.GetLong(true) & ^(1 << mod_num), false)
 					modules_GL[mod_num].Stop = true
 				}

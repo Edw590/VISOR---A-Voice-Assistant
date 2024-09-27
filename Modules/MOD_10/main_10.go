@@ -22,9 +22,9 @@
 package MOD_10
 
 import (
-	"Registry/Registry"
 	"ULComm/ULComm"
 	"Utils"
+	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"github.com/distatus/battery"
 	"github.com/go-vgo/robotgo"
@@ -87,8 +87,8 @@ func init() {realMain =
 			// Battery information
 			var battery_level int = getBatteryInfo().level
 			var power_connected bool = getBatteryInfo().power_connected
-			Registry.GetValue(ClientRegKeys.K_BATTERY_LEVEL).SetData(battery_level, false)
-			Registry.GetValue(ClientRegKeys.K_POWER_CONNECTED).SetData(power_connected, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetData(battery_level, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetData(power_connected, false)
 
 			device_info_GL.System_state.Battery_info = ULComm.BatteryInfo{
 				Level:           battery_level,
@@ -97,7 +97,7 @@ func init() {realMain =
 
 			// Monitor information
 			var screen_brightness int = getBrightness()
-			Registry.GetValue(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetData(screen_brightness, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetData(screen_brightness, false)
 
 			device_info_GL.System_state.Monitor_info = ULComm.MonitorInfo{
 				Screen_on:  true,
@@ -107,8 +107,8 @@ func init() {realMain =
 			// Sound information
 			var sound_volume int = getSoundVolume()
 			var sound_muted bool = getSoundMuted()
-			Registry.GetValue(ClientRegKeys.K_SOUND_VOLUME).SetData(sound_volume, false)
-			Registry.GetValue(ClientRegKeys.K_SOUND_MUTED).SetData(sound_muted, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetData(sound_volume, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetData(sound_muted, false)
 
 			device_info_GL.System_state.Sound_info = ULComm.SoundInfo{
 				Volume: sound_volume,

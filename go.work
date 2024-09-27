@@ -7,7 +7,6 @@ use (
 	Libraries/ACD
 	Libraries/GPT
 	Libraries/OIG
-	Libraries/Registry
 	Libraries/SpeechQueue
 	Libraries/ULComm
 	Libraries/RRComm

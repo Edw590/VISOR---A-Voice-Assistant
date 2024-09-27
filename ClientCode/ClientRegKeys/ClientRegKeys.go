@@ -21,7 +21,9 @@
 
 package ClientRegKeys
 
-import "Registry/Registry"
+import (
+	"Utils/UtilsSWA"
+)
 
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
@@ -47,15 +49,15 @@ const K_SOUND_MUTED string = "SOUND_MUTED"
 RegisterValues registers the client values in the registry.
  */
 func RegisterValues() {
-	Registry.RegisterValue(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", Registry.TYPE_LONG)
+	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", UtilsSWA.TYPE_LONG)
 
-	Registry.RegisterValue(K_LAST_SPEECH, "Last speech", "The last speech that was spoken", Registry.TYPE_STRING)
+	UtilsSWA.RegisterValueREGISTRY(K_LAST_SPEECH, "Last speech", "The last speech that was spoken", UtilsSWA.TYPE_STRING)
 
-	Registry.RegisterValue(K_SHOW_APP_SIG, "Show-app signal", "Signal to show the app", Registry.TYPE_BOOL)
+	UtilsSWA.RegisterValueREGISTRY(K_SHOW_APP_SIG, "Show-app signal", "Signal to show the app", UtilsSWA.TYPE_BOOL)
 
-	Registry.RegisterValue(K_BATTERY_LEVEL, "Battery level", "The battery level", Registry.TYPE_INT)
-	Registry.RegisterValue(K_POWER_CONNECTED, "Power connected", "Whether the power is connected", Registry.TYPE_BOOL)
-	Registry.RegisterValue(K_SCREEN_BRIGHTNESS, "Screen brightness", "The screen brightness", Registry.TYPE_INT)
-	Registry.RegisterValue(K_SOUND_VOLUME, "Sound volume", "The sound volume", Registry.TYPE_INT)
-	Registry.RegisterValue(K_SOUND_MUTED, "Sound muted", "Whether the sound is muted", Registry.TYPE_BOOL)
+	UtilsSWA.RegisterValueREGISTRY(K_BATTERY_LEVEL, "Battery level", "The battery level", UtilsSWA.TYPE_INT)
+	UtilsSWA.RegisterValueREGISTRY(K_POWER_CONNECTED, "Power connected", "Whether the power is connected", UtilsSWA.TYPE_BOOL)
+	UtilsSWA.RegisterValueREGISTRY(K_SCREEN_BRIGHTNESS, "Screen brightness", "The screen brightness", UtilsSWA.TYPE_INT)
+	UtilsSWA.RegisterValueREGISTRY(K_SOUND_VOLUME, "Sound volume", "The sound volume", UtilsSWA.TYPE_INT)
+	UtilsSWA.RegisterValueREGISTRY(K_SOUND_MUTED, "Sound muted", "Whether the sound is muted", UtilsSWA.TYPE_BOOL)
 }

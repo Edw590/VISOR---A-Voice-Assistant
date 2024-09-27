@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"Registry/Registry"
+	"Utils/UtilsSWA"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -51,7 +51,7 @@ func GlobalValues() fyne.CanvasObject {
 	go func() {
 		for {
 			if Current_screen_GL == global_values_canvas_object_GL {
-				registry_text.SetText(Registry.GetRegistryText())
+				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY())
 			}
 
 			time.Sleep(1 * time.Second)

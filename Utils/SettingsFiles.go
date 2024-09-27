@@ -48,6 +48,7 @@ type GenSettings struct {
 	MOD_2 ModsFileInfo.Mod2GenInfo
 	MOD_5 ModsFileInfo.Mod5GenInfo
 	MOD_9 ModsFileInfo.Mod9GenInfo
+	Registry []*Value
 }
 
 ///////////////////////////////////////////////////////////////

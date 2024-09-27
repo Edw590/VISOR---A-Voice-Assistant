@@ -23,13 +23,13 @@ package MOD_9
 
 import (
 	"RRComm/RRComm"
-	"Registry/Registry"
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
 	"ULComm/ULComm"
 	MOD_12 "UserLocator"
 	"Utils"
 	"Utils/ModsFileInfo"
+	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"github.com/apaxa-go/eval"
 	"log"
@@ -216,11 +216,11 @@ func computeCondition(condition string) bool {
 }
 
 func formatCondition(condition string) string {
-	var power_connected bool = Registry.GetValue(ClientRegKeys.K_POWER_CONNECTED).GetData(true, nil).(bool)
-	var battery_level int = Registry.GetValue(ClientRegKeys.K_BATTERY_LEVEL).GetData(true, nil).(int)
-	var screen_brightness int = Registry.GetValue(ClientRegKeys.K_SCREEN_BRIGHTNESS).GetData(true, nil).(int)
-	var sound_volume int = Registry.GetValue(ClientRegKeys.K_SOUND_VOLUME).GetData(true, nil).(int)
-	var sound_muted bool = Registry.GetValue(ClientRegKeys.K_SOUND_MUTED).GetData(true, nil).(bool)
+	var power_connected bool = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).GetData(true, nil).(bool)
+	var battery_level int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).GetData(true, nil).(int)
+	var screen_brightness int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).GetData(true, nil).(int)
+	var sound_volume int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).GetData(true, nil).(int)
+	var sound_muted bool = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).GetData(true, nil).(bool)
 
 	condition = strings.Replace(condition, "power_connected", strconv.FormatBool(power_connected), -1)
 	condition = strings.Replace(condition, "battery_level", strconv.Itoa(battery_level), -1)

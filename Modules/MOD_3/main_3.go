@@ -23,9 +23,9 @@ package MOD_3
 
 import (
 	"GPT/GPT"
-	"Registry/Registry"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
+	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"time"
 
@@ -159,7 +159,7 @@ func init() {realMain =
 				}
 
 				if removed_from_queue {
-					Registry.GetValue(ClientRegKeys.K_LAST_SPEECH).SetData(curr_speech.GetText(), true)
+					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_LAST_SPEECH).SetData(curr_speech.GetText(), true)
 				}
 
 				curr_speech = nil

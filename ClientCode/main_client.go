@@ -24,8 +24,8 @@ package main
 import "C"
 import (
 	MOD_1 "ModManager"
-	"Registry/Registry"
 	"Utils"
+	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
@@ -187,9 +187,9 @@ func init() {realMain =
 
 		go func() {
 			for {
-				if Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
+				if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
 					showWindow()
-					Registry.GetValue(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
+					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
 				}
 
 				time.Sleep(1 * time.Second)
