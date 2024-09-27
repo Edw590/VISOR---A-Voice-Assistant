@@ -32,8 +32,6 @@ const TYPE_FLOAT string = Utils.TYPE_FLOAT
 const TYPE_DOUBLE string = Utils.TYPE_DOUBLE
 const TYPE_STRING string = Utils.TYPE_STRING
 
-var registry_GL *[]*Utils.Value = &Utils.Gen_settings_GL.Registry
-
 // There's an init() function on Keys.go
 
 /*
@@ -52,7 +50,7 @@ RegisterValueREGISTRY registers a value in the registry.
 */
 func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string) *Utils.Value {
 	if value := GetValueREGISTRY(key); value != nil {
-		return value
+		return nil
 	}
 
 	var value *Utils.Value = &Utils.Value{
@@ -77,13 +75,13 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 	}
 
 
-	*registry_GL = append(*registry_GL, value)
+	Utils.Gen_settings_GL.Registry = append(Utils.Gen_settings_GL.Registry, value)
 
 	return value
 }
 
 func GetValueREGISTRY(key string) *Utils.Value {
-	for _, value := range *registry_GL {
+	for _, value := range Utils.Gen_settings_GL.Registry {
 		if value.Key == key {
 			return value
 		}
@@ -101,6 +99,7 @@ RemoveValueREGISTRY removes a value from the registry based on its key.
   - key – the key of the value
 */
 func RemoveValueREGISTRY(key string) {
+	var registry_GL *[]*Utils.Value = &Utils.Gen_settings_GL.Registry
 	for i, value := range *registry_GL {
 		if value.Key == key {
 			*registry_GL = append((*registry_GL)[:i], (*registry_GL)[i+1:]...)
@@ -113,7 +112,7 @@ func RemoveValueREGISTRY(key string) {
 func GetRegistryTextREGISTRY() string {
 	var text string = ""
 
-	for _, value := range *registry_GL {
+	for _, value := range Utils.Gen_settings_GL.Registry {
 		text += "Name: " + value.Pretty_name + "\n" +
 				"Type: " + value.Type + "\n" +
 				"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
