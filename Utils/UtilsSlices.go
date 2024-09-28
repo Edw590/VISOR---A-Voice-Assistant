@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -138,11 +138,11 @@ values from multidimensional slices/arrays.
 func CopyFullSLICES[T any](dest *T, src T) bool {
 	var buf *bytes.Buffer = new(bytes.Buffer)
 	var err error = gob.NewEncoder(buf).Encode(src)
-	if nil != err {
+	if err != nil {
 		return false
 	}
 	err = gob.NewDecoder(buf).Decode(dest)
-	if nil != err {
+	if err != nil {
 		return false
 	}
 
