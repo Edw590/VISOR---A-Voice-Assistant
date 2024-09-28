@@ -27,6 +27,8 @@ import (
 	"github.com/yousifnimah/Cryptx/CRC16"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 // Website Backend //
@@ -46,6 +48,7 @@ func init() {realMain =
 				Try: func() {
 					// Try to register. If it's already registered, ignore the panic.
 					http.HandleFunc("/submit-form", formHandler)
+					http.HandleFunc("/file/", handleGetRequest)
 				},
 			}.Do()
 
@@ -80,7 +83,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 
 	var type_ string = r.FormValue("type")
 	var text1 string = r.FormValue("text1")
-	var text2 string = r.FormValue("text2")
+	//var text2 string = r.FormValue("text2")
 	file, file_header, err := r.FormFile("file")
 
 	//log.Println("Form:", r)
@@ -118,27 +121,48 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("UserLocator")
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", text1 + ".json").
 				WriteTextFile(Utils.DecompressString(file_bytes), false)
-		case "GET":
-			// Text1: true if it's to get a file, false if it's to get its CRC16 checksum
-			// Text2: the file path
-			// Returns: the file contents compressed or the CRC16 checksum
-			var p_file_contents *string = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, text2).ReadTextFile()
-			if p_file_contents == nil {
-				http.Error(w, "File not found", http.StatusNotFound)
-
-				return
-			}
-
-			if text1 == "true" {
-				_, _ = w.Write(Utils.CompressString(*p_file_contents))
-			} else {
-				var crc16 uint16 = CRC16.Result([]byte(*p_file_contents), "CCIT_ZERO")
-				var crc16_bytes []byte = make([]byte, 2)
-				crc16_bytes[0] = byte(crc16 >> 8)
-				crc16_bytes[1] = byte(crc16)
-				_, _ = w.Write(crc16_bytes)
-			}
 		default:
 			// Do nothing
+	}
+}
+
+func handleGetRequest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	url_str, _ := url.Parse(r.URL.String())
+	params, _ := url.ParseQuery(url_str.RawQuery)
+
+	var get_crc16 bool = params.Get("crc") == "true"
+
+	// Remove "/file/" and any parameters from the URL
+	var file_path string = r.URL.Path
+	file_path = strings.TrimPrefix(file_path, "/file/")
+	file_path = strings.Split(file_path, "?")[0]
+	if strings.HasSuffix(file_path, "/") {
+		http.Error(w, "Not a file", http.StatusNotFound)
+
+		return
+	}
+	var p_file_contents *string = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, file_path).ReadTextFile()
+	if p_file_contents == nil {
+		http.Error(w, "File not found", http.StatusNotFound)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+
+	if get_crc16 {
+		var crc16 uint16 = CRC16.Result([]byte(*p_file_contents), "CCIT_ZERO")
+		var crc16_bytes []byte = make([]byte, 2)
+		crc16_bytes[0] = byte(crc16 >> 8)
+		crc16_bytes[1] = byte(crc16)
+		_, _ = w.Write(crc16_bytes)
+	} else {
+		_, _ = w.Write([]byte(*p_file_contents))
 	}
 }

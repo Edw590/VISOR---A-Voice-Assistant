@@ -85,18 +85,18 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 	}
 
 	switch value.Type_ {
-	case TYPE_BOOL:
-		value.Prev_data = "false"
-		value.Curr_data = "false"
-	case TYPE_INT: fallthrough
-	case TYPE_LONG: fallthrough
-	case TYPE_FLOAT: fallthrough
-	case TYPE_DOUBLE:
-		value.Prev_data = "-1"
-		value.Curr_data = "-1"
-	case TYPE_STRING:
-		value.Prev_data = ""
-		value.Curr_data = ""
+		case TYPE_BOOL:
+			value.Prev_data = "false"
+			value.Curr_data = "false"
+		case TYPE_INT: fallthrough
+		case TYPE_LONG: fallthrough
+		case TYPE_FLOAT: fallthrough
+		case TYPE_DOUBLE:
+			value.Prev_data = "-1"
+			value.Curr_data = "-1"
+		case TYPE_STRING:
+			value.Prev_data = ""
+			value.Curr_data = ""
 	}
 
 

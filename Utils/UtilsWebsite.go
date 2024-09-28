@@ -51,27 +51,40 @@ GetFileContentsWEBSITE gets the file contents from the given VISOR's website URL
 – Params:
   - partial_path – the partial path of the file to get the contents from. Example: gpt_text.txt to get from
 	https://www.visor.com/files_EOG/gpt_text.txt
-  - get_crc16 – true if the file contents are to be retrieved, false if the CRC16 checksum of the file is to be retrieved
+  - get_file – true if the file contents are to be retrieved, false if the CRC16 checksum of the file is to be retrieved
 
 – Returns:
   - the file contents or the CRC16 checksum, or nil if an error occurred
  */
 func GetFileContentsWEBSITE(partial_path string, get_file bool) []byte {
-	// Get the file contents
-	received_bytes, err := SubmitFormWEBSITE(WebsiteForm{
-		Type:  "GET",
-		Text1: strconv.FormatBool(get_file),
-		Text2: partial_path,
-	})
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	var add_to_request string = ""
+	if !get_file {
+		add_to_request = "?crc=true"
+	}
+	client := &http.Client{Transport: tr}
+	req, err := http.NewRequest("GET", User_settings_GL.PersonalConsts.Website_url + "/file/" + partial_path +
+		add_to_request, nil)
+	if err != nil {
+		return nil
+	}
+	req.SetBasicAuth("VISOR", User_settings_GL.PersonalConsts.Website_pw)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil
 	}
 
-	if get_file {
-		return []byte(DecompressString(received_bytes))
-	} else {
-		return received_bytes
+	if resp.StatusCode != http.StatusOK {
+		return nil
 	}
+
+	defer resp.Body.Close()
+
+	body_text, _ := io.ReadAll(resp.Body)
+
+	return body_text
 }
 
 /*
@@ -93,11 +106,15 @@ func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
 	writer := multipart.NewWriter(&buffer)
 
 	// Add the form fields
-	_ = writer.WriteField("type", form.Type)
-	_ = writer.WriteField("text1", form.Text1)
-	_ = writer.WriteField("text2", form.Text2)
-
-	// Add the file
+	if form.Type != "" {
+		_ = writer.WriteField("type", form.Type)
+	}
+	if form.Text1 != "" {
+		_ = writer.WriteField("text1", form.Text1)
+	}
+	if form.Text2 != "" {
+		_ = writer.WriteField("text2", form.Text2)
+	}
 	if form.File != nil {
 		part, err := writer.CreateFormFile("file", "file")
 		if err != nil {
@@ -141,12 +158,7 @@ func SubmitFormWEBSITE(form WebsiteForm) ([]byte, error) {
 		return nil, errors.New("response status code: " + strconv.Itoa(resp.StatusCode))
 	}
 
-	var body []byte
-	if resp.Body != nil {
-		body, err = io.ReadAll(resp.Body)
-	}
-
-	return body, err
+	return io.ReadAll(resp.Body)
 }
 
 /*
