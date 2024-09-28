@@ -383,18 +383,18 @@ func (value *Value) GetData(curr_data bool, no_data any) any {
 	}
 
 	switch value.Type_ {
-	case TYPE_BOOL:
-		return value.GetBool(curr_data)
-	case TYPE_INT:
-		return value.GetInt(curr_data)
-	case TYPE_LONG:
-		return value.GetLong(curr_data)
-	case TYPE_FLOAT:
-		return value.GetFloat(curr_data)
-	case TYPE_DOUBLE:
-		return value.GetDouble(curr_data)
-	case TYPE_STRING:
-		return value.GetString(curr_data)
+		case TYPE_BOOL:
+			return value.GetBool(curr_data)
+		case TYPE_INT:
+			return value.GetInt(curr_data)
+		case TYPE_LONG:
+			return value.GetLong(curr_data)
+		case TYPE_FLOAT:
+			return value.GetFloat(curr_data)
+		case TYPE_DOUBLE:
+			return value.GetDouble(curr_data)
+		case TYPE_STRING:
+			return value.GetString(curr_data)
 	}
 
 	// Won't happen
@@ -612,18 +612,18 @@ SetData sets the value and converts it to the right type automatically.
 */
 func (value *Value) SetData(data any, update_if_same bool) bool {
 	switch value.Type_ {
-	case TYPE_BOOL:
-		return value.SetBool(data.(bool), update_if_same)
-	case TYPE_INT:
-		return value.SetInt(data.(int), update_if_same)
-	case TYPE_LONG:
-		return value.SetLong(data.(int64), update_if_same)
-	case TYPE_FLOAT:
-		return value.SetFloat(data.(float32), update_if_same)
-	case TYPE_DOUBLE:
-		return value.SetDouble(data.(float64), update_if_same)
-	case TYPE_STRING:
-		return value.SetString(data.(string), update_if_same)
+		case TYPE_BOOL:
+			return value.SetBool(data.(bool), update_if_same)
+		case TYPE_INT:
+			return value.SetInt(data.(int), update_if_same)
+		case TYPE_LONG:
+			return value.SetLong(data.(int64), update_if_same)
+		case TYPE_FLOAT:
+			return value.SetFloat(data.(float32), update_if_same)
+		case TYPE_DOUBLE:
+			return value.SetDouble(data.(float64), update_if_same)
+		case TYPE_STRING:
+			return value.SetString(data.(string), update_if_same)
 	}
 
 	// Won't happen
