@@ -39,8 +39,12 @@ GetNews gets the news from the given page contents.
   - the news separated by " ||| " and each news location separated by "\n"
  */
 func GetNews() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|news.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("File|false|news.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_OICComm]
+	if comms_map == nil {
+		return ""
+	}
+
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var news_list []OICNews.News
@@ -82,8 +86,12 @@ Weather data in order:
   - the weather separated by " ||| " and each weather location separated by "\n"
  */
 func GetWeather() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|weather.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("File|false|weather.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_OICComm]
+	if comms_map == nil {
+		return ""
+	}
+
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var weather []OICWeather.Weather

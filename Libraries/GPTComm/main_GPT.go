@@ -33,19 +33,27 @@ func main() {
 	Utils.InitializeCommsChannels()
 
 	go func() {
-		Utils.StartCommunicatorSERVER()
+		for {
+			Utils.StartCommunicatorSERVER()
+		}
 	}()
-	time.Sleep(2 * time.Second)
+	time.Sleep(4 * time.Second)
+	//Utils.StopCommunicatorSERVER()
 
-	//GPTComm.SendText("hello")
+	/*for {
+		time.Sleep(1 * time.Second)
+	}*/
+
+
+	GPTComm.SendText("hello")
 	/*for {
 		log.Println(GPT.GetEntry(-1, -1))
 
 		time.Sleep(1 * time.Second)
 	}*/
 
-	for sentence := GPTComm.GetNextSpeechSentence(); ; sentence = GPTComm.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
+	for {
+		log.Println("sentence: " + GPTComm.GetNextSpeechSentence())
 
 		time.Sleep(1 * time.Second)
 	}

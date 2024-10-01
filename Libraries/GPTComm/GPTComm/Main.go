@@ -28,7 +28,7 @@ import (
 )
 
 /*
-GetEntry gets the entry at the given number or time.
+getEntry gets the entry at the given number or time.
 
 If -1 is provided on both parameters, it will return the last entry. The time parameter is prioritized over the number
 parameter.
@@ -41,13 +41,21 @@ parameter.
 
 – Returns:
   - the entry or an empty entry with time = -1 if it doesn't exist
- */
-func GetEntry(time int64, num int) *Entry {
+*/
+func getEntry(time int64, num int) *_Entry {
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|gpt_text.txt"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	if comms_map == nil {
+		return &_Entry{
+			device_id: "",
+			text: "",
+			time: -1,
+		}
+	}
+
 	var file_contents string = Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte))
 	if file_contents == "" {
-		return &Entry{
+		return &_Entry{
 			device_id: "",
 			text: "",
 			time: -1,
@@ -62,7 +70,7 @@ func GetEntry(time int64, num int) *Entry {
 			}
 
 			if getTimeFromEntry(entry) == time {
-				return &Entry{
+				return &_Entry{
 					device_id: getDeviceIdFromEntry(entry),
 					text:      getTextFromEntry(entry),
 					time:      getTimeFromEntry(entry),
@@ -71,7 +79,7 @@ func GetEntry(time int64, num int) *Entry {
 		}
 	} else {
 		if len(entries) == 0 {
-			return &Entry{
+			return &_Entry{
 				device_id: "",
 				text: "",
 				time: -1,
@@ -89,7 +97,7 @@ func GetEntry(time int64, num int) *Entry {
 		var entry string = entries[num]
 
 		if entry != "" {
-			return &Entry{
+			return &_Entry{
 				device_id: getDeviceIdFromEntry(entry),
 				text:      getTextFromEntry(entry),
 				time:      getTimeFromEntry(entry),
@@ -97,7 +105,7 @@ func GetEntry(time int64, num int) *Entry {
 		}
 	}
 
-	return &Entry{
+	return &_Entry{
 		device_id: "",
 		text: "",
 		time: -1,

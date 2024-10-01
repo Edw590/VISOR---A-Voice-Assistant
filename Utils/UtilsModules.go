@@ -295,6 +295,8 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 		moduleInfo.updateModRunInfo()
 
 		to_do()
+
+		CloseCommsChannels()
 	} else {
 		go func() {
 			to_do()
@@ -372,12 +374,12 @@ func SendModErrorEmailMODULES(mod_num int, err_str string) error {
 }
 
 /*
-LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled to srvComm_stop.
+LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled to srvComm_stop_GL.
 
 -----------------------------------------------------------
 
 – Returns:
-  - true if the module should srvComm_stop, false otherwise
+  - true if the module should srvComm_stop_GL, false otherwise
 */
 func (moduleInfo *ModuleInfo) loopSleep() bool {
 	if moduleInfo.signalledToStop() {
@@ -390,12 +392,12 @@ func (moduleInfo *ModuleInfo) loopSleep() bool {
 }
 
 /*
-signalledToStop checks if the module was signalled to srvComm_stop.
+signalledToStop checks if the module was signalled to srvComm_stop_GL.
 
 -----------------------------------------------------------
 
 – Returns:
-  - true if the module was signalled to srvComm_stop, false otherwise
+  - true if the module was signalled to srvComm_stop_GL, false otherwise
 */
 func (moduleInfo *ModuleInfo) signalledToStop() bool {
 	var stop_file_1_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP")
@@ -648,7 +650,8 @@ func IsModSupportedMODULES(mod_num int) bool {
 }
 
 /*
-SignalModulesStopMODULES signals all the modules to stop and waits for them to stop.
+SignalModulesStopMODULES signals all the modules to stop and waits for them to stop, also closing all communication
+channels.
 
 -----------------------------------------------------------
 

@@ -35,8 +35,12 @@ GetRemindersList returns a list of all reminders.
   - a list of all reminders
  */
 func GetRemindersList() *[]ModsFileInfo.Reminder {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|reminders.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_RRComm, []byte("File|false|reminders.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_RRComm]
+	if comms_map == nil {
+		return nil
+	}
+
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var reminders []ModsFileInfo.Reminder
@@ -56,8 +60,12 @@ GetIdsList returns a list of all reminders' IDs.
   - a list of all reminders' IDs separated by "|"
  */
 func GetIdsList() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|reminders.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_RRComm, []byte("File|false|reminders.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_RRComm]
+	if comms_map == nil {
+		return ""
+	}
+
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var user_location []ModsFileInfo.Reminder

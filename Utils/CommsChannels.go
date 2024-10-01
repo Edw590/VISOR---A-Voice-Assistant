@@ -35,3 +35,12 @@ func InitializeCommsChannels() {
 		LibsCommsChannels_GL[i] = make(chan map[string]any)
 	}
 }
+
+func CloseCommsChannels() {
+	for i := 0; i < MODS_ARRAY_SIZE; i++ {
+		close(ModsCommsChannels_GL[i])
+	}
+	for i := 0; i < LIBS_ARRAY_SIZE; i++ {
+		close(LibsCommsChannels_GL[i])
+	}
+}

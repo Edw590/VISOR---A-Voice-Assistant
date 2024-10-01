@@ -67,7 +67,7 @@ func init() {realMain =
 		go func() {
 			for {
 				select {
-					case curr_speech = <-speeches_ch:
+					case curr_speech = <- speeches_ch:
 					case <-kill_ch:
 						return
 				}

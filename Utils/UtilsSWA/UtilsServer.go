@@ -24,7 +24,7 @@ package UtilsSWA
 import "Utils"
 
 /*
-StartCommunicatorSERVER starts the communicator.
+StartCommunicatorSERVER starts the server communicator.
 
 This function does not return until the communicator is stopped.
 */

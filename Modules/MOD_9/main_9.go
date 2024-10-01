@@ -70,6 +70,10 @@ func init() {realMain =
 		for {
 			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("File|true|reminders.json"))
 			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
+			if comms_map == nil {
+				return
+			}
+
 			var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 			if !bytes.Equal(new_crc16, last_crc16) {
 				last_crc16 = new_crc16

@@ -28,8 +28,12 @@ import (
 )
 
 func GetUserLocation() *UserLocation {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|user_location.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_ULComm, []byte("File|false|user_location.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_ULComm]
+	if comms_map == nil {
+		return nil
+	}
+
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var user_location UserLocation

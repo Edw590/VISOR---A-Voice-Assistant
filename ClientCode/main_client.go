@@ -86,6 +86,19 @@ func init() {realMain =
 		go func() {
 			for {
 				Utils.StartCommunicatorSERVER()
+
+				time.Sleep(1 * time.Second)
+			}
+		}()
+		go func() {
+			for {
+				if *module_stop {
+					Utils.StopCommunicatorSERVER()
+
+					return
+				}
+
+				time.Sleep(1 * time.Second)
 			}
 		}()
 

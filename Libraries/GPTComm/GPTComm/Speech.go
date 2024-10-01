@@ -23,7 +23,7 @@ package GPTComm
 
 import (
 	"Utils"
-	"bytes"
+	"log"
 	"strings"
 	"time"
 )
@@ -31,7 +31,7 @@ import (
 var time_begin_GL int64 = -1
 var curr_entry_time_GL int64 = -1
 var curr_idx_GL int = 0
-var last_crc16_GL []byte = nil
+var last_speech_GL string = ""
 
 const END_ENTRY string = "[3234_END]"
 const ALL_DEVICES_ID string = "3234_ALL"
@@ -65,30 +65,27 @@ The function will wait until the time of the next speech is reached.
  */
 func GetNextSpeechSentence() string {
 	if curr_entry_time_GL == -1 {
-		for {
-			Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|true|gpt_text.txt"))
-			var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
-			var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-			if !bytes.Equal(new_crc16, last_crc16_GL) {
-				last_crc16_GL = new_crc16
-				var entry *Entry = GetEntry(-1, -1)
-				var device_id string = entry.GetDeviceID()
-				if entry.GetTime() >= time_begin_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
-					curr_entry_time_GL = entry.GetTime()
-					time_begin_GL = curr_entry_time_GL + 1
+		var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+		if comms_map == nil {
+			return END_ENTRY
+		}
 
-					break
-				}
+		log.Println("comms_map[Utils.COMMS_MAP_SRV_KEY]:", comms_map[Utils.COMMS_MAP_SRV_KEY])
+		if string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)) == "start" {
+			var entry *_Entry = getEntry(-1, -1)
+			var device_id string = entry.getDeviceID()
+			if entry.getTime() >= time_begin_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
+				curr_entry_time_GL = entry.getTime()
+				time_begin_GL = curr_entry_time_GL + 1
+				last_speech_GL = ""
 			}
-
-			time.Sleep(1 * time.Second)
 		}
 	}
 
 	var sentence string = ""
 	for {
-		var entry *Entry = GetEntry(curr_entry_time_GL, -1)
-		var text_split []string = strings.Split(entry.GetText(), " ")
+		var entry *_Entry = getEntry(curr_entry_time_GL, -1)
+		var text_split []string = strings.Split(entry.getText(), " ")
 
 		//log.Println("--------------------------")
 		if curr_idx_GL >= len(text_split) {
@@ -154,5 +151,11 @@ func GetNextSpeechSentence() string {
 		curr_idx_GL = 0
 	}
 
+	last_speech_GL += " " + sentence
+
 	return sentence
+}
+
+func GetLastSpeech() string {
+	return last_speech_GL
 }

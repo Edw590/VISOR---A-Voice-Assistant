@@ -30,20 +30,32 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const COMMS_MAP_SRV_KEY string = "SrvComm"
 
-var srvComm_gen_ch_in chan []byte = make(chan []byte)
-var srvComm_gen_ch_out chan []byte = make(chan []byte, 1000)
-var srvComm_stop bool = false
+var srvComm_gen_ch_in_GL chan []byte
+var srvComm_gen_ch_out_GL chan []byte
+var srvComm_stop_GL bool = false
+var srvComm_started_GL bool = false
 
 /*
 StartCommunicatorSERVER starts the communicator.
 
-This function does not return until the communicator is stopped.
+This function does not return until the communicator is stopped, or returns in case the communicator is already started.
 */
 func StartCommunicatorSERVER() {
+	if srvComm_started_GL {
+		return
+	}
+	srvComm_started_GL = true
+
+	srvComm_stop_GL = false
+	srvComm_gen_ch_in_GL = make(chan []byte)
+	srvComm_gen_ch_out_GL = make(chan []byte, 1000)
+	var routines_working [2]bool
+
 	// Define the WebSocket server address
 	u := url.URL{Scheme: "wss", Host: User_settings_GL.PersonalConsts.Website_domain, Path: "/ws"}
 	log.Printf("Connecting to %s", u.String())
@@ -62,6 +74,7 @@ func StartCommunicatorSERVER() {
 	dialer := websocket.Dialer{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true, // Disable certificate verification
+			ClientSessionCache: tls.NewLRUClientSessionCache(32), // Use an LRU session cache for resumption
 		},
 	}
 
@@ -71,18 +84,21 @@ func StartCommunicatorSERVER() {
 		log.Println("Response:", r)
 		log.Println("Dial error:", err)
 
+		srvComm_started_GL = false
+
 		return
 	}
 	defer c.Close()
 
 	go func() {
+		routines_working[0] = true
 		for {
 			message_type, message, err := c.ReadMessage()
 			if err != nil {
 				log.Println("Read error:", err)
-				srvComm_stop = true
+				srvComm_stop_GL = true
 
-				return
+				break
 			}
 			if message_type != websocket.BinaryMessage {
 				continue
@@ -94,7 +110,7 @@ func StartCommunicatorSERVER() {
 			var index_bar int = strings.Index(string(message), "|")
 			var truncated_msg []byte = message[index_bar + 1:]
 			if msg_to == "GEN" {
-				srvComm_gen_ch_in <- truncated_msg
+				srvComm_gen_ch_in_GL <- truncated_msg
 
 				continue
 			}
@@ -113,30 +129,47 @@ func StartCommunicatorSERVER() {
 				LibsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
 			}
 		}
+		routines_working[0] = false
 	}()
 
 	go func() {
+		routines_working[1] = true
 		for {
-			var message []byte = <-srvComm_gen_ch_out
+			var message []byte = <- srvComm_gen_ch_out_GL
+			if message == nil {
+				return
+			}
 
 			err := c.WriteMessage(websocket.BinaryMessage, message)
 			if err != nil {
 				log.Println("Write error:", err)
-				srvComm_stop = true
+				srvComm_stop_GL = true
 
-				return
+				break
 			}
 			//log.Printf("Sent message: %s", message)
 		}
+		routines_working[1] = false
 	}()
 
 	log.Println("Communicator started")
 
 	for {
-		if WaitWithStopTIMEDATE(&srvComm_stop, 1000000000) {
+		if WaitWithStopTIMEDATE(&srvComm_stop_GL, 1000000000) {
+			close(srvComm_gen_ch_in_GL)
+			close(srvComm_gen_ch_out_GL)
 			_ = c.Close()
+			for {
+				if !routines_working[0] && !routines_working[1] {
+					log.Println("Communicator stopped")
 
-			return
+					srvComm_started_GL = false
+
+					return
+				}
+
+				time.Sleep(500 * time.Millisecond)
+			}
 		}
 	}
 }
@@ -149,7 +182,7 @@ The message is sent by QueueGeneralMessageSERVER().
 If no message is available, the function will wait until a message is received.
 */
 func GetGeneralMessageSERVER() []byte {
-	return <-srvComm_gen_ch_in
+	return <- srvComm_gen_ch_in_GL
 }
 
 /*
@@ -164,7 +197,7 @@ It is received by GetGeneralMessageSERVER().
 */
 func QueueGeneralMessageSERVER(message []byte) {
 	var new_msg []byte = append([]byte("GEN|"), message...)
-	srvComm_gen_ch_out <- new_msg
+	srvComm_gen_ch_out_GL <- new_msg
 }
 
 /*
@@ -184,7 +217,7 @@ func QueueMessageSERVER(is_mod bool, num int, message []byte) {
 	}
 	var message_str string = mod_lib + "_" + strconv.Itoa(num) + "|"
 	var new_msg []byte = append([]byte(message_str), message...)
-	srvComm_gen_ch_out <- new_msg
+	srvComm_gen_ch_out_GL <- new_msg
 }
 
 /*
@@ -197,12 +230,12 @@ QueueNoResponseMessageSERVER queues a message to be sent to the server without e
 */
 func QueueNoResponseMessageSERVER(message []byte) {
 	var new_msg []byte = append([]byte("NONE|"), message...)
-	srvComm_gen_ch_out <- new_msg
+	srvComm_gen_ch_out_GL <- new_msg
 }
 
 /*
 StopCommunicatorSERVER stops the communicator.
 */
 func StopCommunicatorSERVER() {
-	srvComm_stop = true
+	srvComm_stop_GL = true
 }

@@ -21,8 +21,8 @@
 
 package GPTComm
 
-// Entry is a struct containing information of a generated text.
-type Entry struct {
+// _Entry is a struct containing information of a generated text.
+type _Entry struct {
 	// device_id is the device ID of the entry
 	device_id string
 	// text is the text generated
@@ -32,37 +32,37 @@ type Entry struct {
 }
 
 /*
-GetDeviceID gets the device ID of the entry.
+getDeviceID gets the device ID of the entry.
 
 -----------------------------------------------------------
 
 – Returns:
   - the device ID
- */
-func (entry Entry) GetDeviceID() string {
+*/
+func (entry _Entry) getDeviceID() string {
 	return entry.device_id
 }
 
 /*
-GetText gets the text of the entry.
+getText gets the text of the entry.
 
 -----------------------------------------------------------
 
 – Returns:
   - the text, ending in END_ENTRY
 */
-func (entry Entry) GetText() string {
+func (entry _Entry) getText() string {
 	return entry.text
 }
 
 /*
-GetTime gets the time of the entry.
+getTime gets the time of the entry.
 
 -----------------------------------------------------------
 
 – Returns:
   - the time in milliseconds
 */
-func (entry Entry) GetTime() int64 {
+func (entry _Entry) getTime() int64 {
 	return entry.time
 }

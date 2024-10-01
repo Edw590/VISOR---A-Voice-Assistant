@@ -37,6 +37,11 @@ import (
 
 // Website Backend //
 
+const MAX_CHANNELS int = 100
+
+var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
+var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
+
 var (
 	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
@@ -45,6 +50,22 @@ func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+
+		go func() {
+			for {
+				var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_WebsiteBackend]
+				if comms_map == nil {
+					return
+				}
+
+				var message []byte = comms_map["Message"].([]byte)
+				for i := 0; i < MAX_CHANNELS; i++ {
+					if used_channels_GL[i] {
+						channels_GL[i] <- message
+					}
+				}
+			}
+		}()
 
 		var srv *http.Server = nil
 		go func() {
@@ -68,6 +89,12 @@ func init() {realMain =
 
 		for {
 			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
+				for i := 0; i < MAX_CHANNELS; i++ {
+					if used_channels_GL[i] {
+						close(channels_GL[i])
+					}
+				}
+
 				if err := srv.Shutdown(ctx); err == nil {
 					log.Println("Server stopped gracefully")
 				} else {
@@ -87,6 +114,8 @@ var upgrader = websocket.Upgrader{
 }
 
 func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("WebSocketsHandler called")
+
 	// Upgrade HTTP connection to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -99,11 +128,18 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		for {
-			var message []byte = <-channels_GL[channel_num]
+			var message []byte = <- channels_GL[channel_num]
+			if message == nil {
+				return
+			}
+
 			if err := conn.WriteMessage(websocket.BinaryMessage, message); err != nil {
 				log.Println("Write error:", err)
 
 				return
+			} else {
+				log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(message),
+					CRC16.Result(message, "CCIT_ZERO"), message[:strings.Index(string(message), "|")])
 			}
 		}
 	}()
@@ -148,13 +184,17 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 				break
 			} else {
-				log.Printf("Message sent. Length: %d; CRC16: %d; Content: %s", len(response),
+				log.Printf("Message sent 1. Length: %d; CRC16: %d; Content: %s", len(response),
 					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
 			}
 		} else {
 			log.Println("Giving no response")
 		}
 	}
+
+	unregisterChannel(channel_num)
+
+	log.Println("WebSocketsHandler ended")
 }
 
 func handleMessage(type_ string, bytes []byte) []byte {
@@ -260,4 +300,24 @@ func handleMessage(type_ string, bytes []byte) []byte {
 	}
 
 	return []byte("ERROR")
+}
+
+func registerChannel() int {
+	for i := 0; i < MAX_CHANNELS; i++ {
+		if !used_channels_GL[i] {
+			channels_GL[i] = make(chan []byte)
+			used_channels_GL[i] = true
+
+			return i
+		}
+	}
+
+	return -1
+}
+
+func unregisterChannel(channel_num int) {
+	if channel_num >= 0 && channel_num < MAX_CHANNELS {
+		used_channels_GL[channel_num] = false
+		channels_GL[channel_num] = nil
+	}
 }
