@@ -90,8 +90,6 @@ func init() {realMain =
 		}
 
 		Utils.SignalModulesStopMODULES(modules)
-
-		return
 	}
 }
 
@@ -100,7 +98,7 @@ func handleCtrlCGracefully(module_stop *bool) {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		<-c
+		<- c
 
 		*module_stop = true
 	}()

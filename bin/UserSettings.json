@@ -3,28 +3,28 @@
 	// The comments can stay. They're filtered by VISOR.
 
 	"PersonalConsts": {
-		// DEVICE_ID is the device ID of the current device
+		// Device_ID is the device ID of the current device
 		"Device_ID": "",
 
-		// VISOR_DIR is the full path to the main directory of VISOR, be it a Windows or a Unix path
+		// VISOR_dir is the full path to the main directory of VISOR, be it a Windows or a Unix path
 		"VISOR_dir": "",
 
-		// VISOR_EMAIL_ADDR is VISOR's email address
+		// VISOR_email_addr is VISOR's email address
 		"VISOR_email_addr": "",
-		// VISOR_EMAIL_PW is VISOR's email password
+		// VISOR_email_pw is VISOR's email password
 		"VISOR_email_pw": "",
 
-		// USER_EMAIL_ADDR is the email address of the user, used for all email communication
+		// User_email_addr is the email address of the user, used for all email communication
 		"User_email_addr": "",
 
-		// WEBSITE_URL is the URL of the VISOR website
-		"Website_url": "",
-		// WEBSITE_PW is the password for the VISOR website
+		// Website_domain is the domain of the VISOR website
+		"Website_domain": "",
+		// Website_pw is the password for the VISOR website
 		"Website_pw": "",
-		// WEBSITE_DIR is the full path to the directory of the VISOR website
+		// Website_dir is the full path to the directory of the VISOR website
 		"Website_dir": "",
 
-		// WOLFRAM_ALPHA_APPID is the app ID for the Wolfram Alpha API
+		// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
 		"WolframAlpha_AppID": "",
 
 		// Picovoice_API_key is the API key for the Picovoice API
@@ -96,6 +96,10 @@
 		"Model_loc": "/home/edw590/llamacpp_models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf",
 		// LLM configuration string (what's sent to it when it initializes)
 		"Config_str": "You are VISOR, my male personal virtual assistant. I'm Edward. I was born in 1999-11-22. It's currently the year of 2024. Address me as Sir or nothing at all. From now on, always end your answers with \\\"[3234_END]\\\"."
+	},
+	"MOD_8": {
+		"Cert_file": "/etc/ssl/certs/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.crt",
+		"Key_file": "/etc/ssl/private/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.key"
 	},
 	"MOD_10": {
 		// Variables: battery_percent (int), power_connected (bool), brightness (int), sound_volume (int), sound_muted (bool)

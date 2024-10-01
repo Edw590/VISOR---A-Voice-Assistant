@@ -19,7 +19,7 @@
  * under the License.
  ******************************************************************************/
 
-package GPT
+package GPTComm
 
 import (
 	"Utils"
@@ -43,15 +43,17 @@ parameter.
   - the entry or an empty entry with time = -1 if it doesn't exist
  */
 func GetEntry(time int64, num int) *Entry {
-	var page_contents string = string(Utils.GetFileContentsWEBSITE("gpt_text.txt", true))
-	if page_contents == "" {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|gpt_text.txt"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	var file_contents string = Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte))
+	if file_contents == "" {
 		return &Entry{
 			device_id: "",
 			text: "",
 			time: -1,
 		}
 	}
-	var entries []string = strings.Split(page_contents, "[3234_START:")
+	var entries []string = strings.Split(file_contents, "[3234_START:")
 
 	if time != -1 {
 		for _, entry := range entries {
@@ -102,13 +104,10 @@ func GetEntry(time int64, num int) *Entry {
 	}
 }
 
-func SendText(text string) error {
-	_, err := Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-		Type: "GPT",
-		File: Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text),
-	})
-
-	return err
+func SendText(text string) {
+	var message []byte = []byte("GPT|")
+	message = append(message, Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text)...)
+	Utils.QueueNoResponseMessageSERVER(message)
 }
 
 /*

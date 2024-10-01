@@ -24,17 +24,42 @@ package UtilsSWA
 import "Utils"
 
 /*
-InitPersonalConsts initializes the personal constants.
+StartCommunicatorSERVER starts the communicator.
+
+This function does not return until the communicator is stopped.
+*/
+func StartCommunicatorSERVER() {
+	Utils.StartCommunicatorSERVER()
+}
+
+/*
+QueueGeneralMessageSERVER queues a general message to be sent to the server.
+
+It is received by GetGeneralMessageSERVER().
 
 -----------------------------------------------------------
 
 – Params:
-  - device_id – the device ID
-  - website_domain – the domain of VISOR's website
-  - website_pw – the password of VISOR's website
- */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+  - message – the message to be sent
+*/
+func QueueGeneralMessageSERVER(message []byte) {
+	Utils.QueueGeneralMessageSERVER(message)
+}
+
+/*
+GetGeneralMessageSERVER gets a general message from the server.
+
+The message is sent by QueueGeneralMessageSERVER().
+
+If no message is available, the function will wait until a message is received.
+*/
+func GetGeneralMessageSERVER() []byte {
+	return Utils.GetGeneralMessageSERVER()
+}
+
+/*
+StopCommunicatorSERVER stops the communicator.
+*/
+func StopCommunicatorSERVER() {
+	Utils.StopCommunicatorSERVER()
 }

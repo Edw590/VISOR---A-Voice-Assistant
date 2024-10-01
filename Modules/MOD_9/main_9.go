@@ -31,6 +31,7 @@ import (
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
+	"bytes"
 	"github.com/apaxa-go/eval"
 	"log"
 	"strconv"
@@ -67,8 +68,10 @@ func init() {realMain =
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			var new_crc16 []byte = Utils.CheckFileChangedWEBSITE(last_crc16, "reminders.json")
-			if new_crc16 != nil {
+			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("File|true|reminders.json"))
+			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
+			var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+			if !bytes.Equal(new_crc16, last_crc16) {
 				last_crc16 = new_crc16
 
 				updateLocalReminders()

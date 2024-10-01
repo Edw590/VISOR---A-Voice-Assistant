@@ -19,28 +19,12 @@
  * under the License.
  ******************************************************************************/
 
-package main
+package ModsFileInfo
 
-import (
-	"GPT/GPT"
-	"Utils"
-	"log"
-	"time"
-)
-
-func main() {
-	Utils.LoadUserSettings(false)
-
-	log.Println(GPT.SendText("hello"))
-	/*for {
-		log.Println(GPT.GetEntry(-1, -1))
-
-		time.Sleep(1 * time.Second)
-	}*/
-
-	for sentence := GPT.GetNextSpeechSentence(); ; sentence = GPT.GetNextSpeechSentence() {
-		log.Println("sentence: " + sentence)
-
-		time.Sleep(1 * time.Second)
-	}
+// Mod8UserInfo is the format of the custom information file about this specific module.
+type Mod8UserInfo struct {
+	// Cert_file is the location of the TLS certificate file
+	Cert_file string
+	// Key_file is the location of the TLS key file
+	Key_file string
 }

@@ -19,22 +19,24 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package Utils
 
-import "Utils"
+const (
+	NUM_LIB_ACD               int = iota
+	NUM_LIB_OICComm
+	NUM_LIB_GPTComm
+	NUM_LIB_SpeechQueue
+	NUM_LIB_ULComm
+	NUM_LIB_RRComm
 
-/*
-InitPersonalConsts initializes the personal constants.
-
------------------------------------------------------------
-
-– Params:
-  - device_id – the device ID
-  - website_domain – the domain of VISOR's website
-  - website_pw – the password of VISOR's website
- */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+	LIBS_ARRAY_SIZE
+)
+// LIB_NUMS_NAMES is a map of the numbers of the libraries and their names. Use with the NUM_LIB_ constants.
+var LIB_NUMS_NAMES map[int]string = map[int]string{
+	NUM_LIB_ACD:         "Advanced Commands Detection",
+	NUM_LIB_OICComm:     "Online Information Checker Communicator",
+	NUM_LIB_GPTComm:     "GPT Communicator",
+	NUM_LIB_SpeechQueue: "Speech Queue",
+	NUM_LIB_ULComm:      "User Locator Communicator",
+	NUM_LIB_RRComm:      "Reminders Reminder Communicator",
 }

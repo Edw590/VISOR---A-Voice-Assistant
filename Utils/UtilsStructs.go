@@ -19,50 +19,54 @@
  * under the License.
  ******************************************************************************/
 
-package GPT
+package Utils
 
-// Entry is a struct containing information of a generated text.
-type Entry struct {
-	// device_id is the device ID of the entry
-	device_id string
-	// text is the text generated
-	text string
-	// time is the Unix time in milliseconds
-	time int64
-}
+import (
+	"reflect"
+)
 
 /*
-GetDeviceID gets the device ID of the entry.
+CompareSTRUCTS compares two structs and returns true if they are equal, false otherwise.
 
 -----------------------------------------------------------
 
+– Params:
+  - a – the first struct to compare
+  - b – the second struct to compare
+
 – Returns:
-  - the device ID
+  - true if the structs are equal, false otherwise
  */
-func (entry Entry) GetDeviceID() string {
-	return entry.device_id
-}
+func CompareSTRUCTS[T any](a T, b T) bool {
+	valA := reflect.ValueOf(a)
+	valB := reflect.ValueOf(b)
+	typA := reflect.TypeOf(a)
+	typB := reflect.TypeOf(b)
 
-/*
-GetText gets the text of the entry.
+	if typA.Kind() != reflect.Struct || typB.Kind() != reflect.Struct {
+		return false
+	}
 
------------------------------------------------------------
+	if typA != typB {
+		return false
+	}
 
-– Returns:
-  - the text, ending in END_ENTRY
-*/
-func (entry Entry) GetText() string {
-	return entry.text
-}
+	result := true
 
-/*
-GetTime gets the time of the entry.
+	for i := 0; i < valA.NumField(); i++ {
+		fieldA := valA.Field(i)
+		fieldB := valB.Field(i)
 
------------------------------------------------------------
+		if fieldA.Kind() == reflect.Struct {
+			if !CompareSTRUCTS(fieldA.Interface(), fieldB.Interface()) {
+				result = false
+			}
+		} else {
+			if fieldA.Interface() != fieldB.Interface() {
+				result = false
+			}
+		}
+	}
 
-– Returns:
-  - the time in milliseconds
-*/
-func (entry Entry) GetTime() int64 {
-	return entry.time
+	return result
 }

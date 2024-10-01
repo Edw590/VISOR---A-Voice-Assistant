@@ -5,8 +5,8 @@ go 1.20
 use (
 	ClientCode
 	Libraries/ACD
-	Libraries/GPT
-	Libraries/OIG
+	Libraries/GPTComm
+	Libraries/OICComm
 	Libraries/SpeechQueue
 	Libraries/ULComm
 	Libraries/RRComm

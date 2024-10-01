@@ -19,17 +19,13 @@
  * under the License.
  ******************************************************************************/
 
-package main
+package UtilsSWA
 
-import (
-	"OIG/OIG"
-	"Utils"
-	"log"
-)
+import "Utils"
 
-func main() {
-	Utils.PersonalConsts_GL.Init(false)
-
-	log.Println(OIG.GetNews())
-	log.Println(OIG.GetWeather())
+/*
+InitializeCommsChannels initializes the modules and libraries communication channels.
+*/
+func InitializeCommsChannels() {
+	Utils.InitializeCommsChannels()
 }

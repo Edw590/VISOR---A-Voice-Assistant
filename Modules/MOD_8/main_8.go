@@ -22,13 +22,17 @@
 package MOD_8
 
 import (
+	"ULComm/ULComm"
 	"Utils"
+	"context"
 	Tcef "github.com/Edw590/TryCatch-go"
+	"github.com/gorilla/websocket"
 	"github.com/yousifnimah/Cryptx/CRC16"
 	"log"
 	"net/http"
-	"net/url"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // Website Backend //
@@ -47,19 +51,28 @@ func init() {realMain =
 			Tcef.Tcef{
 				Try: func() {
 					// Try to register. If it's already registered, ignore the panic.
-					http.HandleFunc("/submit-form", formHandler)
-					http.HandleFunc("/file/", handleGetRequest)
+					http.HandleFunc("/ws", basicAuth(webSocketsHandler))
 				},
 			}.Do()
 
-			//log.Println("Server running on port 8080")
-			srv = &http.Server{Addr: ":8080"}
-			_ = srv.ListenAndServe()
+			//log.Println("Server running on port 3234")
+			srv = &http.Server{Addr: ":3234"}
+			err := srv.ListenAndServeTLS(Utils.User_settings_GL.MOD_8.Cert_file, Utils.User_settings_GL.MOD_8.Key_file)
+			if err != nil {
+				log.Println("ListenAndServeTLS error:", err)
+			}
 		}()
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+		defer cancel()
 
 		for {
 			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
-				_ = srv.Shutdown(nil)
+				if err := srv.Shutdown(ctx); err == nil {
+					log.Println("Server stopped gracefully")
+				} else {
+					log.Println("Server shutdown error:", err)
+				}
 
 				return
 			}
@@ -67,102 +80,184 @@ func init() {realMain =
 	}
 }
 
-func formHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		log.Println("Invalid request metho: " + r.Method)
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-	}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
-	err := r.ParseMultipartForm(10 << 20) // 10 MB
+func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
+	// Upgrade HTTP connection to WebSocket
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("ParseForm() err: " + err.Error())
-		http.Error(w, "ParseForm() err: " + err.Error(), http.StatusInternalServerError)
-
+		log.Println("Upgrade error:", err)
 		return
 	}
+	defer conn.Close()
 
-	var type_ string = r.FormValue("type")
-	var text1 string = r.FormValue("text1")
-	//var text2 string = r.FormValue("text2")
-	file, file_header, err := r.FormFile("file")
+	var channel_num int = registerChannel()
 
-	//log.Println("Form:", r)
-	//log.Println("Type: " + type_)
-	//log.Println("Text1: " + text1)
-	//log.Println("Text2: " + text2)
+	go func() {
+		for {
+			var message []byte = <-channels_GL[channel_num]
+			if err := conn.WriteMessage(websocket.BinaryMessage, message); err != nil {
+				log.Println("Write error:", err)
 
-	var file_bytes []byte = nil
-	if err == nil {
-		file_bytes = make([]byte, file_header.Size)
-		_, _ = file.Read(file_bytes)
-	}
-	//log.Println("File:", file_bytes)
+				return
+			}
+		}
+	}()
 
-	switch type_ {
-		case "GPT":
-			log.Println("GPT")
-			// File: the text to process, compressed
-			// Returns: nothing
-			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
-				WriteTextFile(Utils.DecompressString(file_bytes), false)
-		case "Email":
-			log.Println("Email")
-			// Text1: the email address to send to
-			// File: the EML file to send, compressed
-			// Returns: nothing
-			_ = Utils.QueueEmailEMAIL(Utils.EmailInfo{
-				Mail_to: text1,
-				Eml:     Utils.DecompressString(file_bytes),
-			})
-		case "UserLocator":
-			// Text1: the device ID
-			// File: the JSON data to write, compressed
-			// Returns: nothing
-			log.Println("UserLocator")
-			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", text1 + ".json").
-				WriteTextFile(Utils.DecompressString(file_bytes), false)
-		default:
-			// Do nothing
+	for {
+		// Read message from WebSocket
+		message_type, message, err := conn.ReadMessage()
+		if err != nil {
+			log.Println("Read error:", err)
+
+			break
+		}
+
+		if message_type != websocket.BinaryMessage {
+			continue
+		}
+		var message_str string = string(message)
+		var index_bar int = strings.Index(message_str, "|")
+		var index_2nd_bar int = strings.Index(message_str[index_bar + 1:], "|")
+		if index_bar == -1 || index_2nd_bar == -1 {
+			continue
+		}
+
+		// Print received message
+		log.Printf("Received: %s", message[:index_bar + index_2nd_bar + 2])
+
+		var message_parts []string = strings.Split(message_str, "|")
+		if len(message_parts) < 3 {
+			continue
+		}
+		var msg_to string = message_parts[0]
+		var type_ string = message_parts[1]
+		var bytes []byte = message[index_bar + index_2nd_bar + 2:]
+
+		var partial_resp []byte = handleMessage(type_, bytes)
+		if msg_to != "NONE" {
+			var response []byte = []byte(msg_to + "|")
+			response = append(response, partial_resp...)
+
+			if err := conn.WriteMessage(websocket.BinaryMessage, response); err != nil {
+				log.Println("Write error:", err)
+
+				break
+			} else {
+				log.Printf("Message sent. Length: %d; CRC16: %d; Content: %s", len(response),
+					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
+			}
+		} else {
+			log.Println("Giving no response")
+		}
 	}
 }
 
-func handleGetRequest(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func handleMessage(type_ string, bytes []byte) []byte {
+	switch type_ {
+		case "Echo":
+			// Example: "Hello world!"
+			return bytes
+		case "GPT":
+			// Example: a compressed string
+			if err := Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
+				WriteTextFile(Utils.DecompressString(bytes), false); err == nil {
+					log.Println("File written")
+
+					return []byte("OK")
+			} else {
+				log.Println("Error writing file:", err)
+			}
+		case "Email":
+			// Example: "email_to@gmail.com|" + a compressed EML file
+			if err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
+				Mail_to: strings.Split(string(bytes), "|")[0],
+				Eml:     Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:]),
+			}); err == nil {
+				log.Println("Email queued")
+
+				return []byte("OK")
+			} else {
+				log.Println("Error queuing email:", err)
+			}
+		case "UserLocator":
+			// Example: "Device_Id|" + a compressed JSON file, or "Device_Id|time=" + timestamp in ms
+			var bytes_split []string = strings.Split(string(bytes), "|")
+			var device_id string = bytes_split[0]
+			// If the message is a timestamp, just update the last communication time of the device.
+			if strings.HasPrefix(bytes_split[1], "time=") {
+				timestamp, err := strconv.ParseInt(strings.Split(bytes_split[1], "time=")[1], 10, 64)
+				if err != nil {
+					log.Println("Error parsing timestamp:", err)
+
+					break
+				}
+
+				var file Utils.GPath = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", device_id + ".json")
+				var p_json *string = file.ReadTextFile()
+				if p_json == nil {
+					log.Println("Error reading file")
+
+					break
+				}
+
+				var device_info ULComm.DeviceInfo
+				if err = Utils.FromJsonGENERAL([]byte(*p_json), &device_info); err != nil {
+					log.Println("Error parsing JSON:", err)
+
+					break
+				}
+
+				device_info.Last_comm = timestamp
+
+				if err = file.WriteTextFile(*Utils.ToJsonGENERAL(device_info), false); err == nil {
+					log.Println("File written")
+
+					return []byte("OK")
+				} else {
+					log.Println("Error writing file:", err)
+				}
+			} else {
+				// If the message is a JSON file, update the device's information.
+				var json string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
+				if err := Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).
+					Add2(false, "devices", device_id + ".json").WriteTextFile(json, false); err == nil {
+						log.Println("File written")
+
+						return []byte("OK")
+				} else {
+					log.Println("Error writing file:", err)
+				}
+			}
+		case "File":
+			// Example: "true|partial_path" or "false|partial_path", where true means to get the CRC16 checksum and
+			// false means to get the file contents
+			var bytes_split []string = strings.Split(string(bytes), "|")
+			var get_crc16 bool = bytes_split[0] == "true"
+			var partial_path string = bytes_split[1]
+
+			var p_file_contents *string = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, partial_path).ReadTextFile()
+			if p_file_contents == nil {
+				log.Println("Error file not found:", partial_path)
+
+				break
+			}
+
+			log.Println("File read")
+			if get_crc16 {
+				var crc16 uint16 = CRC16.Result([]byte(*p_file_contents), "CCIT_ZERO")
+				var crc16_bytes []byte = make([]byte, 2)
+				crc16_bytes[0] = byte(crc16 >> 8)
+				crc16_bytes[1] = byte(crc16)
+				return crc16_bytes
+			} else {
+				return Utils.CompressString(*p_file_contents)
+			}
 	}
 
-	url_str, _ := url.Parse(r.URL.String())
-	params, _ := url.ParseQuery(url_str.RawQuery)
-
-	var get_crc16 bool = params.Get("crc") == "true"
-
-	// Remove "/file/" and any parameters from the URL
-	var file_path string = r.URL.Path
-	file_path = strings.TrimPrefix(file_path, "/file/")
-	file_path = strings.Split(file_path, "?")[0]
-	if strings.HasSuffix(file_path, "/") {
-		http.Error(w, "Not a file", http.StatusNotFound)
-
-		return
-	}
-	var p_file_contents *string = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, file_path).ReadTextFile()
-	if p_file_contents == nil {
-		http.Error(w, "File not found", http.StatusNotFound)
-
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-
-	if get_crc16 {
-		var crc16 uint16 = CRC16.Result([]byte(*p_file_contents), "CCIT_ZERO")
-		var crc16_bytes []byte = make([]byte, 2)
-		crc16_bytes[0] = byte(crc16 >> 8)
-		crc16_bytes[1] = byte(crc16)
-		_, _ = w.Write(crc16_bytes)
-	} else {
-		_, _ = w.Write([]byte(*p_file_contents))
-	}
+	return []byte("ERROR")
 }

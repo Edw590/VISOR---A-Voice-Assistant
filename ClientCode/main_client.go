@@ -83,6 +83,12 @@ func init() {realMain =
 
 		ClientRegKeys.RegisterValues()
 
+		go func() {
+			for {
+				Utils.StartCommunicatorSERVER()
+			}
+		}()
+
 		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
 			modules = append(modules, Utils.Module{

@@ -19,22 +19,19 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package Utils
 
-import "Utils"
+var ModsCommsChannels_GL [MODS_ARRAY_SIZE]chan map[string]any = [MODS_ARRAY_SIZE]chan map[string]any{}
+var LibsCommsChannels_GL [LIBS_ARRAY_SIZE]chan map[string]any = [LIBS_ARRAY_SIZE]chan map[string]any{}
 
 /*
-InitPersonalConsts initializes the personal constants.
-
------------------------------------------------------------
-
-– Params:
-  - device_id – the device ID
-  - website_domain – the domain of VISOR's website
-  - website_pw – the password of VISOR's website
- */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+InitializeCommsChannels initializes the modules and libraries communication channels.
+*/
+func InitializeCommsChannels() {
+	for i := 0; i < MODS_ARRAY_SIZE; i++ {
+		ModsCommsChannels_GL[i] = make(chan map[string]any)
+	}
+	for i := 0; i < LIBS_ARRAY_SIZE; i++ {
+		LibsCommsChannels_GL[i] = make(chan map[string]any)
+	}
 }

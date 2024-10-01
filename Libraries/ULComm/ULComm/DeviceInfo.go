@@ -36,14 +36,10 @@ type DeviceInfo struct {
 	System_state SystemState
 }
 
-func (device_info *DeviceInfo) SendInfo() error {
-	_, err := Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-		Type:  "UserLocator",
-		Text1: Utils.User_settings_GL.PersonalConsts.Device_ID,
-		File:  Utils.CompressString(*Utils.ToJsonGENERAL(device_info)),
-	})
-
-	return err
+func (device_info *DeviceInfo) SendInfo() {
+	var message []byte = []byte("UserLocator|" + Utils.User_settings_GL.PersonalConsts.Device_ID + "|")
+	message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(*device_info))...)
+	Utils.QueueNoResponseMessageSERVER(message)
 }
 
 type SystemState struct {

@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"GPT/GPT"
+	"GPTComm/GPTComm"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -42,7 +42,7 @@ func Communicator() fyne.CanvasObject {
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
-		GPT.SendText(entry_txt_to_speech.Text)
+		GPTComm.SendText(entry_txt_to_speech.Text)
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ func Communicator() fyne.CanvasObject {
 	go func() {
 		for {
 			if Current_screen_GL == comm_canvas_object_GL {
-				var entry *GPT.Entry = GPT.GetEntry(-1, -1)
+				var entry *GPTComm.Entry = GPTComm.GetEntry(-1, -1)
 				if entry != nil {
 					response_text.SetText(entry.GetDeviceID() + ": " + entry.GetText())
 				} else {

@@ -290,6 +290,8 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 			goto end
 		}
 
+		InitializeCommsChannels()
+
 		moduleInfo.updateModRunInfo()
 
 		to_do()
@@ -370,12 +372,12 @@ func SendModErrorEmailMODULES(mod_num int, err_str string) error {
 }
 
 /*
-LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled to stop.
+LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled to srvComm_stop.
 
 -----------------------------------------------------------
 
 – Returns:
-  - true if the module should stop, false otherwise
+  - true if the module should srvComm_stop, false otherwise
 */
 func (moduleInfo *ModuleInfo) loopSleep() bool {
 	if moduleInfo.signalledToStop() {
@@ -388,12 +390,12 @@ func (moduleInfo *ModuleInfo) loopSleep() bool {
 }
 
 /*
-signalledToStop checks if the module was signalled to stop.
+signalledToStop checks if the module was signalled to srvComm_stop.
 
 -----------------------------------------------------------
 
 – Returns:
-  - true if the module was signalled to stop, false otherwise
+  - true if the module was signalled to srvComm_stop, false otherwise
 */
 func (moduleInfo *ModuleInfo) signalledToStop() bool {
 	var stop_file_1_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP")

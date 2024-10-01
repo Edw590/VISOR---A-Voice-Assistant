@@ -24,7 +24,6 @@ package Screens
 import (
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
-	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -39,32 +38,6 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 	Current_screen_GL = dev_mode_canvas_object_GL
 	if dev_mode_canvas_object_GL != nil {
 		return dev_mode_canvas_object_GL
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////
-	// Form section
-	var form_type *widget.Entry = widget.NewEntry()
-	var form_text1 *widget.Entry = widget.NewEntry()
-	var form_text2 *widget.Entry = widget.NewEntry()
-	var file_button *widget.Button = widget.NewButton("File", func() {
-		showFilePicker(window)
-	})
-
-	var form *widget.Form = &widget.Form{
-		Items: []*widget.FormItem{
-			{Text: "Type",  Widget: form_type},
-			{Text: "Text1", Widget: form_text1},
-			{Text: "Text2", Widget: form_text2},
-			{Text: "File",  Widget: file_button},
-		},
-		OnSubmit: func() {
-			Utils.SubmitFormWEBSITE(Utils.WebsiteForm{
-				Type:  form_type.Text,
-				Text1: form_text1.Text,
-				Text2: form_text2.Text,
-				File:  Utils.CompressString(*Utils.PathFILESDIRS(false, "", file_path_GL).ReadTextFile()),
-			})
-		},
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +62,6 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		form,
 		entry_txt_to_speech,
 		btn_speak_min,
 		btn_speak_high,

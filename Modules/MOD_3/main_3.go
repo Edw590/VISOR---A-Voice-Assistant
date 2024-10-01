@@ -22,7 +22,7 @@
 package MOD_3
 
 import (
-	"GPT/GPT"
+	"GPTComm/GPTComm"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
 	"Utils/UtilsSWA"
@@ -167,11 +167,11 @@ func init() {realMain =
 		}()
 
 		go func() {
-			GPT.SetTimeBegin(time.Now().UnixMilli())
+			GPTComm.SetTimeBegin(time.Now().UnixMilli())
 			for {
 				// Keep getting the next sentence to speak from the server
-				var speak string = GPT.GetNextSpeechSentence()
-				if speak == GPT.END_ENTRY {
+				var speak string = GPTComm.GetNextSpeechSentence()
+				if speak == GPTComm.END_ENTRY {
 					continue
 				}
 

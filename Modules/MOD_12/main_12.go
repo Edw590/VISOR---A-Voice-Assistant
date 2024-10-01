@@ -22,7 +22,7 @@
 package MOD_12
 
 import (
-	"GPT/GPT"
+	"GPTComm/GPTComm"
 	"ULComm/ULComm"
 	"Utils"
 	"Utils/ModsFileInfo"
@@ -79,7 +79,7 @@ func init() {realMain =
 				}
 			}
 
-			log.Println("--------------------------------")
+			//log.Println("--------------------------------")
 			for _, device_ULComm := range Device_infos_ULComm_GL {
 				var device_info *_IntDeviceInfo
 				for _, device_info1 := range device_infos {
@@ -147,13 +147,13 @@ func init() {realMain =
 					device_info.Last_known_location = device_info.Curr_location
 				}
 
-				log.Println("device_info:", device_info)
+				//log.Println("device_info:", device_info)
 
 				device_infos = append(device_infos, device_info)
 			}
 
 			var curr_user_location string = getUserLocation(*modUserInfo, device_infos)
-			log.Println("Current user location:", curr_user_location)
+			//log.Println("Current user location:", curr_user_location)
 			updateUserLocation(&user_location, curr_user_location)
 			_ = user_location_json.WriteTextFile(*Utils.ToJsonGENERAL(user_location), false)
 
@@ -176,7 +176,7 @@ func IsDeviceActive(device_id string) bool {
 	}
 
 	var device_infos []*_IntDeviceInfo = getIntDeviceInfos()
-	if device_id == GPT.ALL_DEVICES_ID {
+	if device_id == GPTComm.ALL_DEVICES_ID {
 		// Check if any device is active
 		for _, device_info := range device_infos {
 			if time.Now().Unix() - device_info.Last_comm <= LAST_COMM_MAX {

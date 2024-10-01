@@ -19,22 +19,40 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package MOD_8
 
-import "Utils"
+import (
+	"Utils"
+	"encoding/base64"
+	"net/http"
+	"strings"
+)
 
-/*
-InitPersonalConsts initializes the personal constants.
+func basicAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		const basicAuthPrefix = "Basic "
+		auth := r.Header.Get("Authorization")
+		if !strings.HasPrefix(auth, basicAuthPrefix) {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
------------------------------------------------------------
+		payload, err := base64.StdEncoding.DecodeString(auth[len(basicAuthPrefix):])
+		if err != nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
-– Params:
-  - device_id – the device ID
-  - website_domain – the domain of VISOR's website
-  - website_pw – the password of VISOR's website
- */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+		pair := strings.SplitN(string(payload), ":", 2)
+		if len(pair) != 2 || !validateCredentials(pair[0], pair[1]) {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	}
+}
+
+func validateCredentials(username, password string) bool {
+	return username == "VISOR" && password == Utils.User_settings_GL.PersonalConsts.Website_pw
 }

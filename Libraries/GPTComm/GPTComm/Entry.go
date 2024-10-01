@@ -19,22 +19,50 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package GPTComm
 
-import "Utils"
+// Entry is a struct containing information of a generated text.
+type Entry struct {
+	// device_id is the device ID of the entry
+	device_id string
+	// text is the text generated
+	text string
+	// time is the Unix time in milliseconds
+	time int64
+}
 
 /*
-InitPersonalConsts initializes the personal constants.
+GetDeviceID gets the device ID of the entry.
 
 -----------------------------------------------------------
 
-– Params:
-  - device_id – the device ID
-  - website_domain – the domain of VISOR's website
-  - website_pw – the password of VISOR's website
+– Returns:
+  - the device ID
  */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+func (entry Entry) GetDeviceID() string {
+	return entry.device_id
+}
+
+/*
+GetText gets the text of the entry.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the text, ending in END_ENTRY
+*/
+func (entry Entry) GetText() string {
+	return entry.text
+}
+
+/*
+GetTime gets the time of the entry.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the time in milliseconds
+*/
+func (entry Entry) GetTime() int64 {
+	return entry.time
 }

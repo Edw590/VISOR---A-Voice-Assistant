@@ -40,6 +40,7 @@ type UserSettings struct {
 	MOD_4  ModsFileInfo.Mod4UserInfo
 	MOD_6  ModsFileInfo.Mod6UserInfo
 	MOD_7  ModsFileInfo.Mod7UserInfo
+	MOD_8  ModsFileInfo.Mod8UserInfo
 	MOD_10 ModsFileInfo.Mod10UserInfo
 	MOD_12 ModsFileInfo.Mod12UserInfo
 }
@@ -71,8 +72,8 @@ type _PersonalConsts struct {
 	// User_email_addr is the email address of the user, used for all email communication
 	User_email_addr string
 
-	// Website_url is the URL of the VISOR website
-	Website_url string
+	// Website_domain is the domain of the VISOR website
+	Website_domain string
 	// Website_pw is the password for the VISOR website
 	Website_pw string
 	// Website_dir is the full path to the directory of the VISOR website
@@ -107,13 +108,13 @@ func LoadUserSettings(server bool) error {
 	if User_settings_GL.PersonalConsts.VISOR_server {
 		if !strings.Contains(User_settings_GL.PersonalConsts.VISOR_email_addr, "@") || User_settings_GL.PersonalConsts.Device_ID == "" ||
 			User_settings_GL.PersonalConsts.VISOR_email_pw == "" || !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
-			!strings.Contains(User_settings_GL.PersonalConsts.Website_url, "http") || User_settings_GL.PersonalConsts.Website_pw == "" ||
+			User_settings_GL.PersonalConsts.Website_domain == "" || User_settings_GL.PersonalConsts.Website_pw == "" ||
 			User_settings_GL.PersonalConsts.WolframAlpha_AppID == "" || User_settings_GL.PersonalConsts.Picovoice_API_key == "" {
 			return errors.New("some fields in " + USER_SETTINGS_FILE + " are empty or incorrect - aborting")
 		}
 	} else {
 		if !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
-				!strings.Contains(User_settings_GL.PersonalConsts.Website_url, "http") ||
+				User_settings_GL.PersonalConsts.Website_domain == "" ||
 				User_settings_GL.PersonalConsts.Website_pw == "" {
 			return errors.New("some fields in " + USER_SETTINGS_FILE + " are empty or incorrect - aborting")
 		}

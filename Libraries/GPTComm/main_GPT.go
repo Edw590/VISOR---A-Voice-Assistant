@@ -22,7 +22,7 @@
 package main
 
 import (
-	"ULComm/ULComm"
+	"GPTComm/GPTComm"
 	"Utils"
 	"log"
 	"time"
@@ -37,41 +37,16 @@ func main() {
 	}()
 	time.Sleep(2 * time.Second)
 
-	var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
-		Device_id:    "Test Device",
-		Last_comm:    time.Now().Unix(),
-		System_state: ULComm.SystemState{
-			Connectivity_info: ULComm.ConnectivityInfo{
-				Airplane_mode_enabled: false,
-				Wifi_enabled:          true,
-				Bluetooth_enabled:     false,
-				Mobile_data_enabled:   true,
-				Wifi_networks:         nil,
-				Bluetooth_devices:     nil,
-			},
-			Battery_info:      ULComm.BatteryInfo{
-				Level:           54,
-				Power_connected: true,
-			},
-			Monitor_info:      ULComm.MonitorInfo{
-				Screen_on:  true,
-				Brightness: 30,
-			},
-			Sound_info:        ULComm.SoundInfo{
-				Volume:  50,
-				Muted:   false,
-			},
-		},
+	//GPTComm.SendText("hello")
+	/*for {
+		log.Println(GPT.GetEntry(-1, -1))
+
+		time.Sleep(1 * time.Second)
+	}*/
+
+	for sentence := GPTComm.GetNextSpeechSentence(); ; sentence = GPTComm.GetNextSpeechSentence() {
+		log.Println("sentence: " + sentence)
+
+		time.Sleep(1 * time.Second)
 	}
-	if device_info.Device_id == "" {}
-
-	var device_info2 *ULComm.DeviceInfo = ULComm.CreateDeviceInfo(0, 0, false, false, false, false, 0, false, -1,
-		"test\x01XX:XX:XX:XX:XX:XX\x01-50\x00test2\x01YY:YY:YY:YY:YY:YY\x01-60\x00",
-		"test\x01XX:XX:XX:XX:XX:XX\x01-23\x00test2\x01YY:YY:YY:YY:YY:YY\x01-14\x00", 100, false)
-	log.Println(*device_info2)
-
-	log.Println(device_info)
-	device_info.SendInfo()
-
-	time.Sleep(5 * time.Second)
 }

@@ -19,7 +19,7 @@
  * under the License.
  ******************************************************************************/
 
-package OIG
+package OICComm
 
 import (
 	"OnlineInfoChk/OICNews"
@@ -39,10 +39,12 @@ GetNews gets the news from the given page contents.
   - the news separated by " ||| " and each news location separated by "\n"
  */
 func GetNews() string {
-	var page_contents []byte = Utils.GetFileContentsWEBSITE("news.json", true)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|news.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var news_list []OICNews.News
-	if err := Utils.FromJsonGENERAL(page_contents, &news_list); err != nil {
+	if err := Utils.FromJsonGENERAL(file_contents, &news_list); err != nil {
 		return ""
 	}
 
@@ -80,10 +82,12 @@ Weather data in order:
   - the weather separated by " ||| " and each weather location separated by "\n"
  */
 func GetWeather() string {
-	var page_contents []byte = Utils.GetFileContentsWEBSITE("weather.json", true)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|weather.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var weather []OICWeather.Weather
-	if err := Utils.FromJsonGENERAL(page_contents, &weather); err != nil {
+	if err := Utils.FromJsonGENERAL(file_contents, &weather); err != nil {
 		return ""
 	}
 

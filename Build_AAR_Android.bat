@@ -15,8 +15,8 @@ gomobile bind^
  -o="bin/MainLibraries.aar"^
  "Utils/UtilsSWA"^
  "ACD/ACD"^
- "OIG/OIG"^
- "GPT/GPT"^
+ "OICComm/OICComm"^
+ "GPTComm/GPTComm"^
  "SpeechQueue/SpeechQueue"^
  "ULComm/ULComm"^
  "RRComm/RRComm"

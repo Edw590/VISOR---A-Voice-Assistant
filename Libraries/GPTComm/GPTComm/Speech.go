@@ -19,10 +19,11 @@
  * under the License.
  ******************************************************************************/
 
-package GPT
+package GPTComm
 
 import (
 	"Utils"
+	"bytes"
 	"strings"
 	"time"
 )
@@ -65,8 +66,10 @@ The function will wait until the time of the next speech is reached.
 func GetNextSpeechSentence() string {
 	if curr_entry_time_GL == -1 {
 		for {
-			var new_crc16 []byte = Utils.CheckFileChangedWEBSITE(last_crc16_GL, "gpt_text.txt")
-			if new_crc16 != nil {
+			Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|true|gpt_text.txt"))
+			var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+			var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+			if !bytes.Equal(new_crc16, last_crc16_GL) {
 				last_crc16_GL = new_crc16
 				var entry *Entry = GetEntry(-1, -1)
 				var device_id string = entry.GetDeviceID()

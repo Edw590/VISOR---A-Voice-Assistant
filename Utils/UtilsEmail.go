@@ -143,8 +143,6 @@ func GetModelFileEMAIL(file_name string, things_replace map[string]string) Email
 /*
 QueueEmailEMAIL queues an email to be sent by the Email Sender module.
 
-If
-
 -----------------------------------------------------------
 
 – Params:
@@ -171,7 +169,7 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 		var to_send_dir GPath = GetUserDataDirMODULES(NUM_MOD_EmailSender).Add2(true, TO_SEND_REL_FOLDER)
 		for {
 			var rand_string string = RandStringGENERAL(RAND_STR_LEN)
-			_, err := os.ReadFile(to_send_dir.Add2(false, rand_string+emailInfo.Mail_to+".eml").
+			_, err := os.ReadFile(to_send_dir.Add2(false, rand_string+emailInfo.Mail_to + ".eml").
 				GPathToStringConversion())
 			if nil != err {
 				// If the file doesn't exist, choose that name.
@@ -181,13 +179,11 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 			}
 		}
 	} else {
-		_, err := SubmitFormWEBSITE(WebsiteForm{
-			Type:  "Email",
-			Text1: emailInfo.Mail_to,
-			File:  CompressString(message_eml),
-		})
+		var message []byte = []byte("Email|" + emailInfo.Mail_to + "|")
+		message = append(message, CompressString(message_eml)...)
+		QueueNoResponseMessageSERVER(message)
 
-		return err
+		return nil
 	}
 }
 

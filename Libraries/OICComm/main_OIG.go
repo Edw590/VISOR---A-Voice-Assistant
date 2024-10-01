@@ -19,22 +19,17 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package main
 
-import "Utils"
+import (
+	"OICComm/OICComm"
+	"Utils"
+	"log"
+)
 
-/*
-InitPersonalConsts initializes the personal constants.
+func main() {
+	Utils.LoadUserSettings(false)
 
------------------------------------------------------------
-
-– Params:
-  - device_id – the device ID
-  - website_domain – the domain of VISOR's website
-  - website_pw – the password of VISOR's website
- */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.User_settings_GL.PersonalConsts.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+	log.Println(OICComm.GetNews())
+	log.Println(OICComm.GetWeather())
 }

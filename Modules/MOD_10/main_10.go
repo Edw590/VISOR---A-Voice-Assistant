@@ -125,7 +125,7 @@ func init() {realMain =
 			}
 
 			device_info_GL.Last_comm = time.Now().Unix()
-			_ = device_info_GL.SendInfo()
+			device_info_GL.SendInfo()
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
