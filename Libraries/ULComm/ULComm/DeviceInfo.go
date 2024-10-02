@@ -23,7 +23,10 @@ package ULComm
 
 import (
 	"Utils"
+	"log"
 )
+
+var prev_device_info DeviceInfo
 
 type DeviceInfo struct {
 	// Device_id is the unique identifier of the device
@@ -37,9 +40,18 @@ type DeviceInfo struct {
 }
 
 func (device_info *DeviceInfo) SendInfo() {
+	if Utils.CompareSTRUCTS[DeviceInfo](*device_info, prev_device_info) {
+		log.Println("No changes in device info")
+
+		return
+	}
+
 	var message []byte = []byte("UserLocator|" + Utils.User_settings_GL.PersonalConsts.Device_ID + "|")
 	message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(*device_info))...)
 	Utils.QueueNoResponseMessageSERVER(message)
+
+	log.Println("Sent device info")
+	prev_device_info = *device_info
 }
 
 type SystemState struct {

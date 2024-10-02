@@ -36,6 +36,9 @@ func InitializeCommsChannels() {
 	}
 }
 
+/*
+CloseCommsChannels closes the modules and libraries communication channels.
+ */
 func CloseCommsChannels() {
 	for i := 0; i < MODS_ARRAY_SIZE; i++ {
 		close(ModsCommsChannels_GL[i])

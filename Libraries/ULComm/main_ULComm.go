@@ -70,6 +70,9 @@ func main() {
 		"test\x01XX:XX:XX:XX:XX:XX\x01-23\x00test2\x01YY:YY:YY:YY:YY:YY\x01-14\x00", 100, false)
 	log.Println(*device_info2)
 
+	device_info2.SendInfo()
+	device_info2.SendInfo()
+
 	log.Println(device_info)
 	device_info.SendInfo()
 
