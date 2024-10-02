@@ -79,7 +79,7 @@ func StartCommunicatorSERVER() {
 	}
 
 	// Establish WebSocket connection
-	c, r, err := dialer.Dial(u.String(), headers)
+	conn, r, err := dialer.Dial(u.String(), headers)
 	if err != nil {
 		log.Println("Response:", r)
 		log.Println("Dial error:", err)
@@ -88,12 +88,12 @@ func StartCommunicatorSERVER() {
 
 		return
 	}
-	defer c.Close()
+	defer conn.Close()
 
 	go func() {
 		routines_working[0] = true
 		for {
-			message_type, message, err := c.ReadMessage()
+			message_type, message, err := conn.ReadMessage()
 			if err != nil {
 				log.Println("Read error:", err)
 				srvComm_stop_GL = true
@@ -137,10 +137,10 @@ func StartCommunicatorSERVER() {
 		for {
 			var message []byte = <- srvComm_gen_ch_out_GL
 			if message == nil {
-				return
+				break
 			}
 
-			err := c.WriteMessage(websocket.BinaryMessage, message)
+			err := conn.WriteMessage(websocket.BinaryMessage, message)
 			if err != nil {
 				log.Println("Write error:", err)
 				srvComm_stop_GL = true
@@ -158,7 +158,7 @@ func StartCommunicatorSERVER() {
 		if WaitWithStopTIMEDATE(&srvComm_stop_GL, 1000000000) {
 			close(srvComm_gen_ch_in_GL)
 			close(srvComm_gen_ch_out_GL)
-			_ = c.Close()
+			_ = conn.Close()
 			for {
 				if !routines_working[0] && !routines_working[1] {
 					log.Println("Communicator stopped")

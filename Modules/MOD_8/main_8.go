@@ -39,6 +39,9 @@ import (
 
 const MAX_CHANNELS int = 100
 
+const PONG_WAIT = 60 * time.Second // Allow X time before considering the client unreachable.
+const PING_PERIOD = 30 * time.Second // Must be less than PONG_WAIT.
+
 var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
 var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
 
@@ -124,22 +127,45 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
+	_ = conn.SetReadDeadline(time.Now().Add(PONG_WAIT))
+	conn.SetPongHandler(func(appData string) error {
+		_ = conn.SetReadDeadline(time.Now().Add(PONG_WAIT))
+
+		return nil
+	})
+
+	ticker := time.NewTicker(PING_PERIOD)
+	defer ticker.Stop()
+
 	var channel_num int = registerChannel()
+	if channel_num == -1 {
+		log.Println("No available channels")
+
+		return
+	}
 
 	go func() {
 		for {
-			var message []byte = <- channels_GL[channel_num]
-			if message == nil {
-				return
-			}
+			select {
+				case <- ticker.C:
+					if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+						log.Println("Ping error:", err)
 
-			if err := conn.WriteMessage(websocket.BinaryMessage, message); err != nil {
-				log.Println("Write error:", err)
+						return
+					}
+				case message := <- channels_GL[channel_num]:
+					if message == nil {
+						return
+					}
 
-				return
-			} else {
-				log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(message),
-					CRC16.Result(message, "CCIT_ZERO"), message[:strings.Index(string(message), "|")])
+					if err := conn.WriteMessage(websocket.BinaryMessage, message); err != nil {
+						log.Println("Write error:", err)
+
+						return
+					} else {
+						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(message),
+							CRC16.Result(message, "CCIT_ZERO"), message[:strings.Index(string(message), "|")])
+					}
 			}
 		}
 	}()

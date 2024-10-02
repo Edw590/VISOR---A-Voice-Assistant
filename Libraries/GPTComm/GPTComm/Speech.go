@@ -23,7 +23,6 @@ package GPTComm
 
 import (
 	"Utils"
-	"log"
 	"strings"
 	"time"
 )
@@ -70,7 +69,6 @@ func GetNextSpeechSentence() string {
 			return END_ENTRY
 		}
 
-		log.Println("comms_map[Utils.COMMS_MAP_SRV_KEY]:", comms_map[Utils.COMMS_MAP_SRV_KEY])
 		if string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)) == "start" {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
