@@ -26,7 +26,7 @@ import (
 )
 
 /*
-CompareSTRUCTS compares two structs and returns true if they are equal, false otherwise.
+CompareSTRUCTS compares two structs and returns true if they are equal in all their fields.
 
 -----------------------------------------------------------
 
@@ -35,7 +35,7 @@ CompareSTRUCTS compares two structs and returns true if they are equal, false ot
   - b – the second struct to compare
 
 – Returns:
-  - true if the structs are equal, false otherwise
+  - true if the structs are equal in all their fields, false otherwise
  */
 func CompareSTRUCTS[T any](a T, b T) bool {
 	valA := reflect.ValueOf(a)
@@ -60,10 +60,28 @@ func CompareSTRUCTS[T any](a T, b T) bool {
 		if fieldA.Kind() == reflect.Struct {
 			if !CompareSTRUCTS(fieldA.Interface(), fieldB.Interface()) {
 				result = false
+
+				break
+			}
+		} else if fieldA.Kind() == reflect.Slice || fieldA.Kind() == reflect.Array {
+			if fieldA.Len() != fieldB.Len() {
+				result = false
+
+				break
+			} else {
+				for j := 0; j < fieldA.Len(); j++ {
+					if fieldA.Index(j).Interface() != fieldB.Index(j).Interface() {
+						result = false
+
+						break
+					}
+				}
 			}
 		} else {
 			if fieldA.Interface() != fieldB.Interface() {
 				result = false
+
+				break
 			}
 		}
 	}
