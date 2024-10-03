@@ -44,6 +44,12 @@ var srvComm_started_GL bool = false
 StartCommunicatorSERVER starts the communicator.
 
 This function does not return until the communicator is stopped, or returns in case the communicator is already started.
+
+-----------------------------------------------------------
+
+– Returns:
+  - bool – true if the communicator was started or was already started, false if it an error occurred and it did not
+	start
 */
 func StartCommunicatorSERVER() bool {
 	if srvComm_started_GL {

@@ -30,9 +30,15 @@ import (
 StartCommunicatorSERVER starts the server communicator.
 
 This function does not return until the communicator is stopped.
+
+-----------------------------------------------------------
+
+– Returns:
+  - bool – true if the communicator was started or was already started, false if it an error occurred and it did not
+	start
 */
-func StartCommunicatorSERVER() {
-	Utils.StartCommunicatorSERVER()
+func StartCommunicatorSERVER() bool {
+	return Utils.StartCommunicatorSERVER()
 }
 
 /*
