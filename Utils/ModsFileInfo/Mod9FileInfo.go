@@ -41,8 +41,8 @@ type Reminder struct {
 	Command     string
 	// Time is the time in minutes the reminder is set for
 	Time        string
-	// Repeat_each is the time in minutes between each repeatition of the reminder
-	Repeat_each int64
+	// Repeat_each_min is the time in minutes between each repeatition of the reminder
+	Repeat_each_min int64
 	// User_location is the location the user must be in for the reminder to be triggered
 	User_location string
 	// Device_condition is an additional "advanced" condition for the reminder in Go language

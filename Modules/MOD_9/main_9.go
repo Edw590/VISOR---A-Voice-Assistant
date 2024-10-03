@@ -148,8 +148,8 @@ func init() {realMain =
 					var format string = "2006-01-02 -- 15:04:05"
 					t, _ := time.ParseInLocation(format, reminder_time, time.Local)
 					test_time = t.Unix() / 60
-					if reminder.Repeat_each > 0 {
-						var repeat_each int64 = reminder.Repeat_each
+					if reminder.Repeat_each_min > 0 {
+						var repeat_each int64 = reminder.Repeat_each_min
 						for {
 							if test_time + repeat_each <= curr_time {
 								test_time += repeat_each

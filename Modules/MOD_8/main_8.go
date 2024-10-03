@@ -194,7 +194,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			if device_id != "" {
 				for i, more_device_info := range Utils.Gen_settings_GL.MOD_12.More_devices_info {
 					if more_device_info.Device_id == device_id {
-						Utils.Gen_settings_GL.MOD_12.More_devices_info[i].Last_comm = time.Now().Unix()
+						Utils.Gen_settings_GL.MOD_12.More_devices_info[i].Last_comm_ms = time.Now().Unix()
 					}
 				}
 			}
@@ -345,9 +345,9 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 
 			// Use the timestamp to update the last time used of the device.
-			last_used_timestamp, err := strconv.ParseInt(bytes_split[0], 10, 64)
+			last_time_used_ms, err := strconv.ParseInt(bytes_split[0], 10, 64)
 			if err == nil {
-				(*more_devices_info)[index_device_info].Last_time_used = last_used_timestamp
+				(*more_devices_info)[index_device_info].Last_time_used_ms = last_time_used_ms
 			}
 
 			if len(bytes_split[1]) > 0 {
