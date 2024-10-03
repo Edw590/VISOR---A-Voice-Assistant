@@ -74,10 +74,9 @@ func main() {
 	log.Println(*device_info2)
 
 	ULComm.SendDeviceInfo(device_info2, 0)
+	device_info2.System_state.Sound_info.Volume = 54
 	ULComm.SendDeviceInfo(device_info2, 0)
 
 	log.Println(device_info)
-	ULComm.SendDeviceInfo(&device_info, 0)
-
-	time.Sleep(50 * time.Second)
+	//ULComm.SendDeviceInfo(&device_info, 0)
 }

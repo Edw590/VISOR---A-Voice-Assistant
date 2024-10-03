@@ -91,6 +91,8 @@ func init() {realMain =
 			}
 		}()
 
+		// FIXME: O servidor está a ligar duas vezes... (logs do servidor, 2 vezes a desligar). Vê porquê. Mete a imprimir PIDs.
+
 		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 		defer cancel()
 
@@ -321,7 +323,6 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 		case "DI":
 			// Send device information.
 			// Example: "[last_used_timestamp]|[a compressed JSON file - optional]"
-			// FIXME: What if it's just the JSON that's sent...?
 			// Returns: nothing
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var index_bar int = strings.Index(string(bytes), "|")
@@ -345,12 +346,11 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 
 			// Use the timestamp to update the last time used of the device.
 			last_used_timestamp, err := strconv.ParseInt(bytes_split[0], 10, 64)
-			if err != nil {
-				break
+			if err == nil {
+				(*more_devices_info)[index_device_info].Last_time_used = last_used_timestamp
 			}
-			(*more_devices_info)[index_device_info].Last_time_used = last_used_timestamp
 
-			if index_bar != -1 {
+			if len(bytes_split[1]) > 0 {
 				// If the message contains a JSON file, update the device's information.
 				var json string = Utils.DecompressString(bytes[index_bar + 1:])
 				var device_info ModsFileInfo.DeviceInfo

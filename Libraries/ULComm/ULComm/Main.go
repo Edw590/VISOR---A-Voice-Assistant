@@ -128,8 +128,8 @@ func SendDeviceInfo(device_info *ModsFileInfo.DeviceInfo, last_time_used_ms int6
 		message = append(message, []byte(strconv.FormatInt(last_time_used_ms, 10))...)
 		prev_last_time_used_ms = last_time_used_ms
 	}
+	message = append(message, []byte("|")...)
 	if send_device_info {
-		message = append(message, []byte("|")...)
 		message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(*device_info))...)
 		prev_device_info = *device_info
 	}
