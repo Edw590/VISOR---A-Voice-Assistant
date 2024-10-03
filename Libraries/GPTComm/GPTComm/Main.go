@@ -112,6 +112,14 @@ func getEntry(time int64, num int) *_Entry {
 	}
 }
 
+/*
+SendText sends the given text to the LLM model.
+
+-----------------------------------------------------------
+
+– Params:
+  - text – the text to send
+ */
 func SendText(text string) {
 	var message []byte = []byte("GPT|")
 	message = append(message, Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text)...)

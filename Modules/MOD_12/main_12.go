@@ -23,11 +23,9 @@ package MOD_12
 
 import (
 	"GPTComm/GPTComm"
-	"ULComm/ULComm"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
-	"log"
 	"sort"
 	"time"
 )
@@ -38,9 +36,9 @@ const TIME_SLEEP_S int = 5
 
 const UNKNOWN_LOCATION string = "3234_UNKNOWN"
 
-const LAST_COMM_MAX int64 = 20
-
-var Device_infos_ULComm_GL []ULComm.DeviceInfo = nil
+const LAST_COMM_MAX_S int64 = 30 + 5 // MUST BE HIGHER THAN MOD_8.PONG_WAIT!!!
+// LAST_UNUSED_MAX_S is the maximum time since the last time active to consider the device in a location
+const LAST_UNUSED_MAX_S int64 = 5 * 60
 
 type _IntDeviceInfo struct {
 	Device_id           string
@@ -51,39 +49,25 @@ type _IntDeviceInfo struct {
 }
 
 var (
-	realMain      Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod12GenInfo
+	modUserInfo_GL *ModsFileInfo.Mod12UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-
-		var modUserInfo *ModsFileInfo.Mod12UserInfo = &Utils.User_settings_GL.MOD_12
-
-		var user_location ULComm.UserLocation
-		var user_location_json Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "user_location.json")
-		if user_location_json.Exists() {
-			_ = Utils.FromJsonGENERAL(user_location_json.ReadFile(), &user_location)
-		}
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_12
+		modUserInfo_GL = &Utils.User_settings_GL.MOD_12
 
 		var device_infos []*_IntDeviceInfo = nil
 		for {
-			Device_infos_ULComm_GL = nil
-			for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
-				var device ULComm.DeviceInfo
-				if err := Utils.FromJsonGENERAL(file_info.GPath.ReadFile(), &device); err == nil {
-					Device_infos_ULComm_GL = append(Device_infos_ULComm_GL, device)
-				} else {
-					log.Println("Error reading device file", file_info.GPath, ":", err)
-				}
-			}
-
 			//log.Println("--------------------------------")
-			for _, device_ULComm := range Device_infos_ULComm_GL {
+			for _, more_device_info := range modGenInfo_GL.More_devices_info {
 				var device_info *_IntDeviceInfo
 				for _, device_info1 := range device_infos {
-					if device_info1.Device_id == device_ULComm.Device_id {
+					if device_info1.Device_id == more_device_info.Device_id {
 						device_info = device_info1
 
 						break
@@ -91,27 +75,27 @@ func init() {realMain =
 				}
 				if device_info == nil {
 					device_info = &_IntDeviceInfo{
-						Device_id: device_ULComm.Device_id,
+						Device_id: more_device_info.Device_id,
 					}
 				}
 
 				// Update some information
-				device_info.Last_comm = device_ULComm.Last_comm
-				device_info.Last_time_used = device_ULComm.Last_time_used
+				device_info.Last_comm = more_device_info.Last_comm
+				device_info.Last_time_used = more_device_info.Last_time_used
 				device_info.Curr_location = UNKNOWN_LOCATION
 
-				for _, location_info := range modUserInfo.Locs_info {
+				for _, location_info := range modUserInfo_GL.Locs_info {
 					if location_info.Last_detection < int64(TIME_SLEEP_S) * 2 {
 						// There must be a minimum. That minimum is the time it takes for the devices to update their
 						// status, but double it to be sure they communicated.
 						location_info.Last_detection = int64(TIME_SLEEP_S) * 2
 					}
 
-					var beacon_list []ULComm.ExtBeacon
+					var beacon_list []ModsFileInfo.ExtBeacon
 					if location_info.Type == "wifi" {
-						beacon_list = device_ULComm.System_state.Connectivity_info.Wifi_networks
+						beacon_list = more_device_info.Device_info.System_state.Connectivity_info.Wifi_networks
 					} else if location_info.Type == "bluetooth" {
-						beacon_list = device_ULComm.System_state.Connectivity_info.Bluetooth_devices
+						beacon_list = more_device_info.Device_info.System_state.Connectivity_info.Bluetooth_devices
 					} else {
 						continue
 					}
@@ -152,10 +136,9 @@ func init() {realMain =
 				device_infos = append(device_infos, device_info)
 			}
 
-			var curr_user_location string = getUserLocation(*modUserInfo, device_infos)
+			var curr_user_location string = computeUserLocation(device_infos)
 			//log.Println("Current user location:", curr_user_location)
-			updateUserLocation(&user_location, curr_user_location)
-			_ = user_location_json.WriteTextFile(*Utils.ToJsonGENERAL(user_location), false)
+			updateUserLocation(curr_user_location)
 
 			// TODO: Also check if the location changed on some device. The user must be with it then, even if not using
 			//  it.
@@ -175,11 +158,11 @@ func IsDeviceActive(device_id string) bool {
 		return false
 	}
 
-	var device_infos []*_IntDeviceInfo = getIntDeviceInfos()
+	var more_devices_info []ModsFileInfo.MoreDeviceInfo = modGenInfo_GL.More_devices_info
 	if device_id == GPTComm.ALL_DEVICES_ID {
 		// Check if any device is active
-		for _, device_info := range device_infos {
-			if time.Now().Unix() - device_info.Last_comm <= LAST_COMM_MAX {
+		for _, more_device_info := range more_devices_info {
+			if time.Now().Unix() - more_device_info.Last_comm <= LAST_COMM_MAX_S {
 				return true
 			}
 		}
@@ -187,38 +170,19 @@ func IsDeviceActive(device_id string) bool {
 		return false
 	}
 
-	for _, device_info := range device_infos {
-		if device_info.Device_id == device_id {
-			return time.Now().Unix() - device_info.Last_comm <= LAST_COMM_MAX
+	for _, more_device_info := range more_devices_info {
+		if more_device_info.Device_id == device_id {
+			return time.Now().Unix() - more_device_info.Last_comm <= LAST_COMM_MAX_S
 		}
 	}
 
 	return false
 }
 
-func getIntDeviceInfos() []*_IntDeviceInfo {
-	var device_infos []*_IntDeviceInfo = nil
-	for _, file_info := range moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "devices").GetFileList() {
-		var device ULComm.DeviceInfo
-		if err := Utils.FromJsonGENERAL(file_info.GPath.ReadFile(), &device); err == nil {
-			device_infos = append(device_infos, &_IntDeviceInfo{
-				Device_id: device.Device_id,
-				Last_comm: device.Last_comm,
-				Last_time_used: device.Last_time_used,
-				Curr_location: UNKNOWN_LOCATION,
-			})
-		} else {
-			log.Println("Error reading device file", file_info.GPath, ":", err)
-		}
-	}
-
-	return device_infos
-}
-
-func getUserLocation(modUserInfo ModsFileInfo.Mod12UserInfo, devices []*_IntDeviceInfo) string {
-	if modUserInfo.Devices_info.AlwaysWith_device_id != "" {
+func computeUserLocation(devices []*_IntDeviceInfo) string {
+	if modUserInfo_GL.Devices_info.AlwaysWith_device_id != "" {
 		for _, device := range devices {
-			if device.Device_id == modUserInfo.Devices_info.AlwaysWith_device_id &&
+			if device.Device_id == modUserInfo_GL.Devices_info.AlwaysWith_device_id &&
 					device.Curr_location != UNKNOWN_LOCATION {
 				return device.Curr_location
 			}
@@ -228,7 +192,7 @@ func getUserLocation(modUserInfo ModsFileInfo.Mod12UserInfo, devices []*_IntDevi
 	sortDevicesByLastUsed(devices)
 	var curr_location string = UNKNOWN_LOCATION
 	for _, device := range devices {
-		if device.Curr_location != UNKNOWN_LOCATION && device.Last_time_used + 5*60 >= time.Now().Unix() {
+		if device.Curr_location != UNKNOWN_LOCATION && device.Last_time_used +LAST_UNUSED_MAX_S >= time.Now().Unix() {
 			curr_location = device.Curr_location
 
 			break
@@ -244,7 +208,8 @@ func sortDevicesByLastUsed(devices []*_IntDeviceInfo) {
 	})
 }
 
-func updateUserLocation(user_location *ULComm.UserLocation, new_location string) {
+func updateUserLocation(new_location string) {
+	var user_location *ModsFileInfo.UserLocation = &modGenInfo_GL.User_location
 	if new_location != UNKNOWN_LOCATION {
 		user_location.Last_known_location = user_location.Curr_location
 	}

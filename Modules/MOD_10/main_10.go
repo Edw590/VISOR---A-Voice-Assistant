@@ -24,6 +24,7 @@ package MOD_10
 import (
 	"ULComm/ULComm"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"github.com/distatus/battery"
@@ -38,9 +39,9 @@ import (
 
 // System Checker //
 
-const _TIME_SLEEP_S int = 5
+const _TIME_SLEEP_S int = 30
 
-var device_info_GL ULComm.DeviceInfo
+var device_info_GL ModsFileInfo.DeviceInfo
 
 type _Battery struct {
 	power_connected bool
@@ -66,16 +67,14 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		device_info_GL = ULComm.DeviceInfo{
-			Device_id:    Utils.User_settings_GL.PersonalConsts.Device_ID,
-		}
 		var curr_mouse_position _MousePosition
+		var last_used_timestamp int64 = 0
 
 		for {
 			wifi_on, wifi_networks := getWifiNetworks()
 
 			// Connectivity information
-			device_info_GL.System_state.Connectivity_info = ULComm.ConnectivityInfo{
+			device_info_GL.System_state.Connectivity_info = ModsFileInfo.ConnectivityInfo{
 				Airplane_mode_enabled: false,
 				Wifi_enabled:          wifi_on,
 				Bluetooth_enabled:     false,
@@ -90,7 +89,7 @@ func init() {realMain =
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetData(battery_level, false)
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetData(power_connected, false)
 
-			device_info_GL.System_state.Battery_info = ULComm.BatteryInfo{
+			device_info_GL.System_state.Battery_info = ModsFileInfo.BatteryInfo{
 				Level:           battery_level,
 				Power_connected: power_connected,
 			}
@@ -99,7 +98,7 @@ func init() {realMain =
 			var screen_brightness int = getBrightness()
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetData(screen_brightness, false)
 
-			device_info_GL.System_state.Monitor_info = ULComm.MonitorInfo{
+			device_info_GL.System_state.Monitor_info = ModsFileInfo.MonitorInfo{
 				Screen_on:  true,
 				Brightness: screen_brightness,
 			}
@@ -110,7 +109,7 @@ func init() {realMain =
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetData(sound_volume, false)
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetData(sound_muted, false)
 
-			device_info_GL.System_state.Sound_info = ULComm.SoundInfo{
+			device_info_GL.System_state.Sound_info = ModsFileInfo.SoundInfo{
 				Volume: sound_volume,
 				Muted:  sound_muted,
 			}
@@ -121,11 +120,10 @@ func init() {realMain =
 				curr_mouse_position.x = x
 				curr_mouse_position.y = y
 
-				device_info_GL.Last_time_used = time.Now().Unix()
+				last_used_timestamp = time.Now().Unix()
 			}
 
-			device_info_GL.Last_comm = time.Now().Unix()
-			device_info_GL.SendInfo()
+			ULComm.SendDeviceInfo(&device_info_GL, last_used_timestamp)
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
@@ -188,16 +186,16 @@ func getSoundMuted() bool {
 	return muted
 }
 
-func getWifiNetworks() (bool, []ULComm.ExtBeacon) {
+func getWifiNetworks() (bool, []ModsFileInfo.ExtBeacon) {
 	for i := 0; i < 10; i++ {
 		wifi_nets, err := wifiscan.Scan()
 		if err != nil {
 			return false, nil
 		}
 
-		var wifi_networks []ULComm.ExtBeacon = nil
+		var wifi_networks []ModsFileInfo.ExtBeacon = nil
 		for _, wifi_net := range wifi_nets {
-			wifi_networks = append(wifi_networks, ULComm.ExtBeacon{
+			wifi_networks = append(wifi_networks, ModsFileInfo.ExtBeacon{
 				Name:    wifi_net.SSID,
 				Address: strings.ToUpper(wifi_net.BSSID),
 				RSSI:    wifi_net.RSSI,

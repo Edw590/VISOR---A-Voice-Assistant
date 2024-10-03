@@ -23,42 +23,29 @@ package ULComm
 
 import (
 	"Utils"
+	"Utils/ModsFileInfo"
 	"strconv"
 	"strings"
 )
 
-func GetUserLocation() *UserLocation {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_ULComm, []byte("File|false|user_location.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_ULComm]
-	if comms_map == nil {
-		return nil
-	}
-
-	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
-
-	var user_location UserLocation
-	if err := Utils.FromJsonGENERAL(file_contents, &user_location); err != nil {
-		return nil
-	}
-
-	return &user_location
-}
+var prev_device_info ModsFileInfo.DeviceInfo
+var prev_last_time_used_ms int64
 
 /*
 CreateDeviceInfo creates a DeviceInfo object with the given parameters.
  */
-func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabled bool, wifi_enabled bool,
-		bluetooth_enabled bool, power_connected bool, battery_level int, screen_on bool, monitor_brightness int,
-		wifi_networks string, bluetooth_devices string, sound_volume int, sound_muted bool) *DeviceInfo {
-	var wifi_networks_ret []ExtBeacon
+func CreateDeviceInfo(airplane_mode_enabled bool, wifi_enabled bool, bluetooth_enabled bool, power_connected bool,
+		battery_level int, screen_on bool, monitor_brightness int, wifi_networks string, bluetooth_devices string,
+		sound_volume int, sound_muted bool) *ModsFileInfo.DeviceInfo {
+	var wifi_networks_ret []ModsFileInfo.ExtBeacon
 	for _, network := range strings.Split(wifi_networks, "\x00") {
 		if network == "" {
 			continue
 		}
 
 		var network_info []string = strings.Split(network, "\x01")
-		var wifi_network ExtBeacon = ExtBeacon{
-			Name: network_info[0],
+		var wifi_network ModsFileInfo.ExtBeacon = ModsFileInfo.ExtBeacon{
+			Name:    network_info[0],
 			Address: network_info[1],
 		}
 		rssi, _ := strconv.Atoi(network_info[2])
@@ -67,15 +54,15 @@ func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabl
 		wifi_networks_ret = append(wifi_networks_ret, wifi_network)
 	}
 
-	var bluetooth_devices_ret []ExtBeacon
+	var bluetooth_devices_ret []ModsFileInfo.ExtBeacon
 	for _, device := range strings.Split(bluetooth_devices, "\x00") {
 		if device == "" {
 			continue
 		}
 
 		var device_info []string = strings.Split(device, "\x01")
-		var bluetooth_device ExtBeacon = ExtBeacon{
-			Name: device_info[0],
+		var bluetooth_device ModsFileInfo.ExtBeacon = ModsFileInfo.ExtBeacon{
+			Name:    device_info[0],
 			Address: device_info[1],
 		}
 		rssi, _ := strconv.Atoi(device_info[2])
@@ -84,30 +71,68 @@ func CreateDeviceInfo(last_comm int64, last_time_used int64, airplane_mode_enabl
 		bluetooth_devices_ret = append(bluetooth_devices_ret, bluetooth_device)
 	}
 
-	return &DeviceInfo{
-		Device_id: Utils.User_settings_GL.PersonalConsts.Device_ID,
-		Last_comm: last_comm,
-		Last_time_used: last_time_used,
-		System_state: SystemState{
-			Connectivity_info: ConnectivityInfo{
+	return &ModsFileInfo.DeviceInfo{
+		System_state: ModsFileInfo.SystemState{
+			Connectivity_info: ModsFileInfo.ConnectivityInfo{
 				Airplane_mode_enabled: airplane_mode_enabled,
-				Wifi_enabled: wifi_enabled,
-				Bluetooth_enabled: bluetooth_enabled,
-				Wifi_networks: wifi_networks_ret,
-				Bluetooth_devices: bluetooth_devices_ret,
+				Wifi_enabled:          wifi_enabled,
+				Bluetooth_enabled:     bluetooth_enabled,
+				Wifi_networks:         wifi_networks_ret,
+				Bluetooth_devices:     bluetooth_devices_ret,
 			},
-			Battery_info: BatteryInfo{
+			Battery_info: ModsFileInfo.BatteryInfo{
 				Level:           battery_level,
 				Power_connected: power_connected,
 			},
-			Monitor_info: MonitorInfo{
-				Screen_on: screen_on,
+			Monitor_info: ModsFileInfo.MonitorInfo{
+				Screen_on:  screen_on,
 				Brightness: monitor_brightness,
 			},
-			Sound_info: SoundInfo{
+			Sound_info: ModsFileInfo.SoundInfo{
 				Volume: sound_volume,
-				Muted: sound_muted,
+				Muted:  sound_muted,
 			},
 		},
 	}
+}
+
+/*
+SendDeviceInfo sends the device information to the server.
+
+If the device information is the same as the previous one, it will not be sent.
+
+If the last used timestamp is the same as the previous one, it will not be sent.
+
+-----------------------------------------------------------
+
+– Params:
+  - device_info – the device information to send
+  - last_time_used_ms – the last time the device was used
+ */
+func SendDeviceInfo(device_info *ModsFileInfo.DeviceInfo, last_time_used_ms int64) {
+	var send_device_info bool = true
+	if Utils.CompareSTRUCTS[ModsFileInfo.DeviceInfo](*device_info, prev_device_info) {
+		send_device_info = false
+	}
+	var send_timestamp bool = true
+	if last_time_used_ms == prev_last_time_used_ms {
+		send_timestamp = false
+	}
+
+	if !send_device_info && !send_timestamp {
+		return
+	}
+
+	var message []byte = []byte("DI|")
+	if send_timestamp {
+		message = append(message, []byte(strconv.FormatInt(last_time_used_ms, 10))...)
+		prev_last_time_used_ms = last_time_used_ms
+	}
+	if send_device_info {
+		message = append(message, []byte("|")...)
+		message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(*device_info))...)
+		prev_device_info = *device_info
+	}
+
+	Utils.QueueNoResponseMessageSERVER(message)
 }

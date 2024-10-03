@@ -46,15 +46,15 @@ const _TIME_SLEEP_S int = 1
 var is_writing_GL bool = false
 
 var (
-	realMain      Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-
-		var modUserInfo *ModsFileInfo.Mod7UserInfo = &Utils.User_settings_GL.MOD_7
+		modUserInfo_GL = &Utils.User_settings_GL.MOD_7
 
 		// Force stop Llama to start fresh, in case for any reason it's running without the module being running too,
 		// like a force-stop on the module which doesn't call forceStopLlama().
@@ -109,7 +109,7 @@ func init() {realMain =
 
 					Utils.ModsCommsChannels_GL[Utils.NUM_MOD_WebsiteBackend] <- map[string]any{
 						// Send a message to LIB_2 saying the GPT just started writing
-						"Message": []byte("LIB_2|start"),
+						"Message": []byte("L_2|start"),
 					}
 				} else if strings.Contains(last_answer, "[3234_END]") {
 					is_writing_GL = false
@@ -125,7 +125,7 @@ func init() {realMain =
 		// Configure the LLM model
 		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
-		_, _ = writer.WriteString("llama-cli -m " + modUserInfo.Model_loc + " " +
+		_, _ = writer.WriteString("llama-cli -m " + modUserInfo_GL.Model_loc + " " +
 			"--in-suffix [3234_START] --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --mlock " +
 			"--prompt \"" + config_str + "\"\n")
 		_ = writer.Flush()

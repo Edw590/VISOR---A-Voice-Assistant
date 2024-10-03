@@ -13,6 +13,7 @@ gomobile bind^
  -v^
  -ldflags="-v -s -w -compressdwarf=true"^
  -o="bin/MainLibraries.aar"^
+ "Utils/ModsFileInfo"^
  "Utils/UtilsSWA"^
  "ACD/ACD"^
  "OICComm/OICComm"^

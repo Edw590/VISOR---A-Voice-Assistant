@@ -21,7 +21,10 @@
 
 package UtilsSWA
 
-import "Utils"
+import (
+	"Utils"
+	"time"
+)
 
 /*
 StartCommunicatorSERVER starts the server communicator.
@@ -30,6 +33,20 @@ This function does not return until the communicator is stopped.
 */
 func StartCommunicatorSERVER() {
 	Utils.StartCommunicatorSERVER()
+}
+
+/*
+StartCommunicatorForeverSERVER starts the server communicator in a new thread, in intervals of 1 second in case it's not
+starting.
+*/
+func StartCommunicatorForeverSERVER() {
+	go func() {
+		for {
+			Utils.StartCommunicatorSERVER()
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
 }
 
 /*

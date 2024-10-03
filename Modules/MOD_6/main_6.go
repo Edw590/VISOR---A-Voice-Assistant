@@ -36,11 +36,6 @@ import (
 
 // Online Information Checker //
 
-var (
-	realMain      Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo
-)
-
 const _TIME_SLEEP_S int = 15*60
 
 ////////////////////////////////////
@@ -107,12 +102,16 @@ const _TIME_SLEEP_S int = 15*60
 // Firefox: log.Sprintf("http://localhost:%d", port)
 // Chrome: log.Sprintf("http://127.0.0.1:%d/wd/hub", port) - default
 
+var (
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modUserInfo_GL *ModsFileInfo.Mod6UserInfo
+)
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-
-		var modUserInfo *ModsFileInfo.Mod6UserInfo = &Utils.User_settings_GL.MOD_6
+		modUserInfo_GL = &Utils.User_settings_GL.MOD_6
 
 		for {
 			////////////////////////////////
@@ -148,12 +147,12 @@ func init() {realMain =
 
 			_ = bypassGoogleCookies(driver)
 
-			var weather []OICWeather.Weather = OICWeather.UpdateWeather(driver, modUserInfo.Temp_locs)
+			var weather []OICWeather.Weather = OICWeather.UpdateWeather(driver, modUserInfo_GL.Temp_locs)
 			if err = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "weather.json").
 					WriteTextFile(*Utils.ToJsonGENERAL(weather), false); err != nil {
 				panic(err)
 			}
-			var news []OICNews.News = OICNews.UpdateNews(driver, modUserInfo.News_locs)
+			var news []OICNews.News = OICNews.UpdateNews(driver, modUserInfo_GL.News_locs)
 			if err = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "news.json").
 					WriteTextFile(*Utils.ToJsonGENERAL(news), false); err != nil {
 				panic(err)

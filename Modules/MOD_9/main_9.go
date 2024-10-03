@@ -25,7 +25,6 @@ import (
 	"RRComm/RRComm"
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
-	"ULComm/ULComm"
 	MOD_12 "UserLocator"
 	"Utils"
 	"Utils/ModsFileInfo"
@@ -56,11 +55,17 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_9
 
-		var p_user_location *ULComm.UserLocation = ULComm.GetUserLocation()
-		var user_location ULComm.UserLocation
-		if p_user_location != nil {
-			user_location = *p_user_location
+		Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("JSON|UL"))
+		var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
+		if comms_map == nil {
+			return
 		}
+
+		var user_location ModsFileInfo.UserLocation
+		var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+		_ = Utils.FromJsonGENERAL(json_bytes, &user_location)
+
+		log.Println("User location:", user_location)
 
 		var notifs_were_true map[string]bool = make(map[string]bool)
 
@@ -96,10 +101,6 @@ func init() {realMain =
 			}
 
 			// Location trigger - if the user location changed, check if any reminder is triggered
-			p_user_location = ULComm.GetUserLocation()
-			if p_user_location != nil {
-				user_location = *p_user_location
-			}
 			var curr_last_known_user_loc string = user_location.Curr_location
 			var prev_last_known_user_loc string = user_location.Prev_location
 			if curr_last_known_user_loc != prev_curr_last_known_user_loc || prev_last_known_user_loc != prev_prev_last_known_user_loc {

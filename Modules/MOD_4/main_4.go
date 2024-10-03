@@ -84,19 +84,19 @@ const _MAX_URLS_STORED int = 100
 const _TIME_SLEEP_S int = 2*60
 
 var (
-	realMain      Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modUserInfo_GL *ModsFileInfo.Mod4UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-
-		var modUserInfo *ModsFileInfo.Mod4UserInfo = &Utils.User_settings_GL.MOD_4
+		modUserInfo_GL = &Utils.User_settings_GL.MOD_4
 
 		for {
 
-			for _, feedInfo := range modUserInfo.Feeds_info {
+			for _, feedInfo := range modUserInfo_GL.Feeds_info {
 				// if feedInfo.Feed_num != 8 {
 				//	continue
 				// }
@@ -202,7 +202,7 @@ func init() {realMain =
 						// being treated for the first time.
 						//log.Println("Queuing email: " + email_info.Subject)
 						error_notifying = !queueEmailAllRecps(email_info.Sender, email_info.Subject, email_info.Html,
-							modUserInfo.Mails_to)
+							modUserInfo_GL.Mails_to)
 					}
 
 					if !error_notifying {

@@ -24,6 +24,7 @@ package main
 import (
 	"ULComm/ULComm"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"log"
 	"time"
 )
@@ -33,15 +34,17 @@ func main() {
 	Utils.InitializeCommsChannels()
 
 	go func() {
-		Utils.StartCommunicatorSERVER()
+		for {
+			Utils.StartCommunicatorSERVER()
+
+			time.Sleep(1 * time.Second)
+		}
 	}()
 	time.Sleep(2 * time.Second)
 
-	var device_info ULComm.DeviceInfo = ULComm.DeviceInfo{
-		Device_id:    "Test Device",
-		Last_comm:    time.Now().Unix(),
-		System_state: ULComm.SystemState{
-			Connectivity_info: ULComm.ConnectivityInfo{
+	var device_info ModsFileInfo.DeviceInfo = ModsFileInfo.DeviceInfo{
+		System_state: ModsFileInfo.SystemState{
+			Connectivity_info: ModsFileInfo.ConnectivityInfo{
 				Airplane_mode_enabled: false,
 				Wifi_enabled:          true,
 				Bluetooth_enabled:     false,
@@ -49,32 +52,32 @@ func main() {
 				Wifi_networks:         nil,
 				Bluetooth_devices:     nil,
 			},
-			Battery_info:      ULComm.BatteryInfo{
+			Battery_info:      ModsFileInfo.BatteryInfo{
 				Level:           54,
 				Power_connected: true,
 			},
-			Monitor_info:      ULComm.MonitorInfo{
+			Monitor_info:      ModsFileInfo.MonitorInfo{
 				Screen_on:  true,
 				Brightness: 30,
 			},
-			Sound_info:        ULComm.SoundInfo{
+			Sound_info:        ModsFileInfo.SoundInfo{
 				Volume:  50,
 				Muted:   false,
 			},
 		},
 	}
-	if device_info.Device_id == "" {}
+	if device_info.System_state.Sound_info.Muted {}
 
-	var device_info2 *ULComm.DeviceInfo = ULComm.CreateDeviceInfo(0, 0, false, false, false, false, 0, false, -1,
+	var device_info2 *ModsFileInfo.DeviceInfo = ULComm.CreateDeviceInfo(false, false, false, false, 0, false, -1,
 		"test\x01XX:XX:XX:XX:XX:XX\x01-50\x00test2\x01YY:YY:YY:YY:YY:YY\x01-60\x00",
 		"test\x01XX:XX:XX:XX:XX:XX\x01-23\x00test2\x01YY:YY:YY:YY:YY:YY\x01-14\x00", 100, false)
 	log.Println(*device_info2)
 
-	device_info2.SendInfo()
-	device_info2.SendInfo()
+	ULComm.SendDeviceInfo(device_info2, 0)
+	ULComm.SendDeviceInfo(device_info2, 0)
 
 	log.Println(device_info)
-	device_info.SendInfo()
+	ULComm.SendDeviceInfo(&device_info, 0)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(50 * time.Second)
 }

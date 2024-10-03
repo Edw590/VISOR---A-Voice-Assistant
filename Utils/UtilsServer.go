@@ -45,9 +45,9 @@ StartCommunicatorSERVER starts the communicator.
 
 This function does not return until the communicator is stopped, or returns in case the communicator is already started.
 */
-func StartCommunicatorSERVER() {
+func StartCommunicatorSERVER() bool {
 	if srvComm_started_GL {
-		return
+		return true
 	}
 	srvComm_started_GL = true
 
@@ -79,14 +79,14 @@ func StartCommunicatorSERVER() {
 	}
 
 	// Establish WebSocket connection
-	conn, r, err := dialer.Dial(u.String(), headers)
+	conn, _, err := dialer.Dial(u.String(), headers)
 	if err != nil {
-		log.Println("Response:", r)
-		log.Println("Dial error:", err)
+		//log.Println("Response:", r)
+		//log.Println("Dial error:", err)
 
 		srvComm_started_GL = false
 
-		return
+		return false
 	}
 	defer conn.Close()
 
@@ -95,7 +95,7 @@ func StartCommunicatorSERVER() {
 		for {
 			message_type, message, err := conn.ReadMessage()
 			if err != nil {
-				log.Println("Read error:", err)
+				//log.Println("Read error:", err)
 				srvComm_stop_GL = true
 
 				break
@@ -109,16 +109,16 @@ func StartCommunicatorSERVER() {
 			var msg_to string = strings.Split(string(message), "|")[0]
 			var index_bar int = strings.Index(string(message), "|")
 			var truncated_msg []byte = message[index_bar + 1:]
-			if msg_to == "GEN" {
+			if msg_to == "G" {
 				srvComm_gen_ch_in_GL <- truncated_msg
 
 				continue
 			}
 			var msg_to_split []string = strings.Split(msg_to, "_")
-			var to_mod bool = msg_to_split[0] == "MOD"
+			var to_mod bool = msg_to_split[0] == "M"
 			num, err := strconv.Atoi(msg_to_split[1])
 			if err != nil {
-				log.Println("Error converting module number:", err)
+				//log.Println("Error converting module number:", err)
 
 				continue
 			}
@@ -133,16 +133,23 @@ func StartCommunicatorSERVER() {
 	}()
 
 	go func() {
+		var first_message bool = true
 		routines_working[1] = true
 		for {
-			var message []byte = <- srvComm_gen_ch_out_GL
-			if message == nil {
-				break
+			var message []byte
+			if first_message {
+				message = []byte(User_settings_GL.PersonalConsts.Device_ID)
+				first_message = false
+			} else {
+				message = <- srvComm_gen_ch_out_GL
+				if message == nil {
+					break
+				}
 			}
 
 			err := conn.WriteMessage(websocket.BinaryMessage, message)
 			if err != nil {
-				log.Println("Write error:", err)
+				//log.Println("Write error:", err)
 				srvComm_stop_GL = true
 
 				break
@@ -165,7 +172,7 @@ func StartCommunicatorSERVER() {
 
 					srvComm_started_GL = false
 
-					return
+					return true
 				}
 
 				time.Sleep(500 * time.Millisecond)
@@ -196,7 +203,7 @@ It is received by GetGeneralMessageSERVER().
   - message – the message to be sent
 */
 func QueueGeneralMessageSERVER(message []byte) {
-	var new_msg []byte = append([]byte("GEN|"), message...)
+	var new_msg []byte = append([]byte("G|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
 }
 
@@ -207,13 +214,13 @@ QueueMessageSERVER queues a message to be sent to the server.
 
 – Params:
   - is_mod – true if this function was called from a module, false if it was called from a library
-  - mod_num – the number of the module or library that called this function
+  - num – the number of the module or library that called this function
   - message – the message to be sent
 */
 func QueueMessageSERVER(is_mod bool, num int, message []byte) {
-	var mod_lib string = "MOD"
+	var mod_lib string = "M"
 	if !is_mod {
-		mod_lib = "LIB"
+		mod_lib = "L"
 	}
 	var message_str string = mod_lib + "_" + strconv.Itoa(num) + "|"
 	var new_msg []byte = append([]byte(message_str), message...)
@@ -229,7 +236,7 @@ QueueNoResponseMessageSERVER queues a message to be sent to the server without e
   - message – the message to be sent
 */
 func QueueNoResponseMessageSERVER(message []byte) {
-	var new_msg []byte = append([]byte("NONE|"), message...)
+	var new_msg []byte = append([]byte("N|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
 }
 

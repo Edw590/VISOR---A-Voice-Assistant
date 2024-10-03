@@ -22,8 +22,8 @@
 package MOD_8
 
 import (
-	"ULComm/ULComm"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"context"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/gorilla/websocket"
@@ -39,20 +39,22 @@ import (
 
 const MAX_CHANNELS int = 100
 
-const PONG_WAIT = 60 * time.Second // Allow X time before considering the client unreachable.
-const PING_PERIOD = 30 * time.Second // Must be less than PONG_WAIT.
+const PONG_WAIT = 30 * time.Second // Allow X time before considering the client unreachable. IF YOU CHANGE THIS, CHANGE MOD_12.LAST_COMM_MAX!!!
+const PING_PERIOD = 15 * time.Second // Must be less than PONG_WAIT. -->
 
 var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
 var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
 
 var (
-	realMain      Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modUserInfo_GL *ModsFileInfo.Mod8UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modUserInfo_GL = &Utils.User_settings_GL.MOD_8
 
 		go func() {
 			for {
@@ -75,13 +77,15 @@ func init() {realMain =
 			Tcef.Tcef{
 				Try: func() {
 					// Try to register. If it's already registered, ignore the panic.
+					http.HandleFunc("/add_comment1", handleComment1) // Personal stuff - delete it
+					http.HandleFunc("/add_comment2", handleComment2) // Personal stuff - delete it
 					http.HandleFunc("/ws", basicAuth(webSocketsHandler))
 				},
 			}.Do()
 
 			//log.Println("Server running on port 3234")
 			srv = &http.Server{Addr: ":3234"}
-			err := srv.ListenAndServeTLS(Utils.User_settings_GL.MOD_8.Cert_file, Utils.User_settings_GL.MOD_8.Key_file)
+			err := srv.ListenAndServeTLS(modUserInfo_GL.Cert_file, modUserInfo_GL.Key_file)
 			if err != nil {
 				log.Println("ListenAndServeTLS error:", err)
 			}
@@ -94,7 +98,12 @@ func init() {realMain =
 			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
 				for i := 0; i < MAX_CHANNELS; i++ {
 					if used_channels_GL[i] {
-						close(channels_GL[i])
+						// Ignore the panic in case the channel is already closed (happened).
+						Tcef.Tcef{
+							Try: func() {
+								close(channels_GL[i])
+							},
+						}.Do()
 					}
 				}
 
@@ -119,6 +128,8 @@ var upgrader = websocket.Upgrader{
 func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("WebSocketsHandler called")
 
+	var handler_stopped bool = false
+
 	// Upgrade HTTP connection to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -126,6 +137,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+
+	var device_id string = ""
 
 	_ = conn.SetReadDeadline(time.Now().Add(PONG_WAIT))
 	conn.SetPongHandler(func(appData string) error {
@@ -170,6 +183,25 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	go func() {
+		// Keep updating the last communication time of the device
+		for {
+			if handler_stopped {
+				return
+			}
+			if device_id != "" {
+				for i, more_device_info := range Utils.Gen_settings_GL.MOD_12.More_devices_info {
+					if more_device_info.Device_id == device_id {
+						Utils.Gen_settings_GL.MOD_12.More_devices_info[i].Last_comm = time.Now().Unix()
+					}
+				}
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	var first_message bool = true
 	for {
 		// Read message from WebSocket
 		message_type, message, err := conn.ReadMessage()
@@ -182,6 +214,14 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		if message_type != websocket.BinaryMessage {
 			continue
 		}
+		if first_message {
+			first_message = false
+
+			device_id = string(message)
+
+			continue
+		}
+
 		var message_str string = string(message)
 		var index_bar int = strings.Index(message_str, "|")
 		var index_2nd_bar int = strings.Index(message_str[index_bar + 1:], "|")
@@ -200,8 +240,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		var type_ string = message_parts[1]
 		var bytes []byte = message[index_bar + index_2nd_bar + 2:]
 
-		var partial_resp []byte = handleMessage(type_, bytes)
-		if msg_to != "NONE" {
+		var partial_resp []byte = handleMessage(device_id, type_, bytes)
+		if msg_to != "N" {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
 
@@ -220,88 +260,30 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 	unregisterChannel(channel_num)
 
+	handler_stopped = true
+
 	log.Println("WebSocketsHandler ended")
 }
 
-func handleMessage(type_ string, bytes []byte) []byte {
+func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 	switch type_ {
 		case "Echo":
+			// Echo the message.
 			// Example: "Hello world!"
+			// Returns: the same message
 			return bytes
-		case "GPT":
-			// Example: a compressed string
-			if err := Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
-				WriteTextFile(Utils.DecompressString(bytes), false); err == nil {
-					log.Println("File written")
-
-					return []byte("OK")
-			} else {
-				log.Println("Error writing file:", err)
-			}
 		case "Email":
-			// Example: "email_to@gmail.com|" + a compressed EML file
-			if err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
+			// Send an email.
+			// Example: "email_to@gmail.com|[a compressed EML file]"
+			// Returns: nothing
+			_ = Utils.QueueEmailEMAIL(Utils.EmailInfo{
 				Mail_to: strings.Split(string(bytes), "|")[0],
 				Eml:     Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:]),
-			}); err == nil {
-				log.Println("Email queued")
-
-				return []byte("OK")
-			} else {
-				log.Println("Error queuing email:", err)
-			}
-		case "UserLocator":
-			// Example: "Device_Id|" + a compressed JSON file, or "Device_Id|time=" + timestamp in ms
-			var bytes_split []string = strings.Split(string(bytes), "|")
-			var device_id string = bytes_split[0]
-			// If the message is a timestamp, just update the last communication time of the device.
-			if strings.HasPrefix(bytes_split[1], "time=") {
-				timestamp, err := strconv.ParseInt(strings.Split(bytes_split[1], "time=")[1], 10, 64)
-				if err != nil {
-					log.Println("Error parsing timestamp:", err)
-
-					break
-				}
-
-				var file Utils.GPath = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).Add2(false, "devices", device_id + ".json")
-				var p_json *string = file.ReadTextFile()
-				if p_json == nil {
-					log.Println("Error reading file")
-
-					break
-				}
-
-				var device_info ULComm.DeviceInfo
-				if err = Utils.FromJsonGENERAL([]byte(*p_json), &device_info); err != nil {
-					log.Println("Error parsing JSON:", err)
-
-					break
-				}
-
-				device_info.Last_comm = timestamp
-
-				if err = file.WriteTextFile(*Utils.ToJsonGENERAL(device_info), false); err == nil {
-					log.Println("File written")
-
-					return []byte("OK")
-				} else {
-					log.Println("Error writing file:", err)
-				}
-			} else {
-				// If the message is a JSON file, update the device's information.
-				var json string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
-				if err := Utils.GetUserDataDirMODULES(Utils.NUM_MOD_UserLocator).
-					Add2(false, "devices", device_id + ".json").WriteTextFile(json, false); err == nil {
-						log.Println("File written")
-
-						return []byte("OK")
-				} else {
-					log.Println("Error writing file:", err)
-				}
-			}
+			})
 		case "File":
-			// Example: "true|partial_path" or "false|partial_path", where true means to get the CRC16 checksum and
-			// false means to get the file contents
+			// Get a file from the website.
+			// Example: "[true to get CRC16 checksum, false to get file contents]|[partial_path]"
+			// Returns: a CRC16 checksum or a compressed file
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var get_crc16 bool = bytes_split[0] == "true"
 			var partial_path string = bytes_split[1]
@@ -323,9 +305,64 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			} else {
 				return Utils.CompressString(*p_file_contents)
 			}
+		case "GPT":
+			// Send a file to be processed by the GPT model.
+			// Example: a compressed string
+			// Returns: nothing
+			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
+				WriteTextFile(Utils.DecompressString(bytes), false)
+		case "JSON":
+			// Get JSON information.
+			// Example: "[one of: UL]", UL = User Location
+			// Returns: a compressed JSON file
+			if string(bytes) == "UL" {
+				return Utils.CompressString(*Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_12.User_location))
+			}
+		case "DI":
+			// Send device information.
+			// Example: "[last_used_timestamp]|[a compressed JSON file - optional]"
+			// FIXME: What if it's just the JSON that's sent...?
+			// Returns: nothing
+			var bytes_split []string = strings.Split(string(bytes), "|")
+			var index_bar int = strings.Index(string(bytes), "|")
+
+			var more_devices_info *[]ModsFileInfo.MoreDeviceInfo = &Utils.Gen_settings_GL.MOD_12.More_devices_info
+
+			var index_device_info int = -1
+			for i, more_device_info := range *more_devices_info {
+				if more_device_info.Device_id == device_id {
+					index_device_info = i
+
+					break
+				}
+			}
+			if index_device_info == -1 {
+				*more_devices_info = append(*more_devices_info, ModsFileInfo.MoreDeviceInfo{
+					Device_id: device_id,
+				})
+				index_device_info = len(*more_devices_info) - 1
+			}
+
+			// Use the timestamp to update the last time used of the device.
+			last_used_timestamp, err := strconv.ParseInt(bytes_split[0], 10, 64)
+			if err != nil {
+				break
+			}
+			(*more_devices_info)[index_device_info].Last_time_used = last_used_timestamp
+
+			if index_bar != -1 {
+				// If the message contains a JSON file, update the device's information.
+				var json string = Utils.DecompressString(bytes[index_bar + 1:])
+				var device_info ModsFileInfo.DeviceInfo
+				_ = Utils.FromJsonGENERAL([]byte(json), &device_info)
+
+				log.Println("Device info:", device_info)
+
+				(*more_devices_info)[index_device_info].Device_info = device_info
+			}
 	}
 
-	return []byte("ERROR")
+	return []byte("OK")
 }
 
 func registerChannel() int {
@@ -343,7 +380,8 @@ func registerChannel() int {
 
 func unregisterChannel(channel_num int) {
 	if channel_num >= 0 && channel_num < MAX_CHANNELS {
-		used_channels_GL[channel_num] = false
+		close(channels_GL[channel_num])
 		channels_GL[channel_num] = nil
+		used_channels_GL[channel_num] = false
 	}
 }
