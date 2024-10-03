@@ -195,6 +195,10 @@ The message is sent by QueueGeneralMessageSERVER().
 If no message is available, the function will wait until a message is received.
 */
 func GetGeneralMessageSERVER() []byte {
+	if !srvComm_started_GL {
+		return nil
+	}
+
 	return <- srvComm_gen_ch_in_GL
 }
 
@@ -209,6 +213,10 @@ It is received by GetGeneralMessageSERVER().
   - message – the message to be sent
 */
 func QueueGeneralMessageSERVER(message []byte) {
+	if !srvComm_started_GL {
+		return
+	}
+
 	var new_msg []byte = append([]byte("G|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
 }
@@ -224,6 +232,10 @@ QueueMessageSERVER queues a message to be sent to the server.
   - message – the message to be sent
 */
 func QueueMessageSERVER(is_mod bool, num int, message []byte) {
+	if !srvComm_started_GL {
+		return
+	}
+
 	var mod_lib string = "M"
 	if !is_mod {
 		mod_lib = "L"
@@ -242,6 +254,10 @@ QueueNoResponseMessageSERVER queues a message to be sent to the server without e
   - message – the message to be sent
 */
 func QueueNoResponseMessageSERVER(message []byte) {
+	if !srvComm_started_GL {
+		return
+	}
+
 	var new_msg []byte = append([]byte("N|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
 }

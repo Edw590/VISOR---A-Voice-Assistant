@@ -362,6 +362,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 	}
 
+	// Just to return something
 	return []byte("OK")
 }
 

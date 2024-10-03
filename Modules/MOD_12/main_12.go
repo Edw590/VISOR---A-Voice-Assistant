@@ -192,7 +192,7 @@ func computeUserLocation(devices []*_IntDeviceInfo) string {
 	sortDevicesByLastUsed(devices)
 	var curr_location string = UNKNOWN_LOCATION
 	for _, device := range devices {
-		if device.Curr_location != UNKNOWN_LOCATION && device.Last_time_used +LAST_UNUSED_MAX_S >= time.Now().Unix() {
+		if device.Curr_location != UNKNOWN_LOCATION && device.Last_time_used + LAST_UNUSED_MAX_S >= time.Now().Unix() {
 			curr_location = device.Curr_location
 
 			break
