@@ -68,7 +68,7 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		var curr_mouse_position _MousePosition
-		var last_used_timestamp int64 = 0
+		var last_time_used_s int64 = 0
 
 		for {
 			wifi_on, wifi_networks := getWifiNetworks()
@@ -120,10 +120,10 @@ func init() {realMain =
 				curr_mouse_position.x = x
 				curr_mouse_position.y = y
 
-				last_used_timestamp = time.Now().Unix()
+				last_time_used_s = time.Now().Unix()
 			}
 
-			ULComm.SendDeviceInfo(&device_info_GL, last_used_timestamp)
+			ULComm.SendDeviceInfo(&device_info_GL, last_time_used_s)
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return

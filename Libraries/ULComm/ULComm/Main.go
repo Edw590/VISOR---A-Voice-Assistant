@@ -29,7 +29,7 @@ import (
 )
 
 var prev_device_info ModsFileInfo.DeviceInfo
-var prev_last_time_used_ms int64
+var prev_last_time_used_s int64
 
 /*
 CreateDeviceInfo creates a DeviceInfo object with the given parameters.
@@ -109,13 +109,13 @@ If the last used timestamp is the same as the previous one, it will not be sent.
   - device_info – the device information to send
   - last_time_used_ms – the last time the device was used
  */
-func SendDeviceInfo(device_info *ModsFileInfo.DeviceInfo, last_time_used_ms int64) {
+func SendDeviceInfo(device_info *ModsFileInfo.DeviceInfo, last_time_used_s int64) {
 	var send_device_info bool = true
 	if Utils.CompareSTRUCTS[ModsFileInfo.DeviceInfo](*device_info, prev_device_info) {
 		send_device_info = false
 	}
 	var send_timestamp bool = true
-	if last_time_used_ms == prev_last_time_used_ms {
+	if last_time_used_s == prev_last_time_used_s {
 		send_timestamp = false
 	}
 
@@ -125,8 +125,8 @@ func SendDeviceInfo(device_info *ModsFileInfo.DeviceInfo, last_time_used_ms int6
 
 	var message []byte = []byte("DI|")
 	if send_timestamp {
-		message = append(message, []byte(strconv.FormatInt(last_time_used_ms, 10))...)
-		prev_last_time_used_ms = last_time_used_ms
+		message = append(message, []byte(strconv.FormatInt(last_time_used_s, 10))...)
+		prev_last_time_used_s = last_time_used_s
 	}
 	message = append(message, []byte("|")...)
 	if send_device_info {

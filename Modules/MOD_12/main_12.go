@@ -80,15 +80,15 @@ func init() {realMain =
 				}
 
 				// Update some information
-				device_info.Last_comm = more_device_info.Last_comm_ms
-				device_info.Last_time_used = more_device_info.Last_time_used_ms
+				device_info.Last_comm = more_device_info.Last_comm
+				device_info.Last_time_used = more_device_info.Last_time_used_s
 				device_info.Curr_location = UNKNOWN_LOCATION
 
 				for _, location_info := range modUserInfo_GL.Locs_info {
-					if location_info.Last_detection_ms < int64(TIME_SLEEP_S) * 2 {
+					if location_info.Last_detection_s < int64(TIME_SLEEP_S) * 2 {
 						// There must be a minimum. That minimum is the time it takes for the devices to update their
 						// status, but double it to be sure they communicated.
-						location_info.Last_detection_ms = int64(TIME_SLEEP_S) * 2
+						location_info.Last_detection_s = int64(TIME_SLEEP_S) * 2
 					}
 
 					var beacon_list []ModsFileInfo.ExtBeacon
@@ -116,7 +116,7 @@ func init() {realMain =
 							var distance int = UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon.RSSI, UtilsSWA.DEFAULT_TX_POWER)
 
 							if distance <= location_info.Max_distance &&
-									device_info.Last_comm + location_info.Last_detection_ms >= time.Now().Unix() {
+									device_info.Last_comm + location_info.Last_detection_s >= time.Now().Unix() {
 								// If the device was near the location and the last communication was recent, then the
 								// user is near the location.
 								device_info.Curr_location = location_info.Location
@@ -162,7 +162,7 @@ func IsDeviceActive(device_id string) bool {
 	if device_id == GPTComm.ALL_DEVICES_ID {
 		// Check if any device is active
 		for _, more_device_info := range more_devices_info {
-			if time.Now().Unix() - more_device_info.Last_comm_ms <= LAST_COMM_MAX_S {
+			if time.Now().Unix() - more_device_info.Last_comm <= LAST_COMM_MAX_S {
 				return true
 			}
 		}
@@ -172,7 +172,7 @@ func IsDeviceActive(device_id string) bool {
 
 	for _, more_device_info := range more_devices_info {
 		if more_device_info.Device_id == device_id {
-			return time.Now().Unix() - more_device_info.Last_comm_ms <= LAST_COMM_MAX_S
+			return time.Now().Unix() - more_device_info.Last_comm <= LAST_COMM_MAX_S
 		}
 	}
 
@@ -216,9 +216,9 @@ func updateUserLocation(new_location string) {
 
 	if new_location != user_location.Curr_location {
 		user_location.Prev_location = user_location.Curr_location
-		user_location.Prev_last_time_checked_ms = user_location.Last_time_checked_ms
+		user_location.Prev_last_time_checked_s = user_location.Last_time_checked_s
 
 		user_location.Curr_location = new_location
 	}
-	user_location.Last_time_checked_ms = time.Now().Unix()
+	user_location.Last_time_checked_s = time.Now().Unix()
 }

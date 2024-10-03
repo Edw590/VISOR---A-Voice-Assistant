@@ -30,10 +30,10 @@ type Mod12GenInfo struct {
 type MoreDeviceInfo struct {
 	// Device_id is the unique identifier of the device
 	Device_id string
-	// Last_comm_ms is the last time the device communicated with the server
-	Last_comm_ms int64
-	// Last_time_used_ms is the last time the device was used
-	Last_time_used_ms int64
+	// Last_comm is the last time the device communicated with the server
+	Last_comm int64
+	// Last_time_used_s is the last time the device was used
+	Last_time_used_s int64
 	// Device_info is the information about the device
 	Device_info DeviceInfo
 }
@@ -43,12 +43,12 @@ type UserLocation struct {
 	Last_known_location string
 	// Curr_location is the current location of the user
 	Curr_location string
-	// Last_time_checked_ms is the last time the current location was checked in Unix time
-	Last_time_checked_ms int64
+	// Last_time_checked_s is the last time the current location was checked in Unix time
+	Last_time_checked_s int64
 	// Prev_location is the previous location of the user
 	Prev_location string
-	// Prev_last_time_checked_ms is the last time the previous location was checked in Unix time
-	Prev_last_time_checked_ms int64
+	// Prev_last_time_checked_s is the last time the previous location was checked in Unix time
+	Prev_last_time_checked_s int64
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,9 +73,9 @@ type _LocInfo struct {
 	Name string
 	// Address is the address of the detection (e.g. the wifi BSSID) in the format XX:XX:XX:XX:XX:XX
 	Address string
-	// Last_detection_ms is the maximum amount of time in seconds without checking in which the device may still be in the
+	// Last_detection_s is the maximum amount of time in seconds without checking in which the device may still be in the
 	// specified location
-	Last_detection_ms int64
+	Last_detection_s int64
 	// Max_distance is the maximum distance in meters in which the device is in the specified location
 	Max_distance int
 	// Location is where the device is (e.g. "home")

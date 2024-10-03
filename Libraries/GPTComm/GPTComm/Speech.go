@@ -27,7 +27,7 @@ import (
 	"time"
 )
 
-var time_begin_GL int64 = -1
+var time_begin_ms_GL int64 = -1
 var curr_entry_time_GL int64 = -1
 var curr_idx_GL int = 0
 var last_speech_GL string = ""
@@ -41,10 +41,10 @@ SetTimeBegin sets the time to begin searching for the next speech.
 -----------------------------------------------------------
 
 – Params:
-  - time_begin – the time to begin searching for the next speech
+  - time_begin_ms – the time to begin searching for the next speech in milliseconds
  */
-func SetTimeBegin(time_begin int64) {
-	time_begin_GL = time_begin
+func SetTimeBegin(time_begin_ms int64) {
+	time_begin_ms_GL = time_begin_ms
 }
 
 /*
@@ -72,9 +72,9 @@ func GetNextSpeechSentence() string {
 		if string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)) == "start" {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
-			if entry.getTime() >= time_begin_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
+			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
 				curr_entry_time_GL = entry.getTime()
-				time_begin_GL = curr_entry_time_GL + 1
+				time_begin_ms_GL = curr_entry_time_GL + 1
 				last_speech_GL = ""
 			}
 		}
