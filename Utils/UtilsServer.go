@@ -144,7 +144,7 @@ func StartCommunicatorSERVER() bool {
 		for {
 			var message []byte
 			if first_message {
-				message = []byte(User_settings_GL.PersonalConsts.Device_ID)
+				message = []byte(Device_settings_GL.Device_ID)
 				first_message = false
 			} else {
 				message = <- srvComm_gen_ch_out_GL

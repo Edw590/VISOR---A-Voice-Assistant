@@ -3,12 +3,6 @@
 	// The comments can stay. They're filtered by VISOR.
 
 	"PersonalConsts": {
-		// Device_ID is the device ID of the current device
-		"Device_ID": "",
-
-		// VISOR_dir is the full path to the main directory of VISOR, be it a Windows or a Unix path
-		"VISOR_dir": "",
-
 		// VISOR_email_addr is VISOR's email address
 		"VISOR_email_addr": "",
 		// VISOR_email_pw is VISOR's email password
@@ -21,8 +15,6 @@
 		"Website_domain": "",
 		// Website_pw is the password for the VISOR website
 		"Website_pw": "",
-		// Website_dir is the full path to the directory of the VISOR website
-		"Website_dir": "",
 
 		// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
 		"WolframAlpha_AppID": "",

@@ -63,9 +63,9 @@ func init() {realMain =
 				}
 
 				// Only start the modules supported by the server or client depending on the VISOR_SERVER constant.
-				if Utils.User_settings_GL.PersonalConsts.VISOR_server && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_SERVER == 0) {
+				if Utils.Device_settings_GL.VISOR_server && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_SERVER == 0) {
 					continue
-				} else if !Utils.User_settings_GL.PersonalConsts.VISOR_server && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_CLIENT == 0) {
+				} else if !Utils.Device_settings_GL.VISOR_server && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_CLIENT == 0) {
 					continue
 				}
 

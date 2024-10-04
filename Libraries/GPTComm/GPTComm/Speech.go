@@ -72,7 +72,7 @@ func GetNextSpeechSentence() string {
 		if string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)) == "start" {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
-			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
+			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Device_settings_GL.Device_ID || device_id == ALL_DEVICES_ID) {
 				curr_entry_time_ms_GL = entry.getTime()
 				time_begin_ms_GL = curr_entry_time_ms_GL + 1
 				last_speech_GL = ""

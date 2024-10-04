@@ -28,11 +28,27 @@ import (
 	"strings"
 )
 
+const DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
 const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
 const GEN_SETTINGS_FILE string = "GeneratedSettings_EOG.json"
 
+var Device_settings_GL DeviceSettings
 var User_settings_GL UserSettings
 var Gen_settings_GL GenSettings
+
+type DeviceSettings struct {
+	// Device_ID is the device ID of the current device
+	Device_ID string
+
+	// VISOR_dir is the full path to the main directory of VISOR.
+	VISOR_dir string
+	// VISOR_server is an INTERNAL attribute to be filled INTERNALLY that indicates if the version running is the server
+	// or the client version
+	VISOR_server bool
+
+	// Website_dir is the full path to the directory of the VISOR website
+	Website_dir string
+}
 
 type UserSettings struct {
 	PersonalConsts _PersonalConsts
@@ -56,15 +72,6 @@ type GenSettings struct {
 ///////////////////////////////////////////////////////////////
 
 type _PersonalConsts struct {
-	// Device_ID is the device ID of the current device
-	Device_ID string
-
-	// VISOR_dir is the full path to the main directory of VISOR.
-	VISOR_dir string
-	// VISOR_server is an INTERNAL attribute to be filled INTERNALLY that indicates if the version running is the server
-	// or the client version
-	VISOR_server bool
-
 	// VISOR_email_addr is VISOR's email address
 	VISOR_email_addr string
 	// VISOR_email_pw is VISOR's email password
@@ -77,8 +84,6 @@ type _PersonalConsts struct {
 	Website_domain string
 	// Website_pw is the password for the VISOR website
 	Website_pw string
-	// Website_dir is the full path to the directory of the VISOR website
-	Website_dir string
 
 	// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
 	WolframAlpha_AppID string
@@ -88,9 +93,15 @@ type _PersonalConsts struct {
 }
 
 /*
-LoadUserSettings is the function that initializes the global variables of the UserSettings struct.
+LoadDeviceUserSettings is the function that initializes the global variables of the UserSettings and DeviceSettings
+structs.
+
+-----------------------------------------------------------
+
+– Params:
+  - server – true if the version running is the server version, false if it is the client version
 */
-func LoadUserSettings(server bool) error {
+func LoadDeviceUserSettings(server bool) error {
 	bytes, err := os.ReadFile(USER_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
@@ -100,33 +111,50 @@ func LoadUserSettings(server bool) error {
 		return errors.New("no " + USER_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
-	if err := FromJsonGENERAL(bytes, &User_settings_GL); err != nil {
+	if err = FromJsonGENERAL(bytes, &User_settings_GL); err != nil {
 		return err
 	}
 
-	User_settings_GL.PersonalConsts.VISOR_server = server
+	//////////////////////////////////////////////
 
-	if User_settings_GL.PersonalConsts.VISOR_server {
-		if !strings.Contains(User_settings_GL.PersonalConsts.VISOR_email_addr, "@") || User_settings_GL.PersonalConsts.Device_ID == "" ||
+	bytes, err = os.ReadFile(DEVICE_SETTINGS_FILE)
+	if err != nil {
+		cwd, err := os.Getwd()
+		if err != nil {
+			cwd = "[ERROR]"
+		}
+		return errors.New("no " + DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
+	}
+
+	if err = FromJsonGENERAL(bytes, &Device_settings_GL); err != nil {
+		return err
+	}
+
+	//////////////////////////////////////////////
+
+	Device_settings_GL.VISOR_server = server
+
+	if Device_settings_GL.VISOR_server {
+		if !strings.Contains(User_settings_GL.PersonalConsts.VISOR_email_addr, "@") || Device_settings_GL.Device_ID == "" ||
 			User_settings_GL.PersonalConsts.VISOR_email_pw == "" || !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
 			User_settings_GL.PersonalConsts.Website_domain == "" || User_settings_GL.PersonalConsts.Website_pw == "" ||
 			User_settings_GL.PersonalConsts.WolframAlpha_AppID == "" || User_settings_GL.PersonalConsts.Picovoice_API_key == "" {
-			return errors.New("some fields in " + USER_SETTINGS_FILE + " are empty or incorrect - aborting")
+			return errors.New("some fields in " + USER_SETTINGS_FILE + " and/or " + DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
 		}
 	} else {
 		if !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
 				User_settings_GL.PersonalConsts.Website_domain == "" ||
 				User_settings_GL.PersonalConsts.Website_pw == "" {
-			return errors.New("some fields in " + USER_SETTINGS_FILE + " are empty or incorrect - aborting")
+			return errors.New("some fields in " + USER_SETTINGS_FILE + " and/or " + DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
 		}
 	}
 
-	var visor_path GPath = PathFILESDIRS(true, "", User_settings_GL.PersonalConsts.VISOR_dir)
+	var visor_path GPath = PathFILESDIRS(true, "", Device_settings_GL.VISOR_dir)
 	if !visor_path.Exists() {
 		return errors.New("the VISOR directory \"" + visor_path.GPathToStringConversion() + "\" does not exist - aborting")
 	}
-	if User_settings_GL.PersonalConsts.VISOR_server {
-		var website_path GPath = PathFILESDIRS(true, "", User_settings_GL.PersonalConsts.Website_dir)
+	if Device_settings_GL.VISOR_server {
+		var website_path GPath = PathFILESDIRS(true, "", Device_settings_GL.Website_dir)
 		if !website_path.Exists() {
 			return errors.New("the website directory \"" + website_path.GPathToStringConversion() + "\" does not exist - aborting")
 		}

@@ -74,7 +74,8 @@ func init() {realMain =
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
 			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("File|true|reminders.json"))
-			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
+			// TODO: This must be in another thread - will block if there's no Internet connection
+			comms_map = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
 			if comms_map == nil {
 				return
 			}

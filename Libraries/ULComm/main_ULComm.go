@@ -30,7 +30,7 @@ import (
 )
 
 func main() {
-	Utils.LoadUserSettings(false)
+	Utils.LoadDeviceUserSettings(false)
 	Utils.InitializeCommsChannels()
 
 	go func() {

@@ -163,7 +163,7 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 		message_eml = eml
 	}
 
-	if User_settings_GL.PersonalConsts.VISOR_server {
+	if Device_settings_GL.VISOR_server {
 		// Keep trying to create a file with a unique name.
 		var file_name string = ""
 		var to_send_dir GPath = GetUserDataDirMODULES(NUM_MOD_EmailSender).Add2(true, TO_SEND_REL_FOLDER)

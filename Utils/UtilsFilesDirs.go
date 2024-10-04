@@ -542,7 +542,7 @@ getVISORDirFILESDIRS gets the full path to the VISOR directory.
   - the full path to the VISOR directory
  */
 func getVISORDirFILESDIRS() GPath {
-	return PathFILESDIRS(true, "", User_settings_GL.PersonalConsts.VISOR_dir)
+	return PathFILESDIRS(true, "", Device_settings_GL.VISOR_dir)
 }
 
 /*
@@ -566,5 +566,5 @@ GetWebsiteFilesDirFILESDIRS gets the full path to the website files directory.
   - the full path to the website files directory
 */
 func GetWebsiteFilesDirFILESDIRS() GPath {
-	return PathFILESDIRS(true, "", User_settings_GL.PersonalConsts.Website_dir, _WEBSITE_FILES_REL_DIR)
+	return PathFILESDIRS(true, "", Device_settings_GL.Website_dir, _WEBSITE_FILES_REL_DIR)
 }

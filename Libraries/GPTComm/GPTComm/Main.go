@@ -37,7 +37,7 @@ SendText sends the given text to the LLM model.
 */
 func SendText(text string) {
 	var message []byte = []byte("GPT|")
-	message = append(message, Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text)...)
+	message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "]" + text)...)
 	Utils.QueueNoResponseMessageSERVER(message)
 }
 

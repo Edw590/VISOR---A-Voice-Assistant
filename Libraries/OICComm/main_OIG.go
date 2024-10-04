@@ -28,7 +28,7 @@ import (
 )
 
 func main() {
-	Utils.LoadUserSettings(false)
+	Utils.LoadDeviceUserSettings(false)
 
 	log.Println(OICComm.GetNews())
 	log.Println(OICComm.GetWeather())
