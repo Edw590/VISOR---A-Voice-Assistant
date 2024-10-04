@@ -40,6 +40,9 @@ import (
 
 const _TIME_SLEEP_S int = 5
 
+const SCAN_WIFI_EACH_S int64 = 3 * 60
+var last_check_wifi_when_s int64 = 0
+
 var device_info_GL *ModsFileInfo.DeviceInfo
 
 type _Battery struct {
@@ -60,7 +63,7 @@ type WmiMonitorBrightness struct {
 var (
 	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
-	modGenInfo_GL  *ModsFileInfo.Mod10GenInfo
+	modGenInfo_GL *ModsFileInfo.Mod10GenInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
@@ -72,11 +75,14 @@ func init() {realMain =
 
 		device_info_GL = &modGenInfo_GL.Device_info
 
-		wifi_on, wifi_networks := getWifiNetworks()
+		var wifi_on bool
+		var wifi_networks []ModsFileInfo.ExtBeacon
 		for {
-			if time.Now().Minute() % 3 == 0 {
+			if time.Now().Unix() >= last_check_wifi_when_s + SCAN_WIFI_EACH_S {
 				// Every 3 minutes, update the wifi networks
 				wifi_on, wifi_networks = getWifiNetworks()
+
+				last_check_wifi_when_s = time.Now().Unix()
 			}
 
 			// Connectivity information
