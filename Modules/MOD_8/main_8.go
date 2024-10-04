@@ -83,7 +83,7 @@ func init() {realMain =
 				},
 			}.Do()
 
-			log.Println("Server running on port 3234")
+			//log.Println("Server running on port 3234")
 			srv = &http.Server{Addr: ":3234"}
 			err := srv.ListenAndServeTLS(modUserInfo_GL.Cert_file, modUserInfo_GL.Key_file)
 			if err != nil {
@@ -98,6 +98,8 @@ func init() {realMain =
 
 		for {
 			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
+				_ = srv.Shutdown(ctx)
+
 				for i := 0; i < MAX_CHANNELS; i++ {
 					if used_channels_GL[i] {
 						// Ignore the panic in case the channel is already closed (happened).
@@ -107,12 +109,6 @@ func init() {realMain =
 							},
 						}.Do()
 					}
-				}
-
-				if err := srv.Shutdown(ctx); err == nil {
-					log.Println("Server stopped gracefully")
-				} else {
-					log.Println("Server shutdown error:", err)
 				}
 
 				return
@@ -136,6 +132,9 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Upgrade error:", err)
+
+		handler_stopped = true
+
 		return
 	}
 	defer conn.Close()
@@ -155,6 +154,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	var channel_num int = registerChannel()
 	if channel_num == -1 {
 		log.Println("No available channels")
+
+		handler_stopped = true
 
 		return
 	}
@@ -194,7 +195,9 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			if device_id != "" {
 				for i, more_device_info := range Utils.Gen_settings_GL.MOD_12.More_devices_info {
 					if more_device_info.Device_id == device_id {
-						Utils.Gen_settings_GL.MOD_12.More_devices_info[i].Last_comm = time.Now().Unix()
+						Utils.Gen_settings_GL.MOD_12.More_devices_info[i].Last_comm_s = time.Now().Unix()
+
+						break
 					}
 				}
 			}

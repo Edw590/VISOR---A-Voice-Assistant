@@ -28,6 +28,20 @@ import (
 )
 
 /*
+SendText sends the given text to the LLM model.
+
+-----------------------------------------------------------
+
+– Params:
+  - text – the text to send
+*/
+func SendText(text string) {
+	var message []byte = []byte("GPT|")
+	message = append(message, Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text)...)
+	Utils.QueueNoResponseMessageSERVER(message)
+}
+
+/*
 getEntry gets the entry at the given number or time.
 
 If -1 is provided on both parameters, it will return the last entry. The time parameter is prioritized over the number
@@ -48,8 +62,8 @@ func getEntry(time int64, num int) *_Entry {
 	if comms_map == nil {
 		return &_Entry{
 			device_id: "",
-			text: "",
-			time: -1,
+			text:      "",
+			time_ms:   -1,
 		}
 	}
 
@@ -57,8 +71,8 @@ func getEntry(time int64, num int) *_Entry {
 	if file_contents == "" {
 		return &_Entry{
 			device_id: "",
-			text: "",
-			time: -1,
+			text:      "",
+			time_ms:   -1,
 		}
 	}
 	var entries []string = strings.Split(file_contents, "[3234_START:")
@@ -73,7 +87,7 @@ func getEntry(time int64, num int) *_Entry {
 				return &_Entry{
 					device_id: getDeviceIdFromEntry(entry),
 					text:      getTextFromEntry(entry),
-					time:      getTimeFromEntry(entry),
+					time_ms:   getTimeFromEntry(entry),
 				}
 			}
 		}
@@ -81,8 +95,8 @@ func getEntry(time int64, num int) *_Entry {
 		if len(entries) == 0 {
 			return &_Entry{
 				device_id: "",
-				text: "",
-				time: -1,
+				text:      "",
+				time_ms:   -1,
 			}
 		}
 
@@ -100,30 +114,16 @@ func getEntry(time int64, num int) *_Entry {
 			return &_Entry{
 				device_id: getDeviceIdFromEntry(entry),
 				text:      getTextFromEntry(entry),
-				time:      getTimeFromEntry(entry),
+				time_ms:   getTimeFromEntry(entry),
 			}
 		}
 	}
 
 	return &_Entry{
 		device_id: "",
-		text: "",
-		time: -1,
+		text:      "",
+		time_ms:   -1,
 	}
-}
-
-/*
-SendText sends the given text to the LLM model.
-
------------------------------------------------------------
-
-– Params:
-  - text – the text to send
- */
-func SendText(text string) {
-	var message []byte = []byte("GPT|")
-	message = append(message, Utils.CompressString("[" + Utils.User_settings_GL.PersonalConsts.Device_ID + "]" + text)...)
-	Utils.QueueNoResponseMessageSERVER(message)
 }
 
 /*

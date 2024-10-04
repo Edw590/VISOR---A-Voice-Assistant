@@ -80,7 +80,7 @@ func init() {realMain =
 				}
 
 				// Update some information
-				device_info.Last_comm = more_device_info.Last_comm
+				device_info.Last_comm = more_device_info.Last_comm_s
 				device_info.Last_time_used = more_device_info.Last_time_used_s
 				device_info.Curr_location = UNKNOWN_LOCATION
 
@@ -162,7 +162,7 @@ func IsDeviceActive(device_id string) bool {
 	if device_id == GPTComm.ALL_DEVICES_ID {
 		// Check if any device is active
 		for _, more_device_info := range more_devices_info {
-			if time.Now().Unix() - more_device_info.Last_comm <= LAST_COMM_MAX_S {
+			if time.Now().Unix() - more_device_info.Last_comm_s <= LAST_COMM_MAX_S {
 				return true
 			}
 		}
@@ -172,7 +172,7 @@ func IsDeviceActive(device_id string) bool {
 
 	for _, more_device_info := range more_devices_info {
 		if more_device_info.Device_id == device_id {
-			return time.Now().Unix() - more_device_info.Last_comm <= LAST_COMM_MAX_S
+			return time.Now().Unix() - more_device_info.Last_comm_s <= LAST_COMM_MAX_S
 		}
 	}
 

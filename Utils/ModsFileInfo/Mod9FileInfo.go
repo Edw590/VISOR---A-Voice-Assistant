@@ -33,13 +33,13 @@ type Mod9GenInfo struct {
 type Reminder struct {
 	// Id is the reminder ID
 	Id 		    string
-	// Devices is the devices the reminder is set for
-	Devices     []string
+	// Device_IDs are the devices the reminder is set for
+	Device_IDs  []string
 	// Message is the reminder message
 	Message     string
-	// Command is the command to be executed when the reminder is triggered on the chosen Devices
+	// Command is the command to be executed when the reminder is triggered on the chosen Device_IDs
 	Command     string
-	// Time is the time in minutes the reminder is set for
+	// Time is the time the reminder is set for in the format "2024-12-31 -- 23:59:59"
 	Time        string
 	// Repeat_each_min is the time in minutes between each repeatition of the reminder
 	Repeat_each_min int64

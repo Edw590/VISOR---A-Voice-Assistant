@@ -27,8 +27,8 @@ type _Entry struct {
 	device_id string
 	// text is the text generated
 	text string
-	// time is the Unix time in milliseconds
-	time int64
+	// time_ms is the Unix time_ms in milliseconds
+	time_ms int64
 }
 
 /*
@@ -56,13 +56,13 @@ func (entry _Entry) getText() string {
 }
 
 /*
-getTime gets the time of the entry.
+getTime gets the time_ms of the entry.
 
 -----------------------------------------------------------
 
 – Returns:
-  - the time in milliseconds
+  - the time_ms in milliseconds
 */
 func (entry _Entry) getTime() int64 {
-	return entry.time
+	return entry.time_ms
 }

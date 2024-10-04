@@ -28,7 +28,7 @@ import (
 )
 
 var time_begin_ms_GL int64 = -1
-var curr_entry_time_GL int64 = -1
+var curr_entry_time_ms_GL int64 = -1
 var curr_idx_GL int = 0
 var last_speech_GL string = ""
 
@@ -63,7 +63,7 @@ The function will wait until the time of the next speech is reached.
   - the next sentence to be spoken or END_ENTRY if the end of the text file is reached
  */
 func GetNextSpeechSentence() string {
-	if curr_entry_time_GL == -1 {
+	if curr_entry_time_ms_GL == -1 {
 		var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
 		if comms_map == nil {
 			return END_ENTRY
@@ -73,8 +73,8 @@ func GetNextSpeechSentence() string {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
 			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.User_settings_GL.PersonalConsts.Device_ID || device_id == ALL_DEVICES_ID) {
-				curr_entry_time_GL = entry.getTime()
-				time_begin_ms_GL = curr_entry_time_GL + 1
+				curr_entry_time_ms_GL = entry.getTime()
+				time_begin_ms_GL = curr_entry_time_ms_GL + 1
 				last_speech_GL = ""
 			}
 		}
@@ -82,7 +82,7 @@ func GetNextSpeechSentence() string {
 
 	var sentence string = ""
 	for {
-		var entry *_Entry = getEntry(curr_entry_time_GL, -1)
+		var entry *_Entry = getEntry(curr_entry_time_ms_GL, -1)
 		var text_split []string = strings.Split(entry.getText(), " ")
 
 		//log.Println("--------------------------")
@@ -145,7 +145,7 @@ func GetNextSpeechSentence() string {
 
 	if sentence == "" {
 		sentence = END_ENTRY
-		curr_entry_time_GL = -1
+		curr_entry_time_ms_GL = -1
 		curr_idx_GL = 0
 	}
 

@@ -30,8 +30,8 @@ type Mod12GenInfo struct {
 type MoreDeviceInfo struct {
 	// Device_id is the unique identifier of the device
 	Device_id string
-	// Last_comm is the last time the device communicated with the server
-	Last_comm int64
+	// Last_comm_s is the last time the device communicated with the server
+	Last_comm_s int64
 	// Last_time_used_s is the last time the device was used
 	Last_time_used_s int64
 	// Device_info is the information about the device
