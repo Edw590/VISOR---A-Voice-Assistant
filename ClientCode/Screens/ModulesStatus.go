@@ -104,8 +104,8 @@ func getCheckBoxes(modules []Utils.Module) []fyne.CanvasObject {
 	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_Speech), func(b bool) {
 		modules[Utils.NUM_MOD_Speech].Enabled = b
 	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_RemindersReminder), func(b bool) {
-		modules[Utils.NUM_MOD_RemindersReminder].Enabled = b
+	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_TasksExecutor), func(b bool) {
+		modules[Utils.NUM_MOD_TasksExecutor].Enabled = b
 	}))
 	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_SystemChecker), func(b bool) {
 		modules[Utils.NUM_MOD_SystemChecker].Enabled = b

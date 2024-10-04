@@ -38,7 +38,7 @@ import (
 	"time"
 )
 
-// Reminders Reminder //
+// Tasks Executor //
 
 const TIME_SLEEP_S int = 1
 
@@ -65,9 +65,9 @@ func init() {realMain =
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("File|true|reminders.json"))
+			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_TasksExecutor, []byte("File|true|reminders.json"))
 			// TODO: This must be in another thread - will block if there's no Internet connection
-			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
+			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_TasksExecutor]
 			if comms_map == nil {
 				return
 			}
