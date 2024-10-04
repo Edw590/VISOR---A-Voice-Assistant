@@ -40,7 +40,7 @@ import (
 
 const _TIME_SLEEP_S int = 5
 
-const SCAN_WIFI_EACH_S int64 = 3 * 60
+const SCAN_WIFI_EACH_S int64 = 30
 var last_check_wifi_when_s int64 = 0
 
 var device_info_GL *ModsFileInfo.DeviceInfo
