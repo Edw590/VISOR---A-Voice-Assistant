@@ -123,11 +123,10 @@ func init() {realMain =
 		}()
 
 		// Configure the LLM model
-		var config_str string = *moduleInfo_GL.ModDirsInfo.UserData.Add2(false, "config_string.txt").ReadTextFile()
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli -m " + modUserInfo_GL.Model_loc + " " +
 			"--in-suffix [3234_START] --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --mlock " +
-			"--prompt \"" + config_str + "\"\n")
+			"--prompt \"" + modUserInfo_GL.Config_str + "\"\n")
 		_ = writer.Flush()
 
 		sendToGPT := func(to_send string) {
