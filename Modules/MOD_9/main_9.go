@@ -82,9 +82,9 @@ func init() {realMain =
 					last_crc16 = new_crc16
 
 					updateLocalReminders()
-
-					last_get_tasks_when_s = time.Now().Unix()
 				}
+
+				last_get_tasks_when_s = time.Now().Unix()
 			}
 
 			var reminders *[]ModsFileInfo.Reminder = &modGenInfo_GL.Reminders
