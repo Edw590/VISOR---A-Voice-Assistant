@@ -55,15 +55,7 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_9
 
-		Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("JSON|UL"))
-		var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
-		if comms_map == nil {
-			return
-		}
-
-		var user_location ModsFileInfo.UserLocation
-		var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
-		_ = Utils.FromJsonGENERAL(json_bytes, &user_location)
+		var user_location *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
 
 		log.Println("User location:", user_location)
 
@@ -75,7 +67,7 @@ func init() {realMain =
 		for {
 			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_RemindersReminder, []byte("File|true|reminders.json"))
 			// TODO: This must be in another thread - will block if there's no Internet connection
-			comms_map = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
+			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_RemindersReminder]
 			if comms_map == nil {
 				return
 			}

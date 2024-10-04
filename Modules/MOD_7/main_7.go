@@ -23,7 +23,6 @@ package MOD_7
 
 import (
 	MOD_6 "OnlineInfoChk"
-	MOD_12 "UserLocator"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"bufio"
@@ -230,9 +229,10 @@ func SpeakOnDevice(device_id string, text string) int {
 	if is_writing_GL {
 		return ALREADY_WRITING
 	}
-	if !MOD_12.IsDeviceActive(device_id) {
-		return DEVICE_NOT_ACTIVE
-	}
+	// TODO: Disabled because the function is now gone - implement it again if this function is needed
+	//if !MOD_12.IsDeviceActive(device_id) {
+	//	return DEVICE_NOT_ACTIVE
+	//}
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 	reduceGptTextTxt(gpt_text_txt)

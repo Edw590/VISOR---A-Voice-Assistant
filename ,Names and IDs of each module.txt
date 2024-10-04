@@ -1,7 +1,7 @@
 0 = V.I.S.O.R.                 (client/server)
 1 = Modules Manager            (client/server)
-2 = S.M.A.R.T. Checker         (server)        [Windows only]
-3 = Speech                     (client)
+2 = S.M.A.R.T. Checker         (server)
+3 = Speech                     (client)        [Windows only]
 4 = RSS Feed Notifier          (server)
 5 = Email Sender               (server)
 6 = Online Information Checker (server)        [Linux only]
@@ -10,4 +10,4 @@
 9 = Reminders Reminder         (client)
 10 = System Checker            (client)        [Windows only]
 11 = Speech Recognition        (client)
-12 = User Locator              (server)
+12 = User Locator              (client)

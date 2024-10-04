@@ -30,7 +30,6 @@ import (
 	"github.com/yousifnimah/Cryptx/CRC16"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -39,8 +38,8 @@ import (
 
 const MAX_CHANNELS int = 100
 
-const PONG_WAIT = 30 * time.Second // Allow X time before considering the client unreachable. IF YOU CHANGE THIS, CHANGE MOD_12.LAST_COMM_MAX!!!
-const PING_PERIOD = 15 * time.Second // Must be less than PONG_WAIT. -->
+const PONG_WAIT = 120 * time.Second // Allow X time before considering the client unreachable.
+const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT. -->
 
 var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
 var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
@@ -126,14 +125,10 @@ var upgrader = websocket.Upgrader{
 func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("WebSocketsHandler called")
 
-	var handler_stopped bool = false
-
 	// Upgrade HTTP connection to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Upgrade error:", err)
-
-		handler_stopped = true
 
 		return
 	}
@@ -154,8 +149,6 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	var channel_num int = registerChannel()
 	if channel_num == -1 {
 		log.Println("No available channels")
-
-		handler_stopped = true
 
 		return
 	}
@@ -183,26 +176,6 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 							CRC16.Result(message, "CCIT_ZERO"), message[:strings.Index(string(message), "|")])
 					}
 			}
-		}
-	}()
-
-	go func() {
-		// Keep updating the last communication time of the device
-		for {
-			if handler_stopped {
-				return
-			}
-			if device_id != "" {
-				for i, more_device_info := range Utils.Gen_settings_GL.MOD_12.More_devices_info {
-					if more_device_info.Device_id == device_id {
-						Utils.Gen_settings_GL.MOD_12.More_devices_info[i].Last_comm_s = time.Now().Unix()
-
-						break
-					}
-				}
-			}
-
-			time.Sleep(1 * time.Second)
 		}
 	}()
 
@@ -265,8 +238,6 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 	unregisterChannel(channel_num)
 
-	handler_stopped = true
-
 	log.Println("WebSocketsHandler ended")
 }
 
@@ -316,53 +287,6 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			// Returns: nothing
 			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
 				WriteTextFile(Utils.DecompressString(bytes), false)
-		case "JSON":
-			// Get JSON information.
-			// Example: "[one of: UL]", UL = User Location
-			// Returns: a compressed JSON file
-			if string(bytes) == "UL" {
-				return Utils.CompressString(*Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_12.User_location))
-			}
-		case "DI":
-			// Send device information.
-			// Example: "[last_used_timestamp]|[a compressed JSON file - optional]"
-			// Returns: nothing
-			var bytes_split []string = strings.Split(string(bytes), "|")
-			var index_bar int = strings.Index(string(bytes), "|")
-
-			var more_devices_info *[]ModsFileInfo.MoreDeviceInfo = &Utils.Gen_settings_GL.MOD_12.More_devices_info
-
-			var index_device_info int = -1
-			for i, more_device_info := range *more_devices_info {
-				if more_device_info.Device_id == device_id {
-					index_device_info = i
-
-					break
-				}
-			}
-			if index_device_info == -1 {
-				*more_devices_info = append(*more_devices_info, ModsFileInfo.MoreDeviceInfo{
-					Device_id: device_id,
-				})
-				index_device_info = len(*more_devices_info) - 1
-			}
-
-			// Use the timestamp to update the last time used of the device.
-			last_time_used_s, err := strconv.ParseInt(bytes_split[0], 10, 64)
-			if err == nil {
-				(*more_devices_info)[index_device_info].Last_time_used_s = last_time_used_s
-			}
-
-			if len(bytes_split[1]) > 0 {
-				// If the message contains a JSON file, update the device's information.
-				var json string = Utils.DecompressString(bytes[index_bar + 1:])
-				var device_info ModsFileInfo.DeviceInfo
-				_ = Utils.FromJsonGENERAL([]byte(json), &device_info)
-
-				log.Println("Device info:", device_info)
-
-				(*more_devices_info)[index_device_info].Device_info = device_info
-			}
 	}
 
 	// Just to return something

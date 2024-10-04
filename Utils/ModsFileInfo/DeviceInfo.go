@@ -22,6 +22,8 @@
 package ModsFileInfo
 
 type DeviceInfo struct {
+	// Last_time_used_s is the last time the device was used in Unix time
+	Last_time_used_s int64
 	// System_state is the information about the system state of the device
 	System_state SystemState
 }

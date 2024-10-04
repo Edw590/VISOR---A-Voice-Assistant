@@ -108,7 +108,7 @@ var MOD_NUMS_SUPPORT map[int]int = map[int]int{
 	NUM_MOD_RemindersReminder: MOD_CLIENT,
 	NUM_MOD_SystemChecker:     MOD_CLIENT,
 	NUM_MOD_SpeechRecognition: MOD_CLIENT,
-	NUM_MOD_UserLocator:       MOD_SERVER,
+	NUM_MOD_UserLocator:       MOD_CLIENT,
 }
 
 // _LOOP_TIME_S is the number of seconds to wait for the next timestamp to be registered by a module (must be more than

@@ -29,7 +29,6 @@ import (
 	MOD_6 "OnlineInfoChk"
 	MOD_4 "RssFeedNotifier"
 	MOD_2 "SMARTChecker"
-	MOD_12 "UserLocator"
 	"Utils"
 	MOD_8 "WebsiteBackend"
 )
@@ -42,5 +41,4 @@ var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
 	Utils.NUM_MOD_OnlineInfoChk:     MOD_6.Start,
 	Utils.NUM_MOD_GPTCommunicator:   MOD_7.Start,
 	Utils.NUM_MOD_WebsiteBackend:    MOD_8.Start,
-	Utils.NUM_MOD_UserLocator:       MOD_12.Start,
 }

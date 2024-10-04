@@ -21,6 +21,14 @@
 
 package ModsFileInfo
 
+// Mod10GenInfo is the format of the custom generated information about this specific module.
+type Mod10GenInfo struct {
+	// Device_info is the information about the device
+	Device_info DeviceInfo
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 // Mod10UserInfo is the format of the custom information file about this specific module.
 type Mod10UserInfo struct {
 	// Notifications is the list of notifications

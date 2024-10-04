@@ -22,7 +22,6 @@
 package MOD_10
 
 import (
-	"ULComm/ULComm"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
@@ -39,9 +38,9 @@ import (
 
 // System Checker //
 
-const _TIME_SLEEP_S int = 30
+const _TIME_SLEEP_S int = 5
 
-var device_info_GL ModsFileInfo.DeviceInfo
+var device_info_GL *ModsFileInfo.DeviceInfo
 
 type _Battery struct {
 	power_connected bool
@@ -61,17 +60,24 @@ type WmiMonitorBrightness struct {
 var (
 	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod10GenInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_10
 
 		var curr_mouse_position _MousePosition
-		var last_time_used_s int64 = 0
 
+		device_info_GL = &modGenInfo_GL.Device_info
+
+		wifi_on, wifi_networks := getWifiNetworks()
 		for {
-			wifi_on, wifi_networks := getWifiNetworks()
+			if time.Now().Minute() % 3 == 0 {
+				// Every 3 minutes, update the wifi networks
+				wifi_on, wifi_networks = getWifiNetworks()
+			}
 
 			// Connectivity information
 			device_info_GL.System_state.Connectivity_info = ModsFileInfo.ConnectivityInfo{
@@ -120,10 +126,8 @@ func init() {realMain =
 				curr_mouse_position.x = x
 				curr_mouse_position.y = y
 
-				last_time_used_s = time.Now().Unix()
+				device_info_GL.Last_time_used_s = time.Now().Unix()
 			}
-
-			ULComm.SendDeviceInfo(&device_info_GL, last_time_used_s)
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return

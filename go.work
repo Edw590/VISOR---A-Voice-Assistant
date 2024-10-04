@@ -8,7 +8,6 @@ use (
 	Libraries/GPTComm
 	Libraries/OICComm
 	Libraries/SpeechQueue
-	Libraries/ULComm
 	Libraries/RRComm
 	Modules/MOD_1
 	Modules/MOD_2

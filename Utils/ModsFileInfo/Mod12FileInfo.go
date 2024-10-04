@@ -21,21 +21,10 @@
 
 package ModsFileInfo
 
+// Mod12GenInfo is the format of the custom generated information about this specific module.
 type Mod12GenInfo struct {
-	// More_devices_info is the information about the devices
-	More_devices_info []MoreDeviceInfo
+	// User_location is the location of the user
 	User_location UserLocation
-}
-
-type MoreDeviceInfo struct {
-	// Device_id is the unique identifier of the device
-	Device_id string
-	// Last_comm_s is the last time the device communicated with the server
-	Last_comm_s int64
-	// Last_time_used_s is the last time the device was used
-	Last_time_used_s int64
-	// Device_info is the information about the device
-	Device_info DeviceInfo
 }
 
 type UserLocation struct {
@@ -55,15 +44,10 @@ type UserLocation struct {
 
 // Mod12UserInfo is the format of the custom information file about this specific module.
 type Mod12UserInfo struct {
-	// Devices_info is the information about the devices
-	Devices_info _DevicesInfo
+	// AlwaysWith_device is true if the device is always with the user
+	AlwaysWith_device bool
 	// Locs_info is the information about the locations
 	Locs_info []_LocInfo
-}
-
-type _DevicesInfo struct {
-	// AlwaysWith_device_id is the device id of the device that is always with the user
-	AlwaysWith_device_id string
 }
 
 type _LocInfo struct {
