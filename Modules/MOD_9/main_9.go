@@ -45,8 +45,6 @@ const TIME_SLEEP_S int = 1
 const GET_TASKS_EACH_S int64 = 1 * 60
 var last_get_tasks_when_s int64 = 0
 
-// TODO: Use the new Command attribute of _Mod9UserInfo
-
 var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
@@ -130,10 +128,14 @@ func init() {realMain =
 
 					var condition bool = checkCondition(reminder, notifs_were_true)
 
-					if condition_loc && condition {
+					var device_id_matches bool = checkDevice(reminder)
+
+					if condition_loc && condition && device_id_matches {
 						MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 						log.Println("Reminder! Message: " + reminder.Message)
+
+						// TODO: Execute command here
 					}
 				}
 			}
@@ -180,18 +182,7 @@ func init() {realMain =
 
 				var condition bool = checkCondition(reminder, notifs_were_true)
 
-				var device_id_matches bool = false
-				if len(reminder.Device_IDs) == 0 || reminder.Device_IDs[0] == "3234_ALL" {
-					device_id_matches = true
-				} else {
-					for _, device_id := range reminder.Device_IDs {
-						if device_id == Utils.Device_settings_GL.Device_ID {
-							device_id_matches = true
-
-							break
-						}
-					}
-				}
+				var device_id_matches bool = checkDevice(reminder)
 
 				if condition_time && condition_loc && condition && device_id_matches {
 					MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
@@ -210,6 +201,20 @@ func init() {realMain =
 			}
 		}
 	}
+}
+
+func checkDevice(reminder ModsFileInfo.Reminder) bool {
+	if len(reminder.Device_IDs) == 0 || reminder.Device_IDs[0] == "3234_ALL" {
+		return true
+	}
+
+	for _, device_id := range reminder.Device_IDs {
+		if device_id == Utils.Device_settings_GL.Device_ID {
+			return true
+		}
+	}
+
+	return false
 }
 
 func checkLocation(reminder_loc string, location string) bool {
