@@ -42,7 +42,10 @@ import (
 
 const TIME_SLEEP_S int = 1
 
-// TODO: Use the new Command attribute of _ModUserInfo
+const GET_TASKS_EACH_S int64 = 1 * 60
+var last_get_tasks_when_s int64 = 0
+
+// TODO: Use the new Command attribute of _Mod9UserInfo
 
 var (
 	realMain       Utils.RealMain = nil
@@ -56,7 +59,6 @@ func init() {realMain =
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_9
 
 		var user_location *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
-
 		log.Println("User location:", user_location)
 
 		var notifs_were_true map[string]bool = make(map[string]bool)
@@ -65,21 +67,27 @@ func init() {realMain =
 		var prev_curr_last_known_user_loc string = user_location.Curr_location
 		var prev_prev_last_known_user_loc string = user_location.Prev_location
 		for {
-			Utils.QueueMessageSERVER(true, Utils.NUM_MOD_TasksExecutor, []byte("File|true|reminders.json"))
-			// TODO: This must be in another thread - will block if there's no Internet connection
-			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_TasksExecutor]
-			if comms_map == nil {
-				return
+			if time.Now().Unix() >= last_get_tasks_when_s + GET_TASKS_EACH_S {
+				// Every minute, update the tasks list
+
+				Utils.QueueMessageSERVER(true, Utils.NUM_MOD_TasksExecutor, []byte("File|true|reminders.json"))
+				// TODO: This must be in another thread - will block if there's no Internet connection
+				var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_TasksExecutor]
+				if comms_map == nil {
+					return
+				}
+
+				var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+				if !bytes.Equal(new_crc16, last_crc16) {
+					last_crc16 = new_crc16
+
+					updateLocalReminders()
+
+					last_get_tasks_when_s = time.Now().Unix()
+				}
 			}
 
-			var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-			if !bytes.Equal(new_crc16, last_crc16) {
-				last_crc16 = new_crc16
-
-				updateLocalReminders()
-			}
-
-			var reminders []ModsFileInfo.Reminder = modGenInfo_GL.Reminders
+			var reminders *[]ModsFileInfo.Reminder = &modGenInfo_GL.Reminders
 
 			// Add each reminder to the internal reminders list
 			var reminders_info_list map[string]int64 = modGenInfo_GL.Reminders_info
@@ -87,7 +95,7 @@ func init() {realMain =
 				reminders_info_list = make(map[string]int64)
 				modGenInfo_GL.Reminders_info = reminders_info_list
 			}
-			for _, reminder := range reminders {
+			for _, reminder := range *reminders {
 				if _, ok := reminders_info_list[reminder.Id]; !ok {
 					reminders_info_list[reminder.Id] = 0
 				}
@@ -100,7 +108,7 @@ func init() {realMain =
 				prev_curr_last_known_user_loc = curr_last_known_user_loc
 				prev_prev_last_known_user_loc = prev_last_known_user_loc
 
-				for _, reminder := range reminders {
+				for _, reminder := range *reminders {
 					// If the reminder has a time set or has no location, skip it
 					if reminder.Time != "" || reminder.User_location == "" {
 						continue
@@ -131,11 +139,13 @@ func init() {realMain =
 			}
 
 			// Time/condition trigger - if the time changed (it always does), check if any reminder is triggered
-			for _, reminder := range reminders {
+			for _, reminder := range *reminders {
 				var condition_time bool = false
 				var test_time int64 = 0
 				// If the reminder has no time set, skip it
-				if reminder.Time != "" {
+				if reminder.Time == "" {
+					condition_time = true
+				} else {
 					var curr_time int64 = time.Now().Unix() / 60
 					var reminder_time string = reminder.Time
 					var format string = "2006-01-02 -- 15:04:05"
@@ -144,7 +154,7 @@ func init() {realMain =
 					if reminder.Repeat_each_min > 0 {
 						var repeat_each int64 = reminder.Repeat_each_min
 						for {
-							if test_time + repeat_each <= curr_time {
+							if test_time+repeat_each <= curr_time {
 								test_time += repeat_each
 							} else {
 								break
@@ -152,30 +162,43 @@ func init() {realMain =
 						}
 					}
 
-					condition_time  = curr_time >= test_time && reminders_info_list[reminder.Id] != test_time
-				} else {
-					condition_time = true
+					condition_time = curr_time >= test_time && reminders_info_list[reminder.Id] != test_time
 				}
 
 				// Check if the reminder is due and if it was already reminded
 
 				var condition_loc bool = false
-				if reminder.User_location != "" {
+				if reminder.User_location == "" {
+					condition_loc = true
+				} else {
 					// Check if the reminder has a location and the user is at that location.
 					var curr_user_loc string = user_location.Curr_location
 					if curr_user_loc != MOD_12.UNKNOWN_LOCATION {
 						condition_loc = checkLocation(reminder.User_location, curr_user_loc)
 					}
-				} else {
-					condition_loc = true
 				}
 
 				var condition bool = checkCondition(reminder, notifs_were_true)
 
-				if condition_time && condition_loc && condition {
+				var device_id_matches bool = false
+				if len(reminder.Device_IDs) == 0 || reminder.Device_IDs[0] == "3234_ALL" {
+					device_id_matches = true
+				} else {
+					for _, device_id := range reminder.Device_IDs {
+						if device_id == Utils.Device_settings_GL.Device_ID {
+							device_id_matches = true
+
+							break
+						}
+					}
+				}
+
+				if condition_time && condition_loc && condition && device_id_matches {
 					MOD_3.QueueSpeech(reminder.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 					log.Println("Reminder! Message: " + reminder.Message)
+
+					// TODO: Execute command here
 
 					// Set the last reminded time to the test time
 					reminders_info_list[reminder.Id] = test_time

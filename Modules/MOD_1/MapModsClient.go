@@ -24,10 +24,10 @@
 package MOD_1
 
 import (
-	MOD_9 "RemindersReminder"
 	MOD_3 "Speech"
 	MOD_11 "SpeechRecognition"
 	MOD_10 "SystemState"
+	MOD_9 "TasksExecutor"
 	MOD_12 "UserLocator"
 	"Utils"
 )
