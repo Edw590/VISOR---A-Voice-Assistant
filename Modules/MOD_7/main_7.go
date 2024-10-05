@@ -133,10 +133,6 @@ func init() {realMain =
 			_ = writer.Flush()
 		}
 
-		// Keep this here. Seems it's necessary to say the first hello to Llama3 or it will say it even if we ask
-		// something else.
-		sendToGPT("hello")
-
 		// Process the files to input to the LLM model
 		for {
 			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
