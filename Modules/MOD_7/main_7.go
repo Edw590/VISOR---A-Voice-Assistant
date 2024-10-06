@@ -115,7 +115,7 @@ func init() {realMain =
 
 					Utils.ModsCommsChannels_GL[Utils.NUM_MOD_WebsiteBackend] <- map[string]any{
 						// Send a message to LIB_2 saying the GPT just started writing
-						"Message": []byte("L_2|start"),
+						"Message": []byte(device_id + "|L_2|start"),
 					}
 				} else if strings.Contains(last_answer, "[3234_END]") {
 					is_writing_GL = false

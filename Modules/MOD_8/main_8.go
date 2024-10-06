@@ -167,13 +167,21 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 
-					if err := conn.WriteMessage(websocket.BinaryMessage, message); err != nil {
+					var msg_device_id string = strings.Split(string(message), "|")[0]
+					if msg_device_id != device_id && msg_device_id != "3234_ALL" {
+						continue
+					}
+
+					var index_bar int = strings.Index(string(message), "|")
+					var truncated_msg []byte = message[index_bar + 1:]
+
+					if err := conn.WriteMessage(websocket.BinaryMessage, truncated_msg); err != nil {
 						log.Println("Write error:", err)
 
 						return
 					} else {
-						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(message),
-							CRC16.Result(message, "CCIT_ZERO"), message[:strings.Index(string(message), "|")])
+						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(truncated_msg),
+							CRC16.Result(truncated_msg, "CCIT_ZERO"), truncated_msg[:strings.Index(string(truncated_msg), "|")])
 					}
 			}
 		}
