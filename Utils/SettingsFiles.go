@@ -39,6 +39,10 @@ var Gen_settings_GL GenSettings
 type DeviceSettings struct {
 	// Device_ID is the device ID of the current device
 	Device_ID string
+	// Device_type is the type of the current device
+	Device_type string
+	// Device_description is the description of the current device
+	Device_description string
 
 	// VISOR_dir is the full path to the main directory of VISOR.
 	VISOR_dir string

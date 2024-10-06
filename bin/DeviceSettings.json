@@ -4,6 +4,11 @@
 
 	// Device_ID is the device ID of the current device
 	"Device_ID": "",
+	// Device_type is the type of the device (phone, computer, etc. - you choose the name)
+	"Device_type": "",
+	// Device_description is a description of the device ("personal computer", or the computer model, etc - don't
+	// include "my" or others)
+	"Device_description": "",
 
 	// VISOR_dir is the full path to the main directory of VISOR, be it a Windows or a Unix path
 	"VISOR_dir": "",
