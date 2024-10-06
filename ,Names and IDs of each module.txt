@@ -11,3 +11,4 @@
 10 = System Checker             (client)        [Windows only]
 11 = Speech Recognition         (client)
 12 = User Locator               (client)
+13 = Commands Executor          (client)

@@ -23,6 +23,7 @@ package Screens
 
 import (
 	"GPTComm/GPTComm"
+	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -41,8 +42,13 @@ func Communicator() fyne.CanvasObject {
 	// _Entry and Button section
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
-	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
+	var btn_send_text_gpt *widget.Button = widget.NewButton("Send text to GPT", func() {
 		GPTComm.SendText(entry_txt_to_speech.Text)
+	})
+	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
+		Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
+			"Sentence": entry_txt_to_speech.Text,
+		}
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +81,7 @@ func Communicator() fyne.CanvasObject {
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
 		entry_txt_to_speech,
+		btn_send_text_gpt,
 		btn_send_text,
 		scroll_text,
 	)

@@ -211,10 +211,28 @@ func init() {realMain =
 	}
 }
 
+/*
+QueueSpeech adds a speech to the speech queue.
+
+-----------------------------------------------------------
+
+– Params:
+  - to_speak – the text to speak
+  - priority – the priority of the speech (one of the constants in SpeechQueue)
+  - mode – the mode of the speech (one of the constants in SpeechQueue)
+ */
 func QueueSpeech(to_speak string, priority int, mode int) {
 	SpeechQueue.AddSpeech(to_speak, time.Now().UnixMilli(), priority, mode, "")
 }
 
+/*
+SkipCurrentSpeech skips the current speech.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the speech was skipped successfully, false otherwise
+ */
 func SkipCurrentSpeech() bool {
 	return stopTts(tts_GL)
 }

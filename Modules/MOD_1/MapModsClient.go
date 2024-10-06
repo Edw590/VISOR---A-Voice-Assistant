@@ -24,6 +24,7 @@
 package MOD_1
 
 import (
+	MOD_13 "CmdsExecutor"
 	MOD_3 "Speech"
 	MOD_11 "SpeechRecognition"
 	MOD_10 "SystemState"
@@ -39,4 +40,5 @@ var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
 	Utils.NUM_MOD_SystemChecker:     MOD_10.Start,
 	Utils.NUM_MOD_SpeechRecognition: MOD_11.Start,
 	Utils.NUM_MOD_UserLocator:       MOD_12.Start,
+	Utils.NUM_MOD_CmdsExecutor:      MOD_13.Start,
 }
