@@ -75,17 +75,17 @@ func formatCondition(condition string) string {
 	var registry_values []UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
 	for _, value := range registry_values {
 		var value_str string = "ERROR"
-		if value.Type == UtilsSWA.TYPE_STRING {
+		if value.Type_ == UtilsSWA.TYPE_STRING {
 			value_str = value.GetData(true, nil).(string)
-		} else if value.Type == UtilsSWA.TYPE_INT {
+		} else if value.Type_ == UtilsSWA.TYPE_INT {
 			value_str = strconv.Itoa(value.GetData(true, nil).(int))
-		} else if value.Type == UtilsSWA.TYPE_LONG {
+		} else if value.Type_ == UtilsSWA.TYPE_LONG {
 			value_str = strconv.Itoa(int(value.GetData(true, nil).(int64)))
-		} else if value.Type == UtilsSWA.TYPE_BOOL {
+		} else if value.Type_ == UtilsSWA.TYPE_BOOL {
 			value_str = strconv.FormatBool(value.GetData(true, nil).(bool))
-		} else if value.Type == UtilsSWA.TYPE_FLOAT {
+		} else if value.Type_ == UtilsSWA.TYPE_FLOAT {
 			value_str = strconv.FormatFloat(value.GetData(true, nil).(float64), 'f', -1, 32)
-		} else if value.Type == UtilsSWA.TYPE_DOUBLE {
+		} else if value.Type_ == UtilsSWA.TYPE_DOUBLE {
 			value_str = strconv.FormatFloat(value.GetData(true, nil).(float64), 'f', -1, 64)
 		}
 
