@@ -23,28 +23,28 @@ package ModsFileInfo
 
 // Mod9GenInfo is the format of the custom generated information about this specific module.
 type Mod9GenInfo struct {
-	// Reminders_info maps the reminder ID to the last time the reminder was reminded in Unix minutes
-	Reminders_info map[string]int64
-	// Reminders is the list of all reminders
-	Reminders []Reminder
+	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
+	Tasks_info map[string]int64
+	// Tasks is the list of all tasks
+	Tasks []Task
 }
 
-// Reminder is the format of a reminder
-type Reminder struct {
-	// Id is the reminder ID
+// Task is the format of a task
+type Task struct {
+	// Id is the task ID
 	Id 		    string
-	// Device_IDs are the devices the reminder is set for
+	// Device_IDs are the devices the task is set for
 	Device_IDs  []string
-	// Message is the reminder message
+	// Message is the task message
 	Message     string
-	// Command is the command to be executed when the reminder is triggered on the chosen Device_IDs
+	// Command is the command to be executed when the task is triggered on the chosen Device_IDs
 	Command     string
-	// Time is the time the reminder is set for in the format "2024-12-31 -- 23:59:59"
+	// Time is the time the task is set for in the format "2024-12-31 -- 23:59:59"
 	Time        string
-	// Repeat_each_min is the time in minutes between each repeatition of the reminder
+	// Repeat_each_min is the time in minutes between each repeatition of the task
 	Repeat_each_min int64
-	// User_location is the location the user must be in for the reminder to be triggered
+	// User_location is the location the user must be in for the task to be triggered
 	User_location string
-	// Device_condition is an additional "advanced" condition for the reminder in Go language
+	// Device_condition is an additional "advanced" condition for the task in Go language
 	Device_condition string
 }

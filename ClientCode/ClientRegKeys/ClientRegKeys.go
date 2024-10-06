@@ -25,14 +25,22 @@ import (
 	"Utils/UtilsSWA"
 )
 
+// Modules Manager
+
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
+
+// Speech
 
 // Type: string
 const K_LAST_SPEECH string = "LAST_SPEECH"
 
+// Main app
+
 // Type: bool
 const K_SHOW_APP_SIG string = "SHOW_APP_SIG"
+
+// System Checker
 
 // Type: int
 const K_BATTERY_LEVEL string = "BATTERY_LEVEL"
@@ -49,14 +57,18 @@ const K_SOUND_MUTED string = "SOUND_MUTED"
 RegisterValues registers the client values in the registry.
  */
 func RegisterValues() {
+	// Modules Manager
 	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", UtilsSWA.TYPE_LONG)
 
+	// Speech
 	UtilsSWA.RegisterValueREGISTRY(K_LAST_SPEECH, "Last speech", "The last speech that was spoken", UtilsSWA.TYPE_STRING)
 
+	// Main app
 	UtilsSWA.RegisterValueREGISTRY(K_SHOW_APP_SIG, "Show-app signal", "Signal to show the app", UtilsSWA.TYPE_BOOL)
 
-	UtilsSWA.RegisterValueREGISTRY(K_BATTERY_LEVEL, "Battery level", "The battery level", UtilsSWA.TYPE_INT)
-	UtilsSWA.RegisterValueREGISTRY(K_POWER_CONNECTED, "Power connected", "Whether the power is connected", UtilsSWA.TYPE_BOOL)
+	// System Checker
+	UtilsSWA.RegisterValueREGISTRY(K_BATTERY_LEVEL, "Power - Battery level", "The battery level", UtilsSWA.TYPE_INT)
+	UtilsSWA.RegisterValueREGISTRY(K_POWER_CONNECTED, "Power - Power connected", "Whether the power is connected", UtilsSWA.TYPE_BOOL)
 	UtilsSWA.RegisterValueREGISTRY(K_SCREEN_BRIGHTNESS, "Screen brightness", "The screen brightness", UtilsSWA.TYPE_INT)
 	UtilsSWA.RegisterValueREGISTRY(K_SOUND_VOLUME, "Sound volume", "The sound volume", UtilsSWA.TYPE_INT)
 	UtilsSWA.RegisterValueREGISTRY(K_SOUND_MUTED, "Sound muted", "Whether the sound is muted", UtilsSWA.TYPE_BOOL)

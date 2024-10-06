@@ -19,7 +19,7 @@
  * under the License.
  ******************************************************************************/
 
-package RRComm
+package TEHelper
 
 import (
 	"Utils"
@@ -27,23 +27,23 @@ import (
 )
 
 /*
-GetRemindersList returns a list of all reminders.
+GetTasksList returns a list of all reminders.
 
 -----------------------------------------------------------
 
 – Returns:
   - a list of all reminders
- */
-func GetRemindersList() *[]ModsFileInfo.Reminder {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_RRComm, []byte("File|false|reminders.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_RRComm]
+*/
+func GetTasksList() *[]ModsFileInfo.Task {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|false|tasks.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
 	if comms_map == nil {
 		return nil
 	}
 
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	var reminders []ModsFileInfo.Reminder
+	var reminders []ModsFileInfo.Task
 	if err := Utils.FromJsonGENERAL(file_contents, &reminders); err != nil {
 		return nil
 	}
@@ -58,17 +58,17 @@ GetIdsList returns a list of all reminders' IDs.
 
 – Returns:
   - a list of all reminders' IDs separated by "|"
- */
+*/
 func GetIdsList() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_RRComm, []byte("File|false|reminders.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_RRComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|false|tasks.json"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
 	if comms_map == nil {
 		return ""
 	}
 
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	var user_location []ModsFileInfo.Reminder
+	var user_location []ModsFileInfo.Task
 	if err := Utils.FromJsonGENERAL(file_contents, &user_location); err != nil {
 		return ""
 	}
@@ -82,7 +82,7 @@ func GetIdsList() string {
 }
 
 /*
-GetReminderById returns a reminder by its ID.
+GetTaskById returns a reminder by its ID.
 
 -----------------------------------------------------------
 
@@ -91,9 +91,9 @@ GetReminderById returns a reminder by its ID.
 
 – Returns:
   - the reminder or nil if the reminder was not found
- */
-func GetReminderById(id string) *ModsFileInfo.Reminder {
-	var p_reminders *[]ModsFileInfo.Reminder = GetRemindersList()
+*/
+func GetTaskById(id string) *ModsFileInfo.Task {
+	var p_reminders *[]ModsFileInfo.Task = GetTasksList()
 	if p_reminders == nil {
 		return nil
 	}

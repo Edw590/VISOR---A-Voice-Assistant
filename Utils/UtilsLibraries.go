@@ -27,7 +27,7 @@ const (
 	NUM_LIB_GPTComm
 	NUM_LIB_SpeechQueue
 	NUM_LIB_ULComm
-	NUM_LIB_RRComm
+	NUM_LIB_TEHelper
 
 	LIBS_ARRAY_SIZE
 )
@@ -38,5 +38,5 @@ var LIB_NUMS_NAMES map[int]string = map[int]string{
 	NUM_LIB_GPTComm:     "GPT Communicator",
 	NUM_LIB_SpeechQueue: "Speech Queue",
 	NUM_LIB_ULComm:      "User Locator Communicator",
-	NUM_LIB_RRComm:      "Reminders Reminder Communicator",
+	NUM_LIB_TEHelper:    "Tasks Executor Helper",
 }

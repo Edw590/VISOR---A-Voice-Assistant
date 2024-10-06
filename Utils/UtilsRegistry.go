@@ -32,8 +32,8 @@ type Value struct {
 	Pretty_name string
 	// Description is the Description of the value
 	Description string
-	// Type_ is the type of the value
-	Type_ string
+	// Type is the type of the value
+	Type string
 
 	// Prev_data is the previous data of the value
 	Prev_data string

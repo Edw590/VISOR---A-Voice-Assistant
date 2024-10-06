@@ -8,7 +8,7 @@ use (
 	Libraries/GPTComm
 	Libraries/OICComm
 	Libraries/SpeechQueue
-	Libraries/RRComm
+	Libraries/TEHelper
 	Modules/MOD_1
 	Modules/MOD_2
 	Modules/MOD_3

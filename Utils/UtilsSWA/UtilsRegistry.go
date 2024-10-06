@@ -42,8 +42,8 @@ type Value struct {
 	Pretty_name string
 	// Description is the Description of the value
 	Description string
-	// Type_ is the type of the value
-	Type_ string
+	// Type is the type of the value
+	Type string
 
 	// Prev_data is the previous data of the value
 	Prev_data string
@@ -81,10 +81,10 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 		Key:         key,
 		Pretty_name: pretty_name,
 		Description: description,
-		Type_:       value_type,
+		Type:        value_type,
 	}
 
-	switch value.Type_ {
+	switch value.Type {
 		case TYPE_BOOL:
 			value.Prev_data = "false"
 			value.Curr_data = "false"
@@ -105,6 +105,17 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 	return value
 }
 
+/*
+GetValueREGISTRY gets a value from the registry based on its key.
+
+-----------------------------------------------------------
+
+– Params:
+  - key – the key of the value
+
+– Returns:
+  - the value or nil if the value doesn't exist
+ */
 func GetValueREGISTRY(key string) *Value {
 	for _, value := range Utils.Gen_settings_GL.Registry {
 		if value.Key == key {
@@ -113,6 +124,23 @@ func GetValueREGISTRY(key string) *Value {
 	}
 
 	return nil
+}
+
+/*
+GetValuesREGISTRY gets all the values in the registry.
+
+-----------------------------------------------------------
+
+– Returns:
+  - all the values in the registry
+ */
+func GetValuesREGISTRY() []Value {
+	var values []Value
+	for _, value := range Utils.Gen_settings_GL.Registry {
+		values = append(values, (Value) (*value))
+	}
+
+	return values
 }
 
 /*
@@ -134,12 +162,20 @@ func RemoveValueREGISTRY(key string) {
 	}
 }
 
+/*
+GetRegistryTextREGISTRY gets a text representation of the registry.
+
+-----------------------------------------------------------
+
+– Returns:
+  - a text representation of the registry
+ */
 func GetRegistryTextREGISTRY() string {
 	var text string = ""
 
 	for _, value := range Utils.Gen_settings_GL.Registry {
 		text += "Name: " + value.Pretty_name + "\n" +
-			"Type: " + value.Type_ + "\n" +
+			"Type: " + value.Type + "\n" +
 			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
 			"Prev data: " + value.Prev_data + "\n" +
 			"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_curr) + "\n" +
@@ -210,7 +246,7 @@ GetType returns the type of the Value.
   - the type of the Value
 */
 func (value *Value) GetType() string {
-	return value.Type_
+	return value.Type
 }
 
 /*
@@ -382,7 +418,7 @@ func (value *Value) GetData(curr_data bool, no_data any) any {
 		return no_data_ret
 	}
 
-	switch value.Type_ {
+	switch value.Type {
 		case TYPE_BOOL:
 			return value.GetBool(curr_data)
 		case TYPE_INT:
@@ -429,7 +465,7 @@ SetBool sets the value to a boolean.
   - whether the data was set
 */
 func (value *Value) SetBool(data bool, update_if_same bool) bool {
-	if value.Type_ != TYPE_BOOL {
+	if value.Type != TYPE_BOOL {
 		return false
 	}
 
@@ -464,7 +500,7 @@ SetInt sets the value to an integer.
   - whether the data was set
 */
 func (value *Value) SetInt(data int, update_if_same bool) bool {
-	if value.Type_ != TYPE_INT {
+	if value.Type != TYPE_INT {
 		return false
 	}
 
@@ -494,7 +530,7 @@ SetLong sets the value to a long.
   - whether the data was set
 */
 func (value *Value) SetLong(data int64, update_if_same bool) bool {
-	if value.Type_ != TYPE_LONG {
+	if value.Type != TYPE_LONG {
 		return false
 	}
 
@@ -524,7 +560,7 @@ SetFloat sets the value to a float.
   - whether the data was set
 */
 func (value *Value) SetFloat(data float32, update_if_same bool) bool {
-	if value.Type_ != TYPE_FLOAT {
+	if value.Type != TYPE_FLOAT {
 		return false
 	}
 
@@ -554,7 +590,7 @@ SetDouble sets the value to a double.
   - whether the data was set
 */
 func (value *Value) SetDouble(data float64, update_if_same bool) bool {
-	if value.Type_ != TYPE_DOUBLE {
+	if value.Type != TYPE_DOUBLE {
 		return false
 	}
 
@@ -584,7 +620,7 @@ SetString sets the value to a string.
   - whether the data was set
 */
 func (value *Value) SetString(data string, update_if_same bool) bool {
-	if value.Type_ != TYPE_STRING {
+	if value.Type != TYPE_STRING {
 		return false
 	}
 
@@ -611,7 +647,7 @@ SetData sets the value and converts it to the right type automatically.
   - whether the data was set
 */
 func (value *Value) SetData(data any, update_if_same bool) bool {
-	switch value.Type_ {
+	switch value.Type {
 		case TYPE_BOOL:
 			return value.SetBool(data.(bool), update_if_same)
 		case TYPE_INT:

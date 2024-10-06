@@ -19,6 +19,6 @@ gomobile bind^
  "OICComm/OICComm"^
  "GPTComm/GPTComm"^
  "SpeechQueue/SpeechQueue"^
- "RRComm/RRComm"
+ "TEHelper/TEHelper"
 
 echo Error code: %ERRORLEVEL%
