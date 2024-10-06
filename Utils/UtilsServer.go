@@ -38,6 +38,7 @@ const COMMS_MAP_SRV_KEY string = "SrvComm"
 var srvComm_gen_ch_in_GL chan []byte
 var srvComm_gen_ch_out_GL chan []byte
 var srvComm_stop_GL bool = false
+var srvComm_stopping_GL bool = false
 var srvComm_started_GL bool = false
 
 /*
@@ -169,6 +170,7 @@ func StartCommunicatorSERVER() bool {
 
 	for {
 		if WaitWithStopTIMEDATE(&srvComm_stop_GL, 1000000000) {
+			srvComm_stopping_GL = true
 			close(srvComm_gen_ch_in_GL)
 			close(srvComm_gen_ch_out_GL)
 			_ = conn.Close()
@@ -177,6 +179,7 @@ func StartCommunicatorSERVER() bool {
 					log.Println("Communicator stopped")
 
 					srvComm_started_GL = false
+					srvComm_stopping_GL = false
 
 					return true
 				}
@@ -195,7 +198,7 @@ The message is sent by QueueGeneralMessageSERVER().
 If no message is available, the function will wait until a message is received.
 */
 func GetGeneralMessageSERVER() []byte {
-	if !srvComm_started_GL {
+	if srvComm_stopping_GL || !srvComm_started_GL {
 		return nil
 	}
 
@@ -213,7 +216,7 @@ It is received by GetGeneralMessageSERVER().
   - message – the message to be sent
 */
 func QueueGeneralMessageSERVER(message []byte) {
-	if !srvComm_started_GL {
+	if srvComm_stopping_GL || !srvComm_started_GL {
 		return
 	}
 
@@ -232,7 +235,7 @@ QueueMessageSERVER queues a message to be sent to the server.
   - message – the message to be sent
 */
 func QueueMessageSERVER(is_mod bool, num int, message []byte) {
-	if !srvComm_started_GL {
+	if srvComm_stopping_GL || !srvComm_started_GL {
 		return
 	}
 
@@ -254,7 +257,7 @@ QueueNoResponseMessageSERVER queues a message to be sent to the server without e
   - message – the message to be sent
 */
 func QueueNoResponseMessageSERVER(message []byte) {
-	if !srvComm_started_GL {
+	if srvComm_stopping_GL || !srvComm_started_GL {
 		return
 	}
 
