@@ -26,6 +26,7 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"bufio"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -62,7 +63,13 @@ func init() {realMain =
 		cmd := exec.Command(Utils.GetShell("", ""))
 		stdin, _ := cmd.StdinPipe()
 		stdout, _ := cmd.StdoutPipe()
-		_ = cmd.Start()
+		//stderr, _ := cmd.StderrPipe()
+		err := cmd.Start()
+		if err != nil {
+			log.Println("Error starting GPT:", err)
+
+			return
+		}
 
 		// Begin with the server ID (to say the first hello)
 		var device_id string = Utils.Device_settings_GL.Device_ID
@@ -120,11 +127,26 @@ func init() {realMain =
 				}
 			}
 		}()
+		/*go func() {
+			buf := bufio.NewReader(stderr)
+			for {
+				var one_byte []byte = make([]byte, 1)
+				n, _ := buf.Read(one_byte)
+				if n == 0 {
+					// End of the stream (pipe closed by the main module thread)
+
+					return
+				}
+
+				var one_byte_str string = string(one_byte)
+				fmt.Print(one_byte_str)
+			}
+		}()*/
 
 		// Configure the LLM model
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli -m " + modUserInfo_GL.Model_loc + " " +
-			"--in-suffix [3234_START] --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --mlock " +
+			"--in-suffix [3234_START] --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --keep -1 --mlock " +
 			"--prompt \"" + modUserInfo_GL.Config_str + "\"\n")
 		_ = writer.Flush()
 
@@ -132,6 +154,10 @@ func init() {realMain =
 			_, _ = writer.WriteString(Utils.RemoveNonGraphicChars(to_send) + "\n")
 			_ = writer.Flush()
 		}
+
+		// Keep this here. Seems sometimes it's necessary to say the first hello to Llama3 or it will say it even if we
+		// ask something else (or Llama3 might start writing random things).
+		sendToGPT("hello")
 
 		// Process the files to input to the LLM model
 		for {
