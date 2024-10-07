@@ -89,6 +89,7 @@ func GetNextSpeechSentence() string {
 		//log.Println("text: \"" + text + "\"")
 
 		text = strings.Replace(text, END_ENTRY, ".", -1)
+		text = strings.Replace(text, "...", ".", -1)
 		if last_idx_begin_GL != 0 && last_idx_begin_GL >= len(text) {
 			sentence = ""
 
