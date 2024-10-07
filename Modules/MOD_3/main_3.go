@@ -171,7 +171,7 @@ func init() {realMain =
 			for {
 				// Keep getting the next sentence to speak from the server
 				var speak string = GPTComm.GetNextSpeechSentence()
-				if speak == GPTComm.END_ENTRY {
+				if speak == "" || speak == GPTComm.END_ENTRY {
 					continue
 				}
 

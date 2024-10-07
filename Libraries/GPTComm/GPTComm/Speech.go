@@ -60,7 +60,8 @@ The function will wait until the time of the next speech is reached.
 -----------------------------------------------------------
 
 – Returns:
-  - the next sentence to be spoken or END_ENTRY if the end of the text file is reached
+  - the next sentence to be spoken (sometimes may return an empty string - ignore) or END_ENTRY if the end of the text
+    file is reached
  */
 func GetNextSpeechSentence() string {
 	if curr_entry_time_ms_GL == -1 {
@@ -88,19 +89,28 @@ func GetNextSpeechSentence() string {
 		//log.Println("--------------------------")
 		//log.Println("text: \"" + text + "\"")
 
-		text = strings.Replace(text, END_ENTRY, ". ", -1)
+		text = strings.Replace(text, "\n", ". ", -1)
+		text = strings.Replace(text, END_ENTRY, ". " + END_ENTRY, 1)
 		text = strings.Replace(text, "...", ".", -1)
+		//log.Println("text: \"" + text + "\"")
 		if last_idx_begin_GL != 0 && last_idx_begin_GL >= len(text) {
 			sentence = ""
 
 			break
 		}
 
+		//E se ainda não houver mais texto e isto já tiver tentado ir buscar...? Não vai haver texto, isto vai sair do ciclo e vai retornar END_ENTRY.
+		//	Isto tem de esperar até encontrar o 3234_END!
+
 		var dot_idx = strings.Index(text[last_idx_begin_GL:], ". ")
 		var dot_idx2 = strings.IndexAny(text[last_idx_begin_GL:], "!?")
 		if dot_idx2 != -1 && (dot_idx == -1 || dot_idx2 < dot_idx) {
 			dot_idx = dot_idx2
 		}
+
+		//log.Println("dot_idx:", dot_idx)
+		//log.Println("last_idx_begin_GL:", last_idx_begin_GL)
+		//log.Println("text[last_idx_begin_GL:]:", text[last_idx_begin_GL:])
 
 		// If the last dot index is not found, it means that the sentence is not finished yet. So, we must wait for the
 		// next entry to be added to the text file.
@@ -113,21 +123,29 @@ func GetNextSpeechSentence() string {
 			break
 		}
 
-		time.Sleep(1 * time.Second)
+		if strings.Contains(text[last_idx_begin_GL:], END_ENTRY) {
+			sentence = END_ENTRY
+			curr_entry_time_ms_GL = -1
+			last_idx_begin_GL = 0
+
+			break
+		} else {
+			time.Sleep(1 * time.Second)
+		}
+	}
+
+	if !strings.ContainsAny(sentence, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		sentence = ""
 	}
 
 	//log.Println("sentence: \"" + sentence + "\"")
 
-	if sentence == "" || !strings.ContainsAny(sentence, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-		sentence = END_ENTRY
-		curr_entry_time_ms_GL = -1
-		last_idx_begin_GL = 0
-	}
-
-	if last_speech_GL == "" {
-		last_speech_GL = sentence
-	} else {
-		last_speech_GL += " " + sentence
+	if sentence != "" {
+		if last_speech_GL == "" {
+			last_speech_GL = sentence
+		} else {
+			last_speech_GL += " " + sentence
+		}
 	}
 
 	return sentence
