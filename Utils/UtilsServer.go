@@ -117,7 +117,9 @@ func StartCommunicatorSERVER() bool {
 			var index_bar int = strings.Index(string(message), "|")
 			var truncated_msg []byte = message[index_bar + 1:]
 			if msg_to == "G" {
-				srvComm_gen_ch_in_GL <- truncated_msg
+				if !srvComm_stopping_GL {
+					srvComm_gen_ch_in_GL <- truncated_msg
+				}
 
 				continue
 			}
@@ -130,10 +132,12 @@ func StartCommunicatorSERVER() bool {
 				continue
 			}
 
-			if to_mod {
-				ModsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
-			} else {
-				LibsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
+			if !srvComm_stopping_GL {
+				if to_mod {
+					ModsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
+				} else {
+					LibsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
+				}
 			}
 		}
 		routines_working[0] = false
