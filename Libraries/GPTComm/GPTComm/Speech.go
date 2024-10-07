@@ -88,22 +88,27 @@ func GetNextSpeechSentence() string {
 		//log.Println("--------------------------")
 		//log.Println("text: \"" + text + "\"")
 
-		text = strings.Replace(text, END_ENTRY, ".", -1)
+		text = strings.Replace(text, END_ENTRY, ". ", -1)
 		text = strings.Replace(text, "...", ".", -1)
 		if last_idx_begin_GL != 0 && last_idx_begin_GL >= len(text) {
 			sentence = ""
 
 			break
 		}
-		var dot_idx = strings.IndexAny(text[last_idx_begin_GL:], ".!?")
+
+		var dot_idx = strings.Index(text[last_idx_begin_GL:], ". ")
+		var dot_idx2 = strings.IndexAny(text[last_idx_begin_GL:], "!?")
+		if dot_idx2 != -1 && (dot_idx == -1 || dot_idx2 < dot_idx) {
+			dot_idx = dot_idx2
+		}
 
 		// If the last dot index is not found, it means that the sentence is not finished yet. So, we must wait for the
 		// next entry to be added to the text file.
 		if dot_idx != -1 {
-			sentence = text[last_idx_begin_GL : last_idx_begin_GL + dot_idx + 1]
+			sentence = text[last_idx_begin_GL : last_idx_begin_GL + dot_idx + 2]
 			sentence = strings.Trim(sentence, " ")
 
-			last_idx_begin_GL += dot_idx + 1
+			last_idx_begin_GL += dot_idx + 2
 
 			break
 		}
