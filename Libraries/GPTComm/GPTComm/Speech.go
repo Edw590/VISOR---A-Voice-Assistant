@@ -83,9 +83,11 @@ func GetNextSpeechSentence() string {
 			}
 		} else if response == "true" || response == "false" {
 			gpt_ready_GL = response
-
-			return END_ENTRY
 		}
+	}
+	if curr_entry_time_ms_GL == -1 {
+		// If no Entry was found, return END_ENTRY
+		return END_ENTRY
 	}
 
 	//log.Println("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
@@ -95,6 +97,12 @@ func GetNextSpeechSentence() string {
 	var sentence string = ""
 	for {
 		var entry *_Entry = getEntry(curr_entry_time_ms_GL, -1)
+		if entry.getTime() == -1 {
+			// Maybe no Internet connection, so it returns an empty Entry. Just wait until there is connection again.
+			time.Sleep(1 * time.Second)
+
+			continue
+		}
 		var text = entry.getText()
 
 		//log.Println("--------------------------")
@@ -109,9 +117,6 @@ func GetNextSpeechSentence() string {
 
 			break
 		}
-
-		//E se ainda não houver mais texto e isto já tiver tentado ir buscar...? Não vai haver texto, isto vai sair do ciclo e vai retornar END_ENTRY.
-		//	Isto tem de esperar até encontrar o 3234_END!
 
 		var dot_idx = strings.Index(text[last_idx_begin_GL:], ". ")
 		var dot_idx2 = strings.IndexAny(text[last_idx_begin_GL:], "!?")
@@ -135,6 +140,7 @@ func GetNextSpeechSentence() string {
 		}
 
 		if strings.Contains(text[last_idx_begin_GL:], END_ENTRY) {
+			//log.Println("RRRRRRRRRRRRRRRRRRR")
 			sentence = END_ENTRY
 			curr_entry_time_ms_GL = -1
 			last_idx_begin_GL = 0

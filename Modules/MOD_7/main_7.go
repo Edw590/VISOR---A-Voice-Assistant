@@ -104,6 +104,7 @@ func init() {realMain =
 				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
 						if last_word != "[3234_START]" && last_word != "[3234_END]" {
+							// Meaning: new word written
 							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
 						}
 
