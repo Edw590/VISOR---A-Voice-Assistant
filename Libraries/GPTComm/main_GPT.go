@@ -44,17 +44,29 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}*/
 
-
-	GPTComm.SendText("hello")
 	/*for {
 		log.Println(GPT.GetEntry(-1, -1))
 
 		time.Sleep(1 * time.Second)
 	}*/
 
-	for {
-		log.Println("sentence: " + GPTComm.GetNextSpeechSentence())
+	go func() {for {
+		var sentence string = GPTComm.GetNextSpeechSentence()
+		if sentence == "" {
+			continue
+		}
 
+		log.Println("sentence: " + sentence)
+
+		time.Sleep(1 * time.Second)
+	}
+	}()
+
+	time.Sleep(1 * time.Second)
+
+	log.Println(GPTComm.SendText("hello"))
+
+	for {
 		time.Sleep(1 * time.Second)
 	}
 }

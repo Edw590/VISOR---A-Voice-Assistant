@@ -25,7 +25,10 @@ import (
 	"Utils"
 	"strconv"
 	"strings"
+	"time"
 )
+
+var gpt_ready_GL string
 
 /*
 SendText sends the given text to the LLM model.
@@ -35,10 +38,16 @@ SendText sends the given text to the LLM model.
 – Params:
   - text – the text to send
 */
-func SendText(text string) {
+func SendText(text string) bool {
 	var message []byte = []byte("GPT|")
 	message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "]" + text)...)
-	Utils.QueueNoResponseMessageSERVER(message)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, message)
+	time.Sleep(1 * time.Second)
+
+	var ret = gpt_ready_GL == "true"
+	gpt_ready_GL = ""
+
+	return ret
 }
 
 /*

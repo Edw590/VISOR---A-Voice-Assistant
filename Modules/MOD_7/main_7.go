@@ -26,6 +26,7 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -48,13 +49,17 @@ var is_writing_GL bool = false
 var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod7GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
 		modUserInfo_GL = &Utils.User_settings_GL.MOD_7
+
+		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
 		// Force stop Llama to start fresh, in case for any reason it's running without the module being running too,
 		// like a force-stop on the module which doesn't call forceStopLlama().
@@ -63,7 +68,7 @@ func init() {realMain =
 		cmd := exec.Command(Utils.GetShell("", ""))
 		stdin, _ := cmd.StdinPipe()
 		stdout, _ := cmd.StdoutPipe()
-		//stderr, _ := cmd.StderrPipe()
+		stderr, _ := cmd.StderrPipe()
 		err := cmd.Start()
 		if err != nil {
 			log.Println("Error starting GPT:", err)
@@ -74,25 +79,27 @@ func init() {realMain =
 		// Begin with the server ID (to say the first hello)
 		var device_id string = Utils.Device_settings_GL.Device_ID
 
+		var shut_down bool = false
+
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 		// Start a goroutine to print to the screen and write to a file the output of the LLM model
 		go func() {
-
 			buf := bufio.NewReader(stdout)
 			var last_answer string = ""
 			var last_word string = ""
 			for {
 				var one_byte []byte = make([]byte, 1)
-				n, _ := buf.Read(one_byte)
-				if n == 0 {
-					// End of the stream (pipe closed by the main module thread)
+				n, err := buf.Read(one_byte)
+				if n == 0 || err != nil {
+					// End of the stream (pipe closed by the main module thread or some error occurred - so shut down)
+					shut_down = true
 
 					return
 				}
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				//fmt.Print(one_byte_str)
+				fmt.Print(one_byte_str)
 
 				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
@@ -107,6 +114,7 @@ func init() {realMain =
 				}
 
 				if strings.Contains(last_answer, "[3234_START]") {
+					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 					is_writing_GL = true
 					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
 
@@ -124,10 +132,13 @@ func init() {realMain =
 
 					last_word = ""
 					last_answer = ""
+
+
+					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
 				}
 			}
 		}()
-		/*go func() {
+		go func() {
 			buf := bufio.NewReader(stderr)
 			for {
 				var one_byte []byte = make([]byte, 1)
@@ -141,18 +152,28 @@ func init() {realMain =
 				var one_byte_str string = string(one_byte)
 				fmt.Print(one_byte_str)
 			}
-		}()*/
+		}()
 
 		// Configure the LLM model
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli -m " + modUserInfo_GL.Model_loc + " " +
-			"--in-suffix [3234_START] --interactive-first --ctx-size 0 --threads 4 --temp 0.2 --keep -1 --mlock " +
+			"--in-suffix [3234_START] --interactive-first --ctx-size 8192 --threads 4 --temp 1.0 --keep -1 --mlock " +
 			"--prompt \"" + modUserInfo_GL.Config_str + "\"\n")
 		_ = writer.Flush()
 
+		// Wait for the LLM model to start
+		Utils.WaitWithStopTIMEDATE(module_stop, 30)
+
 		sendToGPT := func(to_send string) {
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer.WriteString(Utils.RemoveNonGraphicChars(to_send) + "\n")
 			_ = writer.Flush()
+
+			time.Sleep(5 * time.Second)
+
+			for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY && !*module_stop {
+				time.Sleep(1 * time.Second)
+			}
 		}
 
 		// Keep this here. Seems sometimes it's necessary to say the first hello to Llama3 or it will say it even if we
@@ -161,10 +182,17 @@ func init() {realMain =
 
 		// Process the files to input to the LLM model
 		for {
+			if *module_stop {
+				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+				forceStopLlama()
+				_ = stdout.Close()
+
+				return
+			}
+
 			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
 			var file_list []Utils.FileInfo = to_process_dir.GetFileList()
 			for len(file_list) > 0 {
-				var shut_down bool = false
 				file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
 				var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
 
@@ -193,7 +221,7 @@ func init() {realMain =
 							}
 						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
 							// Search for the Wikipedia page title
-							var query string = text[len(ASK_WOLFRAM_ALPHA):]
+							var query string = text[len(SEARCH_WIKIPEDIA):]
 
 							_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + MOD_6.RetrieveWikipedia(query) +
 								getEndString(), true)
@@ -207,6 +235,7 @@ func init() {realMain =
 				_ = os.Remove(file_path.GPathToStringConversion())
 
 				if shut_down {
+					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 					forceStopLlama()
 					_ = stdout.Close()
 
@@ -215,6 +244,7 @@ func init() {realMain =
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 				forceStopLlama()
 				_ = stdout.Close()
 

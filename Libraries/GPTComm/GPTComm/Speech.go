@@ -50,6 +50,8 @@ func SetTimeBegin(time_begin_ms int64) {
 /*
 GetNextSpeechSentence gets the next sentence to be spoken of the most recent speech.
 
+THIS FUNCTION MUST BE IN LOOP BEFORE CALLING SendText()!!!
+
 Each time the function is called, a new sentence is returned, until the end of the text file is reached, in which case
 the function will return END_ENTRY.
 
@@ -70,7 +72,8 @@ func GetNextSpeechSentence() string {
 			return END_ENTRY
 		}
 
-		if string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)) == "start" {
+		var response string = string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte))
+		if response == "start" {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
 			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Device_settings_GL.Device_ID || device_id == ALL_DEVICES_ID) {
@@ -78,8 +81,16 @@ func GetNextSpeechSentence() string {
 				time_begin_ms_GL = curr_entry_time_ms_GL + 1
 				last_speech_GL = ""
 			}
+		} else if response == "true" || response == "false" {
+			gpt_ready_GL = response
+
+			return END_ENTRY
 		}
 	}
+
+	//log.Println("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
+	//log.Println("curr_entry_time_ms_GL:", curr_entry_time_ms_GL)
+	//log.Println("time_begin_ms_GL:", time_begin_ms_GL)
 
 	var sentence string = ""
 	for {
@@ -141,12 +152,13 @@ func GetNextSpeechSentence() string {
 	//log.Println("sentence: \"" + sentence + "\"")
 
 	if sentence != "" {
-		if last_speech_GL == "" {
-			last_speech_GL = sentence
-		} else {
-			last_speech_GL += " " + sentence
+		if last_speech_GL != "" {
+			last_speech_GL += " "
 		}
+		last_speech_GL += sentence
 	}
+
+	//log.Println("last_speech_GL: \"" + last_speech_GL + "\"")
 
 	return sentence
 }

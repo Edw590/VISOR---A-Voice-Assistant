@@ -231,16 +231,16 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
 
-			if err := conn.WriteMessage(websocket.BinaryMessage, response); err != nil {
+			if err := conn.WriteMessage(websocket.BinaryMessage, response); err == nil {
+				log.Printf("Message sent 1. Length: %d; CRC16: %d; Content: %s", len(response),
+					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
+			} else {
 				log.Println("Write error:", err)
 
 				break
-			} else {
-				log.Printf("Message sent 1. Length: %d; CRC16: %d; Content: %s", len(response),
-					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
 			}
 		} else {
-			log.Println("Giving no response")
+			log.Println("Returning no response")
 		}
 	}
 
@@ -290,11 +290,21 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 				return Utils.CompressString(*p_file_contents)
 			}
 		case "GPT":
-			// Send a file to be processed by the GPT model.
+			// Send a text to be processed by the GPT model.
 			// Example: a compressed string
-			// Returns: nothing
-			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process", "test.txt").
-				WriteTextFile(Utils.DecompressString(bytes), false)
+			// Returns: true if the text will be processed immediately, false if the GPT is busy for now and the text
+			// will wait
+			var ret []byte
+			if Utils.Gen_settings_GL.MOD_7.State == ModsFileInfo.MOD_7_STATE_READY {
+				ret = []byte("true")
+			} else {
+				ret = []byte("false")
+			}
+
+			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
+				Utils.RandStringGENERAL(10) + ".txt").WriteTextFile(Utils.DecompressString(bytes), false)
+
+			return ret
 	}
 
 	// Just to return something

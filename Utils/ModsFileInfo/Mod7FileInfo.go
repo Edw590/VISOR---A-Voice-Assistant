@@ -21,6 +21,19 @@
 
 package ModsFileInfo
 
+const MOD_7_STATE_READY int = 0
+const MOD_7_STATE_STARTING int = 1
+const MOD_7_STATE_BUSY int = 2
+const MOD_7_STATE_STOPPING int = 3
+
+// Mod12GenInfo is the format of the custom generated information about this specific module.
+type Mod7GenInfo struct {
+	// State is the state of the module
+	State int
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 // Mod7UserInfo is the format of the custom information file about this specific module.
 type Mod7UserInfo struct {
 	// Model_loc is the location of the model file

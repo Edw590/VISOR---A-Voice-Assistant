@@ -23,6 +23,8 @@ package Screens
 
 import (
 	"GPTComm/GPTComm"
+	MOD_3 "Speech"
+	"SpeechQueue/SpeechQueue"
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -43,7 +45,9 @@ func Communicator() fyne.CanvasObject {
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
 	var btn_send_text_gpt *widget.Button = widget.NewButton("Send text to GPT", func() {
-		GPTComm.SendText(entry_txt_to_speech.Text)
+		if !GPTComm.SendText(entry_txt_to_speech.Text) {
+			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment.", SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+		}
 	})
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
