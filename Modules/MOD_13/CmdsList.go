@@ -21,6 +21,11 @@
 
 package MOD_13
 
+import (
+	"ACD/ACD"
+	"strings"
+)
+
 ///////////////////////////////////////////////////////////////////
 // Commands list
 
@@ -122,4 +127,46 @@ var cmdi_info map[string]string = map[string]string{
 	//CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
 	//CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
 	//CMD_GONNA_SLEEP:               CMDi_INF1_ONLY_SPEAK,       // 28
+}
+
+///////////////////////////////////////////////////////////////////
+// Prepare commands strings
+
+func prepareCommandsString() string {
+	var commands = [...][]string{
+		//{CMD_TOGGLE_FLASHLIGHT, ACD.CMDi_TYPE_TURN_ONFF, "", "", "flashlight/lantern"},
+		{CMD_ASK_TIME, ACD.CMDi_TYPE_ASK, "", "", "time"},
+		{CMD_ASK_DATE, ACD.CMDi_TYPE_ASK, "", "", "date"},
+		//{CMD_TOGGLE_WIFI, ACD.CMDi_TYPE_TURN_ONFF, "", "", "wifi"},
+		//{CMD_TOGGLE_MOBILE_DATA, ACD.CMDi_TYPE_TURN_ONFF, "", "", "mobile data"},
+		//{CMD_TOGGLE_BLUETOOTH, ACD.CMDi_TYPE_TURN_ONFF, "", "", "bluetooth"},
+		//{CMD_ANSWER_CALL, ACD.CMDi_TYPE_ANSWER, "", "", "call"},
+		//{CMD_END_CALL, ACD.CMDi_TYPE_STOP, "", "", "call"},
+		//{CMD_TOGGLE_SPEAKERS, ACD.CMDi_TYPE_TURN_ONFF, "", "", "speaker/speakers"},
+		//{CMD_TOGGLE_AIRPLANE_MODE, ACD.CMDi_TYPE_TURN_ONFF, "", "", "airplane mode"},
+		{CMD_ASK_BATTERY_PERCENT, ACD.CMDi_TYPE_ASK, "", "", "battery percentage", "battery status", "battery level"},
+		//{CMD_SHUT_DOWN_DEVICE, ACD.CMDi_TYPE_SHUT_DOWN, "", "", "device/phone"},
+		//{CMD_REBOOT_DEVICE, ACD.CMDi_TYPE_REBOOT, "fast", "fast|;4; -fast", "reboot/restart device/phone|device/phone|device/phone recovery|device/phone safe mode|device/phone bootloader"},
+		//{CMD_TAKE_PHOTO, ACD.CMDi_TYPE_NONE, "take", "", "picture/photo|frontal picture/photo"},
+		//{CMD_RECORD_MEDIA, ACD.CMDi_TYPE_START, "record", "record|record|;4; -record", "audio/sound|video/camera|recording audio/sound|recording video/camera"},
+		//{CMD_SAY_AGAIN, ACD.CMDi_TYPE_REPEAT_SPEECH, "", "", "again", "say", "said"},
+		//{CMD_MAKE_CALL, ACD.CMDi_TYPE_NONE, "make place", "", "call"},
+		//{CMD_TOGGLE_POWER_SAVER_MODE, ACD.CMDi_TYPE_TURN_ONFF, "", "", "power/battery saver"},
+		//{CMD_STOP_RECORD_MEDIA, ACD.CMDi_TYPE_STOP, "", "", "recording audio/sound|recording video/camera"},
+		//{CMD_CONTROL_MEDIA, ACD.CMDi_TYPE_NONE, "play continue resume pause stop next previous", "play continue resume|pause|stop|next|previous", "media/song/songs/music/audio/musics/video/videos"},
+		//{CMD_CONFIRM, ACD.CMDi_TYPE_NONE, "i", "", "do/confirm/approve/certify"},
+		//{CMD_REJECT, ACD.CMDi_TYPE_NONE, "i", "", "don't/reject/disapprove"},
+		//{CMD_STOP_LISTENING, ACD.CMDi_TYPE_STOP, "", "", "listening"},
+		//{CMD_START_LISTENING, ACD.CMDi_TYPE_START, "", "", "listening"},
+		//{CMD_TELL_WEATHER, ACD.CMDi_TYPE_ASK, "", "", "weather"},
+		//{CMD_TELL_NEWS, ACD.CMDi_TYPE_ASK, "", "", "news"},
+		//{CMD_GONNA_SLEEP, ACD.CMDi_TYPE_WILL_GO, "", "", "sleep"},
+	}
+
+	var commands_almost_str []string = nil
+	for _, array := range commands {
+		commands_almost_str = append(commands_almost_str, strings.Join(array, "||"))
+	}
+
+	return strings.Join(commands_almost_str, "\\")
 }
