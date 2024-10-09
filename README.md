@@ -48,7 +48,7 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 This began as a Python project (in 2020), but even using an IDE got the project confusing. So I translated it to Go because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice).
 
 ### - To use the project
-- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). Then go to the `ClientCode` folder and run the command `go build -tags=client .`. For the server, go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move both files to the `bin` folder.
+- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). Then go to the `ClientCode` folder and run the command `go build -tags=client .` ([install Fyne first](https://docs.fyne.io/started/)). For the server, go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move both files to the `bin` folder.
 - Next go on that `bin` folder and edit the JSON files with your values and rename them to end with _EOG.json ("Exclude Only from Git"). Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him). To use the server program, open port 3234 on your router so that the client-server communication can be made.
 - Start the client or the server executables and that's it.
 
