@@ -1,3 +1,4 @@
+Modules:
 00 = V.I.S.O.R.                 (client/server)
 01 = Modules Manager            (client/server)
 02 = S.M.A.R.T. Checker         (server)
@@ -12,3 +13,10 @@
 11 = Speech Recognition         (client)
 12 = User Locator               (client)
 13 = Commands Executor          (client)
+
+Libraries:
+00 = Advanced Commands Detection
+01 = Online Information Checker Communicator
+02 = GPT Communicator
+03 = Speech Queue
+04 = Tasks Executor Helper
