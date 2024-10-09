@@ -26,7 +26,6 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -68,7 +67,7 @@ func init() {realMain =
 		cmd := exec.Command(Utils.GetShell("", ""))
 		stdin, _ := cmd.StdinPipe()
 		stdout, _ := cmd.StdoutPipe()
-		stderr, _ := cmd.StderrPipe()
+		//stderr, _ := cmd.StderrPipe()
 		err := cmd.Start()
 		if err != nil {
 			log.Println("Error starting GPT:", err)
@@ -99,7 +98,7 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				fmt.Print(one_byte_str)
+				//fmt.Print(one_byte_str)
 
 				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
@@ -139,7 +138,7 @@ func init() {realMain =
 				}
 			}
 		}()
-		go func() {
+		/*go func() {
 			buf := bufio.NewReader(stderr)
 			for {
 				var one_byte []byte = make([]byte, 1)
@@ -153,7 +152,7 @@ func init() {realMain =
 				var one_byte_str string = string(one_byte)
 				fmt.Print(one_byte_str)
 			}
-		}()
+		}()*/
 
 		// Configure the LLM model
 		writer := bufio.NewWriter(stdin)
@@ -173,6 +172,7 @@ func init() {realMain =
 			time.Sleep(5 * time.Second)
 
 			for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY && !*module_stop {
+				// TODO: So if this now waits, how do we /stop him...?
 				time.Sleep(1 * time.Second)
 			}
 		}
