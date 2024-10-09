@@ -1,4 +1,4 @@
 [submodule "Libraries/ACD"]
 	path = Libraries/ACD
-	url = git@github.com:Edw590/VISOR-AdvancedCommandsDetection.git
+	url = https://github.com/Edw590/AdvancedCommandsDetection.git
 	branch = master
