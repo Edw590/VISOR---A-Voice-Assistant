@@ -48,12 +48,16 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 This began as a Python project (in 2020), but even using an IDE got the project confusing. So I translated it to Go because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice).
 
 ### - To use the project
-- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). Then go to the `ClientCode` folder and run the command `go build -tags=client .` ([install Fyne first](https://docs.fyne.io/started/)). For the server, go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move both files to the `bin` folder.
+- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). For the server, just go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move the file to the `bin` folder. Then for the client:
+  - [Install Fyne](https://docs.fyne.io/started/)
+  - In MSYS2, install the portaudio package (for Windows x64, the package is [this one](https://packages.msys2.org/packages/mingw-w64-x86_64-portaudio))
+  - Go to the `ClientCode` folder and run the command `go build -tags=client .` (it will take some time the first time)
+  - Move the file to the `bin` folder
 - Next go on that `bin` folder and edit the JSON files with your values and rename them to end with _EOG.json ("Exclude Only from Git"). Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him). To use the server program, open port 3234 on your router so that the client-server communication can be made.
 - Start the client or the server executables and that's it.
 
 #### Supported OSes
-The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
+The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project) - on Windows, the minimum is Windows 7, 32 or 64 bits. If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
 
 To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the bin folder and configure the path on the PersonalConsts_EOG.json file. Nothing else needs to be done to change things from running on either OS.
 
