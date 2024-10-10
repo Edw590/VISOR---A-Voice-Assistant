@@ -185,6 +185,13 @@ func init() {realMain =
 
 			for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY && !*module_stop {
 				// TODO: So if this now waits, how do we /stop him...?
+				if checkStopSpeech() {
+					// Write the end string before exiting
+					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
+
+					break
+				}
+
 				time.Sleep(1 * time.Second)
 			}
 		}
@@ -321,6 +328,39 @@ func reduceGptTextTxt(gpt_text_txt Utils.GPath) {
 			_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[i], true)
 		}
 	}
+}
+
+/*
+checkStopSpeech checks if the text to process contains the /stop command.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the /stop command was found, false otherwise
+ */
+func checkStopSpeech() bool {
+	var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+	var file_list []Utils.FileInfo = to_process_dir.GetFileList()
+	for len(file_list) > 0 {
+		file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
+		var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
+
+		var to_process string = *file_path.ReadTextFile()
+		if to_process != "" {
+			var text string = to_process[strings.Index(to_process, "]") + 1:]
+
+			if text == "/stop" {
+				_ = os.Remove(file_path.GPathToStringConversion())
+				shut_down_GL = true
+
+				return true
+			}
+		}
+
+		Utils.DelElemSLICES(&file_list, idx_to_remove)
+	}
+
+	return false
 }
 
 /*
