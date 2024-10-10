@@ -5,7 +5,7 @@ Modules:
 03 = Speech                     (client)        [Windows only]
 04 = RSS Feed Notifier          (server)
 05 = Email Sender               (server)
-06 = Online Information Checker (server)        [Linux only]
+06 = Online Information Checker (server)
 07 = GPT Communicator           (server)
 08 = Website Backend            (server)
 09 = Tasks Executor             (client)
