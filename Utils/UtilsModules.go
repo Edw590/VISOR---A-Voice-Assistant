@@ -287,7 +287,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 	if mod_num == NUM_MOD_VISOR {
 		// Don't run in another thread if it's the main program - it must be run on the main thread.
 
-		if isModRunningMODULES(mod_num) {
+		if isVISORRunningMODULES(server) {
 			log.Println("Module " + strconv.Itoa(mod_num) + " is already running. Exiting...")
 
 			goto end
@@ -295,7 +295,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		InitializeCommsChannels()
 
-		moduleInfo.updateModRunInfo()
+		moduleInfo.updateVISORRunInfo(server)
 
 		to_do()
 
@@ -312,7 +312,11 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 		printShutdownSequenceMODULES(errs, moduleInfo.Name, moduleInfo.Num)
 
 		// Delete the PID file
-		_ = GetUserDataDirMODULES(mod_num).Add2(false, "PID="+strconv.Itoa(os.Getpid())).Remove()
+		var suffix = "_Client"
+		if server {
+			suffix = "_Server"
+		}
+		_ = GetUserDataDirMODULES(mod_num).Add2(false, "PID=" + strconv.Itoa(os.Getpid()) + suffix).Remove()
 
 		if errs {
 			os.Exit(_MOD_GEN_ERROR_CODE)
@@ -504,27 +508,30 @@ func getModTempDirMODULES(mod_num int) GPath {
 }
 
 /*
-updateModRunInfo updates the information about the running of a module.
-
-Use ONLY with the main program! This uses files.
+updateVISORRunInfo updates the information about the running of VISOR.
 
 -----------------------------------------------------------
 
 – Returns:
   - the path to the file containing the information about the running of the module
- */
-func (moduleInfo *ModuleInfo) updateModRunInfo() {
-	var mod_num int = moduleInfo.Num
-
-	files, _ := os.ReadDir(GetUserDataDirMODULES(mod_num).GPathToStringConversion())
+*/
+func (moduleInfo *ModuleInfo) updateVISORRunInfo(server bool) {
+	files, _ := os.ReadDir(GetUserDataDirMODULES(NUM_MOD_VISOR).GPathToStringConversion())
 
 	var curr_pid string = strconv.Itoa(os.Getpid())
 	var file_exists bool = false
 
+	var suffix = "_Client"
+	if server {
+		suffix = "_Server"
+	}
+
 	// Remove all the old info files
 	for _, file := range files {
-		if strings.HasPrefix(file.Name(), "PID=") {
-			if strings.Split(file.Name(), "=")[1] != curr_pid {
+		if strings.HasPrefix(file.Name(), "PID=") && strings.HasSuffix(file.Name(), suffix) {
+			var pid_str string = strings.Split(file.Name(), "=")[1]
+			pid_str = strings.Split(pid_str, "_")[0]
+			if pid_str != curr_pid {
 				_ = moduleInfo.ModDirsInfo.UserData.Add2(false, file.Name()).Remove()
 			} else {
 				file_exists = true
@@ -533,7 +540,7 @@ func (moduleInfo *ModuleInfo) updateModRunInfo() {
 	}
 
 	if !file_exists {
-		var new_info_file GPath = GetUserDataDirMODULES(mod_num).Add2(false, "PID=" + curr_pid)
+		var new_info_file GPath = GetUserDataDirMODULES(NUM_MOD_VISOR).Add2(false, "PID=" + curr_pid + suffix)
 		err := new_info_file.Create(true)
 		if nil != err {
 			panic(err)
@@ -542,30 +549,36 @@ func (moduleInfo *ModuleInfo) updateModRunInfo() {
 }
 
 /*
-isModRunningMODULES checks if a module is already running.
-
-Use ONLY with the main program! This uses files.
+isVISORRunningMODULES checks if VISOR is already running.
 
 -----------------------------------------------------------
 
 – Params:
-  - mod_num – the number of the module
+  - server – true if the version running is the server version, false if it's the client version
 
 – Returns:
   - true if the module is running, false otherwise
 */
-func isModRunningMODULES(mod_num int) bool {
+func isVISORRunningMODULES(server bool) bool {
 	var curr_pid int = os.Getpid()
-	files, err := os.ReadDir(GetUserDataDirMODULES(mod_num).GPathToStringConversion())
+	files, err := os.ReadDir(GetUserDataDirMODULES(NUM_MOD_VISOR).GPathToStringConversion())
 	if nil != err {
 		return false
 	}
 
 	for _, file := range files {
 		if strings.HasPrefix(file.Name(), "PID=") {
-			var file_path GPath = GetUserDataDirMODULES(mod_num).Add2(false, file.Name())
+			if server && !strings.HasSuffix(file.Name(), "_Server") {
+				continue
+			} else if !server && !strings.HasSuffix(file.Name(), "_Client") {
+				continue
+			}
 
-			var pid_str string = strings.TrimPrefix(file.Name(), "PID=")
+			var file_path GPath = GetUserDataDirMODULES(NUM_MOD_VISOR).Add2(false, file.Name())
+
+			// File name example: PID=1243_Server
+			var pid_str string = strings.Split(file.Name(), "=")[1]
+			pid_str = strings.Split(pid_str, "_")[0]
 
 			var pid int
 			if pid, err = strconv.Atoi(pid_str); nil != err {
