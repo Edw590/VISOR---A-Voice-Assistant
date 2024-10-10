@@ -55,7 +55,17 @@ This began as a Python project (in 2020), but even using an IDE got the project 
   - Move the file to the `bin` folder
 - Next go on that `bin` folder and edit the JSON files with your values and rename them to end with _EOG.json ("Exclude Only from Git"). Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him). To use the server program, open port 3234 on your router so that the client-server communication can be made.
 - In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and use those 2 files on the MOD_8 configuration inside UserSettings_EOG.json.
+- Check below the requirements for each module to work.
 - Start the client or the server executables and that's it.
+
+#### - Requirements for some modules to work
+| Module | Requirement(s)
+|-|-|
+| S.M.A.R.T. Checker | The `smartctl` program must be on the PATH.
+| Speech | Only works on Windows, at least for now.
+| Email Sender | The `curl` program must be on the PATH.
+| Online Information Checker | The `chromedriver` program must be on the PATH.
+| GPT Communicator | The `llama-cli` (llama.cpp project) program must be on the PATH.
 
 #### Supported OSes
 - Unix-like systems
