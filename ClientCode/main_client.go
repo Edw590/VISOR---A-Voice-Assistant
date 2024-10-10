@@ -37,6 +37,7 @@ import (
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -71,7 +72,7 @@ func init() {realMain =
 		if runtime.GOOS == "windows" {
 			if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
 				// Restart the process with conhost.exe on Windows to be able to actually hide the window
-				if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, "VISOR.exe"), "--conhost") {
+				if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])), "--conhost") {
 					return
 				}
 			}
