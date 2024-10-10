@@ -28,9 +28,10 @@ import (
 	"strings"
 )
 
-const DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
-const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
-const GEN_SETTINGS_FILE string = "GeneratedSettings_EOG.json"
+const _DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
+const _USER_SETTINGS_FILE string = "UserSettings_EOG.json"
+const _GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
+const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.json"
 
 var Device_settings_GL DeviceSettings
 var User_settings_GL UserSettings
@@ -108,13 +109,13 @@ structs.
   - server – true if the version running is the server version, false if it is the client version
 */
 func LoadDeviceUserSettings(server bool) error {
-	bytes, err := os.ReadFile(USER_SETTINGS_FILE)
+	bytes, err := os.ReadFile(_USER_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
 		if err != nil {
 			cwd = "[ERROR]"
 		}
-		return errors.New("no " + USER_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
+		return errors.New("no " + _USER_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
 	if err = FromJsonGENERAL(bytes, &User_settings_GL); err != nil {
@@ -123,13 +124,13 @@ func LoadDeviceUserSettings(server bool) error {
 
 	//////////////////////////////////////////////
 
-	bytes, err = os.ReadFile(DEVICE_SETTINGS_FILE)
+	bytes, err = os.ReadFile(_DEVICE_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
 		if err != nil {
 			cwd = "[ERROR]"
 		}
-		return errors.New("no " + DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
+		return errors.New("no " + _DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
 	if err = FromJsonGENERAL(bytes, &Device_settings_GL); err != nil {
@@ -145,13 +146,13 @@ func LoadDeviceUserSettings(server bool) error {
 			User_settings_GL.PersonalConsts.VISOR_email_pw == "" || !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
 			User_settings_GL.PersonalConsts.Website_domain == "" || User_settings_GL.PersonalConsts.Website_pw == "" ||
 			User_settings_GL.PersonalConsts.WolframAlpha_AppID == "" || User_settings_GL.PersonalConsts.Picovoice_API_key == "" {
-			return errors.New("some fields in " + USER_SETTINGS_FILE + " and/or " + DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
+			return errors.New("some fields in " + _USER_SETTINGS_FILE + " and/or " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
 		}
 	} else {
 		if !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
 				User_settings_GL.PersonalConsts.Website_domain == "" ||
 				User_settings_GL.PersonalConsts.Website_pw == "" {
-			return errors.New("some fields in " + USER_SETTINGS_FILE + " and/or " + DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
+			return errors.New("some fields in " + _USER_SETTINGS_FILE + " and/or " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
 		}
 	}
 
@@ -174,14 +175,18 @@ func LoadDeviceUserSettings(server bool) error {
 /*
 loadGenSettings is the function that initializes the global variables of the GenSettings struct.
 */
-func loadGenSettings() error {
-	bytes, err := os.ReadFile(GEN_SETTINGS_FILE)
+func loadGenSettings(server bool) error {
+	var settings_file string = _GEN_SETTINGS_FILE_CLIENT
+	if server {
+		settings_file = _GEN_SETTINGS_FILE_SERVER
+	}
+	bytes, err := os.ReadFile(settings_file)
 	if err != nil {
 		cwd, err := os.Getwd()
 		if err != nil {
 			cwd = "[ERROR]"
 		}
-		return errors.New("no " + GEN_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
+		return errors.New("no " + settings_file + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
 	if err := FromJsonGENERAL(bytes, &Gen_settings_GL); err != nil {
@@ -192,15 +197,19 @@ func loadGenSettings() error {
 }
 
 /*
-saveGenSettings is the function that saves the global variables of the GenSettings struct to the GEN_SETTINGS_FILE file.
- */
-func saveGenSettings() bool {
+saveGenSettings is the function that saves the global variables of the GenSettings struct to the _GEN_SETTINGS_FILE file.
+*/
+func saveGenSettings(server bool) bool {
+	var settings_file string = _GEN_SETTINGS_FILE_CLIENT
+	if server {
+		settings_file = _GEN_SETTINGS_FILE_SERVER
+	}
 	var p_string *string = ToJsonGENERAL(Gen_settings_GL)
 	if p_string == nil {
 		return false
 	}
 
-	if err := os.WriteFile(GEN_SETTINGS_FILE, []byte(*p_string), 0777); err != nil {
+	if err := os.WriteFile(settings_file, []byte(*p_string), 0777); err != nil {
 		return false
 	}
 

@@ -200,7 +200,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 			panic(err)
 		}
 
-		if err := loadGenSettings(); err != nil {
+		if err := loadGenSettings(server); err != nil {
 			log.Println("warning: Error obtaining generated settings - aborting")
 			log.Println(err)
 
@@ -219,7 +219,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 					log.Println("warning: Error obtaining device/user settings - aborting")
 				}
 
-				saveGenSettings()
+				saveGenSettings(server)
 
 				time.Sleep(5 * time.Second)
 			}
