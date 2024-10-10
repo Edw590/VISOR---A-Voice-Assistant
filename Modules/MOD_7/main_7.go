@@ -47,7 +47,6 @@ const _END_TOKENS string = "<|start_header_id|>user<|end_header_id|>"
 const _TIME_SLEEP_S int = 1
 
 var is_writing_GL bool = false
-var shut_down_GL bool = false
 
 var (
 	realMain       Utils.RealMain = nil
@@ -80,6 +79,8 @@ func init() {realMain =
 		}
 
 		var device_id string = ""
+		var shut_down bool = false
+
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 		// Start a goroutine to print to the screen and write to a file the output of the LLM model
 		go func() {
@@ -91,7 +92,7 @@ func init() {realMain =
 				n, err := buf.Read(one_byte)
 				if n == 0 || err != nil {
 					// End of the stream (pipe closed by the main module thread or some error occurred - so shut down)
-					shut_down_GL = true
+					shut_down = true
 
 					return
 				}
@@ -161,11 +162,11 @@ func init() {realMain =
 			"--interactive-first " +
 			"--ctx-size 8192 " + // Value for Raspberry Pi 5 8 GB
 			"--threads 4 " + // Value for Raspberry Pi 5 8 GB
-			"--temp 0.5 " + // To be able to get more varied answers but still not too imaginative
+			"--temp 0.8 " +
 			"--keep -1 " +
 			"--mlock " +
 			"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
-				strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) +
+				strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
 				modUserInfo_GL.Config_str + "<|eot_id|>\" " +
 			"--reverse-prompt \"<|eot_id|>\" " +
 			"--in-prefix \"" + _END_TOKENS + "\" " +
@@ -187,6 +188,10 @@ func init() {realMain =
 				if checkStopSpeech() {
 					// Write the end string before exiting
 					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
+
+					// Not sure how to send a Ctrl+C signal to the process in a way that works (Linux, at least). So
+					// plan B and the process is killed, also clearing the context, unfortunately.
+					shut_down = true
 
 					break
 				}
@@ -219,10 +224,9 @@ func init() {realMain =
 
 					if strings.HasPrefix(text, "/") {
 						// Control commands begin with a slash
-						if text == "/clear" || text == "/stop" {
-							// Clear the context of the LLM model or stop while its writing by stopping the module (the
-							// Manager will restart it)
-							shut_down_GL = true
+						if text == "/clear" {
+							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
+							shut_down = true
 						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
 							// Ask Wolfram Alpha the question
 							var question string = text[len(ASK_WOLFRAM_ALPHA):]
@@ -249,7 +253,7 @@ func init() {realMain =
 				Utils.DelElemSLICES(&file_list, idx_to_remove)
 				_ = os.Remove(file_path.GPathToStringConversion())
 
-				if shut_down_GL {
+				if shut_down {
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 					forceStopLlama()
 					_ = stdout.Close()
@@ -350,7 +354,6 @@ func checkStopSpeech() bool {
 
 			if text == "/stop" {
 				_ = os.Remove(file_path.GPathToStringConversion())
-				shut_down_GL = true
 
 				return true
 			}
