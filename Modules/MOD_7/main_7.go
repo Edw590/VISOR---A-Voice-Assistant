@@ -157,8 +157,8 @@ func init() {realMain =
 		// Configure the LLM model
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli -m " + modUserInfo_GL.Model_loc + " " +
-			"--in-suffix [3234_START] --interactive-first --ctx-size 8192 --threads 4 --temp 1.0 --keep -1 --mlock " +
-			"--prompt \"" + modUserInfo_GL.Config_str + "\"\n")
+			"--in-suffix [3234_START] --reverse-prompt [3234_END] --interactive-first --ctx-size 8192 --threads 4 " +
+			"--temp 1.0 --keep -1 --mlock --prompt \"" + modUserInfo_GL.Config_str + "\"\n")
 		_ = writer.Flush()
 
 		// Wait for the LLM model to start
