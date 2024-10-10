@@ -1,5 +1,3 @@
-//go:build windows
-
 /*******************************************************************************
  * Copyright 2023-2024 Edw590
  *
@@ -21,11 +19,15 @@
  * under the License.
  ******************************************************************************/
 
+//go:build windows
+
 package Utils
 
 import (
 	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
+	"os/exec"
+	"syscall"
 )
 
 /*
@@ -78,4 +80,38 @@ new Windows Terminal). So use StartConAppPROCESSES() to start the program with c
  */
 func HideConsoleWindowPROCESSES() {
 	win.ShowWindow(win.GetConsoleWindow(), win.SW_HIDE)
+}
+
+/*
+GenerateCtrlCPROCESSES generates a Ctrl+C event to a process group.
+
+This function has NOT been tested!
+
+-----------------------------------------------------------
+
+– Params:
+  - process_group_id – the process group ID
+
+– Returns:
+  - an error if the event couldn't be generated, nil otherwise
+*/
+func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
+	if cmd.SysProcAttr == nil {
+		// Set the process to create a new process group
+		// WARNING: this might need to be done before calling cmd.Start()
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
+		}
+	}
+
+	var kernel32 = syscall.NewLazyDLL("kernel32.dll")
+	var procGenerateConsoleCtrlEvent = kernel32.NewProc("GenerateConsoleCtrlEvent")
+
+	// Call GenerateConsoleCtrlEvent with CTRL_C_EVENT
+	r, _, err := procGenerateConsoleCtrlEvent.Call(syscall.CTRL_C_EVENT, uintptr(process_group_id))
+	if r == 0 {
+		return err
+	}
+
+	return nil
 }

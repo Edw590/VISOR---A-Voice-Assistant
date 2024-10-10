@@ -24,6 +24,7 @@
 package Utils
 
 import (
+	"os/exec"
 	"strings"
 )
 
@@ -49,11 +50,15 @@ func RunningAsAdminPROCESSES() bool {
 }
 
 /*
-HideConsoleWindowPROCESSES hides the console window of the program.
-
-Notice: on Windows only works if the program is started with conhost.exe (always is except when it's started by the
-new Windows Terminal). So use StartConAppPROCESSES() to start the program with conhost.exe.
+HideConsoleWindowPROCESSES does NOTHING.
  */
 func HideConsoleWindowPROCESSES() {
 	// TODO See if it's needed on Linux too and find a way
+}
+
+/*
+GenerateCtrlCPROCESSES generates a Ctrl+C event to a process.
+*/
+func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
+	return cmd.Process.Signal(os.Interrupt)
 }
