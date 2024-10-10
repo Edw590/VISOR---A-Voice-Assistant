@@ -38,6 +38,8 @@ type Mod7GenInfo struct {
 type Mod7UserInfo struct {
 	// Model_loc is the location of the model file
 	Model_loc string
+	// System_info is the LLM's system information, like the cutting knowledge date and today's date
+	System_info string
 	// Config_str is the LLM configuration string
 	Config_str string
 }

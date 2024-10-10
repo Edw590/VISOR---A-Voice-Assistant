@@ -85,7 +85,10 @@
 	},
 	"MOD_7": {
 		// GGUF model location
-		"Model_loc": "/home/edw590/llamacpp_models/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf",
+		"Model_loc": "/home/edw590/llamacpp_models/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+		// LLM system information, like the cutting knowledge date and today's date. "3234_YEAR" will be replaced by the
+		// current year.
+		"System_info": "Cutting Knowledge Date: December 2023. Today Year: 3234_YEAR.",
 		// LLM configuration string (what's sent to it when it initializes) - introduce yourself as much as you can, your tastes, everything
 		"Config_str": "You are VISOR, my male personal virtual assistant. I'm Edward. I was born in 1999-11-22. It's currently the year of 2024. Address me as Sir or nothing at all. From now on, always end your answers with \"[3234_END]\". RIGHT NOW DON'T SAY ANYTHING."
 	},

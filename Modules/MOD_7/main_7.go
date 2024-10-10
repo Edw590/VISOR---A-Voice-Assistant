@@ -41,9 +41,13 @@ const _TO_PROCESS_REL_FOLDER string = "to_process"
 const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
 const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
+const _START_TOKENS string = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
+const _END_TOKENS string = "<|start_header_id|>user<|end_header_id|>"
+
 const _TIME_SLEEP_S int = 1
 
 var is_writing_GL bool = false
+var shut_down_GL bool = false
 
 var (
 	realMain       Utils.RealMain = nil
@@ -75,11 +79,7 @@ func init() {realMain =
 			return
 		}
 
-		// Begin with the server ID (to say the first hello)
-		var device_id string = Utils.Device_settings_GL.Device_ID
-
-		var shut_down bool = false
-
+		var device_id string = ""
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 		// Start a goroutine to print to the screen and write to a file the output of the LLM model
 		go func() {
@@ -91,7 +91,7 @@ func init() {realMain =
 				n, err := buf.Read(one_byte)
 				if n == 0 || err != nil {
 					// End of the stream (pipe closed by the main module thread or some error occurred - so shut down)
-					shut_down = true
+					shut_down_GL = true
 
 					return
 				}
@@ -102,7 +102,7 @@ func init() {realMain =
 
 				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
-						if last_word != "[3234_START]" && last_word != "[3234_END]" {
+						if last_word != _START_TOKENS && last_word != _END_TOKENS {
 							// Meaning: new word written
 							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
 						}
@@ -113,10 +113,10 @@ func init() {realMain =
 					}
 				}
 
-				if strings.Contains(last_answer, "[3234_START]") {
+				if strings.Contains(last_answer, _START_TOKENS) {
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 					is_writing_GL = true
-					last_answer = strings.Replace(last_answer, "[3234_START]", "", -1)
+					last_answer = strings.Replace(last_answer, _START_TOKENS, "", -1)
 
 					reduceGptTextTxt(gpt_text_txt)
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
@@ -125,7 +125,7 @@ func init() {realMain =
 						// Send a message to LIB_2 saying the GPT just started writing
 						"Message": []byte(device_id + "|L_2|start"),
 					}
-				} else if strings.Contains(last_answer, "[3234_END]") {
+				} else if strings.Contains(last_answer, _END_TOKENS) {
 					is_writing_GL = false
 
 					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
@@ -154,11 +154,23 @@ func init() {realMain =
 			}
 		}()*/
 
-		// Configure the LLM model
+		// Configure the LLM model (Llama3/3.1's prompt)
 		writer := bufio.NewWriter(stdin)
-		_, _ = writer.WriteString("llama-cli -m " + modUserInfo_GL.Model_loc + " " +
-			"--in-suffix [3234_START] --reverse-prompt [3234_END] --interactive-first --ctx-size 8192 --threads 4 " +
-			"--temp 1.0 --keep -1 --mlock --prompt \"" + modUserInfo_GL.Config_str + "\"\n")
+		_, _ = writer.WriteString("llama-cli " +
+			"--model " + modUserInfo_GL.Model_loc + " " +
+			"--interactive-first " +
+			"--ctx-size 8192 " + // Value for Raspberry Pi 5 8 GB
+			"--threads 4 " + // Value for Raspberry Pi 5 8 GB
+			"--temp 0.5 " + // To be able to get more varied answers but still not too imaginative
+			"--keep -1 " +
+			"--mlock " +
+			"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
+				strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) +
+				modUserInfo_GL.Config_str + "<|eot_id|>\" " +
+			"--reverse-prompt \"<|eot_id|>\" " +
+			"--in-prefix \"" + _END_TOKENS + "\" " +
+			"--in-suffix \"" + _START_TOKENS + "\" " +
+			"\n")
 		_ = writer.Flush()
 
 		// Wait for the LLM model to start
@@ -176,10 +188,6 @@ func init() {realMain =
 				time.Sleep(1 * time.Second)
 			}
 		}
-
-		// Keep this here. Seems sometimes it's necessary to say the first hello to Llama3 or it will say it even if we
-		// ask something else (or Llama3 might start writing random things).
-		sendToGPT("hello")
 
 		// Process the files to input to the LLM model
 		for {
@@ -208,7 +216,7 @@ func init() {realMain =
 						if text == "/clear" || text == "/stop" {
 							// Clear the context of the LLM model or stop while its writing by stopping the module (the
 							// Manager will restart it)
-							shut_down = true
+							shut_down_GL = true
 						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
 							// Ask Wolfram Alpha the question
 							var question string = text[len(ASK_WOLFRAM_ALPHA):]
@@ -235,7 +243,7 @@ func init() {realMain =
 				Utils.DelElemSLICES(&file_list, idx_to_remove)
 				_ = os.Remove(file_path.GPathToStringConversion())
 
-				if shut_down {
+				if shut_down_GL {
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 					forceStopLlama()
 					_ = stdout.Close()
