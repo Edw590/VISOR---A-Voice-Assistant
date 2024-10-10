@@ -22,6 +22,7 @@
 package Utils
 
 import (
+	"bufio"
 	"errors"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/shirou/gopsutil/v4/process"
@@ -203,7 +204,8 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 			log.Println("warning: Error obtaining generated settings - aborting")
 			log.Println(err)
 
-			time.Sleep(5 * time.Second)
+			log.Println("Overwrite settings with empty file? Press ENTER to overwrite, or Ctrl+C to abort.")
+			_, _ = bufio.NewReader(os.Stdin).ReadString('\n')
 		}
 
 		go func() {
