@@ -27,7 +27,7 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fmt"
-	"github.com/Krognol/go-wolfram"
+	"github.com/Edw590/go-wolfram"
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 	gowiki "github.com/trietmn/go-wiki"

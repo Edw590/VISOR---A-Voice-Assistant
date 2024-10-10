@@ -51,6 +51,10 @@ fyne.io/x/fyne v0.0.0-20240421102438-d5a080914907 h1:Ajr8gCMkVv6f7H2IPviMjfZCq40
 fyne.io/x/fyne v0.0.0-20240421102438-d5a080914907/go.mod h1:1pa3ZVIopRWNvfSG4ZrSkcZ3mJ8qoHPZv4PT8/zpn1o=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/Edw590/go-wolfram v0.0.0-20241010091049-7efe0b7dba7e h1:QSUbHwlPsozxRwjJO1s81x2AqlLHiZ6RDou0T+tQ5tg=
+github.com/Edw590/go-wolfram v0.0.0-20241010091049-7efe0b7dba7e/go.mod h1:ubjYqrt3dF4G+YVEDQr+qa2aveeMzt27o/GOH2hswPo=
+github.com/Krognol/go-wolfram v0.0.0-20180610151123-5b91101b92a8 h1:W7c6EO533k0Qxlg81igmCkNf8IL05YnwX/Ja0N+6oOc=
+github.com/Krognol/go-wolfram v0.0.0-20180610151123-5b91101b92a8/go.mod h1:EPNgn+n1Pgo8Us091j1G61MtU6yjVwepTin6xEwlJ6w=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
