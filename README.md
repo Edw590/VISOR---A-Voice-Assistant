@@ -60,9 +60,9 @@ This began as a Python project (in 2020), but even using an IDE got the project 
 - Unix-like systems
 - Windows (Win7+)
 
-The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project) - on Windows, the minimum is Windows 7, 32 or 64 bits. If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
+The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project) - on Windows, the minimum is Windows 7, 32 or 64 bits. If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the ",Names and IDs of each module and library.txt" file. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
 
-To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the bin folder and configure the path on the PersonalConsts_EOG.json file. Nothing else needs to be done to change things from running on either OS.
+To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the `bin` folder and configure the device-specific settings on DeviceSettings_EOG.json (like the path to VISOR, for example). Nothing else needs to be done to change things from running on either OS.
 
 ## About
 ### - License
