@@ -30,7 +30,7 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 | 7 | **GPT Communicator** | Server | Sends and receives text to and from a local LLM (Large Language Model), like Llama 3 through the llama.cpp project.
 | 8 | **Website Backend** | Server | It's the backend of VISOR's website. It is responsible for handling the requests from the frontend.
 | 9 | **Tasks Executor** | Client | Checks tasks and warns/executes when one is triggered. The tasks are fetched from the server.
-| 10 | **System Checker** | Client | Sends information about the system to the server, like Wi-Fi networks and Bluetooth devices in range. Or the state of the Wi-Fi adapter and the Bluetooth adapter. Or the screen brightness. Or others. The server can use this information to determine where the device is and if it's being used or not.
+| 10 | **System Checker** | Client | Collects information about the system, like Wi-Fi networks and Bluetooth devices in range. Or the state of the Wi-Fi adapter and the Bluetooth adapter. Or the screen brightness. Or others. The client can then use this information to determine where the device is and if it's being used or not.
 | 11 | **Speech Recognition** | Client | Currently only checks if the phrase "Hey VISOR" is spoken and shows the UI, but later should be used to detect normal speech to interact with VISOR.
 | 12 | **User Locator** | Client | Locates the user based on everything the client knows about the user (the user must configure some things first) and on system information. For example, if the phone is communicating and the user is always with the phone (the "AlwaysWith" device), then the user is near the phone whether it's being used or not. With the computer, it must be being used because the user may leave the computer and go have lunch but not the phone.
 | 13 | **Commands Executor** | Client | Executes commands from a sentence given to it. The commands are processed by the ACD library.
@@ -38,7 +38,7 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 ## Libraries
 | Name | Description |
 |-|-|
-| **[Advanced Commands Detection (ACD)](https://github.com/DADi590/Advanced-Commands-Detection)** | Detects commands in a sentence of words (a link because it's in another repository). It's the module that understands the user communication (voice or text - as long as it uses words). It can detect no so simple sentences of multiple commands, and understands the meaning of "don't", "it", and "and". Example of a complex sentence it can successfully understand (without the punctuation - it must not be present): `"turn it on. turn on the wifi, and and the airplane mode, get it it on. no, don't turn it on. turn off airplane mode and also the wifi, please."` (ignores/warns about the meaningless "it", turns on the Wi-Fi, and turns off the airplane mode and the Wi-Fi).
+| **[Advanced Commands Detection (ACD)](https://github.com/DADi590/Advanced-Commands-Detection)** | Detects commands in a sentence of words (a link because it's in another repository). It's the module that understands the user communication (voice or text - as long as it uses words). It can detect no so simple sentences of multiple commands, and understands the meaning of "don't", "it", and "and". Example of a complex sentence it can successfully understand (without the punctuation - it must not be present): `"turn it on. turn on the wifi, and... and the airplane mode, get it it on. no, don't turn it on. turn off airplane mode and also the wifi, please."` (ignores/warns about the meaningless "it", turns on the Wi-Fi, and turns off the airplane mode and the Wi-Fi).
 | **GPTComm** | Sends and gets text to and from the GPT Communicator module through the Website Backend module.
 | **OICComm** | Gets the information the Online Internet Checker module put on the website files.
 | **SpeechQueue** | This is an implementation of a speech queue to be used for the Speech modules of VISOR.
@@ -48,12 +48,19 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 This began as a Python project (in 2020), but even using an IDE got the project confusing. So I translated it to Go because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice).
 
 ### - To use the project
-- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). Then go to the `ClientCode` folder and run the command `go build -tags=client .`. For the server, go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move both files to the `bin` folder.
+- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). For the server, just go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move the file to the `bin` folder. Then for the client:
+  - [Install Fyne](https://docs.fyne.io/started/)
+  - In MSYS2, install the portaudio package (for Windows x64, the package is [this one](https://packages.msys2.org/packages/mingw-w64-x86_64-portaudio))
+  - Go to the `ClientCode` folder and run the command `go build -tags=client .` (it will take some time the first time)
+  - Move the file to the `bin` folder
 - Next go on that `bin` folder and edit the JSON files with your values and rename them to end with _EOG.json ("Exclude Only from Git"). Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him). To use the server program, open port 3234 on your router so that the client-server communication can be made.
 - Start the client or the server executables and that's it.
 
 #### Supported OSes
-The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project). If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
+- Unix-like systems
+- Windows (Win7+)
+
+The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project) - on Windows, the minimum is Windows 7, 32 or 64 bits. If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the Modules list above. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
 
 To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the bin folder and configure the path on the PersonalConsts_EOG.json file. Nothing else needs to be done to change things from running on either OS.
 
