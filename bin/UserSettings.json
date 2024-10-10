@@ -90,7 +90,9 @@
 		"Config_str": "You are VISOR, my male personal virtual assistant. I'm Edward. I was born in 1999-11-22. It's currently the year of 2024. Address me as Sir or nothing at all. From now on, always end your answers with \"[3234_END]\". RIGHT NOW DON'T SAY ANYTHING."
 	},
 	"MOD_8": {
+		// Path to the certificate cert file for the HTTPS server
 		"Cert_file": "/etc/ssl/certs/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.crt",
+		// Path to the certificate key file for the HTTPS server
 		"Key_file": "/etc/ssl/private/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.key"
 	},
 	"MOD_10": {
