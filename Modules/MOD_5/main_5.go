@@ -56,6 +56,9 @@ func init() {realMain =
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_5
 
 		var to_send_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(true, Utils.TO_SEND_REL_FOLDER)
+		if !to_send_dir.Exists() {
+			_ = to_send_dir.Create(false)
+		}
 
 		//log.Println("Checking for emails to send in \"" + to_send_dir.GPathToStringConversion() + "\"...")
 
