@@ -160,8 +160,8 @@ func init() {realMain =
 		_, _ = writer.WriteString("llama-cli " +
 			"--model " + modUserInfo_GL.Model_loc + " " +
 			"--interactive-first " +
-			"--ctx-size 8192 " + // Value for Raspberry Pi 5 8 GB
-			"--threads 4 " + // Value for Raspberry Pi 5 8 GB
+			"--ctx-size 16384 " + // Maximum value for the Raspberry Pi 5 (8 GB)
+			"--threads 4 " + // Maximum value for the Raspberry Pi 5 (8 GB)
 			"--temp 0.8 " +
 			"--keep -1 " +
 			"--mlock " +
@@ -300,7 +300,7 @@ func SpeakOnDevice(device_id string, text string) int {
 	if is_writing_GL {
 		return ALREADY_WRITING
 	}
-	// TODO: Disabled because the function is now gone - implement it again if this function is needed
+	// Disabled because the function is now gone - implement it again if this function is needed
 	//if !MOD_12.IsDeviceActive(device_id) {
 	//	return DEVICE_NOT_ACTIVE
 	//}
