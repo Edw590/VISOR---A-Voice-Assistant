@@ -184,7 +184,6 @@ func init() {realMain =
 			time.Sleep(5 * time.Second)
 
 			for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY && !*module_stop {
-				// TODO: So if this now waits, how do we /stop him...?
 				if checkStopSpeech() {
 					// Write the end string before exiting
 					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
