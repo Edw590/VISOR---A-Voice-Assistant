@@ -84,7 +84,7 @@ func init() {realMain =
 
 			//log.Println("Server running on port 3234")
 			srv = &http.Server{Addr: ":3234"}
-			err := srv.ListenAndServeTLS(modUserInfo_GL.Cert_file, modUserInfo_GL.Key_file)
+			err := srv.ListenAndServeTLS(modUserInfo_GL.Crt_file, modUserInfo_GL.Key_file)
 			if err != nil {
 				log.Println("ListenAndServeTLS error:", err)
 			}

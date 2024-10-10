@@ -23,8 +23,8 @@ package ModsFileInfo
 
 // Mod8UserInfo is the format of the custom information file about this specific module.
 type Mod8UserInfo struct {
-	// Cert_file is the location of the TLS certificate file
-	Cert_file string
-	// Key_file is the location of the TLS key file
+	// Crt_file is the location of the SSL certificate crt file
+	Crt_file string
+	// Key_file is the location of the SSL certificate key file
 	Key_file string
 }
