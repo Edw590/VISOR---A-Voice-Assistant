@@ -55,7 +55,7 @@ func init() {realMain =
 		} else {
 			tts_GL = tts
 		}
-		_ = tts_GL.SetRate(-4)
+		_ = tts_GL.SetRate(0)
 		_ = tts_GL.SetVolume(100)
 
 		//log.Println("Waiting for speeches to speak...")
