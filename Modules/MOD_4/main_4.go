@@ -183,9 +183,9 @@ func init() {realMain =
 						}
 					}
 
-					var ignore_video bool = "" == email_info.Html
+					var ignore_video bool = email_info.Html == ""
 
-					if "" == newsInfo.Url { // Some error occurred
+					if newsInfo.Url == "" { // Some error occurred
 						continue
 					}
 

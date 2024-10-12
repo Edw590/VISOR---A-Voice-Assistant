@@ -117,7 +117,7 @@ func PathFILESDIRS(describes_dir bool, separator string, sub_paths ...any) GPath
 		ends_in_separator = true
 	}
 
-	if "" == separator {
+	if separator == "" {
 		separator = string(os.PathSeparator)
 	}
 
@@ -286,7 +286,7 @@ for any other, "\r\n" and "\r" are replaced by "\n".
 */
 func (gPath GPath) WriteTextFile(content string, append bool) error {
 	var new_content string = content
-	if "windows" == runtime.GOOS {
+	if runtime.GOOS == "windows" {
 		new_content = strings.ReplaceAll(new_content, "\r\n", "\n")
 		new_content = strings.ReplaceAll(new_content, "\r", "\n")
 		new_content = strings.ReplaceAll(new_content, "\n", "\r\n")
@@ -411,7 +411,7 @@ func (gPath GPath) Create(create_file bool) error {
 			current_path.p = gPath.s
 		}
 		for _, sub_path := range path_list {
-			if "" == sub_path {
+			if sub_path == "" {
 				continue
 			}
 
@@ -474,7 +474,7 @@ func (gPath GPath) IsSupported() error {
 
 	// Check if the path is the wrong absolute type for the current OS. Else it's supported.
 	// Don't forget the separators are changed to the current OS ones, so the checks are "inverted".
-	if "windows" == runtime.GOOS {
+	if runtime.GOOS == "windows" {
 		// Then check if it's a Linux absolute path.
 		if strings.HasPrefix(gPath.p, "\\") {
 			return errors.New("the path is not supported by the current OS")

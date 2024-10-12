@@ -47,7 +47,7 @@ func RunningAsAdminPROCESSES() bool {
 		return false
 	}
 
-	return "0" == strings.TrimSpace(stdOutErrCmd.Stdout_str)
+	return strings.TrimSpace(stdOutErrCmd.Stdout_str) == "0"
 }
 
 /*

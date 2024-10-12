@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -95,7 +95,7 @@ func ExecCmdMainSHELL(commands_list[] string, windows_shell string, linux_shell 
 			commands_str += "\n"
 		}
 	}
-	if "windows" == runtime.GOOS {
+	if runtime.GOOS == "windows" {
 		commands_str = strings.Replace(commands_str, "{{EXE}}", ".exe", -1)
 	} else {
 		commands_str = strings.Replace(commands_str, "{{EXE}}", "", -1)
@@ -152,7 +152,7 @@ func GetShell(windows_shell string, linux_shell string) string {
 		linux_shell = "bash"
 	}
 	var shell string = ""
-	if "windows" == runtime.GOOS {
+	if runtime.GOOS == "windows" {
 		shell = windows_shell
 	} else {
 		shell = linux_shell
