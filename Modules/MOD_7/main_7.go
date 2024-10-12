@@ -26,6 +26,7 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -70,7 +71,7 @@ func init() {realMain =
 		cmd := exec.Command(Utils.GetShell("", ""))
 		stdin, _ := cmd.StdinPipe()
 		stdout, _ := cmd.StdoutPipe()
-		//stderr, _ := cmd.StderrPipe()
+		stderr, _ := cmd.StderrPipe()
 		err := cmd.Start()
 		if err != nil {
 			log.Println("Error starting GPT:", err)
@@ -99,7 +100,7 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				//fmt.Print(one_byte_str)
+				fmt.Print(one_byte_str)
 
 				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
@@ -139,7 +140,7 @@ func init() {realMain =
 				}
 			}
 		}()
-		/*go func() {
+		go func() {
 			buf := bufio.NewReader(stderr)
 			for {
 				var one_byte []byte = make([]byte, 1)
@@ -153,9 +154,13 @@ func init() {realMain =
 				var one_byte_str string = string(one_byte)
 				fmt.Print(one_byte_str)
 			}
-		}()*/
+		}()
 
-		// Configure the LLM model (Llama3/3.1's prompt)
+		var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
+		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
+		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
+
+		// Configure the LLM model (Llama3/3.1/3.2's prompt)
 		writer := bufio.NewWriter(stdin)
 		_, _ = writer.WriteString("llama-cli " +
 			"--model " + modUserInfo_GL.Model_loc + " " +
@@ -167,7 +172,7 @@ func init() {realMain =
 			"--mlock " +
 			"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
 				strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
-				modUserInfo_GL.Config_str + "<|eot_id|>\" " +
+				modUserInfo_GL.User_intro + ". " + visor_intro + "<|eot_id|>\" " +
 			"--reverse-prompt \"<|eot_id|>\" " +
 			"--in-prefix \"" + _END_TOKENS + "\" " +
 			"--in-suffix \"" + _START_TOKENS + "\" " +
