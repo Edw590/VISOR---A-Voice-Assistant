@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2023 Edw590
+ * Copyright 2023-2024 Edw590
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -54,4 +54,20 @@ func StartConAppPROCESSES(path GPath, arg string) bool {
 	}
 
 	return true
+}
+
+/*
+KillAllPROCESSES kills all the processes with the given name.
+
+-----------------------------------------------------------
+
+– Params:
+  - prog_name – the name of the process to kill
+ */
+func KillAllPROCESSES(prog_name string) {
+	if runtime.GOOS == "windows" {
+		_, _ = ExecCmdSHELL([]string{"taskkill /F /IM " + prog_name + "{{EXE}}"})
+	} else {
+		_, _ = ExecCmdSHELL([]string{"killall " + prog_name + "{{EXE}}"})
+	}
 }

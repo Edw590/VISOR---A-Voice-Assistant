@@ -374,7 +374,7 @@ func checkStopSpeech() bool {
 forceStopLlama stops the LLM model by killing its processes.
  */
 func forceStopLlama() {
-	_, _ = Utils.ExecCmdSHELL([]string{"killall llama-cli"})
+	Utils.KillAllPROCESSES("llama-cli")
 }
 
 func getStartString(device_id string) string {
