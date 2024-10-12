@@ -45,14 +45,9 @@ type DeviceSettings struct {
 	// Device_description is the description of the current device
 	Device_description string
 
-	// VISOR_dir is the full path to the main directory of VISOR.
-	VISOR_dir string
 	// VISOR_server is an INTERNAL attribute to be filled INTERNALLY that indicates if the version running is the server
 	// or the client version
 	VISOR_server bool
-
-	// Website_dir is the full path to the directory of the VISOR website
-	Website_dir string
 }
 
 type UserSettings struct {
@@ -153,17 +148,6 @@ func LoadDeviceUserSettings(server bool) error {
 				User_settings_GL.PersonalConsts.Website_domain == "" ||
 				User_settings_GL.PersonalConsts.Website_pw == "" {
 			return errors.New("some fields in " + _USER_SETTINGS_FILE + " and/or " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
-		}
-	}
-
-	var visor_path GPath = PathFILESDIRS(true, "", Device_settings_GL.VISOR_dir)
-	if !visor_path.Exists() {
-		return errors.New("the VISOR directory \"" + visor_path.GPathToStringConversion() + "\" does not exist - aborting")
-	}
-	if Device_settings_GL.VISOR_server {
-		var website_path GPath = PathFILESDIRS(true, "", Device_settings_GL.Website_dir)
-		if !website_path.Exists() {
-			return errors.New("the website directory \"" + website_path.GPathToStringConversion() + "\" does not exist - aborting")
 		}
 	}
 

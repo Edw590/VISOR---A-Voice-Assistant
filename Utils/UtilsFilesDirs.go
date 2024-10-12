@@ -186,6 +186,25 @@ func (gPath GPath) Add2(describes_dir bool, sub_paths ...any) GPath {
 }
 
 /*
+RemoveLast removes the last subpath from a path.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the path without the last subpath as a GPath
+ */
+func (gPath GPath) RemoveLast() GPath {
+	if !gPath.dir {
+		return gPath
+	}
+
+	gPath.p = strings.TrimSuffix(gPath.p, gPath.s)
+	gPath.p = gPath.p[:strings.LastIndex(gPath.p, gPath.s)+1]
+
+	return gPath
+}
+
+/*
 GPathToStringConversion converts a GPath to a string.
 
 The function has a big name on purpose to discourage its use - only use it when absolutely necessary (for the reason
@@ -540,9 +559,9 @@ getVISORDirFILESDIRS gets the full path to the VISOR directory.
 
 – Returns:
   - the full path to the VISOR directory
- */
+*/
 func getVISORDirFILESDIRS() GPath {
-	return PathFILESDIRS(true, "", Device_settings_GL.VISOR_dir)
+	return PathFILESDIRS(true, "", filepath.Dir(os.Args[0])).RemoveLast()
 }
 
 /*
@@ -566,5 +585,5 @@ GetWebsiteFilesDirFILESDIRS gets the full path to the website files directory.
   - the full path to the website files directory
 */
 func GetWebsiteFilesDirFILESDIRS() GPath {
-	return PathFILESDIRS(true, "", Device_settings_GL.Website_dir, _WEBSITE_FILES_REL_DIR)
+	return PathFILESDIRS(true, "", getVISORDirFILESDIRS(), _DATA_REL_DIR, "Website", _WEBSITE_FILES_REL_DIR)
 }
