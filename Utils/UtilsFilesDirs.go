@@ -23,6 +23,7 @@ package Utils
 
 import (
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -561,7 +562,13 @@ getVISORDirFILESDIRS gets the full path to the VISOR directory.
   - the full path to the VISOR directory
 */
 func getVISORDirFILESDIRS() GPath {
-	return PathFILESDIRS(true, "", filepath.Dir(os.Args[0])).RemoveLast()
+	var visor_path, err = os.Executable()
+	if err != nil {
+		log.Println("CRITICAL ERROR - Could not obtain VISOR's path. Error below.")
+		panic(err)
+	}
+
+	return PathFILESDIRS(true, "", filepath.Dir(visor_path)).RemoveLast()
 }
 
 /*
