@@ -36,8 +36,10 @@ type Mod7GenInfo struct {
 
 // Mod7UserInfo is the format of the custom information file about this specific module.
 type Mod7UserInfo struct {
-	// Model_loc is the location of the model file
-	Model_loc string
+	// Model_smart_loc is the location of the model file for the smart LLM
+	Model_smart_loc string
+	// Model_dumb_loc is the location of the model file for the dumb LLM
+	Model_dumb_loc string
 	// System_info is the LLM's system information, like the cutting knowledge date and today's date
 	System_info string
 	// User_intro is the user's introduction to the LLM

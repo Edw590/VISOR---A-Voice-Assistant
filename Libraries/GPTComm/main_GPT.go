@@ -64,7 +64,7 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	log.Println(GPTComm.SendText("hello"))
+	log.Println(GPTComm.SendText("hello", true))
 
 	for {
 		time.Sleep(1 * time.Second)

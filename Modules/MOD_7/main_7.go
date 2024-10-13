@@ -27,6 +27,7 @@ import (
 	"Utils/ModsFileInfo"
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -65,32 +66,77 @@ func init() {realMain =
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
 		// Force stop Llama to start fresh, in case for any reason it's running without the module being running too,
-		// like a force-stop on the module which doesn't call forceStopLlama().
+		// like a force-stop on VISOR which then won't call forceStopLlama().
 		forceStopLlama()
 
-		cmd := exec.Command(Utils.GetShell("", ""))
-		stdin, _ := cmd.StdinPipe()
-		stdout, _ := cmd.StdoutPipe()
-		stderr, _ := cmd.StderrPipe()
-		err := cmd.Start()
-		if err != nil {
-			log.Println("Error starting GPT:", err)
+		var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
+		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
+		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
+
+		writer_smart, stdout_smart, stderr_smart := startLlama(12288, 4, 0.8, modUserInfo_GL.Model_smart_loc,
+			modUserInfo_GL.User_intro, visor_intro)
+		if writer_smart == nil {
+			log.Println("Error starting the Llama model (smart)")
+
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 
 			return
 		}
+		reader_smart := bufio.NewReader(stdout_smart)
+
+		writer_dumb, stdout_dumb, stderr_dumb := startLlama(4096, 4, 1.5, modUserInfo_GL.Model_dumb_loc, "", visor_intro)
+		if writer_dumb == nil {
+			log.Println("Error starting the Llama model (dumb)")
+
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+
+			return
+		}
+		reader_dumb := bufio.NewReader(stdout_dumb)
+
+		// Leave these 2 threads running. Without them the processes stop for some reason.
+		go func() {
+			buf := bufio.NewReader(stderr_smart)
+			for {
+				var one_byte []byte = make([]byte, 1)
+				n, _ := buf.Read(one_byte)
+				if n == 0 {
+					// End of the stream (pipe closed by the main module thread)
+
+					return
+				}
+
+				//var one_byte_str string = string(one_byte)
+				//fmt.Print(one_byte_str)
+			}
+		}()
+		go func() {
+			buf := bufio.NewReader(stderr_dumb)
+			for {
+				var one_byte []byte = make([]byte, 1)
+				n, _ := buf.Read(one_byte)
+				if n == 0 {
+					// End of the stream (pipe closed by the main module thread)
+
+					return
+				}
+
+				//var one_byte_str string = string(one_byte)
+				//fmt.Print(one_byte_str)
+			}
+		}()
 
 		var device_id string = ""
 		var shut_down bool = false
 
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
-		// Start a goroutine to print to the screen and write to a file the output of the LLM model
-		go func() {
-			buf := bufio.NewReader(stdout)
+
+		readGPT := func(reader *bufio.Reader, print bool) {
 			var last_answer string = ""
 			var last_word string = ""
 			for {
 				var one_byte []byte = make([]byte, 1)
-				n, err := buf.Read(one_byte)
+				n, err := reader.Read(one_byte)
 				if n == 0 || err != nil {
 					// End of the stream (pipe closed by the main module thread or some error occurred - so shut down)
 					shut_down = true
@@ -100,13 +146,15 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
-				fmt.Print(one_byte_str)
+				if print {
+					fmt.Print(one_byte_str)
+				}
 
 				if is_writing_GL {
 					if one_byte_str == " " || one_byte_str == "\n" {
 						if last_word != _START_TOKENS && last_word != _END_TOKENS {
 							// Meaning: new word written
-							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
+							_ = gpt_text_txt.WriteTextFile(last_word+one_byte_str, true)
 						}
 
 						last_word = ""
@@ -135,57 +183,32 @@ func init() {realMain =
 					last_word = ""
 					last_answer = ""
 
-
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
 				}
 			}
+		}
+
+		// Read from both GPTs --> but make them *never* work both at the same time. Only one at a time answering.
+		go func() {
+			readGPT(reader_smart, true)
 		}()
 		go func() {
-			buf := bufio.NewReader(stderr)
-			for {
-				var one_byte []byte = make([]byte, 1)
-				n, _ := buf.Read(one_byte)
-				if n == 0 {
-					// End of the stream (pipe closed by the main module thread)
-
-					return
-				}
-
-				var one_byte_str string = string(one_byte)
-				fmt.Print(one_byte_str)
-			}
+			readGPT(reader_dumb, true)
 		}()
-
-		var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
-		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
-
-		// Configure the LLM model (Llama3/3.1/3.2's prompt)
-		writer := bufio.NewWriter(stdin)
-		_, _ = writer.WriteString("llama-cli " +
-			"--model " + modUserInfo_GL.Model_loc + " " +
-			"--interactive-first " +
-			"--ctx-size 16384 " + // Maximum value for the Raspberry Pi 5 (8 GB)
-			"--threads 4 " + // Maximum value for the Raspberry Pi 5 (8 GB)
-			"--temp 0.8 " +
-			"--keep -1 " +
-			"--mlock " +
-			"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
-				strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
-				modUserInfo_GL.User_intro + ". " + visor_intro + "<|eot_id|>\" " +
-			"--reverse-prompt \"<|eot_id|>\" " +
-			"--in-prefix \"" + _END_TOKENS + "\" " +
-			"--in-suffix \"" + _START_TOKENS + "\" " +
-			"\n")
-		_ = writer.Flush()
 
 		// Wait for the LLM model to start
 		Utils.WaitWithStopTIMEDATE(module_stop, 30)
 
-		sendToGPT := func(to_send string) {
+		sendToGPT := func(to_send string, use_smart bool) {
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
-			_, _ = writer.WriteString(Utils.RemoveNonGraphicChars(to_send) + "\n")
-			_ = writer.Flush()
+			var to_write string = Utils.RemoveNonGraphicCharsGENERAL(to_send) + "\n"
+			if use_smart {
+				_, _ = writer_smart.WriteString(to_write)
+				_ = writer_smart.Flush()
+			} else {
+				_, _ = writer_dumb.WriteString(to_write)
+				_ = writer_dumb.Flush()
+			}
 
 			time.Sleep(5 * time.Second)
 
@@ -210,7 +233,8 @@ func init() {realMain =
 			if *module_stop {
 				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 				forceStopLlama()
-				_ = stdout.Close()
+				_ = stdout_smart.Close()
+				_ = stdout_dumb.Close()
 
 				return
 			}
@@ -223,11 +247,13 @@ func init() {realMain =
 
 				var to_process string = *file_path.ReadTextFile()
 				if to_process != "" {
-					// It comes like: "[device_id]text"
-					device_id = to_process[1:strings.Index(to_process, "]")]
+					// It comes like: "[device_id|[true or false]]text"
+					var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
+					device_id = params_split[0]
+					var use_smart bool = params_split[1] == "true"
 					var text string = to_process[strings.Index(to_process, "]") + 1:]
 
-					if strings.HasPrefix(text, "/") {
+					if use_smart && strings.HasPrefix(text, "/") {
 						// Control commands begin with a slash
 						if text == "/clear" {
 							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
@@ -241,7 +267,7 @@ func init() {realMain =
 								_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
 									". " + getEndString(), true)
 							} else {
-								sendToGPT("Summarize in sentences the following: " + result)
+								sendToGPT("Summarize in sentences the following: " + result, true)
 							}
 						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
 							// Search for the Wikipedia page title
@@ -251,7 +277,7 @@ func init() {realMain =
 								getEndString(), true)
 						}
 					} else {
-						sendToGPT(text)
+						sendToGPT(text, use_smart)
 					}
 				}
 
@@ -261,7 +287,8 @@ func init() {realMain =
 				if shut_down {
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 					forceStopLlama()
-					_ = stdout.Close()
+					_ = stdout_smart.Close()
+					_ = stdout_dumb.Close()
 
 					return
 				}
@@ -270,7 +297,8 @@ func init() {realMain =
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 				forceStopLlama()
-				_ = stdout.Close()
+				_ = stdout_smart.Close()
+				_ = stdout_dumb.Close()
 
 				return
 			}
@@ -278,44 +306,38 @@ func init() {realMain =
 	}
 }
 
-const NO_ERRORS int = 0
-const ALREADY_WRITING int = 1
-const DEVICE_NOT_ACTIVE int = 2
-/*
-SpeakOnDevice sends a text to be spoken on a device.
+func startLlama(ctx_size int, threads int, temp float32, model_loc string, user_intro string, visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
+	cmd := exec.Command(Utils.GetShell("", ""))
+	stdin, _ := cmd.StdinPipe()
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
+	err := cmd.Start()
+	if err != nil {
+		log.Println("Error starting a command shell:", err)
 
------CONSTANTS-----
-
-  - NO_ERRORS – no errors
-  - ALREADY_WRITING – VISOR is already generating text to some device
-  - DEVICE_NOT_ACTIVE – the device is not active
-
------CONSTANTS-----
-
------------------------------------------------------------
-
-– Params:
-  - device_id – the device ID
-  - text – the text to be spoken
-
-– Returns:
-  - true if the text was sent to be spoken, false if the device is already speaking or the device is not active
- */
-func SpeakOnDevice(device_id string, text string) int {
-	if is_writing_GL {
-		return ALREADY_WRITING
+		return nil, nil, nil
 	}
-	// Disabled because the function is now gone - implement it again if this function is needed
-	//if !MOD_12.IsDeviceActive(device_id) {
-	//	return DEVICE_NOT_ACTIVE
-	//}
 
-	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
-	reduceGptTextTxt(gpt_text_txt)
+	// Configure the LLM model (Llama3/3.1/3.2's prompt)
+	writer := bufio.NewWriter(stdin)
+	_, _ = writer.WriteString("llama-cli " +
+		"--model \"" + model_loc + "\" " +
+		"--interactive-first " +
+		"--ctx-size " + strconv.Itoa(ctx_size) + " " +
+		"--threads " + strconv.Itoa(threads) + " " +
+		"--temp " + strconv.FormatFloat(float64(temp), 'f', -1, 32) + " " +
+		"--keep -1 " +
+		"--mlock " +
+		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
+		strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
+		user_intro + ". " + visor_intro + "<|eot_id|>\" " +
+		"--reverse-prompt \"<|eot_id|>\" " +
+		"--in-prefix \"" + _END_TOKENS + "\" " +
+		"--in-suffix \"" + _START_TOKENS + "\" " +
+		"\n")
+	_ = writer.Flush()
 
-	_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + text + getEndString(), true)
-
-	return NO_ERRORS
+	return writer, stdout, stderr
 }
 
 /*

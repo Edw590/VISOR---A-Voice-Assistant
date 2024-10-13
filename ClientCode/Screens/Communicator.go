@@ -44,9 +44,16 @@ func Communicator() fyne.CanvasObject {
 	// _Entry and Button section
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
-	var btn_send_text_gpt *widget.Button = widget.NewButton("Send text to GPT", func() {
-		if !GPTComm.SendText(entry_txt_to_speech.Text) {
-			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment.", SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text to GPT (smart)", func() {
+		if !GPTComm.SendText(entry_txt_to_speech.Text, true) {
+			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment or not available.", SpeechQueue.PRIORITY_USER_ACTION,
+				SpeechQueue.MODE1_ALWAYS_NOTIFY)
+		}
+	})
+	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text to GPT (dumb)", func() {
+		if !GPTComm.SendText(entry_txt_to_speech.Text, false) {
+			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment or not available.", SpeechQueue.PRIORITY_USER_ACTION,
+				SpeechQueue.MODE1_ALWAYS_NOTIFY)
 		}
 	})
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
@@ -85,7 +92,8 @@ func Communicator() fyne.CanvasObject {
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
 		entry_txt_to_speech,
-		btn_send_text_gpt,
+		btn_send_text_gpt_smart,
+		btn_send_text_gpt_dumb,
 		btn_send_text,
 		scroll_text,
 	)

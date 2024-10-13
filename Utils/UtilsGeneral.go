@@ -248,7 +248,7 @@ func WasArgUsedGENERAL(args []string, wanted_arg string) bool {
 }
 
 /*
-RemoveNonGraphicChars removes all the non-graphic characters from a string.
+RemoveNonGraphicCharsGENERAL removes all the non-graphic characters from a string.
 
 -----------------------------------------------------------
 
@@ -257,8 +257,8 @@ RemoveNonGraphicChars removes all the non-graphic characters from a string.
 
 – Returns:
   - the string without the non-graphic characters
- */
-func RemoveNonGraphicChars(str string) string {
+*/
+func RemoveNonGraphicCharsGENERAL(str string) string {
 	str = strings.Map(func(r rune) rune {
 		if unicode.IsGraphic(r) {
 			return r

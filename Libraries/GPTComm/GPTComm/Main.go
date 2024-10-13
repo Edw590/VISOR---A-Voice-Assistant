@@ -37,10 +37,12 @@ SendText sends the given text to the LLM model.
 
 – Params:
   - text – the text to send
+  - use_smart – whether to use the smart LLM or not
 */
-func SendText(text string) bool {
+func SendText(text string, use_smart bool) bool {
 	var message []byte = []byte("GPT|")
-	message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "]" + text)...)
+	message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "|" +
+		strconv.FormatBool(use_smart) + "]" + text)...)
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, message)
 	time.Sleep(1 * time.Second)
 
