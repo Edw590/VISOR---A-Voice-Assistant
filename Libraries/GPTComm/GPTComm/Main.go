@@ -36,16 +36,18 @@ SendText sends the given text to the LLM model.
 -----------------------------------------------------------
 
 – Params:
-  - text – the text to send
-  - use_smart – whether to use the smart LLM or not
+  - text – the text to send or an empty string to just get the return value
+  - use_smart – whether to use the smart LLM or not (ignored in case `text` is empty)
 
 – Returns:
-  - true if the text will be processed immediately, false if it's on hold
+  - true if the text will be processed immediately, false if the GPT is busy and the text will be put on hold
 */
 func SendText(text string, use_smart bool) bool {
 	var message []byte = []byte("GPT|")
-	message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "|" +
-		strconv.FormatBool(use_smart) + "]" + text)...)
+	if text != "" {
+		message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "|" +
+			strconv.FormatBool(use_smart) + "]" + text)...)
+	}
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, message)
 	time.Sleep(1 * time.Second)
 

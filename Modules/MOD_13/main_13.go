@@ -185,7 +185,7 @@ func init() {realMain =
 }
 
 func speakInternal(txt_to_speak string, speech_priority int, mode int, auto_gpt bool) {
-	if auto_gpt && Utils.IsCommunicatorConnectedSERVER() {
+	if auto_gpt && Utils.IsCommunicatorConnectedSERVER() && GPTComm.SendText("", false) {
 		var text string = "Sent from my " + Utils.Device_settings_GL.Device_type + ": write ONE concise sentence " +
 			"saying \"" + txt_to_speak + "\"."
 		if !GPTComm.SendText(text, false) {

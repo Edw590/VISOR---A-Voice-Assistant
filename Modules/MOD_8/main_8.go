@@ -291,7 +291,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 		case "GPT":
 			// Send a text to be processed by the GPT model.
-			// Example: a compressed string
+			// Example: a compressed string or nil to just get the return value
 			// Returns: true if the text will be processed immediately, false if the GPT is busy for now and the text
 			// will wait
 			var ret []byte
@@ -301,8 +301,10 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 				ret = []byte("false")
 			}
 
-			_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
-				Utils.RandStringGENERAL(10) + ".txt").WriteTextFile(Utils.DecompressString(bytes), false)
+			if bytes != nil {
+				_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
+					Utils.RandStringGENERAL(10) + ".txt").WriteTextFile(Utils.DecompressString(bytes), false)
+			}
 
 			return ret
 	}
