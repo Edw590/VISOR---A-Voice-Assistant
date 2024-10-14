@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 Edw590
+ * Copyright 2023-2024 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
