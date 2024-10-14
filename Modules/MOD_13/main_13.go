@@ -110,7 +110,23 @@ func init() {realMain =
 				continue
 			}
 
+			var send_to_GPT bool = false
 			if len(detected_cmds) == 0 || detected_cmds[0] == "" {
+				send_to_GPT = true
+			} else {
+				send_to_GPT = true
+				for _, command := range detected_cmds {
+					num, _ := strconv.ParseFloat(command, 32)
+					if num >= 1 {
+						// If there's any command detected, don't send to GPT
+						send_to_GPT = false
+
+						break
+					}
+				}
+				// If there are only WARN_-started constants (nevative numbers), send to GPT
+			}
+			if send_to_GPT {
 				if !Utils.IsCommunicatorConnectedSERVER() {
 					var speak string = "GPT unavailable. Communicator not connected."
 					MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
