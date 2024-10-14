@@ -20,20 +20,20 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="VISOR / Server / Linux" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="VISOR / Client / Windows (x64)" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR" />
-    <working_directory value="$PROJECT_DIR$/ServerCode" />
-    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR\bin\VISOR_linux -tags=server" />
+    <working_directory value="$PROJECT_DIR$/bin" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR\bin\VISOR_Client_x64.exe -tags=client" />
+    <parameters value="--conhost" />
     <envs>
-      <env name="GOOS" value="linux" />
-      <env name="GOARCH" value="arm64" />
+      <env name="GOOS" value="windows" />
+      <env name="GOARCH" value="amd64" />
     </envs>
     <kind value="PACKAGE" />
-    <package value="VISOR_Server" />
-    <directory value="$PROJECT_DIR$/Modules/MOD_2" />
-    <filePath value="$PROJECT_DIR$/MOD_4_1/main_4.go" />
+    <package value="VISOR_Client" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
     <output_directory value="$PROJECT_DIR$/bin" />
-    <option name="run" value="false" />
     <method v="2" />
   </configuration>
 </component>
