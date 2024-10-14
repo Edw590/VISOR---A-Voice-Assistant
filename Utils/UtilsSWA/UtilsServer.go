@@ -86,3 +86,15 @@ StopCommunicatorSERVER stops the communicator.
 func StopCommunicatorSERVER() {
 	Utils.StopCommunicatorSERVER()
 }
+
+/*
+IsCommunicatorConnectedSERVER checks if the communicator is connected.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the communicator is connected, false otherwise
+*/
+func IsCommunicatorConnectedSERVER() bool {
+	return Utils.IsCommunicatorConnectedSERVER()
+}

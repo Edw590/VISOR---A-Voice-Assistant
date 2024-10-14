@@ -23,6 +23,7 @@ package MOD_13
 
 import (
 	"ACD/ACD"
+	"GPTComm/GPTComm"
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
 	"TEHelper/TEHelper"
@@ -109,6 +110,22 @@ func init() {realMain =
 				continue
 			}
 
+			if len(detected_cmds) == 0 || detected_cmds[0] == "" {
+				if !Utils.IsCommunicatorConnectedSERVER() {
+					var speak string = "GPT unavailable. Communicator not connected."
+					MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+
+					return
+				}
+
+				if !GPTComm.SendText(sentence_str, true) {
+					MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.",
+						SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				}
+
+				return
+			}
+
 			for _, command := range detected_cmds {
 				var dot_index int = strings.Index(command, ".")
 				if dot_index == -1 {
@@ -127,15 +144,15 @@ func init() {realMain =
 				switch cmd_id {
 					case CMD_ASK_TIME:
 						var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
-						MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2)
+						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 					case CMD_ASK_DATE:
 						var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
-						MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2)
+						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 					case CMD_ASK_BATTERY_PERCENT:
 						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 							GetData(true, nil).(int)
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-						MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2)
+						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 				}
 			}
 
@@ -147,4 +164,19 @@ func init() {realMain =
 			}
 		}
 	}
+}
+
+func speakInternal(txt_to_speak string, speech_priority int, mode int, auto_gpt bool) {
+	if auto_gpt && Utils.IsCommunicatorConnectedSERVER() {
+		var text string = "Sent from my " + Utils.Device_settings_GL.Device_type + ": write ONE concise sentence " +
+			"saying \"" + txt_to_speak + "\"."
+		if !GPTComm.SendText(text, false) {
+			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment.", SpeechQueue.PRIORITY_USER_ACTION,
+				SpeechQueue.MODE1_ALWAYS_NOTIFY)
+		}
+
+		return
+	}
+
+	MOD_3.QueueSpeech(txt_to_speak, speech_priority, mode)
 }

@@ -38,6 +38,9 @@ SendText sends the given text to the LLM model.
 – Params:
   - text – the text to send
   - use_smart – whether to use the smart LLM or not
+
+– Returns:
+  - true if the text will be processed immediately, false if it's on hold
 */
 func SendText(text string, use_smart bool) bool {
 	var message []byte = []byte("GPT|")

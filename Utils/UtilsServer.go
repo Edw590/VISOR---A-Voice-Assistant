@@ -40,6 +40,7 @@ var srvComm_gen_ch_out_GL chan []byte
 var srvComm_stop_GL bool = false
 var srvComm_stopping_GL bool = false
 var srvComm_started_GL bool = false
+var srvComm_connected_GL bool = false
 
 /*
 StartCommunicatorSERVER starts the communicator.
@@ -172,6 +173,8 @@ func StartCommunicatorSERVER() bool {
 
 	log.Println("Communicator started")
 
+	srvComm_connected_GL = true
+
 	for {
 		if WaitWithStopTIMEDATE(&srvComm_stop_GL, 1000000000) {
 			srvComm_stopping_GL = true
@@ -184,6 +187,7 @@ func StartCommunicatorSERVER() bool {
 
 					srvComm_started_GL = false
 					srvComm_stopping_GL = false
+					srvComm_connected_GL = false
 
 					return true
 				}
@@ -274,4 +278,16 @@ StopCommunicatorSERVER stops the communicator.
 */
 func StopCommunicatorSERVER() {
 	srvComm_stop_GL = true
+}
+
+/*
+IsCommunicatorConnectedSERVER checks if the communicator is connected.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the communicator is connected, false otherwise
+ */
+func IsCommunicatorConnectedSERVER() bool {
+	return srvComm_connected_GL
 }
