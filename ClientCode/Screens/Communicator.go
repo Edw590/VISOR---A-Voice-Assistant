@@ -78,19 +78,16 @@ func Communicator() fyne.CanvasObject {
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
-	var response_text *widget.Label = widget.NewLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed " +
-		"do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud " +
-		"exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit " +
-		"in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non " +
-		"proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+	var response_text *widget.Entry = widget.NewMultiLineEntry()
 	response_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
+	response_text.SetMinRowsVisible(100)
 	var scroll_text *container.Scroll = container.NewVScroll(response_text)
 	scroll_text.SetMinSize(response_text.MinSize()) // Set the minimum size for the scroll container
 
 	go func() {
 		for {
 			if Current_screen_GL == comm_canvas_object_GL {
-				response_text.SetText(GPTComm.GetLastSpeech())
+				response_text.SetText(GPTComm.GetLastText())
 			}
 			scroll_text.SetMinSize(response_text.MinSize())
 

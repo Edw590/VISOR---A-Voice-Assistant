@@ -31,6 +31,7 @@ var time_begin_ms_GL int64 = -1
 var curr_entry_time_ms_GL int64 = -1
 var last_speech_GL string = ""
 var last_idx_begin_GL int = 0
+var last_text_GL string = ""
 
 const END_ENTRY string = "[3234_END]"
 const ALL_DEVICES_ID string = "3234_ALL"
@@ -104,6 +105,7 @@ func GetNextSpeechSentence() string {
 			continue
 		}
 		var text = entry.getText()
+		last_text_GL = text
 
 		//log.Println("--------------------------")
 		//log.Println("text: \"" + text + "\"")
@@ -169,6 +171,26 @@ func GetNextSpeechSentence() string {
 	return sentence
 }
 
+/*
+GetLastSpeech gets the last speech that was spoken, optimized for speech by a TTS engine.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the last speech that was spoken
+ */
 func GetLastSpeech() string {
 	return last_speech_GL
+}
+
+/*
+GetLastText gets the last text that was spoken, exactly as written by the LLM.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the last text that was spoken
+ */
+func GetLastText() string {
+	return last_text_GL
 }
