@@ -20,13 +20,13 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="VISOR / Server / Linux" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <configuration default="false" name="VISOR / Server / Windows (x64)" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="VISOR" />
     <working_directory value="$PROJECT_DIR$/ServerCode" />
-    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR\bin\VISOR_linux -tags=server" />
+    <go_parameters value="-o C:\Users\Edw590\AssistantProjects\VISOR\bin\VISOR_Server_x64.exe -tags=server" />
     <envs>
-      <env name="GOOS" value="linux" />
-      <env name="GOARCH" value="arm64" />
+      <env name="GOOS" value="windows" />
+      <env name="GOARCH" value="amd64" />
     </envs>
     <kind value="PACKAGE" />
     <package value="VISOR_Server" />

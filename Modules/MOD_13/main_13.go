@@ -145,9 +145,11 @@ func init() {realMain =
 					case CMD_ASK_TIME:
 						var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
 						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+
 					case CMD_ASK_DATE:
 						var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
 						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+
 					case CMD_ASK_BATTERY_PERCENT:
 						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 							GetData(true, nil).(int)
