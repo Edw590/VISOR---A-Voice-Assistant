@@ -187,7 +187,8 @@ func init() {realMain =
 					// Restore the previous screen state
 					Screens.Current_screen_GL = prev_screen
 				}),
-				fyne.NewMenuItem("Quit", func() {
+				fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
+					Utils.CloseCommsChannels()
 					Utils.SignalModulesStopMODULES(modules)
 
 					my_app_GL.Quit()

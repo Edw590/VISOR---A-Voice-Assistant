@@ -298,8 +298,6 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 		moduleInfo.updateVISORRunInfo(server)
 
 		to_do()
-
-		CloseCommsChannels()
 	} else {
 		go func() {
 			to_do()

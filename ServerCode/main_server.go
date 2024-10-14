@@ -89,6 +89,8 @@ func init() {realMain =
 			}
 		}
 
+		Utils.CloseCommsChannels()
+
 		Utils.SignalModulesStopMODULES(modules)
 	}
 }
