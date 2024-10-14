@@ -96,6 +96,7 @@ func GetNextSpeechSentence() string {
 	//log.Println("time_begin_ms_GL:", time_begin_ms_GL)
 
 	var sentence string = ""
+	var ignore_sentence bool = false
 	for {
 		var entry *_Entry = getEntry(curr_entry_time_ms_GL, -1)
 		if entry.getTime() == -1 {
@@ -137,6 +138,17 @@ func GetNextSpeechSentence() string {
 			sentence = strings.Trim(sentence, " ")
 
 			last_idx_begin_GL += dot_idx + 2
+
+			// Ignore code
+			if strings.Contains(sentence, "```") {
+				ignore_sentence = !ignore_sentence
+			}
+
+			if ignore_sentence {
+				time.Sleep(1 * time.Second)
+
+				continue
+			}
 
 			break
 		}
