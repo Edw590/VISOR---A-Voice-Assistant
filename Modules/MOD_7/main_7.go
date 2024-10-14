@@ -48,8 +48,6 @@ const _END_TOKENS string = "<|start_header_id|>user<|end_header_id|>"
 
 const _TIME_SLEEP_S int = 1
 
-var is_writing_GL bool = false
-
 var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
@@ -79,6 +77,7 @@ func init() {realMain =
 			log.Println("Error starting the Llama model (smart)")
 
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+			forceStopLlama()
 
 			return
 		}
@@ -89,6 +88,8 @@ func init() {realMain =
 			log.Println("Error starting the Llama model (dumb)")
 
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+			forceStopLlama()
+			_ = stdout_smart.Close()
 
 			return
 		}
@@ -134,6 +135,7 @@ func init() {realMain =
 		readGPT := func(reader *bufio.Reader, print bool) {
 			var last_answer string = ""
 			var last_word string = ""
+			var is_writing bool = false
 			for {
 				var one_byte []byte = make([]byte, 1)
 				n, err := reader.Read(one_byte)
@@ -150,11 +152,11 @@ func init() {realMain =
 					fmt.Print(one_byte_str)
 				}
 
-				if is_writing_GL {
+				if is_writing {
 					if one_byte_str == " " || one_byte_str == "\n" {
 						if last_word != _START_TOKENS && last_word != _END_TOKENS {
 							// Meaning: new word written
-							_ = gpt_text_txt.WriteTextFile(last_word+one_byte_str, true)
+							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
 						}
 
 						last_word = ""
@@ -165,7 +167,7 @@ func init() {realMain =
 
 				if strings.Contains(last_answer, _START_TOKENS) {
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
-					is_writing_GL = true
+					is_writing = true
 					last_answer = strings.Replace(last_answer, _START_TOKENS, "", -1)
 
 					reduceGptTextTxt(gpt_text_txt)
@@ -176,7 +178,7 @@ func init() {realMain =
 						"Message": []byte(device_id + "|L_2|start"),
 					}
 				} else if strings.Contains(last_answer, _END_TOKENS) {
-					is_writing_GL = false
+					is_writing = false
 
 					_ = gpt_text_txt.WriteTextFile(getEndString(), true)
 
