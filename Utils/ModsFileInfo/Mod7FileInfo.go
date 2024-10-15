@@ -30,6 +30,8 @@ const MOD_7_STATE_STOPPING int = 3
 type Mod7GenInfo struct {
 	// State is the state of the module
 	State int
+	// Memories is the list of memories the GPT has
+	Memories []string
 }
 
 ///////////////////////////////////////////////////////////////////////////////

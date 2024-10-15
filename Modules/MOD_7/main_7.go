@@ -71,8 +71,10 @@ func init() {realMain =
 		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
 		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
 
+		var memories string = strings.Join(modGenInfo_GL.Memories, ". ")
+
 		writer_smart, stdout_smart, stderr_smart := startLlama(12288, 4, 0.8, modUserInfo_GL.Model_smart_loc,
-			modUserInfo_GL.User_intro, visor_intro)
+			modUserInfo_GL.User_intro + ". | Memories you stored about me: " + memories, visor_intro)
 		if writer_smart == nil {
 			log.Println("Error starting the Llama model (smart)")
 
@@ -132,6 +134,9 @@ func init() {realMain =
 
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
+		var first_3234_end bool = true
+		var memorizing bool = false
+		memories = ""
 		readGPT := func(reader *bufio.Reader, print bool) {
 			var last_answer string = ""
 			var last_word string = ""
@@ -148,6 +153,9 @@ func init() {realMain =
 
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
+				if memorizing {
+					memories += one_byte_str
+				}
 				if print {
 					fmt.Print(one_byte_str)
 				}
@@ -185,7 +193,12 @@ func init() {realMain =
 					last_word = ""
 					last_answer = ""
 
-					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
+					// The first time is the "dumb" LLM being ready. The 2nd time is the "smart" one.
+					if first_3234_end {
+						first_3234_end = false
+					} else {
+						modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
+					}
 				}
 			}
 		}
@@ -201,18 +214,18 @@ func init() {realMain =
 		// Wait for the LLM model to start
 		Utils.WaitWithStopTIMEDATE(module_stop, 30)
 
+		var user_text string = ""
 		sendToGPT := func(to_send string, use_smart bool) {
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
-			var to_write string = Utils.RemoveNonGraphicCharsGENERAL(to_send) + "\n"
+			var to_write string = Utils.RemoveNonGraphicCharsGENERAL(to_send)
 			if use_smart {
-				_, _ = writer_smart.WriteString(to_write)
+				user_text += to_write + ". "
+				_, _ = writer_smart.WriteString(to_write + "\n")
 				_ = writer_smart.Flush()
 			} else {
-				_, _ = writer_dumb.WriteString(to_write)
+				_, _ = writer_dumb.WriteString(to_write + "\n")
 				_ = writer_dumb.Flush()
 			}
-
-			time.Sleep(5 * time.Second)
 
 			for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY && !*module_stop {
 				if checkStopSpeech() {
@@ -230,17 +243,36 @@ func init() {realMain =
 			}
 		}
 
-		// Process the files to input to the LLM model
-		for {
-			if *module_stop {
-				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
-				forceStopLlama()
-				_ = stdout_smart.Close()
-				_ = stdout_dumb.Close()
+		memorizeThings := func() {
+			device_id = Utils.Device_settings_GL.Device_ID
+			memorizing = true
+			var text string = "Write in bullet points a list of key things to know about the user from the following " +
+				"user input. If there's nothing important, write ONLY \"* [3234_NONE]\". For example, for \"I like " +
+				"bags\" you'd write something like \"* The user likes bags\". But you ignore useless information, " +
+				"like the user saying they're bored (you ignore that). User input: \"" + user_text + "\"."
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
+			_, _ = writer_dumb.WriteString(text + "\n")
+			_ = writer_dumb.Flush()
 
-				return
+			for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY {
+				time.Sleep(1 * time.Second)
+			}
+			memorizing = false
+
+			var memories_split []string = strings.Split(memories, "\n")
+			for _, memory := range memories_split {
+				var memory_lower string = strings.ToLower(memory)
+				if memory != "" && !strings.Contains(memory_lower, "none") && strings.Contains(memory_lower, "* ") {
+					modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, memory[2:])
+				}
 			}
 
+			// Give time to write everything down
+			time.Sleep(6 * time.Second)
+		}
+
+		// Process the files to input to the LLM model
+		for {
 			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
 			var file_list []Utils.FileInfo = to_process_dir.GetFileList()
 			for len(file_list) > 0 {
@@ -269,7 +301,7 @@ func init() {realMain =
 								_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
 									". " + getEndString(), true)
 							} else {
-								sendToGPT("Summarize in sentences the following: " + result, true)
+								sendToGPT("Summarize in sentences the following: " + result, false)
 							}
 						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
 							// Search for the Wikipedia page title
@@ -287,6 +319,7 @@ func init() {realMain =
 				_ = os.Remove(file_path.GPathToStringConversion())
 
 				if shut_down {
+					memorizeThings()
 					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
 					forceStopLlama()
 					_ = stdout_smart.Close()
@@ -332,7 +365,7 @@ func startLlama(ctx_size int, threads int, temp float32, model_loc string, user_
 		"--mlock " +
 		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
 		strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
-		user_intro + ". " + visor_intro + "<|eot_id|>\" " +
+		user_intro + ". | " + visor_intro + "<|eot_id|>\" " +
 		"--reverse-prompt \"<|eot_id|>\" " +
 		"--in-prefix \"" + _END_TOKENS + "\" " +
 		"--in-suffix \"" + _START_TOKENS + "\" " +
