@@ -23,6 +23,7 @@ package GPTComm
 
 import (
 	"Utils"
+	"Utils/UtilsSWA"
 	"strings"
 	"time"
 )
@@ -165,7 +166,7 @@ func GetNextSpeechSentence() string {
 		}
 	}
 
-	if !strings.ContainsAny(sentence, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+	if !UtilsSWA.StringHasLettersGENERAL(sentence) {
 		sentence = ""
 	}
 

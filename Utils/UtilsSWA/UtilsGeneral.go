@@ -42,8 +42,51 @@ func RemoveNonGraphicCharsGENERAL(str string) string {
 		if unicode.IsGraphic(r) {
 			return r
 		}
+
 		return -1
 	}, str)
 
 	return str
+}
+
+/*
+StringHasLetters checks if a string has any letters.
+
+-----------------------------------------------------------
+
+– Params:
+  - s – the string to check
+
+– Returns:
+  - true if the string has any letters, false otherwise
+ */
+func StringHasLettersGENERAL(str string) bool {
+	for _, r := range str {
+		if unicode.IsLetter(r) {
+			return true
+		}
+	}
+
+	return false
+}
+
+/*
+StringHasNumbers checks if a string has any numbers.
+
+-----------------------------------------------------------
+
+– Params:
+  - s – the string to check
+
+– Returns:
+  - true if the string has any numbers, false otherwise
+ */
+func StringHasNumbersGENERAL(str string) bool {
+	for _, r := range str {
+		if unicode.IsNumber(r) {
+			return true
+		}
+	}
+
+	return false
 }
