@@ -22,13 +22,12 @@
 package MOD_4
 
 import (
+	"Utils/UtilsSWA"
 	"encoding/json"
 	"strings"
 	"time"
 
 	"github.com/mmcdole/gofeed"
-
-	"Utils"
 )
 
 type _PlaylistPage struct {
@@ -73,14 +72,14 @@ func ytPlaylistScraping(playlist_id string, item_num int, item_count int) _Video
 	// This is here to make sure the page is only scraped once
 	if playlistPage_GL.id != playlist_id {
 		var playlist_url string = "https://www.youtube.com/playlist?list=" + playlist_id
-		var page_html *string = Utils.GetPageHtmlWEBPAGES(playlist_url)
-		if page_html == nil {
+		var page_html_bytes []byte = UtilsSWA.GetPageHtmlWEBPAGES(playlist_url)
+		if page_html_bytes == nil {
 			playlistPage_GL.id = ""
 
 			return videoInfo
 		}
 
-		videos_info_json = strings.Split(*page_html, "{\"playlistVideoRenderer\":")
+		videos_info_json = strings.Split(string(page_html_bytes), "{\"playlistVideoRenderer\":")
 
 		// Separate and remove the rest of the page from the last item
 		var last_json string = videos_info_json[len(videos_info_json)-1]

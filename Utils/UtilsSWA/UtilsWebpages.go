@@ -22,28 +22,30 @@
 package UtilsSWA
 
 import (
-	"strings"
-	"unicode"
+	"io"
+	"net/http"
 )
 
 /*
-RemoveNonGraphicCharsGENERAL removes all the non-graphic characters from a string.
+GetPageHtmlWEBPAGES gets the HTML of a page.
 
 -----------------------------------------------------------
 
 – Params:
-  - str – the string to remove the non-graphic characters from
+  - url – the URL of the page
 
 – Returns:
-  - the string without the non-graphic characters
+  - the HTML of the page or nil if an error occurs
 */
-func RemoveNonGraphicCharsGENERAL(str string) string {
-	str = strings.Map(func(r rune) rune {
-		if unicode.IsGraphic(r) {
-			return r
+func GetPageHtmlWEBPAGES(url string) []byte {
+	resp, err := http.Get(url)
+	if err == nil {
+		body, err := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
+		if resp.StatusCode <= 299 && err == nil {
+			return body
 		}
-		return -1
-	}, str)
+	}
 
-	return str
+	return nil
 }

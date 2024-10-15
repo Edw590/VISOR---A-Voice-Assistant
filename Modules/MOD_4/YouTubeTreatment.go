@@ -22,6 +22,7 @@
 package MOD_4
 
 import (
+	"Utils/UtilsSWA"
 	"strconv"
 	"strings"
 	"time"
@@ -199,11 +200,11 @@ The format returned is the same as the one from the SecondsToTimeStr() function.
   - the duration of the video if it was found, _VID_TIME_DEF otherwise
 */
 func getVideoDuration(video_url string) string {
-	var p_page_html *string = Utils.GetPageHtmlWEBPAGES(video_url)
-	if p_page_html == nil {
+	var page_html_bytes []byte = UtilsSWA.GetPageHtmlWEBPAGES(video_url)
+	if page_html_bytes == nil {
 		return _VID_TIME_DEF
 	}
-	var page_html string = *p_page_html
+	var page_html string = string(page_html_bytes)
 
 	// I think the data is in JSON, so I got the lengthSeconds that I found randomly looking for the seconds. It also a
 	// double quote after the number ("lengthSeconds":"47" for 47 seconds) --> CAN CHANGE (checked on 2023-07-04).
@@ -256,11 +257,11 @@ getChannelImageUrl gets the URL of the channel image of by getting the channel's
   - the URL of the channel image if it was found, _GEN_ERROR otherwise
 */
 func getChannelImageUrl(channel_code string) string {
-	var p_page_html *string = Utils.GetPageHtmlWEBPAGES("https://www.youtube.com/channel/" + channel_code)
-	if p_page_html == nil {
+	var page_html_bytes []byte = UtilsSWA.GetPageHtmlWEBPAGES("https://www.youtube.com/channel/" + channel_code)
+	if page_html_bytes == nil {
 		return _GEN_ERROR
 	}
-	var page_html string = *p_page_html
+	var page_html string = string(page_html_bytes)
 
 	// The image URL is on the 3rd occurrence of the "https://yt3.googleusercontent.com/" on HTML of the channel's page
 	// --> CAN CHANGE (checked on 2023-07-04).

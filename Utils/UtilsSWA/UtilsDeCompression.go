@@ -19,35 +19,38 @@
  * under the License.
  ******************************************************************************/
 
-package Utils
+package UtilsSWA
 
 import (
-	"io"
-	"net/http"
+	"Utils"
 )
 
 /*
-GetPageHtmlWEBPAGES gets the HTML of a page.
+CompressString compresses a string.
 
 -----------------------------------------------------------
 
 – Params:
-  - url – the URL of the page
+	- to_compress – the string to compress
 
 – Returns:
-  - the HTML of the page or nil if an error occurs
+	- the compressed string or nil if an error occurred
 */
-func GetPageHtmlWEBPAGES(url string) *string {
-	resp, err := http.Get(url)
-	if err == nil {
-		body, err := io.ReadAll(resp.Body)
-		_ = resp.Body.Close()
-		if resp.StatusCode <= 299 && err == nil {
-			var ret string = string(body)
+func CompressString(to_compress string) []byte {
+	return Utils.CompressString(to_compress)
+}
 
-			return &ret
-		}
-	}
+/*
+DecompressString decompresses a string.
 
-	return nil
+-----------------------------------------------------------
+
+– Params:
+	- to_decompress – the string to decompress
+
+– Returns:
+	- the decompressed string or an empty string if an error occurred
+*/
+func DecompressString(to_decompress []byte) string {
+	return Utils.DecompressString(to_decompress)
 }

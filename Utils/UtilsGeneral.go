@@ -29,7 +29,6 @@ import (
 	"math/rand"
 	"strings"
 	"time"
-	"unicode"
 	"unsafe"
 
 	"github.com/dchest/jsmin"
@@ -245,26 +244,4 @@ func WasArgUsedGENERAL(args []string, wanted_arg string) bool {
 	}
 
 	return false
-}
-
-/*
-RemoveNonGraphicCharsGENERAL removes all the non-graphic characters from a string.
-
------------------------------------------------------------
-
-– Params:
-  - str – the string to remove the non-graphic characters from
-
-– Returns:
-  - the string without the non-graphic characters
-*/
-func RemoveNonGraphicCharsGENERAL(str string) string {
-	str = strings.Map(func(r rune) rune {
-		if unicode.IsGraphic(r) {
-			return r
-		}
-		return -1
-	}, str)
-
-	return str
 }

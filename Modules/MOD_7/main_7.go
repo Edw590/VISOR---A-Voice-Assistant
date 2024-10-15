@@ -25,6 +25,7 @@ import (
 	MOD_6 "OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"
+	"Utils/UtilsSWA"
 	"bufio"
 	"fmt"
 	"io"
@@ -221,7 +222,7 @@ func init() {realMain =
 		var user_text string = ""
 		sendToGPT := func(to_send string, use_smart bool) {
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
-			var to_write string = Utils.RemoveNonGraphicCharsGENERAL(to_send)
+			var to_write string = UtilsSWA.RemoveNonGraphicCharsGENERAL(to_send)
 			if use_smart {
 				user_text += to_write + ". "
 				_, _ = writer_smart.WriteString(to_write + "\n")
