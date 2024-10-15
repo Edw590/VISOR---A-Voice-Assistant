@@ -211,8 +211,12 @@ func init() {realMain =
 			readGPT(reader_dumb, true)
 		}()
 
-		// Wait for the LLM model to start
-		Utils.WaitWithStopTIMEDATE(module_stop, 30)
+		// Wait for the LLM models to start
+		for modGenInfo_GL.State != ModsFileInfo.MOD_7_STATE_READY {
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+				return
+			}
+		}
 
 		var user_text string = ""
 		sendToGPT := func(to_send string, use_smart bool) {
