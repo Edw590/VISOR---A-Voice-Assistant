@@ -251,7 +251,7 @@ func init() {realMain =
 			device_id = Utils.Device_settings_GL.Device_ID
 			memorizing = true
 			var text string = "Write in BULLET points (no + or anything. ONLY *) a list of key things to know about " +
-				"the user from the following input. If there's nothing important, write ONLY \"* [3234_NONE]\". " +
+				"the USER from the following input. If there's nothing important, write ONLY \"* [3234_NONE]\". " +
 				"For example, for \"I like bags\" you'd write something like \"* The user likes bags\". But you " +
 				"IGNORE USELESS INFORMATION, like the user saying they're bored (you IGNORE that). Input: \"" +
 				input_text + "\"."
@@ -266,8 +266,8 @@ func init() {realMain =
 
 			var memories_split []string = strings.Split(to_memorize, "\n")
 			for _, memory := range memories_split {
-				if memory != "" && !strings.Contains(strings.ToLower(memory), "none") && strings.Contains(memory, "* ") &&
-						UtilsSWA.StringHasLettersGENERAL(memory) {
+				if UtilsSWA.StringHasLettersGENERAL(memory) && strings.Contains(memory, "* ") &&
+						!strings.Contains(strings.ToLower(memory), "none") {
 					var star_space_idx int = strings.LastIndex(memory, "* ")
 					modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, memory[star_space_idx + 2:])
 				}
