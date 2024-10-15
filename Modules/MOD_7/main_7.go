@@ -72,10 +72,10 @@ func init() {realMain =
 		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
 		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
 
-		var memories string = strings.Join(modGenInfo_GL.Memories, ". ")
+		var to_memorize string = strings.Join(modGenInfo_GL.Memories, ". ")
 
 		writer_smart, stdout_smart, stderr_smart := startLlama(12288, 4, 0.8, modUserInfo_GL.Model_smart_loc,
-			modUserInfo_GL.User_intro + ". | Memories you stored about me: " + memories, visor_intro)
+			modUserInfo_GL.User_intro, to_memorize, visor_intro)
 		if writer_smart == nil {
 			log.Println("Error starting the Llama model (smart)")
 
@@ -86,7 +86,8 @@ func init() {realMain =
 		}
 		reader_smart := bufio.NewReader(stdout_smart)
 
-		writer_dumb, stdout_dumb, stderr_dumb := startLlama(4096, 4, 1.5, modUserInfo_GL.Model_dumb_loc, "", visor_intro)
+		writer_dumb, stdout_dumb, stderr_dumb := startLlama(4096, 4, 1.5, modUserInfo_GL.Model_dumb_loc, "", "",
+			"You're a voice assistant")
 		if writer_dumb == nil {
 			log.Println("Error starting the Llama model (dumb)")
 
@@ -110,8 +111,7 @@ func init() {realMain =
 					return
 				}
 
-				//var one_byte_str string = string(one_byte)
-				//fmt.Print(one_byte_str)
+				//fmt.Print(string(one_byte))
 			}
 		}()
 		go func() {
@@ -125,8 +125,7 @@ func init() {realMain =
 					return
 				}
 
-				//var one_byte_str string = string(one_byte)
-				//fmt.Print(one_byte_str)
+				//fmt.Print(string(one_byte))
 			}
 		}()
 
@@ -137,7 +136,7 @@ func init() {realMain =
 
 		var first_3234_end bool = true
 		var memorizing bool = false
-		memories = ""
+		to_memorize = ""
 		readGPT := func(reader *bufio.Reader, print bool) {
 			var last_answer string = ""
 			var last_word string = ""
@@ -155,7 +154,7 @@ func init() {realMain =
 				var one_byte_str string = string(one_byte)
 				last_answer += one_byte_str
 				if memorizing {
-					memories += one_byte_str
+					to_memorize += one_byte_str
 				}
 				if print {
 					fmt.Print(one_byte_str)
@@ -248,13 +247,14 @@ func init() {realMain =
 			}
 		}
 
-		memorizeThings := func() {
+		memorizeThings := func(input_text string) {
 			device_id = Utils.Device_settings_GL.Device_ID
 			memorizing = true
-			var text string = "Write in bullet points a list of key things to know about the user from the following " +
-				"user input. If there's nothing important, write ONLY \"* [3234_NONE]\". For example, for \"I like " +
-				"bags\" you'd write something like \"* The user likes bags\". But you ignore useless information, " +
-				"like the user saying they're bored (you ignore that). User input: \"" + user_text + "\"."
+			var text string = "Write in BULLET points (no + or anything. ONLY *) a list of key things to know about " +
+				"the user from the following input. If there's nothing important, write ONLY \"* [3234_NONE]\". " +
+				"For example, for \"I like bags\" you'd write something like \"* The user likes bags\". But you " +
+				"IGNORE USELESS INFORMATION, like the user saying they're bored (you IGNORE that). Input: \"" +
+				input_text + "\"."
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer_dumb.WriteString(text + "\n")
 			_ = writer_dumb.Flush()
@@ -264,16 +264,26 @@ func init() {realMain =
 			}
 			memorizing = false
 
-			var memories_split []string = strings.Split(memories, "\n")
+			var memories_split []string = strings.Split(to_memorize, "\n")
 			for _, memory := range memories_split {
-				var memory_lower string = strings.ToLower(memory)
-				if memory != "" && !strings.Contains(memory_lower, "none") && strings.Contains(memory_lower, "* ") {
-					modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, memory[2:])
+				if memory != "" && !strings.Contains(strings.ToLower(memory), "none") && strings.Contains(memory, "* ") &&
+						UtilsSWA.StringHasLettersGENERAL(memory) {
+					var star_space_idx int = strings.LastIndex(memory, "* ")
+					modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, memory[star_space_idx + 2:])
 				}
 			}
 
 			// Give time to write everything down
 			time.Sleep(6 * time.Second)
+		}
+
+		shutDown := func() {
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+			forceStopLlama()
+			_ = stdout_smart.Close()
+			_ = stderr_smart.Close()
+			_ = stdout_dumb.Close()
+			_ = stderr_dumb.Close()
 		}
 
 		// Process the files to input to the LLM model
@@ -324,21 +334,25 @@ func init() {realMain =
 				_ = os.Remove(file_path.GPathToStringConversion())
 
 				if shut_down {
-					memorizeThings()
-					modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
-					forceStopLlama()
-					_ = stdout_smart.Close()
-					_ = stdout_dumb.Close()
+					// Summarize the list of memories too (sometimes VISOR may memorize useless sentences, so this will
+					// cut them out)
+					var memories_str string = ""
+					if len(modGenInfo_GL.Memories) > 0 {
+						memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
+						modGenInfo_GL.Memories = nil
+					}
+					if memories_str != "" || user_text != "" {
+						memorizeThings(memories_str + ". " + user_text)
+					}
+
+					shutDown()
 
 					return
 				}
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
-				forceStopLlama()
-				_ = stdout_smart.Close()
-				_ = stdout_dumb.Close()
+				shutDown()
 
 				return
 			}
@@ -346,7 +360,8 @@ func init() {realMain =
 	}
 }
 
-func startLlama(ctx_size int, threads int, temp float32, model_loc string, user_intro string, visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
+func startLlama(ctx_size int, threads int, temp float32, model_loc string, user_intro string, memories string,
+				visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
 	cmd := exec.Command(Utils.GetShell("", ""))
 	stdin, _ := cmd.StdinPipe()
 	stdout, _ := cmd.StdoutPipe()
@@ -369,8 +384,9 @@ func startLlama(ctx_size int, threads int, temp float32, model_loc string, user_
 		"--keep -1 " +
 		"--mlock " +
 		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
-		strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
-		user_intro + ". | " + visor_intro + "<|eot_id|>\" " +
+			strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
+			"User introduction: " + user_intro + ". | Memories stored about the user: " + memories + ". | About you: " +
+			visor_intro + "<|eot_id|>\" " +
 		"--reverse-prompt \"<|eot_id|>\" " +
 		"--in-prefix \"" + _END_TOKENS + "\" " +
 		"--in-suffix \"" + _START_TOKENS + "\" " +
