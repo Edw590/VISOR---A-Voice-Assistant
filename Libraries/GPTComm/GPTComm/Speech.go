@@ -33,6 +33,7 @@ var curr_entry_time_ms_GL int64 = -1
 var last_speech_GL string = ""
 var last_idx_begin_GL int = 0
 var last_text_GL string = ""
+var ignore_sentence_GL bool = false
 
 const END_ENTRY string = "[3234_END]"
 const ALL_DEVICES_ID string = "3234_ALL"
@@ -82,6 +83,7 @@ func GetNextSpeechSentence() string {
 				curr_entry_time_ms_GL = entry.getTime()
 				time_begin_ms_GL = curr_entry_time_ms_GL + 1
 				last_speech_GL = ""
+				ignore_sentence_GL = false
 			}
 		} else if response == "true" || response == "false" {
 			gpt_ready_GL = response
@@ -97,7 +99,6 @@ func GetNextSpeechSentence() string {
 	//log.Println("time_begin_ms_GL:", time_begin_ms_GL)
 
 	var sentence string = ""
-	var ignore_sentence bool = false
 	for {
 		var entry *_Entry = getEntry(curr_entry_time_ms_GL, -1)
 		if entry.getTime() == -1 {
@@ -142,10 +143,10 @@ func GetNextSpeechSentence() string {
 
 			// Ignore code
 			if strings.Contains(sentence, "```") {
-				ignore_sentence = !ignore_sentence
+				ignore_sentence_GL = !ignore_sentence_GL
 			}
 
-			if ignore_sentence {
+			if ignore_sentence_GL {
 				time.Sleep(1 * time.Second)
 
 				continue
