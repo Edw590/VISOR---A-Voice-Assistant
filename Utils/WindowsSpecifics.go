@@ -26,18 +26,27 @@ package Utils
 import (
 	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
+	"os/exec"
+	"syscall"
 )
 
-// == FUNCTION 1: RunningAsAdminPROCESSES ==
+/*
+RunningAsAdminPROCESSES checks if the program is running as administrator/root.
 
-/**
- * Checks if the program is running with Administrator (root) privileges.
- *
- * @return true if running as admin, false otherwise
- */
+-----------------------------------------------------------
+
+– Returns:
+  - true if the program is running as admin, false otherwise
+*/
 func RunningAsAdminPROCESSES() bool {
-	// Step 1: Create a Security Identifier (SID) for the Administrators group
+	// Took from https://github.com/golang/go/issues/28804
+
 	var sid *windows.SID
+
+	// Although this looks scary, it is directly copied from the
+	// official windows documentation. The Go API for this is a
+	// direct wrap around the official C++ API.
+	// See https://docs.microsoft.com/en-us/windows/desktop/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
 	err := windows.AllocateAndInitializeSid(
 		&windows.SECURITY_NT_AUTHORITY,      // Authority
 		2,                                   // Revision
@@ -46,82 +55,66 @@ func RunningAsAdminPROCESSES() bool {
 		0, 0, 0, 0, 0, 0,                    // Sub-authority values
 		&sid)
 	if err != nil {
-		// If SID creation fails, return false
 		return false
 	}
-	defer windows.FreeSid(sid) // Clean up SID memory
+	defer windows.FreeSid(sid)
 
-	// Step 2: Get current process token (handle)
-	// Passing 0 gets the token for the current process
+	// This appears to cast a null pointer so I'm not sure why this
+	// works, but this guy says it does and it Works for Me™:
+	// https://github.com/golang/go/issues/28804#issuecomment-438838144
 	token := windows.Token(0)
 
-	// Step 3: Check if the token is a member of the Administration Group
 	member, err := token.IsMember(sid)
 	if err != nil {
-		// If membership check fails, return false
 		return false
 	}
 
-	// Return the membership result
 	return member
 }
 
-// == FUNCTION 2: HideConsoleWindowPROCESSES ==
+/*
+HideConsoleWindowPROCESSES hides the console window of the program.
 
-/**
- * Hides the console window of the program.
- *
- * Note: Only works on Windows if the program is started with conhost.exe
- * (which is the default, except when using the new Windows Terminal).
- */
+Notice: on Windows only works if the program is started with conhost.exe (always is except when it's started by the
+new Windows Terminal). So use StartConAppPROCESSES() to start the program with conhost.exe.
+*/
 func HideConsoleWindowPROCESSES() {
 	// Hide the console window using the SW_HIDE flag
 	win.ShowWindow(win.GetConsoleWindow(), win.SW_HIDE)
 }
 
-// == FUNCTION 3: GenerateCtrlCPROCESSES ==
-
-/**
- * Generates a Ctrl+C event to a process group.
- *
- * @param cmd         The command to generate the event for
- * @param process_group_id The ID of the process group
- * @return error if the event couldn't be generated, nil otherwise
- *
- * Note: This function has NOT been thoroughly tested!
- */
-
-// TODO: Implement GenerateCtrlCPROCESSES usage in the future
-
 /*
+GenerateCtrlCPROCESSES generates a Ctrl+C event to a process group.
+
+This function has NOT been tested!
+
+-----------------------------------------------------------
+
+– Params:
+  - process_group_id – the process group ID
+
+– Returns:
+  - an error if the event couldn't be generated, nil otherwise
+*/
 func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
-	// Ensures the command has a SysProAttr set
 	if cmd.SysProcAttr == nil {
-		// Create a new SysProcAttr to set the creation flags
+		// Set the process to create a new process group
+		// WARNING: this might need to be done before calling cmd.Start()
 		cmd.SysProcAttr = &syscall.SysProcAttr{
-			// Create a new process group
 			CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP,
 		}
 	}
 
-	// Load the kernel32.DLL
 	var kernel32 = syscall.NewLazyDLL("kernel32.dll")
-
-	// Get the GenerateConsoleCtrlEvent procedure
 	var procGenerateConsoleCtrlEvent = kernel32.NewProc("GenerateConsoleCtrlEvent")
 
 	// Call GenerateConsoleCtrlEvent with CTRL_C_EVENT
 	r, _, err := procGenerateConsoleCtrlEvent.Call(
 		syscall.CTRL_C_EVENT,      // Ctrl+C event
 		uintptr(process_group_id)) // Process group ID
-
-	// If the call fails, return the error
 	if r == 0 {
 		return err
 	}
 
-	// If successful, return nil
-
 	return nil
 }
-*/
