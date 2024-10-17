@@ -32,7 +32,7 @@ import (
 //const CMD_TOGGLE_FLASHLIGHT string = "1";
 const CMD_ASK_TIME string = "2";
 const CMD_ASK_DATE string = "3";
-//const CMD_TOGGLE_WIFI string = "4";
+const CMD_TOGGLE_WIFI string = "4";
 //const CMD_TOGGLE_MOBILE_DATA string = "5";
 //const CMD_TOGGLE_BLUETOOTH string = "6";
 //const CMD_ANSWER_CALL string = "7";
@@ -53,9 +53,10 @@ const CMD_ASK_BATTERY_PERCENT  string = "12";
 //const CMD_REJECT  string = "23";
 //const CMD_STOP_LISTENING  string = "24";
 //const CMD_START_LISTENING  string = "25";
-//const CMD_TELL_WEATHER  string = "26";
-//const CMD_TELL_NEWS  string = "27";
+const CMD_TELL_WEATHER  string = "26";
+const CMD_TELL_NEWS  string = "27";
 //const CMD_GONNA_SLEEP  string = "28";
+const CMD_TOGGLE_ETHERNET string = "29";
 
 ///////////////////////////////////////////////////////////////////
 // Return IDs
@@ -103,7 +104,7 @@ var cmdi_info map[string]string = map[string]string{
 	//CMD_TOGGLE_FLASHLIGHT:         CMDi_INF1_DO_SOMETHING,     // 1
 	CMD_ASK_TIME:                  CMDi_INF1_ONLY_SPEAK,       // 2
 	CMD_ASK_DATE:                  CMDi_INF1_ONLY_SPEAK,       // 3
-	//CMD_TOGGLE_WIFI:               CMDi_INF1_DO_SOMETHING,     // 4
+	CMD_TOGGLE_WIFI:               CMDi_INF1_DO_SOMETHING,     // 4
 	//CMD_TOGGLE_MOBILE_DATA:        CMDi_INF1_DO_SOMETHING,     // 5
 	//CMD_TOGGLE_BLUETOOTH:          CMDi_INF1_DO_SOMETHING,     // 6
 	//CMD_ANSWER_CALL:               CMDi_INF1_DO_SOMETHING,     // 7
@@ -124,9 +125,10 @@ var cmdi_info map[string]string = map[string]string{
 	//CMD_REJECT:                    CMDi_INF1_ASSIST_CMD,       // 23
 	//CMD_STOP_LISTENING:            CMDi_INF1_DO_SOMETHING,     // 24
 	//CMD_START_LISTENING:           CMDi_INF1_DO_SOMETHING,     // 25
-	//CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
-	//CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
+	CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
+	CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
 	//CMD_GONNA_SLEEP:               CMDi_INF1_ONLY_SPEAK,       // 28
+	CMD_TOGGLE_ETHERNET:           CMDi_INF1_DO_SOMETHING,     // 4
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -137,7 +139,7 @@ func prepareCommandsString() string {
 		//{CMD_TOGGLE_FLASHLIGHT, ACD.CMDi_TYPE_TURN_ONFF, "", "", "flashlight/lantern"},
 		{CMD_ASK_TIME, ACD.CMDi_TYPE_ASK, "", "", "time"},
 		{CMD_ASK_DATE, ACD.CMDi_TYPE_ASK, "", "", "date/day/month/year"},
-		//{CMD_TOGGLE_WIFI, ACD.CMDi_TYPE_TURN_ONFF, "", "", "wifi"},
+		{CMD_TOGGLE_WIFI, ACD.CMDi_TYPE_TURN_ONFF, "", "", "wifi"},
 		//{CMD_TOGGLE_MOBILE_DATA, ACD.CMDi_TYPE_TURN_ONFF, "", "", "mobile data"},
 		//{CMD_TOGGLE_BLUETOOTH, ACD.CMDi_TYPE_TURN_ONFF, "", "", "bluetooth"},
 		//{CMD_ANSWER_CALL, ACD.CMDi_TYPE_ANSWER, "", "", "call"},
@@ -158,9 +160,10 @@ func prepareCommandsString() string {
 		//{CMD_REJECT, ACD.CMDi_TYPE_NONE, "i", "", "don't/reject/disapprove"},
 		//{CMD_STOP_LISTENING, ACD.CMDi_TYPE_STOP, "", "", "listening"},
 		//{CMD_START_LISTENING, ACD.CMDi_TYPE_START, "", "", "listening"},
-		//{CMD_TELL_WEATHER, ACD.CMDi_TYPE_ASK, "", "", "weather"},
-		//{CMD_TELL_NEWS, ACD.CMDi_TYPE_ASK, "", "", "news"},
+		{CMD_TELL_WEATHER, ACD.CMDi_TYPE_ASK, "", "", "weather"},
+		{CMD_TELL_NEWS, ACD.CMDi_TYPE_ASK, "", "", "news"},
 		//{CMD_GONNA_SLEEP, ACD.CMDi_TYPE_WILL_GO, "", "", "sleep"},
+		{CMD_TOGGLE_ETHERNET, ACD.CMDi_TYPE_TURN_ONFF, "", "", "ethernet"},
 	}
 
 	var commands_almost_str []string = nil

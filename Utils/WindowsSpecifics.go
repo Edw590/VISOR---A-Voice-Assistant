@@ -1,5 +1,3 @@
-//go:build windows
-
 /*******************************************************************************
  * Copyright 2023-2024 The V.I.S.O.R. authors
  *
@@ -20,6 +18,8 @@
  * specific language governing permissions and limitations
  * under the License.
  ******************************************************************************/
+
+//go:build windows
 
 package Utils
 
@@ -117,4 +117,25 @@ func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
 	}
 
 	return nil
+}
+
+func ToggleWifiCONNECTIVITY(enable bool) bool {
+	return toggleNetworkInterfaceCONNECTIVITY("Wi-Fi", enable)
+}
+
+func ToggleEthernetCONNECTIVITY(enable bool) bool {
+	return toggleNetworkInterfaceCONNECTIVITY("Ethernet", enable)
+}
+
+func toggleNetworkInterfaceCONNECTIVITY(interface_name string, enable bool) bool {
+	var en_dis string = "disabled"
+	if enable {
+		en_dis = "enabled"
+	}
+	cmd_output, err := ExecCmdSHELL([]string{"netsh interface set interface " + interface_name + " " + en_dis})
+	if err != nil {
+		return false
+	}
+
+	return cmd_output.Exit_code == 0
 }

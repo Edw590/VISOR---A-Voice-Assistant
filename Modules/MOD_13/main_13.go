@@ -24,6 +24,7 @@ package MOD_13
 import (
 	"ACD/ACD"
 	"GPTComm/GPTComm"
+	"OICComm/OICComm"
 	MOD_3 "Speech"
 	"SpeechQueue/SpeechQueue"
 	"TEHelper/TEHelper"
@@ -150,7 +151,7 @@ func init() {realMain =
 				}
 
 				var cmd_id string = command[:dot_index] // "14.3" --> "14"
-				//var cmd_variant string = command[dot_index:] // "14.3" --> ".3"
+				var cmd_variant string = command[dot_index:] // "14.3" --> ".3"
 
 				var speech_mode2 = SpeechQueue.MODE_DEFAULT
 				if cmdi_info[cmd_id] == CMDi_INF1_ONLY_SPEAK {
@@ -171,6 +172,111 @@ func init() {realMain =
 							GetData(true, nil).(int)
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
 						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+
+					case CMD_TOGGLE_WIFI:
+						if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
+							var speak string
+							if cmd_variant == RET_ON {
+								speak = "Wi-Fi turned on."
+							} else {
+								speak = "Wi-Fi turned off."
+							}
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+						} else {
+							var on_off string = "off"
+							if cmd_variant == RET_ON {
+								on_off = "on"
+							}
+							var speak string = "Sorry, I couldn't turn the Wi-Fi " + on_off + "."
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						}
+
+					case CMD_TOGGLE_ETHERNET:
+						if Utils.ToggleEthernetCONNECTIVITY(cmd_variant == RET_ON) {
+							var speak string
+							if cmd_variant == RET_ON {
+								speak = "Ethernet turned on."
+							} else {
+								speak = "Ethernet turned off."
+							}
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+						} else {
+							var on_off string = "off"
+							if cmd_variant == RET_ON {
+								on_off = "on"
+							}
+							var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						}
+
+					case CMD_TELL_WEATHER:
+						var speak string = "Obtaining the weather..."
+						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+
+						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
+
+						if UtilsSWA.WaitForNetwork(0) {
+							var weather_str string = OICComm.GetWeather()
+							if weather_str == "" {
+								speak = "I'm sorry Sir, but I couldn't get the weather information."
+								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+
+								break
+							}
+
+							var weather_by_loc []string = strings.Split(weather_str, "\n")
+							for _, weather := range weather_by_loc {
+								if weather == "" {
+									continue
+								}
+
+								var weather_data []string = strings.Split(weather, " ||| ")
+								speak = "The weather in " + weather_data[0] + " is " + weather_data[5] +
+									" with " + weather_data[1] + " degrees, a maximum of " + weather_data[6] +
+									" degrees and a minimum of " + weather_data[7] + " degrees. The precipitation is of " +
+									weather_data[2] + ", humidity of " + weather_data[3] + ", and wind of " +
+									weather_data[4] + "."
+								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+							}
+						} else {
+							speak = "No network connection available to get the weather."
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						}
+
+					case CMD_TELL_NEWS:
+						var speak string = "Obtaining the latest news..."
+						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+
+						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
+
+						if UtilsSWA.WaitForNetwork(0) {
+							var news_str string = OICComm.GetWeather()
+							if news_str == "" {
+								speak = "I'm sorry Sir, but I couldn't get the news information."
+								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+
+								break
+							}
+
+							var news_by_loc []string = strings.Split(news_str, "\n")
+							for _, news_data := range news_by_loc {
+								if news_data == "" {
+									continue
+								}
+
+								var news []string = strings.Split(news_data, " ||| ")
+
+								speak = "News in " + news[0] + ". "
+
+								for _, n := range news[1:] {
+									speak += n + ". "
+								}
+								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+							}
+						} else {
+							speak = "No network connection available to get the weather."
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						}
 				}
 			}
 

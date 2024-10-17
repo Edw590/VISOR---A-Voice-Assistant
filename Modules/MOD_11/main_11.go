@@ -31,10 +31,8 @@ import (
 
 // Speech Recognition //
 
-var (
-	in []int16
-	stream *portaudio.Stream
-)
+var in_GL []int16
+var stream_GL *portaudio.Stream
 
 var (
 	realMain      Utils.RealMain = nil
@@ -57,17 +55,17 @@ func init() {realMain =
 		}
 		defer porcupine_.Delete()
 
-		portaudio.Initialize()
+		err = portaudio.Initialize()
 		if err != nil {
 			panic(err)
 		}
 		defer closeAudio()
-		in = make([]int16, porcupine.FrameLength)
-		stream, err = portaudio.OpenDefaultStream(1, 0, float64(porcupine.SampleRate), porcupine.FrameLength, in)
+		in_GL = make([]int16, porcupine.FrameLength)
+		stream_GL, err = portaudio.OpenDefaultStream(1, 0, float64(porcupine.SampleRate), porcupine.FrameLength, in_GL)
 		if err != nil {
 			panic(err)
 		}
-		err = stream.Start()
+		err = stream_GL.Start()
 		if err != nil {
 			panic(err)
 		}
@@ -86,18 +84,18 @@ func init() {realMain =
 }
 
 func getNextFrameAudio() []int16 {
-	err := stream.Read()
+	err := stream_GL.Read()
 	if err != nil {
 		panic(err)
 	}
 
-	return in
+	return in_GL
 }
 
 func closeAudio() {
-	if stream != nil {
-		stream.Stop()
-		stream.Close()
+	if stream_GL != nil {
+		_ = stream_GL.Stop()
+		_ = stream_GL.Close()
 	}
-	portaudio.Terminate()
+	_ = portaudio.Terminate()
 }
