@@ -33,15 +33,15 @@ CompressString compresses a string.
 -----------------------------------------------------------
 
 – Params:
-	- to_compress – the string to compress
+  - to_compress – the string to compress
 
 – Returns:
-	- the compressed string or nil if an error occurred
- */
+  - the compressed string or nil if an error occurred
+*/
 func CompressString(to_compress string) []byte {
 	var buffer bytes.Buffer
 
-	writer := brotli.NewWriterLevel(nil, 99999)
+	writer := brotli.NewWriterLevel(&buffer, brotli.BestCompression)
 
 	// Reset the compressor and encode from some input stream.
 	writer.Reset(&buffer)
@@ -61,11 +61,11 @@ DecompressString decompresses a string.
 -----------------------------------------------------------
 
 – Params:
-	- to_decompress – the string to decompress
+  - to_decompress – the string to decompress
 
 – Returns:
-	- the decompressed string or an empty string if an error occurred
- */
+  - the decompressed string or an empty string if an error occurred
+*/
 func DecompressString(to_decompress []byte) string {
 	reader := brotli.NewReader(bytes.NewReader(to_decompress))
 
