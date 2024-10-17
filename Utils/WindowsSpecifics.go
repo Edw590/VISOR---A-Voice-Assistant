@@ -1,3 +1,5 @@
+//go:build windows
+
 /*******************************************************************************
  * Copyright 2023-2024 The V.I.S.O.R. authors
  *
@@ -18,8 +20,6 @@
  * specific language governing permissions and limitations
  * under the License.
  ******************************************************************************/
-
-//go:build windows
 
 package Utils
 
@@ -48,11 +48,11 @@ func RunningAsAdminPROCESSES() bool {
 	// direct wrap around the official C++ API.
 	// See https://docs.microsoft.com/en-us/windows/desktop/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
 	err := windows.AllocateAndInitializeSid(
-		&windows.SECURITY_NT_AUTHORITY,
-		2,
-		windows.SECURITY_BUILTIN_DOMAIN_RID,
-		windows.DOMAIN_ALIAS_RID_ADMINS,
-		0, 0, 0, 0, 0, 0,
+		&windows.SECURITY_NT_AUTHORITY,      // Authority
+		2,                                   // Revision
+		windows.SECURITY_BUILTIN_DOMAIN_RID, // Domain RID
+		windows.DOMAIN_ALIAS_RID_ADMINS,     // Administrator RID
+		0, 0, 0, 0, 0, 0,                    // Sub-authority values
 		&sid)
 	if err != nil {
 		return false
@@ -77,8 +77,9 @@ HideConsoleWindowPROCESSES hides the console window of the program.
 
 Notice: on Windows only works if the program is started with conhost.exe (always is except when it's started by the
 new Windows Terminal). So use StartConAppPROCESSES() to start the program with conhost.exe.
- */
+*/
 func HideConsoleWindowPROCESSES() {
+	// Hide the console window using the SW_HIDE flag
 	win.ShowWindow(win.GetConsoleWindow(), win.SW_HIDE)
 }
 
@@ -108,7 +109,9 @@ func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
 	var procGenerateConsoleCtrlEvent = kernel32.NewProc("GenerateConsoleCtrlEvent")
 
 	// Call GenerateConsoleCtrlEvent with CTRL_C_EVENT
-	r, _, err := procGenerateConsoleCtrlEvent.Call(syscall.CTRL_C_EVENT, uintptr(process_group_id))
+	r, _, err := procGenerateConsoleCtrlEvent.Call(
+		syscall.CTRL_C_EVENT,      // Ctrl+C event
+		uintptr(process_group_id)) // Process group ID
 	if r == 0 {
 		return err
 	}
