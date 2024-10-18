@@ -9,19 +9,19 @@ use (
 	Libraries/OICComm
 	Libraries/SpeechQueue
 	Libraries/TEHelper
-	Modules/MOD_1
-	Modules/MOD_2
-	Modules/MOD_3
-	Modules/MOD_4
-	Modules/MOD_5
-	Modules/MOD_6
-	Modules/MOD_7
-	Modules/MOD_8
-	Modules/MOD_9
-	Modules/MOD_10
-	Modules/MOD_11
-	Modules/MOD_12
-	Modules/MOD_13
+	./Modules/ModulesManager
+	./Modules/SMARTChecker
+	./Modules/Speech
+	./Modules/RSSFeedNotifier
+	./Modules/EmailSender
+	./Modules/OnlineInfoChk
+	./Modules/GPTCommunicator
+	./Modules/WebsiteBackend
+	./Modules/TasksExecutor
+	./Modules/SystemChecker
+	./Modules/SpeechRecognition
+	./Modules/UserLocator
+	./Modules/CmdsExecutor
 	ServerCode
 	Utils
 )
