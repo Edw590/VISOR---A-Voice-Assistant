@@ -70,9 +70,17 @@ parameter.
   - num – the number of the entry or negative to count from the end
 
 – Returns:
-  - the entry or an empty entry with time = -1 if it doesn't exist
+  - the entry or an empty entry with time = -1 if it doesn't exist or there's no Internet connection
 */
 func getEntry(time int64, num int) *_Entry {
+	if !Utils.IsCommunicatorConnectedSERVER() {
+		return &_Entry{
+			device_id: "",
+			text:      "",
+			time_ms:   -1,
+		}
+	}
+
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|gpt_text.txt"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
 	if comms_map == nil {
