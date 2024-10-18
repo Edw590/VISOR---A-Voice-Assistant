@@ -10,7 +10,7 @@ Modules:
 08 = Website Backend            (server)
 09 = Tasks Executor             (client)
 10 = System Checker             (client)        [Windows only]
-11 = Speech Recognition         (client)
+11 = Speech Recognition         (client)        [Windows only]
 12 = User Locator               (client)
 13 = Commands Executor          (client)
 
