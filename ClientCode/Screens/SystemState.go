@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	MOD_10 "SystemState"
+	"SystemChecker"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -51,7 +51,7 @@ func SystemState() fyne.CanvasObject {
 	go func() {
 		for {
 			if Current_screen_GL == system_state_canvas_object_GL {
-				registry_text.SetText(MOD_10.GetDeviceInfoText())
+				registry_text.SetText(SystemChecker.GetDeviceInfoText())
 			}
 
 			time.Sleep(1 * time.Second)
