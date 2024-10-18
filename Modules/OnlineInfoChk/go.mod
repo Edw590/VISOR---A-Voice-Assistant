@@ -5,7 +5,7 @@ module OnlineInfoChk
 go 1.20
 
 require (
-	github.com/Krognol/go-wolfram v0.0.0-20180610151123-5b91101b92a8
+	github.com/Edw590/go-wolfram v0.0.0-20241010091529-fb9031908c5d
 	github.com/tebeka/selenium v0.9.9
 	github.com/trietmn/go-wiki v1.0.3
 )

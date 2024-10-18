@@ -3,25 +3,25 @@
 go 1.20
 
 use (
+	./Modules/CmdsExecutor
+	./Modules/EmailSender
+	./Modules/GPTCommunicator
+	./Modules/ModulesManager
+	./Modules/OnlineInfoChk
+	./Modules/RSSFeedNotifier
+	./Modules/SMARTChecker
+	./Modules/Speech
+	./Modules/SpeechRecognition
+	./Modules/SystemChecker
+	./Modules/TasksExecutor
+	./Modules/UserLocator
+	./Modules/WebsiteBackend
 	ClientCode
 	Libraries/ACD
 	Libraries/GPTComm
 	Libraries/OICComm
 	Libraries/SpeechQueue
 	Libraries/TEHelper
-	./Modules/ModulesManager
-	./Modules/SMARTChecker
-	./Modules/Speech
-	./Modules/RSSFeedNotifier
-	./Modules/EmailSender
-	./Modules/OnlineInfoChk
-	./Modules/GPTCommunicator
-	./Modules/WebsiteBackend
-	./Modules/TasksExecutor
-	./Modules/SystemChecker
-	./Modules/SpeechRecognition
-	./Modules/UserLocator
-	./Modules/CmdsExecutor
 	ServerCode
 	Utils
 )

@@ -1,4 +1,6 @@
 github.com/Edw590/TryCatch-go v0.0.0-20240613213244-892990200ac0 h1:u6sP3yUfLMd0WWmS8hgmBWGfUxgW4qJ8Tt6c4YnQ9Zc=
 github.com/Edw590/TryCatch-go v0.0.0-20240613213244-892990200ac0/go.mod h1:qWA2lTf+JwXalxTxY1ixCagWd20Obcl1pAHRmLIQKqk=
+github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
+github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/yousifnimah/Cryptx v1.0.1 h1:oZbB6CjvqOzkmoghsncb3/4sV2As8nqOJCjZPd08Xdw=
 github.com/yousifnimah/Cryptx v1.0.1/go.mod h1:vmpiwqtg+fR+KaAisCdz2+6k30jWb+/X7EyUysDKh0U=

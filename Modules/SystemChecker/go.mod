@@ -5,9 +5,7 @@ module SystemChecker
 go 1.20
 
 require (
-	github.com/apaxa-go/eval v0.0.0-20171223182326-1d18b251d679
 	github.com/distatus/battery v0.11.0
-	github.com/eiannone/keyboard v0.0.0-20220611211555-0d226195f203
 	github.com/go-vgo/robotgo v0.110.1
 	github.com/itchyny/volume-go v0.2.2
 	github.com/yusufpapurcu/wmi v1.2.4
@@ -19,7 +17,6 @@ require (
 )
 
 require (
-	github.com/apaxa-go/helper v0.0.0-20180607175117-61d31b1c31c3 // indirect
 	github.com/gen2brain/shm v0.0.0-20230802011745-f2460f5984f7 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/jezek/xgb v1.1.0 // indirect
@@ -41,6 +38,5 @@ require (
 	github.com/vcaesar/tt v0.20.0 // indirect
 	golang.org/x/image v0.12.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
 	howett.net/plist v1.0.0 // indirect
 )

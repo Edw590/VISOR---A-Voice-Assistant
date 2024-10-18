@@ -7,8 +7,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802 h1:1BDTz0u9nC3//pOC
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/BurntSushi/xgbutil v0.0.0-20160919175755-f7c97cef3b4e h1:4ZrkT/RzpnROylmoQL57iVUL57wGKTR5O6KpVnbm2tA=
 github.com/BurntSushi/xgbutil v0.0.0-20160919175755-f7c97cef3b4e/go.mod h1:uw9h2sd4WWHOPdJ13MQpwK5qYWKYDumDqxWWIknEQ+k=
-github.com/Krognol/go-wolfram v0.0.0-20180610151123-5b91101b92a8 h1:W7c6EO533k0Qxlg81igmCkNf8IL05YnwX/Ja0N+6oOc=
-github.com/Krognol/go-wolfram v0.0.0-20180610151123-5b91101b92a8/go.mod h1:EPNgn+n1Pgo8Us091j1G61MtU6yjVwepTin6xEwlJ6w=
+github.com/Edw590/go-wolfram v0.0.0-20241010091529-fb9031908c5d h1:dxGZ0drmrUfNOQ93n9kAWkxOXK4bQHRUaFhRzGySTU4=
+github.com/Edw590/go-wolfram v0.0.0-20241010091529-fb9031908c5d/go.mod h1:ubjYqrt3dF4G+YVEDQr+qa2aveeMzt27o/GOH2hswPo=
 github.com/anaskhan96/soup v1.2.5 h1:V/FHiusdTrPrdF4iA1YkVxsOpdNcgvqT1hG+YtcZ5hM=
 github.com/anaskhan96/soup v1.2.5/go.mod h1:6YnEp9A2yywlYdM4EgDz9NEHclocMepEtku7wg6Cq3s=
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPdPJAN/hZIm0C4OItdklCFmMRWYpio=

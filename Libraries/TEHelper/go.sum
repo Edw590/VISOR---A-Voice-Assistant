@@ -1,0 +1,6 @@
+github.com/apaxa-go/eval v0.0.0-20171223182326-1d18b251d679 h1:iTmI8Fqjh2VU/hADCC/Nq9pvDCHCK2UNh0KfERvnkIM=
+github.com/apaxa-go/eval v0.0.0-20171223182326-1d18b251d679/go.mod h1:yCWGQBpTUzqKEfPFn43j9Spr7GLwB8ytxK4Q0tPuZ7g=
+github.com/apaxa-go/helper v0.0.0-20180607175117-61d31b1c31c3 h1:badF2fxl2BsWu2f01OYRU9cNnbrOSoOlayijH7r9ip4=
+github.com/apaxa-go/helper v0.0.0-20180607175117-61d31b1c31c3/go.mod h1:42ENZ1Wd+1+1pgQWSQ/naAWaaP/uKw1zmnrMzBBNyTQ=
+golang.org/x/text v0.19.0 h1:kTxAhCbGbxhK0IwgSKiMO5awPoDQ0RpfiVYBfK860YM=
+golang.org/x/text v0.19.0/go.mod h1:BuEKDfySbSR4drPmRPG/7iBdf8hvFMuRexcpahXilzY=

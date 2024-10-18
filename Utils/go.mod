@@ -9,6 +9,7 @@ require (
 	github.com/andybalholm/brotli v1.1.0
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a
 	github.com/dchest/jsmin v0.0.0-20220218165748-59f39799265f
+	github.com/gorilla/websocket v1.5.3
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e
 	github.com/shirou/gopsutil/v4 v4.24.5
 	github.com/ztrue/tracerr v0.4.0
