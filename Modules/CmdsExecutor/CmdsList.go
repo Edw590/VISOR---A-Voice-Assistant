@@ -57,6 +57,7 @@ const CMD_TELL_WEATHER  string = "26";
 const CMD_TELL_NEWS  string = "27";
 //const CMD_GONNA_SLEEP  string = "28";
 const CMD_TOGGLE_ETHERNET string = "29";
+const CMD_TOGGLE_NETWORKING string = "30";
 
 ///////////////////////////////////////////////////////////////////
 // Return IDs
@@ -128,7 +129,8 @@ var cmdi_info map[string]string = map[string]string{
 	CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
 	CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
 	//CMD_GONNA_SLEEP:               CMDi_INF1_ONLY_SPEAK,       // 28
-	CMD_TOGGLE_ETHERNET:           CMDi_INF1_DO_SOMETHING,     // 4
+	CMD_TOGGLE_ETHERNET:   CMDi_INF1_DO_SOMETHING, // 4
+	CMD_TOGGLE_NETWORKING: CMDi_INF1_DO_SOMETHING, // 4
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -164,6 +166,7 @@ func prepareCommandsString() string {
 		{CMD_TELL_NEWS, ACD.CMDi_TYPE_ASK, "", "", "news"},
 		//{CMD_GONNA_SLEEP, ACD.CMDi_TYPE_WILL_GO, "", "", "sleep"},
 		{CMD_TOGGLE_ETHERNET, ACD.CMDi_TYPE_TURN_ONFF, "", "", "ethernet"},
+		{CMD_TOGGLE_NETWORKING, ACD.CMDi_TYPE_TURN_ONFF, "", "", "networking/internet"},
 	}
 
 	var commands_almost_str []string = nil

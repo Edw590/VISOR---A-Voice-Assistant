@@ -119,14 +119,63 @@ func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
 	return nil
 }
 
+/*
+ToggleWifiCONNECTIVITY toggles the Wi-Fi interface.
+
+-----------------------------------------------------------
+
+– Params:
+  - enable – true to enable the Wi-Fi interface, false to disable it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
 func ToggleWifiCONNECTIVITY(enable bool) bool {
 	return toggleNetworkInterfaceCONNECTIVITY("Wi-Fi", enable)
 }
 
+/*
+ToggleEthernetCONNECTIVITY toggles the Ethernet interface.
+
+-----------------------------------------------------------
+
+– Params:
+  - enable – true to enable the Ethernet interface, false to disable it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
 func ToggleEthernetCONNECTIVITY(enable bool) bool {
 	return toggleNetworkInterfaceCONNECTIVITY("Ethernet", enable)
 }
 
+/*
+ToggleNetworkingCONNECTIVITY toggles the Wi-Fi and Ethernet interfaces.
+
+-----------------------------------------------------------
+
+– Params:
+  - enable – true to enable the interfaces, false to disable them
+
+– Returns:
+  - true if the operation was successful for both, false otherwise
+*/
+func ToggleNetworkingCONNECTIVITY(enable bool) bool {
+	return ToggleWifiCONNECTIVITY(enable) && ToggleEthernetCONNECTIVITY(enable)
+}
+
+/*
+toggleNetworkInterfaceCONNECTIVITY toggles a network interface.
+
+-----------------------------------------------------------
+
+– Params:
+  - interface_name – the name of the interface
+  - enable – true to enable the interface, false to disable it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
 func toggleNetworkInterfaceCONNECTIVITY(interface_name string, enable bool) bool {
 	var en_dis string = "disabled"
 	if enable {

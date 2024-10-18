@@ -63,3 +63,68 @@ GenerateCtrlCPROCESSES generates a Ctrl+C event to a process.
 func GenerateCtrlCPROCESSES(cmd *exec.Cmd, process_group_id uint32) error {
 	return cmd.Process.Signal(os.Interrupt)
 }
+
+/*
+ToggleWifiCONNECTIVITY toggles the Wi-Fi interface.
+
+-----------------------------------------------------------
+
+– Params:
+  - enable – true to enable the Wi-Fi interface, false to disable it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+*/
+func ToggleWifiCONNECTIVITY(enable bool) bool {
+	var on_off string = "off"
+	if enable {
+		on_off = "on"
+	}
+	cmd_output, err := ExecCmdSHELL([]string{"nmcli radio wifi " + on_off})
+	if err != nil {
+		return false
+	}
+
+	return cmd_output.Exit_code == 0
+}
+
+/*
+ToggleEthernetCONNECTIVITY toggles the Ethernet interface.
+
+NOT implemented.
+
+-----------------------------------------------------------
+
+– Params:
+  - enable – true to enable the Ethernet interface, false to disable it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+*/
+func ToggleEthernetCONNECTIVITY(enable bool) bool {
+	return false
+}
+
+/*
+ToggleNetworkingCONNECTIVITY toggles the networking.
+
+-----------------------------------------------------------
+
+– Params:
+  - enable – true to enable the networking, false to disable it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
+func ToggleNetworkingCONNECTIVITY(enable bool) bool {
+	var on_off string = "off"
+	if enable {
+		on_off = "on"
+	}
+	cmd_output, err := ExecCmdSHELL([]string{"nmcli networking " + on_off})
+	if err != nil {
+		return false
+	}
+
+	return cmd_output.Exit_code == 0
+}

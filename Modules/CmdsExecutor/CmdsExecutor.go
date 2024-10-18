@@ -167,12 +167,6 @@ func init() {realMain =
 						var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
 						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 
-					case CMD_ASK_BATTERY_PERCENT:
-						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
-							GetData(true, nil).(int)
-						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
-
 					case CMD_TOGGLE_WIFI:
 						if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
 							var speak string
@@ -191,23 +185,11 @@ func init() {realMain =
 							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 						}
 
-					case CMD_TOGGLE_ETHERNET:
-						if Utils.ToggleEthernetCONNECTIVITY(cmd_variant == RET_ON) {
-							var speak string
-							if cmd_variant == RET_ON {
-								speak = "Ethernet turned on."
-							} else {
-								speak = "Ethernet turned off."
-							}
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
-						} else {
-							var on_off string = "off"
-							if cmd_variant == RET_ON {
-								on_off = "on"
-							}
-							var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
-						}
+					case CMD_ASK_BATTERY_PERCENT:
+						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
+							GetData(true, nil).(int)
+						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
+						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 
 					case CMD_TELL_WEATHER:
 						var speak string = "Obtaining the weather..."
@@ -275,6 +257,42 @@ func init() {realMain =
 							}
 						} else {
 							speak = "No network connection available to get the weather."
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						}
+
+					case CMD_TOGGLE_ETHERNET:
+						if Utils.ToggleEthernetCONNECTIVITY(cmd_variant == RET_ON) {
+							var speak string
+							if cmd_variant == RET_ON {
+								speak = "Ethernet turned on."
+							} else {
+								speak = "Ethernet turned off."
+							}
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+						} else {
+							var on_off string = "off"
+							if cmd_variant == RET_ON {
+								on_off = "on"
+							}
+							var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						}
+
+					case CMD_TOGGLE_NETWORKING:
+						if Utils.ToggleNetworkingCONNECTIVITY(cmd_variant == RET_ON) {
+							var speak string
+							if cmd_variant == RET_ON {
+								speak = "Networking turned on."
+							} else {
+								speak = "Networking turned off."
+							}
+							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+						} else {
+							var on_off string = "off"
+							if cmd_variant == RET_ON {
+								on_off = "on"
+							}
+							var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
 							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
 						}
 				}
