@@ -22,6 +22,8 @@
 package TasksExecutor
 
 import (
+	"Speech"
+	"SpeechQueue/SpeechQueue"
 	"TEHelper/TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
@@ -41,21 +43,33 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_9
 
-		var user_location *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
-		log.Println("User location:", user_location)
-
-		TEHelper.UpdateUserLocation(user_location)
-
 		//TEHelper.LoadLocalTasks()
 
 		go func() {
 			for {
-				TEHelper.CheckDueTasks()
+				var task *ModsFileInfo.Task = TEHelper.CheckDueTasks()
+				if task == nil {
+					break
+				}
+
+				log.Println("Task! -->", task.Id)
+
+				if task.Message != "" {
+					Speech.QueueSpeech(task.Message, SpeechQueue.PRIORITY_MEDIUM, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				}
+
+				if task.Command != "" {
+					Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
+						"SentenceInternal": task.Command,
+					}
+				}
 			}
 		}()
 
 		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
+			TEHelper.UpdateUserLocation(&Utils.Gen_settings_GL.MOD_12.User_location)
+
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
 				TEHelper.StopChecker()
 
 				return

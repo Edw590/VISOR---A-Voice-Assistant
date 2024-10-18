@@ -69,7 +69,14 @@ func init() {realMain =
 				last_and = ""
 			}
 
-			var sentence_str string = comms_map["Sentence"].(string)
+			var speech_priority int = SpeechQueue.PRIORITY_MEDIUM
+			var sentence_str string = ""
+			if val, ok := comms_map["SentenceInternal"]; ok {
+				sentence_str = val.(string)
+			} else {
+				speech_priority = SpeechQueue.PRIORITY_USER_ACTION
+				sentence_str = comms_map["Sentence"].(string)
+			}
 			var cmds_info_str = ACD.Main(sentence_str, false, true, last_it + "|" + last_and)
 			log.Println("*****************************")
 			fmt.Println(sentence_str)
@@ -103,7 +110,7 @@ func init() {realMain =
 			if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
 				var speak string = "WARNING! There was a problem processing the commands sir. This needs a fix. The " +
 					"error was the following: " + cmds_info_str + ". You said: " + sentence_str
-				MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				MOD_3.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 				log.Println("EXECUTOR - ERR_PROC_CMDS")
 
 				time.Sleep(1 * time.Second)
@@ -130,14 +137,14 @@ func init() {realMain =
 			if send_to_GPT {
 				if !Utils.IsCommunicatorConnectedSERVER() {
 					var speak string = "GPT unavailable. Communicator not connected."
-					MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+					MOD_3.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 					return
 				}
 
 				if !GPTComm.SendText(sentence_str, true) {
 					MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.",
-						SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+						speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 				}
 
 				return
@@ -161,11 +168,11 @@ func init() {realMain =
 				switch cmd_id {
 					case CMD_ASK_TIME:
 						var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
-						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, true)
 
 					case CMD_ASK_DATE:
 						var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
-						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, true)
 
 					case CMD_TOGGLE_WIFI:
 						if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
@@ -175,25 +182,25 @@ func init() {realMain =
 							} else {
 								speak = "Wi-Fi turned off."
 							}
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+							speakInternal(speak, speech_priority, speech_mode2, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the Wi-Fi " + on_off + "."
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, true)
 						}
 
 					case CMD_ASK_BATTERY_PERCENT:
 						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 							GetData(true, nil).(int)
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, true)
 
 					case CMD_TELL_WEATHER:
 						var speak string = "Obtaining the weather..."
-						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+						speakInternal(speak, speech_priority, speech_mode2, false)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -201,7 +208,7 @@ func init() {realMain =
 							var weather_str string = OICComm.GetWeather()
 							if weather_str == "" {
 								speak = "I'm sorry Sir, but I couldn't get the weather information."
-								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+								speakInternal(speak, speech_priority, speech_mode2, true)
 
 								break
 							}
@@ -218,16 +225,16 @@ func init() {realMain =
 									" degrees and a minimum of " + weather_data[7] + " degrees. The precipitation is of " +
 									weather_data[2] + ", humidity of " + weather_data[3] + ", and wind of " +
 									weather_data[4] + "."
-								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+								speakInternal(speak, speech_priority, speech_mode2, true)
 							}
 						} else {
 							speak = "No network connection available to get the weather."
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, true)
 						}
 
 					case CMD_TELL_NEWS:
 						var speak string = "Obtaining the latest news..."
-						speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, true)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -235,7 +242,7 @@ func init() {realMain =
 							var news_str string = OICComm.GetWeather()
 							if news_str == "" {
 								speak = "I'm sorry Sir, but I couldn't get the news information."
-								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+								speakInternal(speak, speech_priority, speech_mode2, true)
 
 								break
 							}
@@ -253,11 +260,11 @@ func init() {realMain =
 								for _, n := range news[1:] {
 									speak += n + ". "
 								}
-								speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+								speakInternal(speak, speech_priority, speech_mode2, false)
 							}
 						} else {
 							speak = "No network connection available to get the weather."
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, true)
 						}
 
 					case CMD_TOGGLE_ETHERNET:
@@ -268,14 +275,14 @@ func init() {realMain =
 							} else {
 								speak = "Ethernet turned off."
 							}
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+							speakInternal(speak, speech_priority, speech_mode2, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, true)
 						}
 
 					case CMD_TOGGLE_NETWORKING:
@@ -286,14 +293,14 @@ func init() {realMain =
 							} else {
 								speak = "Networking turned off."
 							}
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, false)
+							speakInternal(speak, speech_priority, speech_mode2, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
-							speakInternal(speak, SpeechQueue.PRIORITY_USER_ACTION, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, true)
 						}
 				}
 			}
@@ -313,7 +320,7 @@ func speakInternal(txt_to_speak string, speech_priority int, mode int, auto_gpt 
 		var text string = "Sent from my " + Utils.Device_settings_GL.Device_type + ": write ONE concise sentence " +
 			"saying \"" + txt_to_speak + "\"."
 		if !GPTComm.SendText(text, false) {
-			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment.", SpeechQueue.PRIORITY_USER_ACTION,
+			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment.", speech_priority,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY)
 		}
 

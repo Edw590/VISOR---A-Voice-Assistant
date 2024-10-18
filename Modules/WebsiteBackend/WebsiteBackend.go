@@ -90,7 +90,7 @@ func init() {realMain =
 			}
 		}()
 
-		// FIXME: O servidor está a ligar duas vezes... (logs do servidor, 2 vezes a desligar). Vê porquê. Mete a imprimir PIDs.
+		// FIXME: The server is starting twice... (server logs do servidor, 2 times stopping). See why. Print PIDs.
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 		defer cancel()

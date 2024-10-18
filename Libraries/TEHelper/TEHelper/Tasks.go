@@ -27,14 +27,16 @@ import (
 )
 
 /*
-GetTasksList returns a list of all reminders.
+getTasksList returns a list of all reminders.
+
+This function will BLOCK if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 
 – Returns:
   - a list of all reminders
 */
-func GetTasksList() *[]ModsFileInfo.Task {
+func getTasksList() *[]ModsFileInfo.Task {
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|false|tasks.json"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
 	if comms_map == nil {
@@ -43,12 +45,12 @@ func GetTasksList() *[]ModsFileInfo.Task {
 
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	var reminders []ModsFileInfo.Task
-	if err := Utils.FromJsonGENERAL(file_contents, &reminders); err != nil {
+	var tasks []ModsFileInfo.Task
+	if err := Utils.FromJsonGENERAL(file_contents, &tasks); err != nil {
 		return nil
 	}
 
-	return &reminders
+	return &tasks
 }
 
 /*
@@ -60,22 +62,9 @@ GetIdsList returns a list of all reminders' IDs.
   - a list of all reminders' IDs separated by "|"
 */
 func GetIdsList() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|false|tasks.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
-	if comms_map == nil {
-		return ""
-	}
-
-	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
-
-	var user_location []ModsFileInfo.Task
-	if err := Utils.FromJsonGENERAL(file_contents, &user_location); err != nil {
-		return ""
-	}
-
 	var ids string
-	for _, reminder := range user_location {
-		ids += reminder.Id + "|"
+	for _, task := range tasks_GL {
+		ids += task.Id + "|"
 	}
 
 	return ids
@@ -93,12 +82,7 @@ GetTaskById returns a reminder by its ID.
   - the reminder or nil if the reminder was not found
 */
 func GetTaskById(id string) *ModsFileInfo.Task {
-	var p_reminders *[]ModsFileInfo.Task = GetTasksList()
-	if p_reminders == nil {
-		return nil
-	}
-
-	for _, reminder := range *p_reminders {
+	for _, reminder := range tasks_GL {
 		if reminder.Id == id {
 			return &reminder
 		}

@@ -22,28 +22,23 @@
 package TEHelper
 
 import (
-	MOD_3 "Speech"
-	"SpeechQueue/SpeechQueue"
-	MOD_12 "UserLocator"
+	"UserLocator"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"bytes"
-	"log"
 	"strings"
 	"time"
 )
 
-const _TIME_SLEEP_S int = 1
-
-const GET_TASKS_EACH_S int64 = 1 * 60
-var last_get_tasks_when_s int64 = 0
+const _GET_TASKS_EACH_S int64 = 1 * 60
+var last_get_tasks_when_s_GL int64 = 0
 
 var last_crc16_GL []byte = nil
 
 var tasks_GL []ModsFileInfo.Task
 var user_location_GL ModsFileInfo.UserLocation
 
-var tasks_info_list map[string]int64 = make(map[string]int64)
+var tasks_info_list_GL map[string]int64 = make(map[string]int64)
 
 var conditions_were_true_GL map[string]bool = make(map[string]bool)
 
@@ -52,12 +47,22 @@ var prev_prev_last_known_user_loc_GL string = user_location_GL.Prev_location
 
 var stop_GL bool = false
 
+/*
+CheckDueTasks checks if any Task is due.
+
+This function will block until a Task is due. When that happens, the Task is returned.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the Task that is due or nil if the checker was stopped
+ */
 func CheckDueTasks() *ModsFileInfo.Task {
 	for {
-		if time.Now().Unix() >= last_get_tasks_when_s + GET_TASKS_EACH_S {
-			UpdateLocalTasks() // TODO: RUN THIS IN ANOTHER THREAD!!!
+		if time.Now().Unix() >= last_get_tasks_when_s_GL+ _GET_TASKS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
+			UpdateLocalTasks()
 
-			last_get_tasks_when_s = time.Now().Unix()
+			last_get_tasks_when_s_GL = time.Now().Unix()
 		}
 
 		// Location trigger - if the user location changed, check if any task is triggered
@@ -92,12 +97,6 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				var device_id_matches bool = checkDeviceID(task)
 
 				if condition_loc && condition && device_id_matches {
-					MOD_3.QueueSpeech(task.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
-
-					log.Println("Task! -->", task.Message)
-
-					// TODO: Execute command here
-
 					return &task
 				}
 			}
@@ -126,7 +125,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 					}
 				}
 
-				condition_time = curr_time >= test_time && tasks_info_list[task.Id] != test_time
+				condition_time = curr_time >= test_time && tasks_info_list_GL[task.Id] != test_time
 			}
 
 			// Check if the task is due and if it was already reminded
@@ -137,7 +136,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			} else {
 				// Check if the task has a location and the user is at that location.
 				var curr_user_loc string = user_location_GL.Curr_location
-				if curr_user_loc != MOD_12.UNKNOWN_LOCATION {
+				if curr_user_loc != UserLocator.UNKNOWN_LOCATION {
 					condition_loc = checkLocation(task.User_location, curr_user_loc)
 				}
 			}
@@ -147,23 +146,14 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			var device_id_matches bool = checkDeviceID(task)
 
 			if condition_time && condition_loc && condition && device_id_matches {
-				MOD_3.QueueSpeech(task.Message, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
-
-				log.Println("Task! -->", task)
-
-				// TODO: Execute command here
-
 				// Set the last reminded time to the test time
-				tasks_info_list[task.Id] = test_time
-
-				// TODO: This must RETURN the task that just went off. Think about how to do it with multiple tasks
-				//  triggering at the same time over and over again.
+				tasks_info_list_GL[task.Id] = test_time
 
 				return &task
 			}
 		}
 
-		if Utils.WaitWithStopTIMEDATE(&stop_GL, _TIME_SLEEP_S) {
+		if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
 			return nil
 		}
 	}
@@ -178,10 +168,18 @@ func LoadLocalTasks(json string) {
 	tasks_GL = p_tasks
 }
 
+/*
+UpdateLocalTasks updates the local list of tasks.
+
+This function will BLOCK if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
+
+-----------------------------------------------------------
+
+– Returns:
+  - a JSON string with all the tasks or an empty string if there was no change in the tasks since the last call
+*/
 func UpdateLocalTasks() string {
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|true|tasks.json"))
-	// TODO: This must be in another thread - will block if there's no Internet connection
-	//  Like any other communication on the project!
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
 	if comms_map == nil {
 		return ""
@@ -191,7 +189,7 @@ func UpdateLocalTasks() string {
 	if !bytes.Equal(new_crc16, last_crc16_GL) {
 		last_crc16_GL = new_crc16
 
-		var p_tasks *[]ModsFileInfo.Task = GetTasksList()
+		var p_tasks *[]ModsFileInfo.Task = getTasksList()
 		if p_tasks == nil {
 			return ""
 		}
@@ -204,10 +202,21 @@ func UpdateLocalTasks() string {
 	return ""
 }
 
+/*
+UpdateUserLocation updates the internal user location.
+
+-----------------------------------------------------------
+
+– Params:
+  - user_location – the new user location
+ */
 func UpdateUserLocation(user_location *ModsFileInfo.UserLocation) {
 	user_location_GL = *user_location
 }
 
+/*
+StopChecker stops the CheckDueTasks function.
+ */
 func StopChecker() {
 	stop_GL = true
 }
