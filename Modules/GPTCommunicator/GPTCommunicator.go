@@ -321,6 +321,21 @@ func init() {realMain =
 						if text == "/clear" {
 							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
 							shut_down = true
+						} else if text == "/mem" {
+							// Memorize and clear the context
+
+							// Summarize the list of memories too (sometimes VISOR may memorize useless sentences, so
+							// this will cut them out)
+							var memories_str string = ""
+							if len(modGenInfo_GL.Memories) > 0 {
+								memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
+								modGenInfo_GL.Memories = nil
+							}
+							if memories_str != "" || user_text != "" {
+								memorizeThings(memories_str + ". " + user_text)
+							}
+
+							shut_down = true
 						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
 							// Ask Wolfram Alpha the question
 							var question string = text[len(ASK_WOLFRAM_ALPHA):]
@@ -348,17 +363,6 @@ func init() {realMain =
 				_ = os.Remove(file_path.GPathToStringConversion())
 
 				if shut_down {
-					// Summarize the list of memories too (sometimes VISOR may memorize useless sentences, so this will
-					// cut them out)
-					var memories_str string = ""
-					if len(modGenInfo_GL.Memories) > 0 {
-						memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
-						modGenInfo_GL.Memories = nil
-					}
-					if memories_str != "" || user_text != "" {
-						memorizeThings(memories_str + ". " + user_text)
-					}
-
 					shutDown()
 
 					return
