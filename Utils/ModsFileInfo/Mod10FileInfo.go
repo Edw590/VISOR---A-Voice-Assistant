@@ -26,19 +26,3 @@ type Mod10GenInfo struct {
 	// Device_info is the information about the device
 	Device_info DeviceInfo
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-// Mod10UserInfo is the format of the custom information file about this specific module.
-type Mod10UserInfo struct {
-	// Notifications is the list of notifications
-	Notifications []_Notification
-}
-
-// _Notification is the format of a notification.
-type _Notification struct {
-	// Condition is the condition for the notification in Go language
-	Condition string
-	// Speak is the text to speak when the condition is met
-	Speak     string
-}

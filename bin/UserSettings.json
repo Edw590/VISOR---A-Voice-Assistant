@@ -103,28 +103,6 @@
 		// Path to the SSL certificate key file for the HTTPS server
 		"Key_file": "/etc/ssl/private/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.key"
 	},
-	"MOD_10": {
-		// Variables: battery_percent (int), power_connected (bool), brightness (int), sound_volume (int), sound_muted (bool)
-		// Put the booleans inside "bool()", like the examples below.
-		"Notifications": [
-			{
-				"Condition": "bool(battery_percent > 80) && bool(power_connected)",
-				"Speak": "Battery levels above 80%"
-			},
-			{
-				"Condition": "bool(battery_percent < 20) && bool(!power_connected)",
-				"Speak": "Attention! Battery levels below 20%!"
-			},
-			{
-				"Condition": "bool(battery_percent < 10) && bool(!power_connected)",
-				"Speak": "Warning! Battery levels below 10%!"
-			},
-			{
-				"Condition": "bool(brightness == 0) && (bool(sound_volume == 0) || bool(sound_muted))",
-				"Speak": "Sleep well sir!"
-			}
-		]
-	},
 	"MOD_12": {
 		"Devices_info": {
 			// AlwaysWith_device_id is the device ID of the device that the user always has with them, if any
