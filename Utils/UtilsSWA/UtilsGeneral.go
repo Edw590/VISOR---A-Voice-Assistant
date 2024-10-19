@@ -22,9 +22,29 @@
 package UtilsSWA
 
 import (
+	"Utils"
 	"strings"
 	"unicode"
 )
+
+/*
+RandStringGENERAL generates a random string with the given length, containing only ASCII letters (upper case
+or lower case) and numbers.
+RemoveNonGraphicCharsGENERAL removes all the non-graphic characters from a string.
+
+-----------------------------------------------------------
+
+– Params:
+  - length – length of the generating string
+  - str – the string to remove the non-graphic characters from
+
+– Returns:
+  - the generated string
+  - the string without the non-graphic characters
+*/
+func RandStringGENERAL(length int) string {
+	return Utils.RandStringGENERAL(length)
+}
 
 /*
 RemoveNonGraphicCharsGENERAL removes all the non-graphic characters from a string.
