@@ -189,10 +189,7 @@ func init() {realMain =
 					Screens.Current_screen_GL = prev_screen
 				}),
 				fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
-					Utils.CloseCommsChannels()
-					Utils.SignalModulesStopMODULES(modules)
-
-					my_app_GL.Quit()
+					quitApp(modules)
 				}),
 			)
 			desk.SetSystemTrayMenu(menu)
@@ -215,6 +212,12 @@ func init() {realMain =
 
 		go func() {
 			for {
+				if *module_stop {
+					quitApp(modules)
+
+					break
+				}
+
 				if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
 					showWindow()
 					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
@@ -278,4 +281,11 @@ func showWindow() {
 	my_window_GL.Hide()
 	my_window_GL.Show()
 	my_window_GL.RequestFocus()
+}
+
+func quitApp(modules []Utils.Module) {
+	Utils.CloseCommsChannels()
+	Utils.SignalModulesStopMODULES(modules)
+
+	my_app_GL.Quit()
 }
