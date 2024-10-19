@@ -205,6 +205,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 			device_id = string(message)
 
+			log.Println("Device ID connected:", device_id)
+
 			continue
 		}
 
@@ -281,11 +283,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 
 			log.Println("File read")
 			if get_crc16 {
-				var crc16 uint16 = CRC16.Result([]byte(*p_file_contents), "CCIT_ZERO")
-				var crc16_bytes []byte = make([]byte, 2)
-				crc16_bytes[0] = byte(crc16 >> 8)
-				crc16_bytes[1] = byte(crc16)
-				return crc16_bytes
+				return getCRC16([]byte(*p_file_contents))
 			} else {
 				return Utils.CompressString(*p_file_contents)
 			}
@@ -307,6 +305,17 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 
 			return ret
+		case "US":
+			// Get user settings.
+			// Example: "[true to get file contents, false to get CRC16 checksum]"
+			// Returns: the user settings in JSON format compressed
+			var get_settings bool = string(bytes) == "true"
+			var json string = *Utils.ToJsonGENERAL(Utils.User_settings_GL)
+			if get_settings {
+				return Utils.CompressString(json)
+			} else {
+				return getCRC16([]byte(json))
+			}
 	}
 
 	// Just to return something
@@ -332,4 +341,13 @@ func unregisterChannel(channel_num int) {
 		channels_GL[channel_num] = nil
 		used_channels_GL[channel_num] = false
 	}
+}
+
+func getCRC16(bytes []byte) []byte {
+	var crc16 uint16 = CRC16.Result(bytes, "CCIT_ZERO")
+	var crc16_bytes []byte = make([]byte, 2)
+	crc16_bytes[0] = byte(crc16 >> 8)
+	crc16_bytes[1] = byte(crc16)
+
+	return crc16_bytes
 }
