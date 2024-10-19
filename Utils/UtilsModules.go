@@ -212,11 +212,17 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 			// Keep reloading the device/user settings and saving the generated settings global variables in case it's
 			// MOD_0 that's running.
 			for {
+				if module.Stop {
+					break
+				}
+
 				err := LoadDeviceUserSettings(server)
 				if err != nil {
 					module.Stop = true
 
 					log.Println("warning: Error obtaining device/user settings - aborting")
+
+					break
 				}
 
 				saveGenSettings(server)
@@ -698,4 +704,9 @@ func SignalModulesStopMODULES(modules []Module) {
 
 		time.Sleep(1 * time.Second)
 	}
+
+	modules[NUM_MOD_VISOR].Stop = true
+
+	// Give time for threads to stop
+	time.Sleep(1 * time.Second)
 }
