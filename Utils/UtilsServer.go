@@ -51,13 +51,15 @@ This function does not return until the communicator is stopped, or returns in c
 
 – Returns:
   - bool – true if the communicator was started or was already started, false if it an error occurred and it did not
-	start
+    start
 */
 func StartCommunicatorSERVER() bool {
 	if srvComm_started_GL {
 		return true
 	}
 	srvComm_started_GL = true
+	log.Println("Communicator start")
+	log.Println("srvComm_connected_GL:", srvComm_connected_GL)
 
 	srvComm_stop_GL = false
 	srvComm_gen_ch_in_GL = make(chan []byte)
@@ -81,7 +83,7 @@ func StartCommunicatorSERVER() bool {
 	// Create a custom WebSocket dialer
 	dialer := websocket.Dialer{
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true, // Disable certificate verification
+			InsecureSkipVerify: true,                             // Disable certificate verification
 			ClientSessionCache: tls.NewLRUClientSessionCache(32), // Use an LRU session cache for resumption
 		},
 	}
@@ -116,7 +118,7 @@ func StartCommunicatorSERVER() bool {
 
 			var msg_to string = strings.Split(string(message), "|")[0]
 			var index_bar int = strings.Index(string(message), "|")
-			var truncated_msg []byte = message[index_bar + 1:]
+			var truncated_msg []byte = message[index_bar+1:]
 			if msg_to == "G" {
 				if !srvComm_stopping_GL {
 					srvComm_gen_ch_in_GL <- truncated_msg
@@ -153,7 +155,7 @@ func StartCommunicatorSERVER() bool {
 				message = []byte(Device_settings_GL.Device_ID)
 				first_message = false
 			} else {
-				message = <- srvComm_gen_ch_out_GL
+				message = <-srvComm_gen_ch_out_GL
 				if message == nil {
 					break
 				}
@@ -210,7 +212,7 @@ func GetGeneralMessageSERVER() []byte {
 		return nil
 	}
 
-	return <- srvComm_gen_ch_in_GL
+	return <-srvComm_gen_ch_in_GL
 }
 
 /*
@@ -278,6 +280,8 @@ StopCommunicatorSERVER stops the communicator.
 */
 func StopCommunicatorSERVER() {
 	srvComm_stop_GL = true
+	log.Println("Stopping communicator...")
+	log.Println("srvComm_connected_GL:", srvComm_connected_GL)
 }
 
 /*
@@ -287,7 +291,7 @@ IsCommunicatorConnectedSERVER checks if the communicator is connected.
 
 – Returns:
   - true if the communicator is connected, false otherwise
- */
+*/
 func IsCommunicatorConnectedSERVER() bool {
 	return srvComm_connected_GL
 }

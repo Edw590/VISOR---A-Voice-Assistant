@@ -88,7 +88,7 @@ func init() {
 			var to_memorize string = strings.Join(modGenInfo_GL.Memories, ". ")
 
 			// Declare and assign context sizes
-			smart_ctx_size := 12288
+			smart_ctx_size := 8192
 			dumb_ctx_size := 4096
 
 			// Log the configuration of both LLaMa instances
@@ -98,7 +98,7 @@ func init() {
 				smart_ctx_size, 4, 0.8, dumb_ctx_size, 4, 1.5)
 
 			// Start LLM instance (smart and dumb)
-			writer_smart, stdout_smart, stderr_smart := startLlama("Smart", 12288, 4, 0.8, modUserInfo_GL.Model_smart_loc,
+			writer_smart, stdout_smart, stderr_smart := startLlama("Smart", 8192, 4, 0.8, modUserInfo_GL.Model_smart_loc,
 				modUserInfo_GL.User_intro, to_memorize, visor_intro)
 			if writer_smart == nil {
 				log.Println("Error starting the Llama model (smart)")
@@ -395,13 +395,13 @@ func startLlama(instanceType string, ctx_size int, threads int, temp float32, mo
 	err := cmd.Start()
 	if err != nil {
 		log.Printf("Error starting a command shell: %v", err)
-
+		log.Printf("Error starting %s LLaMA instance: %v", instanceType, err)
 		return nil, nil, nil
 	}
 
 	// Configure the LLM model (Llama3/3.1/3.2's prompt)
 	writer := bufio.NewWriter(stdin)
-	_, _ = writer.WriteString("llama-cli " +
+	_, err = writer.WriteString("llama-cli " +
 		"--model \"" + model_loc + "\" " +
 		"--interactive-first " +
 		"--ctx-size " + strconv.Itoa(ctx_size) + " " +
@@ -417,7 +417,29 @@ func startLlama(instanceType string, ctx_size int, threads int, temp float32, mo
 		"--in-prefix \"" + _END_TOKENS + "\" " +
 		"--in-suffix \"" + _START_TOKENS + "\" " +
 		"\n")
-	_ = writer.Flush()
+	if err != nil {
+		log.Printf("Error writing to %s LLaMA instance stdin: %v", instanceType, err)
+		return nil, nil, nil
+	}
+	err = writer.Flush()
+	if err != nil {
+		log.Printf("Error flushing %s LLaMA instance stdin: %v", instanceType, err)
+		return nil, nil, nil
+	}
+
+	// Log any errors from the LLaMa instance
+	go func() {
+		_, err := io.Copy(os.Stdout, stdout)
+		if err != nil {
+			log.Printf("Error reading from %s LLaMA instance stdout: %v", instanceType, err)
+		}
+	}()
+	go func() {
+		_, err := io.Copy(os.Stderr, stderr)
+		if err != nil {
+			log.Printf("Error reading from %s LLaMA instance stderr: %v", instanceType, err)
+		}
+	}()
 
 	return writer, stdout, stderr
 }
