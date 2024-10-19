@@ -33,8 +33,8 @@ type Mod9GenInfo struct {
 type Task struct {
 	// Id is the task ID
 	Id 		    string
-	// Device_IDs are the devices the task is set for
-	Device_IDs  []string
+	// Device_IDs are the devices the task is set for, separated by "|"
+	Device_IDs  string
 	// Message is the task message
 	Message     string
 	// Command is the command to be executed when the task is triggered on the chosen Device_IDs
