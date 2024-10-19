@@ -88,7 +88,7 @@ func init() {
 			var to_memorize string = strings.Join(modGenInfo_GL.Memories, ". ")
 
 			// Declare and assign context sizes
-			smart_ctx_size := 8192
+			smart_ctx_size := 12288
 			dumb_ctx_size := 4096
 
 			// Log the configuration of both LLaMa instances
@@ -98,7 +98,7 @@ func init() {
 				smart_ctx_size, 4, 0.8, dumb_ctx_size, 4, 1.5)
 
 			// Start LLM instance (smart and dumb)
-			writer_smart, stdout_smart, stderr_smart := startLlama("Smart", 8192, 4, 0.8, modUserInfo_GL.Model_smart_loc,
+			writer_smart, stdout_smart, stderr_smart := startLlama("Smart", 12288, 4, 0.8, modUserInfo_GL.Model_smart_loc,
 				modUserInfo_GL.User_intro, to_memorize, visor_intro)
 			if writer_smart == nil {
 				log.Println("Error starting the Llama model (smart)")
