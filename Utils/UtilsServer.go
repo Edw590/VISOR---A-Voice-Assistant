@@ -58,9 +58,7 @@ func StartCommunicatorSERVER() bool {
 		return true
 	}
 	srvComm_started_GL = true
-	log.Println("Communicator start")
-	log.Println("srvComm_connected_GL:", srvComm_connected_GL)
-
+	
 	srvComm_stop_GL = false
 	srvComm_gen_ch_in_GL = make(chan []byte)
 	srvComm_gen_ch_out_GL = make(chan []byte, 1000)
