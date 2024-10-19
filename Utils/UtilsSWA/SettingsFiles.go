@@ -19,24 +19,14 @@
  * under the License.
  ******************************************************************************/
 
-package Utils
+package UtilsSWA
 
-const (
-	NUM_LIB_ACD               int = iota
-	NUM_LIB_OICComm
-	NUM_LIB_GPTComm
-	NUM_LIB_SpeechQueue
-	NUM_LIB_TEHelper
-	NUM_LIB_SettingsSync
+import "Utils"
 
-	LIBS_ARRAY_SIZE
-)
-// LIB_NUMS_NAMES is a map of the numbers of the libraries and their names. Use with the NUM_LIB_ constants.
-var LIB_NUMS_NAMES map[int]string = map[int]string{
-	NUM_LIB_ACD:          "Advanced Commands Detection",
-	NUM_LIB_OICComm:      "Online Information Checker Communicator",
-	NUM_LIB_GPTComm:      "GPT Communicator",
-	NUM_LIB_SpeechQueue:  "Speech Queue",
-	NUM_LIB_TEHelper:     "Tasks Executor Helper",
-	NUM_LIB_SettingsSync: "Settings Synchronizer",
+func LoadUserSettings(json string) bool {
+	if err := Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL); err != nil {
+		return false
+	}
+
+	return true
 }

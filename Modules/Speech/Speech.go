@@ -68,7 +68,7 @@ func init() {realMain =
 			for {
 				select {
 					case curr_speech = <- speeches_ch:
-					case <-kill_ch:
+					case <- kill_ch:
 						return
 				}
 

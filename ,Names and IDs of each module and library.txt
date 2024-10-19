@@ -20,3 +20,4 @@ Libraries:
 02 = GPT Communicator
 03 = Speech Queue
 04 = Tasks Executor Helper
+05 = Settings Synchronizer

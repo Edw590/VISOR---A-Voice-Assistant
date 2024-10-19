@@ -153,7 +153,7 @@ func StartCommunicatorSERVER() bool {
 				message = []byte(Device_settings_GL.Device_ID)
 				first_message = false
 			} else {
-				message = <-srvComm_gen_ch_out_GL
+				message = <- srvComm_gen_ch_out_GL
 				if message == nil {
 					break
 				}
@@ -210,7 +210,7 @@ func GetGeneralMessageSERVER() []byte {
 		return nil
 	}
 
-	return <-srvComm_gen_ch_in_GL
+	return <- srvComm_gen_ch_in_GL
 }
 
 /*

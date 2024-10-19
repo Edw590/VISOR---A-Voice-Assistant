@@ -30,7 +30,7 @@ import (
 /*
 GetNews gets the news from the given page contents.
 
-This function will BLOCK if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
+This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 
@@ -69,7 +69,7 @@ func GetNews() string {
 /*
 GetWeather gets the weather from the given page contents.
 
-This function will BLOCK if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
+This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 Weather data in order:
   - Location
