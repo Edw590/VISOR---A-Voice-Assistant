@@ -61,174 +61,173 @@ func main() {
 	}
 	Utils.ModStartup2(realMain, &module, false)
 }
-func init() {
-	realMain =
-		func(module_stop *bool, moduleInfo_any any) {
-			if !isOpenGLSupport() {
-				log.Println("Required OpenGL version not supported. Exiting...")
+func init() {realMain =
+	func(module_stop *bool, moduleInfo_any any) {
+		if !isOpenGLSupport() {
+			log.Println("Required OpenGL version not supported. Exiting...")
 
-				return
-			}
+			return
+		}
 
-			// All mainly alright, let's hide the terminal window
-			if runtime.GOOS == "windows" {
-				if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
-					// Restart the process with conhost.exe on Windows to be able to actually hide the window
-					if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])), "--conhost") {
-						return
-					}
+		// All mainly alright, let's hide the terminal window
+		if runtime.GOOS == "windows" {
+			if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
+				// Restart the process with conhost.exe on Windows to be able to actually hide the window
+				if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])), "--conhost") {
+					return
 				}
 			}
-			Utils.HideConsoleWindowPROCESSES()
+		}
+		Utils.HideConsoleWindowPROCESSES()
 
-			//////////////////////////////////////////
-			// No terminal window from here on
+		//////////////////////////////////////////
+		// No terminal window from here on
 
-			ClientRegKeys.RegisterValues()
+		ClientRegKeys.RegisterValues()
 
-			go func() {
-				for {
-					Utils.StartCommunicatorSERVER()
+		go func() {
+			for {
+				Utils.StartCommunicatorSERVER()
 
-					time.Sleep(1 * time.Second)
-				}
-			}()
-			go func() {
-				for {
-					if *module_stop {
-						Utils.StopCommunicatorSERVER()
-
-						return
-					}
-
-					time.Sleep(1 * time.Second)
-				}
-			}()
-
-			var modules []Utils.Module
-			for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
-				modules = append(modules, Utils.Module{
-					Num:     i,
-					Name:    Utils.GetModNameMODULES(i),
-					Stop:    true,
-					Stopped: true,
-					Enabled: true,
-				})
+				time.Sleep(1 * time.Second)
 			}
-			// Just for it to print that VISOR is running
-			modules[Utils.NUM_MOD_VISOR].Stop = false
-			modules[Utils.NUM_MOD_VISOR].Stopped = false
-			// The Manager needs to be started first. It'll handle the others.
-			modules[Utils.NUM_MOD_ModManager].Stop = false
+		}()
+		go func() {
+			for {
+				if *module_stop {
+					Utils.StopCommunicatorSERVER()
 
-			MOD_1.Start(modules)
+					return
+				}
 
-			// Create a new application
-			my_app_GL = app.NewWithID("com.edw590.visor_c")
-			my_app_GL.SetIcon(Logo.LogoBlackGmail)
-			my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
+				time.Sleep(1 * time.Second)
+			}
+		}()
 
-			processNotifications()
+		var modules []Utils.Module
+		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
+			modules = append(modules, Utils.Module{
+				Num:     i,
+				Name:    Utils.GetModNameMODULES(i),
+				Stop:    true,
+				Stopped: true,
+				Enabled: true,
+			})
+		}
+		// Just for it to print that VISOR is running
+		modules[Utils.NUM_MOD_VISOR].Stop = false
+		modules[Utils.NUM_MOD_VISOR].Stopped = false
+		// The Manager needs to be started first. It'll handle the others.
+		modules[Utils.NUM_MOD_ModManager].Stop = false
 
-			// Create the content area with a label to display different screens
-			var content_label *widget.Label = widget.NewLabel("Welcome!")
-			var content_container *fyne.Container = container.NewVBox(content_label)
+		MOD_1.Start(modules)
 
-			// Create the navigation bar
-			var nav_bar *fyne.Container = container.NewVBox(
-				widget.NewButton("Home", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.Home()}
-					content_container.Refresh()
+		// Create a new application
+		my_app_GL = app.NewWithID("com.edw590.visor_c")
+		my_app_GL.SetIcon(Logo.LogoBlackGmail)
+		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
+
+		processNotifications()
+
+		// Create the content area with a label to display different screens
+		var content_label *widget.Label = widget.NewLabel("Welcome!")
+		var content_container *fyne.Container = container.NewVBox(content_label)
+
+		// Create the navigation bar
+		var nav_bar *fyne.Container = container.NewVBox(
+			widget.NewButton("Home", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Home()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Dev Mode", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Communicator", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Communicator()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Modules Status", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Calendar", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Calendar()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Global values", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("System State", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.SystemState()}
+				content_container.Refresh()
+			}),
+		)
+
+		// Create a split container to hold the navigation bar and the content
+		var split *container.Split = container.NewHSplit(nav_bar, content_container)
+		split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
+
+		// Set the content of the window
+		my_window_GL.SetContent(split)
+
+		var prev_screen fyne.CanvasObject = nil
+		// Add system tray functionality
+		if desk, ok := my_app_GL.(desktop.App); ok {
+			var icon *fyne.StaticResource = Logo.LogoBlackGmail
+			var menu *fyne.Menu = fyne.NewMenu("Tray",
+				fyne.NewMenuItem("Show", func() {
+					// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
+					// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
+					// fixes whatever the problem is.
+					my_window_GL.Hide()
+					my_window_GL.Show()
+					my_window_GL.RequestFocus()
+
+					// Restore the previous screen state
+					Screens.Current_screen_GL = prev_screen
 				}),
-				widget.NewButton("Dev Mode", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
-					content_container.Refresh()
-				}),
-				widget.NewButton("Communicator", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.Communicator()}
-					content_container.Refresh()
-				}),
-				widget.NewButton("Modules Status", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
-					content_container.Refresh()
-				}),
-				widget.NewButton("Calendar", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.Calendar()}
-					content_container.Refresh()
-				}),
-				widget.NewButton("Global values", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues()}
-					content_container.Refresh()
-				}),
-				widget.NewButton("System State", func() {
-					content_container.Objects = []fyne.CanvasObject{Screens.SystemState()}
-					content_container.Refresh()
+				fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
+					Utils.CloseCommsChannels()
+					Utils.SignalModulesStopMODULES(modules)
+
+					my_app_GL.Quit()
 				}),
 			)
-
-			// Create a split container to hold the navigation bar and the content
-			var split *container.Split = container.NewHSplit(nav_bar, content_container)
-			split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
-
-			// Set the content of the window
-			my_window_GL.SetContent(split)
-
-			var prev_screen fyne.CanvasObject = nil
-			// Add system tray functionality
-			if desk, ok := my_app_GL.(desktop.App); ok {
-				var icon *fyne.StaticResource = Logo.LogoBlackGmail
-				var menu *fyne.Menu = fyne.NewMenu("Tray",
-					fyne.NewMenuItem("Show", func() {
-						// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
-						// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
-						// fixes whatever the problem is.
-						my_window_GL.Hide()
-						my_window_GL.Show()
-						my_window_GL.RequestFocus()
-
-						// Restore the previous screen state
-						Screens.Current_screen_GL = prev_screen
-					}),
-					fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
-						Utils.CloseCommsChannels()
-						Utils.SignalModulesStopMODULES(modules)
-
-						my_app_GL.Quit()
-					}),
-				)
-				desk.SetSystemTrayMenu(menu)
-				desk.SetSystemTrayIcon(icon)
-			}
-
-			// Minimize to tray on close
-			my_window_GL.SetCloseIntercept(func() {
-				// Store the previous screen before hiding
-				prev_screen = Screens.Current_screen_GL
-				Screens.Current_screen_GL = nil
-				my_window_GL.Hide()
-
-				// Create and send one-time notification
-				notificationTitle := "V.I.S.O.R. Minimized"
-				notificationText := "V.I.S.O.R. is still running in the background. To quit, please use the 'Quit (USE THIS ONE)' option from the system tray menu."
-				notification := fyne.NewNotification(notificationTitle, notificationText)
-				my_app_GL.SendNotification(notification)
-			})
-
-			go func() {
-				for {
-					if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
-						showWindow()
-						UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
-					}
-
-					time.Sleep(1 * time.Second)
-				}
-			}()
-
-			// Show and run the application
-			my_window_GL.Resize(fyne.NewSize(640, 480))
-			my_window_GL.ShowAndRun()
+			desk.SetSystemTrayMenu(menu)
+			desk.SetSystemTrayIcon(icon)
 		}
+
+		// Minimize to tray on close
+		my_window_GL.SetCloseIntercept(func() {
+			// Store the previous screen before hiding
+			prev_screen = Screens.Current_screen_GL
+			Screens.Current_screen_GL = nil
+			my_window_GL.Hide()
+
+			// Create and send one-time notification
+			notificationTitle := "V.I.S.O.R. Minimized"
+			notificationText := "V.I.S.O.R. is still running in the background. To quit, please use the 'Quit (USE THIS ONE)' option from the system tray menu."
+			notification := fyne.NewNotification(notificationTitle, notificationText)
+			my_app_GL.SendNotification(notification)
+		})
+
+		go func() {
+			for {
+				if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
+					showWindow()
+					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
+				}
+
+				time.Sleep(1 * time.Second)
+			}
+		}()
+
+		// Show and run the application
+		my_window_GL.Resize(fyne.NewSize(640, 480))
+		my_window_GL.ShowAndRun()
+	}
 }
 
 /*
