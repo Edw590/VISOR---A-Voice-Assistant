@@ -22,36 +22,8 @@
 package TEHelper
 
 import (
-	"Utils"
 	"Utils/ModsFileInfo"
 )
-
-/*
-getTasksList returns a list of all reminders.
-
-This function will BLOCK if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
-
------------------------------------------------------------
-
-– Returns:
-  - a list of all reminders
-*/
-func getTasksList() *[]ModsFileInfo.Task {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|false|tasks.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
-	if comms_map == nil {
-		return nil
-	}
-
-	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
-
-	var tasks []ModsFileInfo.Task
-	if err := Utils.FromJsonGENERAL(file_contents, &tasks); err != nil {
-		return nil
-	}
-
-	return &tasks
-}
 
 /*
 GetIdsList returns a list of all reminders' IDs.

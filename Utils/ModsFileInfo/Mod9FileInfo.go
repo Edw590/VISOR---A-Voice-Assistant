@@ -25,6 +25,12 @@ package ModsFileInfo
 type Mod9GenInfo struct {
 	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
 	Tasks_info map[string]int64
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// Mod9UserInfo is the format of the custom information file about this specific module.
+type Mod9UserInfo struct {
 	// Tasks is the list of all tasks
 	Tasks []Task
 }

@@ -57,6 +57,7 @@ type UserSettings struct {
 	MOD_6  ModsFileInfo.Mod6UserInfo
 	MOD_7  ModsFileInfo.Mod7UserInfo
 	MOD_8  ModsFileInfo.Mod8UserInfo
+	MOD_9  ModsFileInfo.Mod9UserInfo
 	MOD_12 ModsFileInfo.Mod12UserInfo
 }
 

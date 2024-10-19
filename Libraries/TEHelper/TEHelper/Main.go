@@ -25,15 +25,9 @@ import (
 	"UserLocator"
 	"Utils"
 	"Utils/ModsFileInfo"
-	"bytes"
 	"strings"
 	"time"
 )
-
-const _GET_TASKS_EACH_S int64 = 1 * 60
-var last_get_tasks_when_s_GL int64 = 0
-
-var last_crc16_GL []byte = nil
 
 var tasks_GL []ModsFileInfo.Task
 var user_location_GL ModsFileInfo.UserLocation
@@ -59,11 +53,7 @@ This function will block until a Task is due. When that happens, the Task is ret
  */
 func CheckDueTasks() *ModsFileInfo.Task {
 	for {
-		if time.Now().Unix() >= last_get_tasks_when_s_GL+ _GET_TASKS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
-			UpdateLocalTasks()
-
-			last_get_tasks_when_s_GL = time.Now().Unix()
-		}
+		tasks_GL = Utils.User_settings_GL.MOD_9.Tasks
 
 		// Location trigger - if the user location changed, check if any task is triggered
 		var curr_last_known_user_loc string = user_location_GL.Curr_location
@@ -157,49 +147,6 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			return nil
 		}
 	}
-}
-
-func LoadLocalTasks(json string) {
-	var p_tasks []ModsFileInfo.Task
-	if err := Utils.FromJsonGENERAL([]byte(json), &p_tasks); err != nil {
-		return
-	}
-
-	tasks_GL = p_tasks
-}
-
-/*
-UpdateLocalTasks updates the local list of tasks.
-
-This function will BLOCK if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
-
------------------------------------------------------------
-
-– Returns:
-  - a JSON string with all the tasks or an empty string if there was no change in the tasks since the last call
-*/
-func UpdateLocalTasks() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_TEHelper, []byte("File|true|tasks.json"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_TEHelper]
-	if comms_map == nil {
-		return ""
-	}
-
-	var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-	if !bytes.Equal(new_crc16, last_crc16_GL) {
-		last_crc16_GL = new_crc16
-
-		var p_tasks *[]ModsFileInfo.Task = getTasksList()
-		if p_tasks == nil {
-			return ""
-		}
-
-		tasks_GL = *p_tasks
-
-		return *Utils.ToJsonGENERAL(tasks_GL)
-	}
-
-	return ""
 }
 
 /*

@@ -43,8 +43,6 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_9
 
-		//TEHelper.LoadLocalTasks()
-
 		go func() {
 			for {
 				var task *ModsFileInfo.Task = TEHelper.CheckDueTasks()
