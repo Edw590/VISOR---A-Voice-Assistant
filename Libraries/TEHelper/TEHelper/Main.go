@@ -53,7 +53,7 @@ This function will block until a Task is due. When that happens, the Task is ret
  */
 func CheckDueTasks() *ModsFileInfo.Task {
 	for {
-		tasks_GL = Utils.User_settings_GL.MOD_9.Tasks
+		tasks_GL = Utils.User_settings_GL.TasksExecutor.Tasks
 
 		// Location trigger - if the user location changed, check if any task is triggered
 		var curr_last_known_user_loc string = user_location_GL.Curr_location

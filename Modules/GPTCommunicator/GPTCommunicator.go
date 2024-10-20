@@ -69,7 +69,7 @@ func init() {realMain =
 		// Initialize module information and state
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
-		modUserInfo_GL = &Utils.User_settings_GL.MOD_7
+		modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
 		// Set initial module state
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING

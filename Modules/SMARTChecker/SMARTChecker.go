@@ -50,7 +50,7 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_2
-		modUserInfo_GL = &Utils.User_settings_GL.MOD_2
+		modUserInfo_GL = &Utils.User_settings_GL.SMARTChecker
 
 		if !Utils.RunningAsAdminPROCESSES() {
 			panic(errors.New("this program must be run as administrator/root"))

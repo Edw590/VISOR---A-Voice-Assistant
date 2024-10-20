@@ -51,14 +51,14 @@ type DeviceSettings struct {
 }
 
 type UserSettings struct {
-	PersonalConsts _PersonalConsts
-	MOD_2  ModsFileInfo.Mod2UserInfo
-	MOD_4  ModsFileInfo.Mod4UserInfo
-	MOD_6  ModsFileInfo.Mod6UserInfo
-	MOD_7  ModsFileInfo.Mod7UserInfo
-	MOD_8  ModsFileInfo.Mod8UserInfo
-	MOD_9  ModsFileInfo.Mod9UserInfo
-	MOD_12 ModsFileInfo.Mod12UserInfo
+	PersonalConsts  _PersonalConsts
+	SMARTChecker    ModsFileInfo.Mod2UserInfo
+	RSSFeedNotifier ModsFileInfo.Mod4UserInfo
+	OnlineInfoChk   ModsFileInfo.Mod6UserInfo
+	GPTCommunicator ModsFileInfo.Mod7UserInfo
+	WebsiteBackend  ModsFileInfo.Mod8UserInfo
+	TasksExecutor   ModsFileInfo.Mod9UserInfo
+	UserLocator     ModsFileInfo.Mod12UserInfo
 }
 
 type GenSettings struct {

@@ -92,7 +92,7 @@ func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modUserInfo_GL = &Utils.User_settings_GL.MOD_4
+		modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
 
 		for {
 
