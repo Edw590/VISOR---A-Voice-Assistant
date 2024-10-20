@@ -204,9 +204,9 @@ func init() {realMain =
 			my_window_GL.Hide()
 
 			// Create and send one-time notification
-			notificationTitle := "V.I.S.O.R. minimized"
-			notificationText := "I'm still running in the background. To quit, use the system tray menu."
-			notification := fyne.NewNotification(notificationTitle, notificationText)
+			var notification_title string = "V.I.S.O.R. minimized"
+			var notification_text string = "I'm still running in the background. To quit, use the system tray menu."
+			notification := fyne.NewNotification(notification_title, notification_text)
 			my_app_GL.SendNotification(notification)
 		})
 
