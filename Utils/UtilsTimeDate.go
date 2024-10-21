@@ -25,9 +25,9 @@ import (
 	"time"
 )
 
-const TIME_FORMAT string = "15:04:05"
-const DATE_FORMAT string = "2006-01-02"
-const DATE_TIME_FORMAT string = DATE_FORMAT + " -- " + TIME_FORMAT + " (MST)"
+const TIME_FORMAT string = "15:04:05 (MST)"
+const DATE_FORMAT string = "Monday 2006-01-02"
+const DATE_TIME_FORMAT string = DATE_FORMAT + " -- " + TIME_FORMAT
 
 /*
 GetDateTimeStrTIMEDATE gets the current time and date in the format DATE_TIME_FORMAT.
@@ -87,10 +87,10 @@ getTimeDateInFormatTIMEDATE gets the time and/or date in the given format.
   - the time and/or date in the given format
 */
 func getTimeDateInFormatTIMEDATE(millis int64, format string) string {
-	if millis != -1 {
-		return time.Unix(0, millis*1e6).Format(format)
-	} else {
+	if millis == -1 {
 		return time.Now().Format(format)
+	} else {
+		return time.Unix(0, millis*1e6).Format(format)
 	}
 }
 
