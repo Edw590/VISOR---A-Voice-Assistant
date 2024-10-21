@@ -81,6 +81,7 @@ func init() {realMain =
 		var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
 		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
 		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
+		visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
 
 		// Initialize memory string
 		var to_memorize string = strings.Join(modGenInfo_GL.Memories, ". ")
@@ -389,7 +390,7 @@ func init() {realMain =
 	}
 }
 
-func startLlama(instanceType string, ctx_size int, threads int, temp float32, model_loc string, memories string,
+func startLlama(instance_type string, ctx_size int, threads int, temp float32, model_loc string, memories string,
 				visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
 	cmd := exec.Command(Utils.GetShell("", ""))
 	stdin, _ := cmd.StdinPipe()
@@ -397,10 +398,16 @@ func startLlama(instanceType string, ctx_size int, threads int, temp float32, mo
 	stderr, _ := cmd.StderrPipe()
 	err := cmd.Start()
 	if err != nil {
-		log.Printf("Error starting %s LLaMA instance: %v", instanceType, err)
+		log.Printf("Error starting %s LLaMA instance: %v", instance_type, err)
 
 		return nil, nil, nil
 	}
+
+	var system_info string = modUserInfo_GL.System_info
+	system_info = strings.Replace(system_info, "3234_WEEKDAY", time.Now().Weekday().String(), -1)
+	system_info = strings.Replace(system_info, "3234_DAY", strconv.Itoa(time.Now().Day()), -1)
+	system_info = strings.Replace(system_info, "3234_MONTH", time.Now().Month().String(), -1)
+	system_info = strings.Replace(system_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1)
 
 	// Configure the LLM model (Llama3/3.1/3.2's prompt)
 	writer := bufio.NewWriter(stdin)
@@ -412,20 +419,19 @@ func startLlama(instanceType string, ctx_size int, threads int, temp float32, mo
 		"--temp " + strconv.FormatFloat(float64(temp), 'f', -1, 32) + " " +
 		"--keep -1 " +
 		"--mlock " +
-		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
-		strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " | " +
+		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" + system_info + " | " +
 		"Memories stored about the user: " + memories + ". | About you: " + visor_intro + "<|eot_id|>\" " +
 		"--reverse-prompt \"<|eot_id|>\" " +
 		"--in-prefix \"" + _END_TOKENS + "\" " +
 		"--in-suffix \"" + _START_TOKENS + "\" " +
 		"\n")
 	if err != nil {
-		log.Printf("Error writing to %s LLaMA instance stdin: %v", instanceType, err)
+		log.Printf("Error writing to %s LLaMA instance stdin: %v", instance_type, err)
 		return nil, nil, nil
 	}
 	err = writer.Flush()
 	if err != nil {
-		log.Printf("Error flushing %s LLaMA instance stdin: %v", instanceType, err)
+		log.Printf("Error flushing %s LLaMA instance stdin: %v", instance_type, err)
 		return nil, nil, nil
 	}
 

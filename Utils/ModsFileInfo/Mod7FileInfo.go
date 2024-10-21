@@ -44,4 +44,6 @@ type Mod7UserInfo struct {
 	Model_dumb_loc string
 	// System_info is the LLM's system information, like the cutting knowledge date and today's date
 	System_info string
+	// User_nickname is the user nickname to be used by the LLM
+	User_nickname string
 }
