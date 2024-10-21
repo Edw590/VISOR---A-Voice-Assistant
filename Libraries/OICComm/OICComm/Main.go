@@ -22,9 +22,8 @@
 package OICComm
 
 import (
-	"OnlineInfoChk/OICNews"
-	"OnlineInfoChk/OICWeather"
 	"Utils"
+	"Utils/ModsFileInfo"
 )
 
 /*
@@ -41,7 +40,7 @@ This function will BLOCK FOREVER if there's no Internet connection! Check first 
   - the news separated by " ||| " and each news location separated by "\n"
  */
 func GetNews() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("File|false|news.json"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("JSON|true|News"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_OICComm]
 	if comms_map == nil {
 		return ""
@@ -49,7 +48,7 @@ func GetNews() string {
 
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	var news_list []OICNews.News
+	var news_list []ModsFileInfo.News
 	if err := Utils.FromJsonGENERAL(file_contents, &news_list); err != nil {
 		return ""
 	}
@@ -90,7 +89,7 @@ Weather data in order:
   - the weather separated by " ||| " and each weather location separated by "\n"
  */
 func GetWeather() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("File|false|weather.json"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("JSON|true|Weather"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_OICComm]
 	if comms_map == nil {
 		return ""
@@ -98,7 +97,7 @@ func GetWeather() string {
 
 	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	var weather []OICWeather.Weather
+	var weather []ModsFileInfo.Weather
 	if err := Utils.FromJsonGENERAL(file_contents, &weather); err != nil {
 		return ""
 	}

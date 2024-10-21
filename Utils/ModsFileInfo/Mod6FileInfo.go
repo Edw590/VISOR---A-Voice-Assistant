@@ -21,12 +21,46 @@
 
 package ModsFileInfo
 
-import "OnlineInfoChk/OICNews"
+// Mod6GenInfo is the format of the custom generated information about this specific module.
+type Mod6GenInfo struct {
+	// News is the news information
+	News []News
+	// Weather is the weather information
+	Weather []Weather
+}
+
+// News is the format of the news information.
+type News struct {
+	Location string
+	News []string
+}
+
+// Weather is the format of the weather information.
+type Weather struct {
+	Location string
+	Temperature string
+	Max_temp string
+	Min_temp string
+	Precipitation string
+	Humidity string
+	Wind   string
+	Status string
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 // Mod6UserInfo is the format of the custom information file about this specific module.
 type Mod6UserInfo struct {
 	// Temp_locs is the locations to get the weather from
 	Temp_locs   []string
 	// News_locs is the locations to get the news from
-	News_locs []OICNews.NewsLocs
+	News_locs []NewsLocs
+}
+
+// NewsLocs is the information about a news location.
+type NewsLocs struct {
+	// News_str is the news search string
+	News_str string
+	// Location is the location of the news
+	Location string
 }

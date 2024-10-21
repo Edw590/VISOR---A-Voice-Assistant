@@ -260,11 +260,11 @@ func randomizeData(data []byte) []byte {
 	var num_added_bytes int = 0
 	for i := 0; i < randomized_data_length; i++ {
 		if i % 16 == 0 {
-			rand.Read(b)
+			_, _ = rand.Read(b)
 			random_index = i + int(b[0]) % int(math.Min(float64(randomized_data_length-i), 16))
 		}
 		if i == random_index {
-			rand.Read(b)
+			_, _ = rand.Read(b)
 			randomized_data[i] = b[0]%128 + 128
 			num_added_bytes++
 		} else {
@@ -327,7 +327,7 @@ with AES.
  */
 func getIv() ([]byte, error) {
 	iv := make([]byte, _IV_LENGTH_BYTES)
-	rand.Read(iv)
+	_, _ = rand.Read(iv)
 
 	return iv, nil
 }

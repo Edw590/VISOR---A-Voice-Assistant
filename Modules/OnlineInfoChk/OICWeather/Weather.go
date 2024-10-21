@@ -22,22 +22,12 @@
 package OICWeather
 
 import (
+	"Utils/ModsFileInfo"
 	"github.com/tebeka/selenium"
 )
 
-type Weather struct {
-	Location string
-	Temperature string
-	Max_temp string
-	Min_temp string
-	Precipitation string
-	Humidity string
-	Wind   string
-	Status string
-}
-
 /*
-UpdateWeather updates the weather for the given locations to a file called "weather.json".
+UpdateWeather updates the weather for the given locations.
 
 -----------------------------------------------------------
 
@@ -48,8 +38,8 @@ UpdateWeather updates the weather for the given locations to a file called "weat
 – Returns:
   - the error if any
 */
-func UpdateWeather(driver selenium.WebDriver, locations []string) []Weather {
-	var weather []Weather = nil
+func UpdateWeather(driver selenium.WebDriver, locations []string) []ModsFileInfo.Weather {
+	var weather []ModsFileInfo.Weather = nil
 	for _, location := range locations {
 		if location == "" {
 			continue
@@ -70,7 +60,7 @@ func UpdateWeather(driver selenium.WebDriver, locations []string) []Weather {
 		//log.Println("")
 
 		// write the info to an json struct
-		weather = append(weather, Weather{
+		weather = append(weather, ModsFileInfo.Weather{
 			Location:      location,
 			Temperature:   temperature,
 			Max_temp:      max_temp,

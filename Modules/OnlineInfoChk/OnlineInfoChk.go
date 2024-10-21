@@ -105,12 +105,14 @@ const _TIME_SLEEP_S int = 15*60
 var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod6GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod6UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_6
 		modUserInfo_GL = &Utils.User_settings_GL.OnlineInfoChk
 
 		for {
@@ -147,16 +149,8 @@ func init() {realMain =
 
 			_ = bypassGoogleCookies(driver)
 
-			var weather []OICWeather.Weather = OICWeather.UpdateWeather(driver, modUserInfo_GL.Temp_locs)
-			if err = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "weather.json").
-					WriteTextFile(*Utils.ToJsonGENERAL(weather), false); err != nil {
-				panic(err)
-			}
-			var news []OICNews.News = OICNews.UpdateNews(driver, modUserInfo_GL.News_locs)
-			if err = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "news.json").
-					WriteTextFile(*Utils.ToJsonGENERAL(news), false); err != nil {
-				panic(err)
-			}
+			modGenInfo_GL.Weather = OICWeather.UpdateWeather(driver, modUserInfo_GL.Temp_locs)
+			modGenInfo_GL.News = OICNews.UpdateNews(driver, modUserInfo_GL.News_locs)
 
 			_ = driver.Quit()
 			_ = service.Stop()
