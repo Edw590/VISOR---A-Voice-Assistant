@@ -21,6 +21,20 @@
 
 package ModsFileInfo
 
+// Mod4GenInfo is the format of the custom generated information about this specific module.
+type Mod4GenInfo struct {
+	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
+	Notified_news map[int][]NewsInfo
+}
+
+// NewsInfo is the information about news.
+type NewsInfo struct {
+	Url   string
+	Title string
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 // Mod4UserInfo is the format of the custom information file about this specific module.
 type Mod4UserInfo struct {
 	// Mails_info is the information about the mails to send the feeds info to

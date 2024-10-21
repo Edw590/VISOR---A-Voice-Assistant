@@ -24,7 +24,6 @@ package RSSFeedNotifier
 import (
 	"Utils/ModsFileInfo"
 	"context"
-	"strconv"
 	"strings"
 	"time"
 
@@ -70,12 +69,6 @@ type _FeedType struct {
 	type_3 string
 }
 
-// _NewsInfo is the information about news.
-type _NewsInfo struct {
-	Url   string
-	Title string
-}
-
 // _MAX_URLS_STORED is the maximum number of URLs stored in the file. This is to avoid having a file with too many URLs.
 // 100 because it must be above the number of entries in all the feeds, and 100 is a big number (30 for StackExchange,
 // 15 for YT - 100 seems perfect).
@@ -86,20 +79,26 @@ const _TIME_SLEEP_S int = 2*60
 var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod4GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod4UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_4
 		modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
+
+		if modGenInfo_GL.Notified_news == nil {
+			modGenInfo_GL.Notified_news = make(map[int][]ModsFileInfo.NewsInfo)
+		}
 
 		for {
 
 			for _, feedInfo := range modUserInfo_GL.Feeds_info {
-				// if feedInfo.Feed_num != 8 {
+				//if feedInfo.Feed_num != 8 {
 				//	continue
-				// }
+				//}
 				//log.Println("__________________________BEGINNING__________________________")
 
 				var feedType _FeedType = getFeedType(feedInfo.Feed_type)
@@ -128,16 +127,9 @@ func init() {realMain =
 				//log.Println("feedType.type_2: " + feedType.type_2)
 				//log.Println("feedType.type_3: " + feedType.type_3)
 
-				var notif_news_file_path Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(true, "notified_news",
-					strconv.Itoa(feedInfo.Feed_num)+".json")
-				var newsInfo_list []_NewsInfo = nil
-				if notif_news_file_path.Exists() {
-					var notified_news_json []byte = notif_news_file_path.ReadFile()
-					Utils.FromJsonGENERAL(notified_news_json, &newsInfo_list)
-				}
-
 				var new_feed bool = false
-				if len(newsInfo_list) == 0 {
+				newsInfo_list, ok := modGenInfo_GL.Notified_news[feedInfo.Feed_num]
+				if !ok {
 					new_feed = true
 				}
 
@@ -149,7 +141,6 @@ func init() {realMain =
 					continue
 				}
 
-				var notified_news_list_modified bool = false
 				for item_num, item := range parsed_feed.Items {
 
 					var check_skipping_later bool = true
@@ -167,7 +158,7 @@ func init() {realMain =
 					}
 
 					var email_info Utils.EmailInfo = Utils.EmailInfo{}
-					var newsInfo _NewsInfo = _NewsInfo{}
+					var newsInfo ModsFileInfo.NewsInfo
 
 					switch feedType.type_1 {
 						case _TYPE_1_YOUTUBE: {
@@ -206,16 +197,15 @@ func init() {realMain =
 					}
 
 					if !error_notifying {
+						//log.Println("Adding news to list...")
 						newsInfo_list = append(newsInfo_list, newsInfo)
 						if len(newsInfo_list) > _MAX_URLS_STORED {
 							newsInfo_list = newsInfo_list[1:]
 						}
-						notified_news_list_modified = true
 					}
 				}
-				if notified_news_list_modified {
-					_ = notif_news_file_path.WriteTextFile(*Utils.ToJsonGENERAL(newsInfo_list), false)
-				}
+
+				modGenInfo_GL.Notified_news[feedInfo.Feed_num] = newsInfo_list
 
 				//log.Println("__________________________ENDING__________________________")
 			}
@@ -268,7 +258,7 @@ isNewNews checks if the news is new.
 – Returns:
   - true if the news is new, false otherwise
  */
-func isNewNews(newsInfo_list []_NewsInfo, title string, url string) bool {
+func isNewNews(newsInfo_list []ModsFileInfo.NewsInfo, title string, url string) bool {
 	//log.Println("Checking if news is new: " + title)
 	for _, newsInfo := range newsInfo_list {
 		if  newsInfo.Url == url && newsInfo.Title == title {
