@@ -91,17 +91,6 @@ func init() {realMain =
 				time.Sleep(1 * time.Second)
 			}
 		}()
-		go func() {
-			for {
-				if *module_stop {
-					Utils.StopCommunicatorSERVER()
-
-					return
-				}
-
-				time.Sleep(1 * time.Second)
-			}
-		}()
 
 		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
@@ -212,9 +201,10 @@ func init() {realMain =
 		go func() {
 			for {
 				if *module_stop {
+					Utils.StopCommunicatorSERVER()
 					quitApp(modules)
 
-					break
+					return
 				}
 
 				if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
