@@ -21,9 +21,9 @@
 
 package Utils
 
-const NOTIFS_REL_FOLDER string = "notifs"
-
 func QueueNotificationNOTIFS(title string, text string) {
-	var file_name string = title + "-" + RandStringGENERAL(20) + ".txt"
-	_ = GetUserDataDirMODULES(NUM_MOD_VISOR).Add2(false, NOTIFS_REL_FOLDER, file_name).WriteTextFile(text, false)
+	ModsCommsChannels_GL[NUM_MOD_VISOR] <- map[string]any{
+		// Send a message to LIB_2 saying the GPT just started writing
+		"Notification": []string{title, text},
+	}
 }

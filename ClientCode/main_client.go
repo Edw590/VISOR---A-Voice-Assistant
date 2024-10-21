@@ -39,7 +39,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"time"
 )
 
@@ -239,20 +238,16 @@ processNotifications processes in a different thread the notifications queued in
 func processNotifications() {
 	go func() {
 		for {
-			var file_list []Utils.FileInfo = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_VISOR).
-				Add2(true, Utils.NOTIFS_REL_FOLDER).GetFileList()
-			for _, file := range file_list {
-				// Display the notification
-				notification := fyne.NewNotification(strings.Split(file.Name, "-")[0], *file.GPath.ReadTextFile())
-				my_app_GL.SendNotification(notification)
-
-				// Remove the file
-				_ = file.GPath.Remove()
-
-				time.Sleep(5 * time.Second)
+			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_VISOR]
+			if comms_map == nil {
+				return
 			}
 
-			time.Sleep(1 * time.Second)
+			var notif_info []string = comms_map["Notification"].([]string)
+			notification := fyne.NewNotification(notif_info[0], notif_info[1])
+			my_app_GL.SendNotification(notification)
+
+			time.Sleep(5 * time.Second)
 		}
 	}()
 }
