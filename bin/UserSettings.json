@@ -92,10 +92,7 @@
 		"Model_dumb_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
 		// LLM system information, like the cutting knowledge date and today's date. "3234_YEAR" will be replaced by the
 		// current year.
-		"System_info": "Cutting Knowledge Date: December 2023. Today Date: 24 July 3234_YEAR.",
-		// LLM system configuration string (what's sent to it when it initializes) - introduce yourself as much as you can, your tastes, your life, everything.
-		// If the server will run on Windows, don't input any non-ASCII characters (like accents)
-		"User_intro": "I'm Edward. I was born in 1999-11-22. Address me as Sir or nothing at all."
+		"System_info": "Cutting Knowledge Date: December 2023. Today Date: 24 July 3234_YEAR."
 	},
 	"WebsiteBackend": {
 		// Path to the SSL certificate cert file for the HTTPS server

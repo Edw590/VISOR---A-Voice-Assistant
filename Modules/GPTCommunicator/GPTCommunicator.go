@@ -98,7 +98,7 @@ func init() {realMain =
 
 		// Start LLM instance (smart and dumb)
 		writer_smart, stdout_smart, stderr_smart := startLlama("Smart", smart_ctx_size, 4, 0.8,
-			modUserInfo_GL.Model_smart_loc, modUserInfo_GL.User_intro, to_memorize, visor_intro)
+			modUserInfo_GL.Model_smart_loc, to_memorize, visor_intro)
 		if writer_smart == nil {
 			log.Println("Error starting the Llama model (smart)")
 
@@ -110,7 +110,7 @@ func init() {realMain =
 		reader_smart := bufio.NewReader(stdout_smart)
 
 		writer_dumb, stdout_dumb, stderr_dumb := startLlama("Dumb", dumb_ctx_size, 4, 1.5,
-			modUserInfo_GL.Model_dumb_loc, "", "", "You're a voice assistant")
+			modUserInfo_GL.Model_dumb_loc, "", "You're a voice assistant")
 		if writer_dumb == nil {
 			log.Println("Error starting the Llama model (dumb)")
 
@@ -389,8 +389,8 @@ func init() {realMain =
 	}
 }
 
-func startLlama(instanceType string, ctx_size int, threads int, temp float32, model_loc string, user_intro string, memories string,
-	visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
+func startLlama(instanceType string, ctx_size int, threads int, temp float32, model_loc string, memories string,
+				visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
 	cmd := exec.Command(Utils.GetShell("", ""))
 	stdin, _ := cmd.StdinPipe()
 	stdout, _ := cmd.StdoutPipe()
@@ -413,9 +413,8 @@ func startLlama(instanceType string, ctx_size int, threads int, temp float32, mo
 		"--keep -1 " +
 		"--mlock " +
 		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" +
-		strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " " +
-		"User introduction: " + user_intro + ". | Memories stored about the user: " + memories + ". | About you: " +
-		visor_intro + "<|eot_id|>\" " +
+		strings.Replace(modUserInfo_GL.System_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1) + " | " +
+		"Memories stored about the user: " + memories + ". | About you: " + visor_intro + "<|eot_id|>\" " +
 		"--reverse-prompt \"<|eot_id|>\" " +
 		"--in-prefix \"" + _END_TOKENS + "\" " +
 		"--in-suffix \"" + _START_TOKENS + "\" " +
