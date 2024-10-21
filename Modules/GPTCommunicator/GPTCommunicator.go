@@ -276,10 +276,9 @@ func init() {realMain =
 		memorizeThings := func(input_text string) {
 			device_id = Utils.Device_settings_GL.Device_ID
 			memorizing = true
-			var text string = "Write in BULLET points (no + or anything. ONLY *) a list of key things to know about " +
-				"the USER from the following input. If there's nothing important, write ONLY \"* [3234_NONE]\". " +
-				"For example, for \"I like bags\" you'd write something like \"* The user likes bags\". But you " +
-				"IGNORE USELESS INFORMATION, like the user saying they're bored (you IGNORE that). Input: \"" +
+			var text string = "Write in BULLET points (no + or anything. ONLY *) a list of important things to know " +
+				"about the USER from the following input. If there's nothing important, write ONLY \"* [3234_NONE]\". " +
+				"For example, for \"I like bags\" you'd write something like \"* The user likes bags\". Input: \"" +
 				input_text + "\"."
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer_dumb.WriteString(text + "\n")
