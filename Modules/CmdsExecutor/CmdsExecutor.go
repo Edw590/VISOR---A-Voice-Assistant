@@ -110,7 +110,7 @@ func init() {realMain =
 			log.Println("*****************************")
 
 			if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
-				var speak string = "WARNING! There was a problem processing the commands sir. This needs a fix. The " +
+				var speak string = "WARNING! There was a problem processing the commands Sir. This needs a fix. The " +
 					"error was the following: " + cmds_info_str + ". You said: " + sentence_str
 				MOD_3.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 				log.Println("EXECUTOR - ERR_PROC_CMDS")

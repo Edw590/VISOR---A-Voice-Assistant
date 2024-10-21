@@ -23,6 +23,7 @@ package TEHelper
 
 import (
 	"Utils/ModsFileInfo"
+	"strconv"
 )
 
 /*
@@ -36,7 +37,7 @@ GetIdsList returns a list of all reminders' IDs.
 func GetIdsList() string {
 	var ids string
 	for _, task := range tasks_GL {
-		ids += task.Id + "|"
+		ids += strconv.Itoa(task.Id) + "|"
 	}
 
 	return ids
@@ -53,7 +54,7 @@ GetTaskById returns a reminder by its ID.
 – Returns:
   - the reminder or nil if the reminder was not found
 */
-func GetTaskById(id string) *ModsFileInfo.Task {
+func GetTaskById(id int) *ModsFileInfo.Task {
 	for _, reminder := range tasks_GL {
 		if reminder.Id == id {
 			return &reminder

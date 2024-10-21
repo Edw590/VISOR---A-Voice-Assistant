@@ -96,7 +96,7 @@ func formatCondition(condition string) string {
 	return condition
 }
 
-func checkCondition(task ModsFileInfo.Task, conditions_were_true map[string]bool) bool {
+func checkCondition(task ModsFileInfo.Task, conditions_were_true map[int]bool) bool {
 	var condition bool = false
 	if task.Device_condition != "" {
 		if ok := conditions_were_true[task.Id]; !ok {

@@ -32,9 +32,9 @@ import (
 var tasks_GL []ModsFileInfo.Task
 var user_location_GL ModsFileInfo.UserLocation
 
-var tasks_info_list_GL map[string]int64 = make(map[string]int64)
+var tasks_info_list_GL map[int]int64 = make(map[int]int64)
 
-var conditions_were_true_GL map[string]bool = make(map[string]bool)
+var conditions_were_true_GL map[int]bool = make(map[int]bool)
 
 var prev_curr_last_known_user_loc_GL string = user_location_GL.Curr_location
 var prev_prev_last_known_user_loc_GL string = user_location_GL.Prev_location

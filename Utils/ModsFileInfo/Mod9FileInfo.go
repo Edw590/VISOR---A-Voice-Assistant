@@ -38,7 +38,7 @@ type Mod9UserInfo struct {
 // Task is the format of a task
 type Task struct {
 	// Id is the task ID
-	Id 		    string
+	Id 		    int
 	// Device_IDs are the devices the task is set for, separated by "|"
 	Device_IDs  string
 	// Message is the task message
