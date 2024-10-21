@@ -313,72 +313,71 @@ func init() {realMain =
 			_ = stderr_dumb.Close()
 		}
 
-		// Process the files to input to the LLM model
+		// Process the text to input to the LLM model
 		for {
-			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
-			var file_list []Utils.FileInfo = to_process_dir.GetFileList()
-			for len(file_list) > 0 {
-				file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
-				var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
+			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_GPTCommunicator]
+			if comms_map == nil {
+				return
+			}
+			map_value, ok := comms_map["ToProcess"]
+			if !ok {
+				continue
+			}
 
-				var to_process string = *file_path.ReadTextFile()
-				if to_process != "" {
-					// It comes like: "[device_id|[true or false]]text"
-					var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
-					device_id = params_split[0]
-					var use_smart bool = params_split[1] == "true"
-					var text string = to_process[strings.Index(to_process, "]")+1:]
+			var to_process string = map_value.(string)
+			if to_process != "" {
+				// It comes like: "[device_id|[true or false]]text"
+				var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
+				device_id = params_split[0]
+				var use_smart bool = params_split[1] == "true"
+				var text string = to_process[strings.Index(to_process, "]")+1:]
 
-					if use_smart && strings.HasPrefix(text, "/") {
-						// Control commands begin with a slash
-						if text == "/clear" {
-							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
-							shut_down = true
-						} else if text == "/mem" {
-							// Memorize and clear the context
+				if use_smart && strings.HasPrefix(text, "/") {
+					// Control commands begin with a slash
+					if text == "/clear" {
+						// Clear the context of the LLM model by stopping the module (the Manager will restart it)
+						shut_down = true
+					} else if text == "/mem" {
+						// Memorize and clear the context
 
-							// Summarize the list of memories too (sometimes VISOR may memorize useless sentences, so
-							// this will cut them out)
-							var memories_str string = ""
-							if len(modGenInfo_GL.Memories) > 0 {
-								memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
-							}
-							if memories_str != "" || user_text != "" {
-								memorizeThings(memories_str + ". " + user_text)
-							}
-
-							shut_down = true
-						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
-							// Ask Wolfram Alpha the question
-							var question string = text[len(ASK_WOLFRAM_ALPHA):]
-							result, direct_result := MOD_6.RetrieveWolframAlpha(question)
-
-							if direct_result {
-								_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+"The answer is: "+result+
-									". "+getEndString(), true)
-							} else {
-								sendToGPT("Summarize in sentences the following: "+result, false)
-							}
-						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
-							// Search for the Wikipedia page title
-							var query string = text[len(SEARCH_WIKIPEDIA):]
-
-							_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+MOD_6.RetrieveWikipedia(query)+
-								getEndString(), true)
+						// Summarize the list of memories too (sometimes VISOR may memorize useless sentences, so
+						// this will cut them out)
+						var memories_str string = ""
+						if len(modGenInfo_GL.Memories) > 0 {
+							memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
 						}
-					} else {
-						sendToGPT(text, use_smart)
+						if memories_str != "" || user_text != "" {
+							memorizeThings(memories_str + ". " + user_text)
+						}
+
+						shut_down = true
+					} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
+						// Ask Wolfram Alpha the question
+						var question string = text[len(ASK_WOLFRAM_ALPHA):]
+						result, direct_result := MOD_6.RetrieveWolframAlpha(question)
+
+						if direct_result {
+							_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+"The answer is: "+result+
+								". "+getEndString(), true)
+						} else {
+							sendToGPT("Summarize in sentences the following: "+result, false)
+						}
+					} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
+						// Search for the Wikipedia page title
+						var query string = text[len(SEARCH_WIKIPEDIA):]
+
+						_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+MOD_6.RetrieveWikipedia(query)+
+							getEndString(), true)
 					}
+				} else {
+					sendToGPT(text, use_smart)
 				}
+			}
 
-				Utils.DelElemSLICES(&file_list, idx_to_remove)
-				_ = os.Remove(file_path.GPathToStringConversion())
+			if shut_down {
+				shutDown()
 
-				if shut_down {
-					shutDown()
-
-					return
-				}
+				return
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {

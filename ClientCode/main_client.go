@@ -232,8 +232,12 @@ func processNotifications() {
 			if comms_map == nil {
 				return
 			}
+			map_value, ok := comms_map["Notification"]
+			if !ok {
+				continue
+			}
 
-			var notif_info []string = comms_map["Notification"].([]string)
+			var notif_info []string = map_value.([]string)
 			notification := fyne.NewNotification(notif_info[0], notif_info[1])
 			my_app_GL.SendNotification(notification)
 

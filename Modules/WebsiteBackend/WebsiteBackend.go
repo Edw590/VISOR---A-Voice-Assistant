@@ -61,8 +61,12 @@ func init() {realMain =
 				if comms_map == nil {
 					return
 				}
+				map_value, ok := comms_map["Message"]
+				if !ok {
+					continue
+				}
 
-				var message []byte = comms_map["Message"].([]byte)
+				var message []byte = map_value.([]byte)
 				for i := 0; i < MAX_CHANNELS; i++ {
 					if used_channels_GL[i] {
 						channels_GL[i] <- message
@@ -300,8 +304,9 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 
 			if bytes != nil {
-				_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
-					Utils.RandStringGENERAL(10) + ".txt").WriteTextFile(Utils.DecompressString(bytes), false)
+				Utils.ModsCommsChannels_GL[Utils.NUM_MOD_GPTCommunicator] <- map[string]any{
+					"ToProcess": Utils.DecompressString(bytes),
+				}
 			}
 
 			return ret

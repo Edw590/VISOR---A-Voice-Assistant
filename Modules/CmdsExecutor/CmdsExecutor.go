@@ -71,11 +71,13 @@ func init() {realMain =
 
 			var speech_priority int = SpeechQueue.PRIORITY_MEDIUM
 			var sentence_str string = ""
-			if val, ok := comms_map["SentenceInternal"]; ok {
-				sentence_str = val.(string)
-			} else {
+			if map_value, ok := comms_map["SentenceInternal"]; ok {
+				sentence_str = map_value.(string)
+			} else if map_value, ok = comms_map["Sentence"]; ok {
 				speech_priority = SpeechQueue.PRIORITY_USER_ACTION
-				sentence_str = comms_map["Sentence"].(string)
+				sentence_str = map_value.(string)
+			} else {
+				continue
 			}
 			var cmds_info_str = ACD.Main(sentence_str, false, true, last_it + "|" + last_and)
 			log.Println("*****************************")
