@@ -53,13 +53,13 @@ algorithm (eg. "32B4A667AA8F").
 -----------------------------------------------------------
 
 – Params:
-  - byteArray – the bytes to calculate the hash from
+  - data – the bytes to calculate the hash from
 
 – Returns:
   - the hash string
  */
-func GetHashStringOfBytesCRYPTOHASHING(byteArray []byte) string {
-	hash := sha512.Sum512(byteArray)
+func GetHashStringOfBytesCRYPTOHASHING(data []byte) string {
+	hash := sha512.Sum512(data)
 
 	return hex.EncodeToString(hash[:])
 }

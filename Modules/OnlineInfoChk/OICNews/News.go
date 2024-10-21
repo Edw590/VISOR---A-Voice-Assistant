@@ -22,24 +22,12 @@
 package OICNews
 
 import (
+	"Utils/ModsFileInfo"
 	"github.com/tebeka/selenium"
 )
 
-type News struct {
-	Location string
-	News []string
-}
-
-// NewsLocs is the information about a news location.
-type NewsLocs struct {
-	// News_str is the news search string
-	News_str string
-	// Location is the location of the news
-	Location string
-}
-
 /*
-UpdateNews updates the news for the given locations to a file called "news.json".
+UpdateNews updates the news for the given locations.
 
 -----------------------------------------------------------
 
@@ -51,8 +39,8 @@ UpdateNews updates the news for the given locations to a file called "news.json"
 – Returns:
   - the error if any
 */
-func UpdateNews(driver selenium.WebDriver, news_locs []NewsLocs) []News {
-	var news []News = nil
+func UpdateNews(driver selenium.WebDriver, news_locs []ModsFileInfo.NewsLocs) []ModsFileInfo.News {
+	var news []ModsFileInfo.News = nil
 	for _, news_loc := range news_locs {
 		texts, err := findNews(driver, news_loc.News_str)
 		if err != nil {
@@ -65,7 +53,7 @@ func UpdateNews(driver selenium.WebDriver, news_locs []NewsLocs) []News {
 		//log.Println("")
 
 		// write the info to an json struct
-		news = append(news, News{
+		news = append(news, ModsFileInfo.News{
 			Location: news_loc.Location,
 			News:     texts,
 		})

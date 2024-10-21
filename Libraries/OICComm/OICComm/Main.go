@@ -41,7 +41,7 @@ This function will BLOCK FOREVER if there's no Internet connection! Check first 
   - the news separated by " ||| " and each news location separated by "\n"
  */
 func GetNews() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("File|false|news.json"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("JSON|true|News"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_OICComm]
 	if comms_map == nil {
 		return ""
@@ -90,7 +90,7 @@ Weather data in order:
   - the weather separated by " ||| " and each weather location separated by "\n"
  */
 func GetWeather() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("File|false|weather.json"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, []byte("JSON|true|Weather"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_OICComm]
 	if comms_map == nil {
 		return ""
