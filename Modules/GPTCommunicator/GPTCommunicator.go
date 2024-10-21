@@ -289,6 +289,7 @@ func init() {realMain =
 			}
 			memorizing = false
 
+			modGenInfo_GL.Memories = nil
 			var memories_split []string = strings.Split(to_memorize, "\n")
 			for _, memory := range memories_split {
 				if UtilsSWA.StringHasLettersGENERAL(memory) && strings.Contains(memory, "* ") &&
@@ -340,7 +341,6 @@ func init() {realMain =
 							var memories_str string = ""
 							if len(modGenInfo_GL.Memories) > 0 {
 								memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
-								modGenInfo_GL.Memories = nil
 							}
 							if memories_str != "" || user_text != "" {
 								memorizeThings(memories_str + ". " + user_text)
