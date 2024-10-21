@@ -385,12 +385,12 @@ func SendModErrorEmailMODULES(mod_num int, err_str string) error {
 }
 
 /*
-LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled to srvComm_stop_GL.
+LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled to stop.
 
 -----------------------------------------------------------
 
 – Returns:
-  - true if the module should srvComm_stop_GL, false otherwise
+  - true if the module should stop, false otherwise
 */
 func (moduleInfo *ModuleInfo) loopSleep() bool {
 	if moduleInfo.signalledToStop() {
@@ -403,12 +403,12 @@ func (moduleInfo *ModuleInfo) loopSleep() bool {
 }
 
 /*
-signalledToStop checks if the module was signalled to srvComm_stop_GL.
+signalledToStop checks if the module was signalled to stop.
 
 -----------------------------------------------------------
 
 – Returns:
-  - true if the module was signalled to srvComm_stop_GL, false otherwise
+  - true if the module was signalled to stop, false otherwise
 */
 func (moduleInfo *ModuleInfo) signalledToStop() bool {
 	var stop_file_1_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP")
