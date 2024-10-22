@@ -24,17 +24,18 @@ package UtilsSWA
 import "Utils"
 
 /*
-InitPersonalConsts initializes the personal constants.
+InitWebsiteConsts initializes the website constants.
+
+Useful for before the User Settings are downloaded - this sets the constants needed to access the server and download
+the User Settings file.
 
 -----------------------------------------------------------
 
 – Params:
-  - device_id – the device ID
   - website_domain – the domain of VISOR's website
   - website_pw – the password of VISOR's website
  */
-func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
-	Utils.Device_settings_GL.Device_ID = device_id
+func InitWebsiteConsts(website_domain string, website_pw string) {
 	Utils.User_settings_GL.General.Website_domain = website_domain
 	Utils.User_settings_GL.General.Website_pw = website_pw
 }
