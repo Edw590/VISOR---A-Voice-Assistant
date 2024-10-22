@@ -276,10 +276,9 @@ func init() {realMain =
 		memorizeThings := func(input_text string) {
 			device_id = Utils.Device_settings_GL.Device_ID
 			memorizing = true
-			var text string = "Write in BULLET points (no + or anything. ONLY *) a list of important things to know " +
-				"about the USER from the following input. If there's nothing important, write ONLY \"* [3234_NONE]\". " +
-				"For example, for \"I like bags\" you'd write something like \"* The user likes bags\". Input: \"" +
-				input_text + "\"."
+			var text string = "Profile the USER based on their input. Write detailed user information as BULLET " +
+				"points (no + or anything. ONLY *). Format the output as \"* The user [detail]\". Example: \"* The " +
+				"user likes bags\". User input: \"" + input_text + "\"."
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer_dumb.WriteString(text + "\n")
 			_ = writer_dumb.Flush()
@@ -293,9 +292,14 @@ func init() {realMain =
 			var memories_split []string = strings.Split(to_memorize, "\n")
 			for _, memory := range memories_split {
 				if UtilsSWA.StringHasLettersGENERAL(memory) && strings.Contains(memory, "* ") &&
-					!strings.Contains(strings.ToLower(memory), "none") {
-					var star_space_idx int = strings.LastIndex(memory, "* ")
-					modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, memory[star_space_idx+2:])
+						!strings.Contains(strings.ToLower(memory), "none") {
+					memory = strings.Replace(memory, "* The user's ", "* The user ", -1)
+					var the_user_idx int = strings.LastIndex(memory, "* The user ")
+					if the_user_idx == -1 {
+						continue
+					}
+
+					modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, memory[the_user_idx + len("* The user "):])
 				}
 			}
 
