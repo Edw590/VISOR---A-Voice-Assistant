@@ -44,8 +44,8 @@ type UserLocation struct {
 
 // Mod12UserInfo is the format of the custom information file about this specific module.
 type Mod12UserInfo struct {
-	// AlwaysWith_device is true if the device is always with the user
-	AlwaysWith_device bool
+	// AlwaysWith_device is the ID of the device that is always with the user
+	AlwaysWith_device string
 	// Locs_info is the information about the locations
 	Locs_info []_LocInfo
 }

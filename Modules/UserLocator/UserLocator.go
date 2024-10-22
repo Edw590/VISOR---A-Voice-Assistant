@@ -133,7 +133,8 @@ func init() {realMain =
 }
 
 func computeUserLocation(int_device_info _IntDeviceInfo) string {
-	if modUserInfo_GL.AlwaysWith_device && int_device_info.Curr_location != UNKNOWN_LOCATION {
+	if modUserInfo_GL.AlwaysWith_device == Utils.Device_settings_GL.Device_ID &&
+			int_device_info.Curr_location != UNKNOWN_LOCATION {
 		return int_device_info.Curr_location
 	}
 

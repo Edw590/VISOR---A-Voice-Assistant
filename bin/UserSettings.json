@@ -169,10 +169,8 @@
 		]
 	},
 	"UserLocator": {
-		"Devices_info": {
-			// AlwaysWith_device_id is the device ID of the device that the user always has with them, if any
-			"AlwaysWith_device_id": ""
-		},
+		// AlwaysWith_device_id is the ID of the device that the user always has with them, if any
+		"AlwaysWith_device_id": "MyPhone",
 		"Locs_info": [
 			{
 				// Type can be "wifi" or "bluetooth"
@@ -188,7 +186,7 @@
 				// considered to in the location
 				"Max_distance": 10,
 				// Location is the location name the network is associated with
-				"Location": "home_city"
+				"Location": "home_lisbon"
 			}
 		]
 	}
