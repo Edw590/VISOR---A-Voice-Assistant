@@ -195,7 +195,9 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 	if mod_num == NUM_MOD_VISOR {
 		printStartupSequenceMODULES(mod_name)
 
-		if err := loadDeviceSettings(server); err != nil {
+		VISOR_server_GL = server
+
+		if err := loadDeviceSettings(); err != nil {
 			log.Println("CRITICAL ERROR: Error obtaining device settings - aborting")
 			panic(err)
 		}
@@ -217,7 +219,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 				}
 
 				// Always reload the device settings
-				err := loadDeviceSettings(server)
+				err := loadDeviceSettings()
 				if err != nil {
 					module.Stop = true
 

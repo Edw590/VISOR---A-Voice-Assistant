@@ -105,7 +105,7 @@ Call this before SettingsSync.LoadUserSettings.
 – Returns:
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
-func loadDeviceSettings(server bool) error {
+func loadDeviceSettings() error {
 	bytes, err := os.ReadFile(DEVICE_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
@@ -115,18 +115,7 @@ func loadDeviceSettings(server bool) error {
 		return errors.New("no " + DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
-	if err = FromJsonGENERAL(bytes, &Device_settings_GL); err != nil {
-		return err
-	}
-
-	VISOR_server_GL = server
-
-	if Device_settings_GL.Device_ID == "" || Device_settings_GL.Device_type == "" ||
-			Device_settings_GL.Device_description == "" {
-		return errors.New("some fields in " + DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
-	}
-
-	return nil
+	return FromJsonGENERAL(bytes, &Device_settings_GL)
 }
 
 /*
