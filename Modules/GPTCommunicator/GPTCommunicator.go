@@ -91,8 +91,8 @@ func init() {realMain =
 		var dumb_ctx_size int = 4096
 
 		// Log the configuration of both LLaMa instances
-		//log.Printf("Starting 2 LLaMa instances with the following configurations:\n"+
-		//	"	- Smart: ctxSize=%d, threads=%d, temp=%f\n"+
+		//log.Printf("Starting 2 LLaMa instances with the following configurations:\n" +
+		//	"	- Smart: ctxSize=%d, threads=%d, temp=%f\n" +
 		//	"	- Dumb: ctxSize=%d, threads=%d, temp=%f\n",
 		//	smart_ctx_size, 4, 0.8, dumb_ctx_size, 4, 1.5,
 		//)
@@ -190,7 +190,7 @@ func init() {realMain =
 					if one_byte_str == " " || one_byte_str == "\n" {
 						if last_word != _START_TOKENS && last_word != _END_TOKENS {
 							// Meaning: new word written
-							_ = gpt_text_txt.WriteTextFile(last_word+one_byte_str, true)
+							_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
 						}
 
 						last_word = ""
@@ -333,7 +333,7 @@ func init() {realMain =
 				var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
 				device_id = params_split[0]
 				var use_smart bool = params_split[1] == "true"
-				var text string = to_process[strings.Index(to_process, "]")+1:]
+				var text string = to_process[strings.Index(to_process, "]") + 1:]
 
 				if use_smart && strings.HasPrefix(text, "/") {
 					// Control commands begin with a slash
@@ -360,10 +360,10 @@ func init() {realMain =
 						result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
 
 						if direct_result {
-							_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+"The answer is: "+result+
-								". "+getEndString(), true)
+							_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
+								". " + getEndString(), true)
 						} else {
-							sendToGPT("Summarize in sentences the following: "+result, false)
+							sendToGPT("Summarize in sentences the following: " + result, false)
 						}
 					} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
 						// Search for the Wikipedia page title
@@ -452,10 +452,10 @@ func reduceGptTextTxt(gpt_text_txt Utils.GPath) {
 	var text string = *gpt_text_txt.ReadTextFile()
 	var entries []string = strings.Split(text, "[3234_START:")
 	if len(entries) > 5 {
-		_ = gpt_text_txt.WriteTextFile("[3234_START:"+entries[len(entries)-5], false)
+		_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[len(entries)-5], false)
 
 		for i := len(entries) - 4; i < len(entries); i++ {
-			_ = gpt_text_txt.WriteTextFile("[3234_START:"+entries[i], true)
+			_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[i], true)
 		}
 	}
 }
@@ -477,7 +477,7 @@ func checkStopSpeech() bool {
 
 		var to_process string = *file_path.ReadTextFile()
 		if to_process != "" {
-			var text string = to_process[strings.Index(to_process, "]")+1:]
+			var text string = to_process[strings.Index(to_process, "]") + 1:]
 
 			if text == "/stop" {
 				_ = os.Remove(file_path.GPathToStringConversion())
