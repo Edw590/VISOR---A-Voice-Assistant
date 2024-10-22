@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	MOD_3 "Speech"
+	"Speech"
 	"SpeechQueue/SpeechQueue"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -46,13 +46,13 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 	entry_txt_to_speech.PlaceHolder = "Enter text to speak"
 	entry_txt_to_speech.Text = "This is an example."
 	var btn_speak_min *widget.Button = widget.NewButton("Speak (min priority)", func() {
-		MOD_3.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_LOW, SpeechQueue.MODE_DEFAULT)
+		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_LOW, SpeechQueue.MODE_DEFAULT)
 	})
 	var btn_speak_high *widget.Button = widget.NewButton("Speak (high priority)", func() {
-		MOD_3.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 	})
 	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
-		MOD_3.SkipCurrentSpeech()
+		Speech.SkipCurrentSpeech()
 	})
 
 

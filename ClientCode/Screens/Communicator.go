@@ -23,7 +23,7 @@ package Screens
 
 import (
 	"GPTComm/GPTComm"
-	MOD_3 "Speech"
+	"Speech"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
 	"fyne.io/fyne/v2"
@@ -52,26 +52,26 @@ func Communicator() fyne.CanvasObject {
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to GPT (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. Communicator not connected."
-			MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 			return
 		}
 
 		if !GPTComm.SendText(entry_txt_to_speech.Text, true) {
-			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
+			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY)
 		}
 	})
 	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to GPT (dumb)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. Communicator not connected."
-			MOD_3.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 			return
 		}
 
 		if !GPTComm.SendText(entry_txt_to_speech.Text, false) {
-			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
+			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY)
 		}
 	})

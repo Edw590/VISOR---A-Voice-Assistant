@@ -23,7 +23,7 @@ package GPTCommunicator
 
 import (
 	// Utilities for working with files and directories
-	MOD_6 "OnlineInfoChk"
+	"OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
@@ -357,7 +357,7 @@ func init() {realMain =
 					} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
 						// Ask Wolfram Alpha the question
 						var question string = text[len(ASK_WOLFRAM_ALPHA):]
-						result, direct_result := MOD_6.RetrieveWolframAlpha(question)
+						result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
 
 						if direct_result {
 							_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+"The answer is: "+result+
@@ -369,7 +369,7 @@ func init() {realMain =
 						// Search for the Wikipedia page title
 						var query string = text[len(SEARCH_WIKIPEDIA):]
 
-						_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+MOD_6.RetrieveWikipedia(query)+
+						_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
 							getEndString(), true)
 					}
 				} else {

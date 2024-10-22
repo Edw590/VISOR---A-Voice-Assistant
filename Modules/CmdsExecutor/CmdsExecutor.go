@@ -25,7 +25,7 @@ import (
 	"ACD/ACD"
 	"GPTComm/GPTComm"
 	"OICComm/OICComm"
-	MOD_3 "Speech"
+	"Speech"
 	"SpeechQueue/SpeechQueue"
 	"TEHelper/TEHelper"
 	"Utils"
@@ -112,7 +112,7 @@ func init() {realMain =
 			if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
 				var speak string = "WARNING! There was a problem processing the commands Sir. This needs a fix. The " +
 					"error was the following: " + cmds_info_str + ". You said: " + sentence_str
-				MOD_3.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 				log.Println("EXECUTOR - ERR_PROC_CMDS")
 
 				time.Sleep(1 * time.Second)
@@ -139,13 +139,13 @@ func init() {realMain =
 			if send_to_GPT {
 				if !Utils.IsCommunicatorConnectedSERVER() {
 					var speak string = "GPT unavailable. Communicator not connected."
-					MOD_3.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+					Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 
 					return
 				}
 
 				if !GPTComm.SendText(sentence_str, true) {
-					MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.",
+					Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.",
 						speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
 				}
 
@@ -322,12 +322,12 @@ func speakInternal(txt_to_speak string, speech_priority int, mode int, auto_gpt 
 		var text string = "Rephrase the following to maintain its meaning but change its wording: \"" + txt_to_speak +
 			"\". Current device: user's " + Utils.Device_settings_GL.Device_type + "."
 		if !GPTComm.SendText(text, false) {
-			MOD_3.QueueSpeech("Sorry, the GPT is busy at the moment.", speech_priority,
+			Speech.QueueSpeech("Sorry, the GPT is busy at the moment.", speech_priority,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY)
 		}
 
 		return
 	}
 
-	MOD_3.QueueSpeech(txt_to_speak, speech_priority, mode)
+	Speech.QueueSpeech(txt_to_speak, speech_priority, mode)
 }
