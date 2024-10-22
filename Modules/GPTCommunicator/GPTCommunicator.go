@@ -231,10 +231,10 @@ func init() {realMain =
 
 		// Read from both GPTs --> but make them *never* work both at the same time. Only one at a time answering.
 		go func() {
-			readGPT(reader_smart, true)
+			readGPT(reader_smart, false)
 		}()
 		go func() {
-			readGPT(reader_dumb, true)
+			readGPT(reader_dumb, false)
 		}()
 
 		// Wait for the LLM models to start
