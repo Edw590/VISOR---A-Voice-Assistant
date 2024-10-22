@@ -21,14 +21,15 @@
 
 package main
 
-import "C"
 import (
-	MOD_1 "ModManager"
+	"ModulesManager"
+	"SettingsSync/SettingsSync"
 	"Utils"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -62,6 +63,50 @@ func main() {
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+
+		//////////////////////////////////////////
+		// Get the user settings
+
+		go func() {
+			for {
+				Utils.StartCommunicatorSERVER()
+
+				time.Sleep(1 * time.Second)
+			}
+		}()
+
+		var user_settings_json string = ""
+		var p_user_settings_json *string = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadTextFile()
+		if p_user_settings_json != nil {
+			user_settings_json = *p_user_settings_json
+		}
+		if !SettingsSync.LoadUserSettings(user_settings_json) {
+			log.Println("Failed to load user settings. Attempting to retrieve them from the server...")
+			log.Println("Please enter VISOR's website domain")
+			var website_domain string
+			_, _ = fmt.Scanln(&website_domain)
+
+			log.Println("Please enter VISOR's website password")
+			var website_password string
+			_, _ = fmt.Scanln(&website_password)
+
+			Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
+			Utils.User_settings_GL.PersonalConsts.Website_pw = website_password
+
+			UtilsSWA.WaitForNetwork(10)
+
+			// Load or sync the user settings
+			if !SettingsSync.SyncUserSettings(false) {
+				log.Println("Failed to obtain user settings. Exiting...")
+
+				return
+			}
+		}
+
+		//////////////////////////////////////////
+		// Prepare to hide the window
+
 		if !isOpenGLSupport() {
 			log.Println("Required OpenGL version not supported. Exiting...")
 
@@ -82,15 +127,12 @@ func init() {realMain =
 		//////////////////////////////////////////
 		// No terminal window from here on
 
-		ClientRegKeys.RegisterValues()
-
+		// Keep syncing the user settings with the server.
 		go func() {
-			for {
-				Utils.StartCommunicatorSERVER()
-
-				time.Sleep(1 * time.Second)
-			}
+			SettingsSync.SyncUserSettings(true)
 		}()
+
+		ClientRegKeys.RegisterValues()
 
 		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
@@ -102,20 +144,19 @@ func init() {realMain =
 				Enabled: true,
 			})
 		}
-		// Just for it to print that VISOR is running
 		modules[Utils.NUM_MOD_VISOR].Stop = false
 		modules[Utils.NUM_MOD_VISOR].Stopped = false
 		// The Manager needs to be started first. It'll handle the others.
 		modules[Utils.NUM_MOD_ModManager].Stop = false
 
-		MOD_1.Start(modules)
+		ModulesManager.Start(modules)
 
 		// Create a new application
 		my_app_GL = app.NewWithID("com.edw590.visor_c")
 		my_app_GL.SetIcon(Logo.LogoBlackGmail)
 		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
 
-		processNotifications()
+		processCommsChannel()
 
 		// Create the content area with a label to display different screens
 		var content_label *widget.Label = widget.NewLabel("Welcome!")
@@ -207,12 +248,9 @@ func init() {realMain =
 					return
 				}
 
-				if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).GetData(true, nil).(bool) {
-					showWindow()
-					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).SetData(false, false)
-				}
+				Utils.SaveUserSettings()
 
-				time.Sleep(1 * time.Second)
+				time.Sleep(5 * time.Second)
 			}
 		}()
 
@@ -223,9 +261,9 @@ func init() {realMain =
 }
 
 /*
-processNotifications processes in a different thread the notifications queued in the notifications folder.
+processCommsChannel processes in a different thread the communications channel.
 */
-func processNotifications() {
+func processCommsChannel() {
 	go func() {
 		for {
 			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_VISOR]
@@ -233,15 +271,18 @@ func processNotifications() {
 				return
 			}
 			map_value, ok := comms_map["Notification"]
-			if !ok {
-				continue
+			if ok {
+				var notif_info []string = map_value.([]string)
+				notification := fyne.NewNotification(notif_info[0], notif_info[1])
+				my_app_GL.SendNotification(notification)
+
+				time.Sleep(5 * time.Second)
+			} else {
+				map_value, ok = comms_map["ShowApp"]
+				if ok {
+					showWindow()
+				}
 			}
-
-			var notif_info []string = map_value.([]string)
-			notification := fyne.NewNotification(notif_info[0], notif_info[1])
-			my_app_GL.SendNotification(notification)
-
-			time.Sleep(5 * time.Second)
 		}
 	}()
 }

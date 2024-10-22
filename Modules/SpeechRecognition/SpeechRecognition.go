@@ -23,8 +23,6 @@ package SpeechRecognition
 
 import (
 	"Utils"
-	"Utils/UtilsSWA"
-	"VISOR_Client/ClientRegKeys"
 	porcupine "github.com/Picovoice/porcupine/binding/go/v3"
 	"github.com/gordonklaus/portaudio"
 )
@@ -73,7 +71,9 @@ func init() {realMain =
 		for {
 			keywordIndex, _ := porcupine_.Process(getNextFrameAudio())
 			if keywordIndex >= 0 {
-				UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SHOW_APP_SIG).SetData(true, false)
+				Utils.ModsCommsChannels_GL[Utils.NUM_MOD_VISOR] <- map[string]any{
+					"ShowApp": nil,
+				}
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 0) {

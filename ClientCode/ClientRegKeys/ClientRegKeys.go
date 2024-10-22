@@ -35,11 +35,6 @@ const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 // Type: string
 const K_LAST_SPEECH string = "LAST_SPEECH"
 
-// Main app
-
-// Type: bool
-const K_SHOW_APP_SIG string = "SHOW_APP_SIG"
-
 // System Checker
 
 // Type: int
@@ -62,9 +57,6 @@ func RegisterValues() {
 
 	// Speech
 	UtilsSWA.RegisterValueREGISTRY(K_LAST_SPEECH, "Last speech", "The last speech that was spoken", UtilsSWA.TYPE_STRING)
-
-	// Main app
-	UtilsSWA.RegisterValueREGISTRY(K_SHOW_APP_SIG, "Show-app signal", "Signal to show the app", UtilsSWA.TYPE_BOOL)
 
 	// System Checker
 	UtilsSWA.RegisterValueREGISTRY(K_BATTERY_LEVEL, "Power - Battery level", "The battery level", UtilsSWA.TYPE_INT)

@@ -22,7 +22,8 @@
 package main
 
 import (
-	MOD_1 "ModManager"
+	"ModulesManager"
+	"SettingsSync/SettingsSync"
 	"Utils"
 	"VISOR_Server/ServerRegKeys"
 	"log"
@@ -48,6 +49,14 @@ func main() {
 }
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
+		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+
+		if !loadUserSettings() {
+			log.Println("Failed to load user settings. Exiting...")
+
+			return
+		}
+
 		if !Utils.RunningAsAdminPROCESSES() {
 			log.Println("Not running as administrator/root. Exiting...")
 
@@ -66,13 +75,12 @@ func init() {realMain =
 				Enabled: true,
 			})
 		}
-		// Just for it to print that VISOR is running
 		modules[Utils.NUM_MOD_VISOR].Stop = false
 		modules[Utils.NUM_MOD_VISOR].Stopped = false
 		// The Manager needs to be started first. It'll handle the others.
 		modules[Utils.NUM_MOD_ModManager].Stop = false
 
-		MOD_1.Start(modules)
+		ModulesManager.Start(modules)
 
 		handleCtrlCGracefully(module_stop)
 
@@ -84,13 +92,15 @@ func init() {realMain =
 				printModulesStatus(modules)
 			}
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+			// Keep reloading the user settings
+			loadUserSettings()
+
+			if Utils.WaitWithStopTIMEDATE(module_stop, 5) {
 				break
 			}
 		}
 
 		Utils.CloseCommsChannels()
-
 		Utils.SignalModulesStopMODULES(modules)
 	}
 }
@@ -115,4 +125,19 @@ func printModulesStatus(modules []Utils.Module) {
 		log.Println("- Support: " + strconv.FormatBool(Utils.IsModSupportedMODULES(module.Num)))
 		log.Println("- Running: " + strconv.FormatBool(!module.Stopped))
 	}
+}
+
+func loadUserSettings() bool {
+	var user_settings_json string = ""
+	var p_user_settings_json *string = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadTextFile()
+	if p_user_settings_json == nil {
+		return false
+	}
+
+	user_settings_json = *p_user_settings_json
+	if !SettingsSync.LoadUserSettings(user_settings_json) {
+		return false
+	}
+
+	return true
 }

@@ -163,7 +163,7 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 		message_eml = eml
 	}
 
-	if Device_settings_GL.VISOR_server {
+	if VISOR_server_GL {
 		// Keep trying to create a file with a unique name.
 		var file_name string = ""
 		var to_send_dir GPath = GetUserDataDirMODULES(NUM_MOD_EmailSender).Add2(true, TO_SEND_REL_FOLDER)
@@ -311,6 +311,10 @@ func getCurlStringEMAIL(mail_to string, emergency_email bool) string {
 	var timeout string = "10"
 	if emergency_email {
 		timeout = "100000"
+	}
+
+	if User_settings_GL.PersonalConsts.VISOR_email_addr == "" || User_settings_GL.PersonalConsts.VISOR_email_pw == "" {
+		return "echo \"No email address or password set\""
 	}
 
 	return "curl{{EXE}} --location --connect-timeout " + timeout + " --verbose \"smtp://smtp.gmail.com:587\" --user \"" +

@@ -35,9 +35,19 @@ var stop_GL bool = false
 /*
 SyncUserSettings keeps synchronizing the remote user settings file with the local one.
 
-This function only returns when it's stopped with StopUserSettingsSyncer().
+-----------------------------------------------------------
+
+– Params:
+  - loop – if true, the function will keep running until it's stopped with StopUserSettingsSyncer()
+
+– Returns:
+  - true if the user settings were successfully synchronized, false otherwise
 */
-func SyncUserSettings() {
+func SyncUserSettings(loop bool) bool {
+	if !loop && !Utils.IsCommunicatorConnectedSERVER() {
+		return false
+	}
+
 	var last_get_settings_when_s int64 = 0
 	for {
 		var update_settings bool = false
@@ -48,30 +58,34 @@ func SyncUserSettings() {
 		}
 
 		if update_settings {
-			Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("US|false"))
+			Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|false|US"))
 			var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
 			if comms_map == nil {
-				return
+				return false
+			}
+			map_value, ok := comms_map[Utils.COMMS_MAP_SRV_KEY]
+			if !ok {
+				continue
 			}
 
-			var new_crc16 []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+			var new_crc16 []byte = map_value.([]byte)
 			if !bytes.Equal(new_crc16, last_crc16_GL) {
 				last_crc16_GL = new_crc16
 
-				Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("US|true"))
+				Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|true|US"))
 				comms_map = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
 				if comms_map == nil {
-					return
+					return false
 				}
 
 				var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-				_ = Utils.FromJsonGENERAL(json, &Utils.User_settings_GL)
+				return Utils.FromJsonGENERAL(json, &Utils.User_settings_GL) == nil
 			}
 		}
 
-		if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
-			return
+		if !loop || Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
+			return false
 		}
 	}
 }
@@ -81,4 +95,39 @@ StopUserSettingsSyncer stops the user settings synchronizer.
  */
 func StopUserSettingsSyncer() {
 	stop_GL = true
+}
+
+/*
+GetUserSettings returns the user settings in JSON format.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the user settings in JSON format
+ */
+func GetUserSettings() string {
+	return *Utils.ToJsonGENERAL(Utils.User_settings_GL)
+}
+
+/*
+LoadUserSettings loads the user settings from the given JSON string.
+
+-----------------------------------------------------------
+
+– Params:
+  - json – the JSON string to load the user settings from
+
+– Returns:
+  - true if the user settings were successfully loaded, false otherwise
+ */
+func LoadUserSettings(json string) bool {
+	if json == "" {
+		return false
+	}
+
+	if err := Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL); err != nil {
+		return false
+	}
+
+	return true
 }

@@ -4,23 +4,23 @@
 
 	"PersonalConsts": {
 		// VISOR_email_addr is VISOR's email address
-		"VISOR_email_addr": "some@email.com",
+		"VISOR_email_addr": "visor@email.address",
 		// VISOR_email_pw is VISOR's email password
-		"VISOR_email_pw": "a_password",
+		"VISOR_email_pw": "a_2fa_password",
 
 		// User_email_addr is the email address of the user, used for all email communication
-		"User_email_addr": "your@email.com",
+		"User_email_addr": "your@email.address",
 
 		// Website_domain is the domain of the VISOR website
-		"Website_domain": "visor.com",
+		"Website_domain": "myserver.domain",
 		// Website_pw is the password for the VISOR website
-		"Website_pw": "TGLKJRGT954u54BTRHt5",
+		"Website_pw": "a_random_letters_and_numbers_strong_password",
 
 		// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
 		"WolframAlpha_AppID": "999999-9999999999",
 
 		// Picovoice_API_key is the API key for the Picovoice API
-		"Picovoice_API_key": "IJHGGYuikjhgTYUIUYGhjkJUYHYHJhBN/5yGAU1pY8ydOKA=="
+		"Picovoice_API_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/56yHGr565RTttt=="
 	},
 	"SMARTChecker": {
 		"Disks_info": {

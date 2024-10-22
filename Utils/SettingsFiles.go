@@ -25,17 +25,17 @@ import (
 	"Utils/ModsFileInfo"
 	"errors"
 	"os"
-	"strings"
 )
 
 const _DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
-const _USER_SETTINGS_FILE string = "UserSettings_EOG.json"
+const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
 const _GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
 const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.json"
 
 var Device_settings_GL DeviceSettings
 var User_settings_GL UserSettings
 var Gen_settings_GL GenSettings
+var VISOR_server_GL bool = false
 
 type DeviceSettings struct {
 	// Device_ID is the device ID of the current device
@@ -44,10 +44,6 @@ type DeviceSettings struct {
 	Device_type string
 	// Device_description is the description of the current device
 	Device_description string
-
-	// VISOR_server is an INTERNAL attribute to be filled INTERNALLY that indicates if the version running is the server
-	// or the client version
-	VISOR_server bool
 }
 
 type UserSettings struct {
@@ -97,31 +93,20 @@ type _PersonalConsts struct {
 }
 
 /*
-LoadDeviceUserSettings is the function that initializes the global variables of the UserSettings and DeviceSettings
-structs.
+loadDeviceSettings is the function that initializes the global variables of the DeviceSettings structs.
+
+Call this before SettingsSync.LoadUserSettings.
 
 -----------------------------------------------------------
 
 – Params:
   - server – true if the version running is the server version, false if it is the client version
+
+– Returns:
+  - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
-func LoadDeviceUserSettings(server bool) error {
-	bytes, err := os.ReadFile(_USER_SETTINGS_FILE)
-	if err != nil {
-		cwd, err := os.Getwd()
-		if err != nil {
-			cwd = "[ERROR]"
-		}
-		return errors.New("no " + _USER_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
-	}
-
-	if err = FromJsonGENERAL(bytes, &User_settings_GL); err != nil {
-		return err
-	}
-
-	//////////////////////////////////////////////
-
-	bytes, err = os.ReadFile(_DEVICE_SETTINGS_FILE)
+func loadDeviceSettings(server bool) error {
+	bytes, err := os.ReadFile(_DEVICE_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
 		if err != nil {
@@ -134,32 +119,49 @@ func LoadDeviceUserSettings(server bool) error {
 		return err
 	}
 
-	//////////////////////////////////////////////
+	VISOR_server_GL = server
 
-	Device_settings_GL.VISOR_server = server
-
-	if Device_settings_GL.VISOR_server {
-		if !strings.Contains(User_settings_GL.PersonalConsts.VISOR_email_addr, "@") || Device_settings_GL.Device_ID == "" ||
-			User_settings_GL.PersonalConsts.VISOR_email_pw == "" || !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
-			User_settings_GL.PersonalConsts.Website_domain == "" || User_settings_GL.PersonalConsts.Website_pw == "" ||
-			User_settings_GL.PersonalConsts.WolframAlpha_AppID == "" || User_settings_GL.PersonalConsts.Picovoice_API_key == "" {
-			return errors.New("some fields in " + _USER_SETTINGS_FILE + " and/or " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
-		}
-	} else {
-		if !strings.Contains(User_settings_GL.PersonalConsts.User_email_addr, "@") ||
-				User_settings_GL.PersonalConsts.Website_domain == "" ||
-				User_settings_GL.PersonalConsts.Website_pw == "" {
-			return errors.New("some fields in " + _USER_SETTINGS_FILE + " and/or " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
-		}
+	if Device_settings_GL.Device_ID == "" || Device_settings_GL.Device_type == "" ||
+			Device_settings_GL.Device_description == "" {
+		return errors.New("some fields in " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
 	}
 
 	return nil
+}
+
+/*
+SaveUserSettings is the function that saves the global variables of the UserSettings struct.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the user settings were successfully saved, false otherwise
+ */
+func SaveUserSettings() bool {
+	var p_string *string = ToJsonGENERAL(User_settings_GL)
+	if p_string == nil {
+		return false
+	}
+
+	if err := os.WriteFile(USER_SETTINGS_FILE, []byte(*p_string), 0777); err != nil {
+		return false
+	}
+
+	return true
 }
 
 ///////////////////////////////////////////////////////////////
 
 /*
 loadGenSettings is the function that initializes the global variables of the GenSettings struct.
+
+-----------------------------------------------------------
+
+– Params:
+  - server – true if the version running is the server version, false if it is the client version
+
+– Returns:
+  - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
 func loadGenSettings(server bool) error {
 	var settings_file string = _GEN_SETTINGS_FILE_CLIENT
@@ -184,6 +186,11 @@ func loadGenSettings(server bool) error {
 
 /*
 saveGenSettings is the function that saves the global variables of the GenSettings struct to the _GEN_SETTINGS_FILE file.
+
+-----------------------------------------------------------
+
+– Params:
+  - server – true if the generated settings were successfully saved, false otherwise
 */
 func saveGenSettings(server bool) bool {
 	var settings_file string = _GEN_SETTINGS_FILE_CLIENT
