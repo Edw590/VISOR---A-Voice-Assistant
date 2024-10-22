@@ -1,5 +1,6 @@
 {
-	// NOTICE: Rename this file to "UserSettings_EOG.json" and fill in your values (I have examples here)
+	// NOTICE: Rename this file to "UserSettings_EOG.json" and fill in your values (I have examples here).
+	// Place it on the server's bin folder. The client will retrieve it from the server and keep it updated locally.
 	// The comments can stay. They're filtered by VISOR.
 
 	"PersonalConsts": {
@@ -11,9 +12,9 @@
 		// User_email_addr is the email address of the user, used for all email communication
 		"User_email_addr": "your@email.address",
 
-		// Website_domain is the domain of the VISOR website
+		// Website_domain is the domain of the VISOR server (or your IP address if you don't have a domain)
 		"Website_domain": "myserver.domain",
-		// Website_pw is the password for the VISOR website
+		// Website_pw is the password for the VISOR server
 		"Website_pw": "a_random_letters_and_numbers_strong_password",
 
 		// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
