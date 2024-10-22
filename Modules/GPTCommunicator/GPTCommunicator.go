@@ -84,7 +84,8 @@ func init() {realMain =
 		visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
 
 		// Initialize memory string
-		var to_memorize string = strings.Join(modGenInfo_GL.Memories, ". ")
+		var memories string = strings.Join(modGenInfo_GL.Memories, ". ")
+		memories = strings.Replace(memories, "\"", "\\\"", -1)
 
 		// Declare and assign context sizes
 		var smart_ctx_size int = 12288
@@ -99,7 +100,7 @@ func init() {realMain =
 
 		// Start LLM instance (smart and dumb)
 		writer_smart, stdout_smart, stderr_smart := startLlama("Smart", smart_ctx_size, 4, 0.8,
-			modUserInfo_GL.Model_smart_loc, to_memorize, visor_intro)
+			modUserInfo_GL.Model_smart_loc, memories, visor_intro)
 		if writer_smart == nil {
 			log.Println("Error starting the Llama model (smart)")
 
@@ -160,7 +161,7 @@ func init() {realMain =
 
 		var first_3234_end bool = true
 		var memorizing bool = false
-		to_memorize = ""
+		var to_memorize string = ""
 
 		// Function to read GPT output from a reader
 		readGPT := func(reader *bufio.Reader, print bool) {
