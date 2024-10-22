@@ -24,6 +24,7 @@ package SettingsSync
 import (
 	"Utils"
 	"bytes"
+	"errors"
 	"time"
 )
 
@@ -105,7 +106,7 @@ GetUserSettings returns the user settings in JSON format.
 – Returns:
   - the user settings in JSON format
  */
-func GetUserSettings() string {
+func GetJsonUserSettings() string {
 	return *Utils.ToJsonGENERAL(Utils.User_settings_GL)
 }
 
@@ -120,14 +121,14 @@ LoadUserSettings loads the user settings from the given JSON string.
 – Returns:
   - true if the user settings were successfully loaded, false otherwise
  */
-func LoadUserSettings(json string) bool {
+func LoadUserSettings(json string) error {
 	if json == "" {
-		return false
+		return errors.New("empty JSON string")
 	}
 
 	if err := Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL); err != nil {
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }

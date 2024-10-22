@@ -54,5 +54,5 @@ func basicAuth(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func validateCredentials(username, password string) bool {
-	return username == "VISOR" && password == Utils.User_settings_GL.PersonalConsts.Website_pw
+	return username == "VISOR" && password == Utils.User_settings_GL.General.Website_pw
 }

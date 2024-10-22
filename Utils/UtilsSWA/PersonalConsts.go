@@ -35,6 +35,6 @@ InitPersonalConsts initializes the personal constants.
  */
 func InitPersonalConsts(device_id string, website_domain string, website_pw string) {
 	Utils.Device_settings_GL.Device_ID = device_id
-	Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-	Utils.User_settings_GL.PersonalConsts.Website_pw = website_pw
+	Utils.User_settings_GL.General.Website_domain = website_domain
+	Utils.User_settings_GL.General.Website_pw = website_pw
 }

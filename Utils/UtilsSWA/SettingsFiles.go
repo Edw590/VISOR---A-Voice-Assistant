@@ -23,10 +23,6 @@ package UtilsSWA
 
 import "Utils"
 
-func LoadUserSettings(json string) bool {
-	if err := Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL); err != nil {
-		return false
-	}
-
-	return true
-}
+const DEVICE_SETTINGS_FILE string = Utils.DEVICE_SETTINGS_FILE
+const USER_SETTINGS_FILE string = Utils.USER_SETTINGS_FILE
+const GEN_SETTINGS_FILE_CLIENT string = Utils.GEN_SETTINGS_FILE_CLIENT

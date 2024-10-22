@@ -81,7 +81,7 @@ func init() {realMain =
 		if p_user_settings_json != nil {
 			user_settings_json = *p_user_settings_json
 		}
-		if !SettingsSync.LoadUserSettings(user_settings_json) {
+		if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
 			log.Println("Failed to load user settings. Attempting to retrieve them from the server...")
 			log.Println("Please enter VISOR's website domain")
 			var website_domain string
@@ -91,8 +91,8 @@ func init() {realMain =
 			var website_password string
 			_, _ = fmt.Scanln(&website_password)
 
-			Utils.User_settings_GL.PersonalConsts.Website_domain = website_domain
-			Utils.User_settings_GL.PersonalConsts.Website_pw = website_password
+			Utils.User_settings_GL.General.Website_domain = website_domain
+			Utils.User_settings_GL.General.Website_pw = website_password
 
 			UtilsSWA.WaitForNetwork(10)
 

@@ -27,9 +27,9 @@ import (
 	"os"
 )
 
-const _DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
+const DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
 const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
-const _GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
+const GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
 const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.json"
 
 var Device_settings_GL DeviceSettings
@@ -47,7 +47,7 @@ type DeviceSettings struct {
 }
 
 type UserSettings struct {
-	PersonalConsts  _PersonalConsts
+	General         _GeneralConsts
 	SMARTChecker    ModsFileInfo.Mod2UserInfo
 	RSSFeedNotifier ModsFileInfo.Mod4UserInfo
 	OnlineInfoChk   ModsFileInfo.Mod6UserInfo
@@ -71,7 +71,7 @@ type GenSettings struct {
 
 ///////////////////////////////////////////////////////////////
 
-type _PersonalConsts struct {
+type _GeneralConsts struct {
 	// VISOR_email_addr is VISOR's email address
 	VISOR_email_addr string
 	// VISOR_email_pw is VISOR's email password
@@ -106,13 +106,13 @@ Call this before SettingsSync.LoadUserSettings.
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
 func loadDeviceSettings(server bool) error {
-	bytes, err := os.ReadFile(_DEVICE_SETTINGS_FILE)
+	bytes, err := os.ReadFile(DEVICE_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
 		if err != nil {
 			cwd = "[ERROR]"
 		}
-		return errors.New("no " + _DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
+		return errors.New("no " + DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
 	if err = FromJsonGENERAL(bytes, &Device_settings_GL); err != nil {
@@ -123,7 +123,7 @@ func loadDeviceSettings(server bool) error {
 
 	if Device_settings_GL.Device_ID == "" || Device_settings_GL.Device_type == "" ||
 			Device_settings_GL.Device_description == "" {
-		return errors.New("some fields in " + _DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
+		return errors.New("some fields in " + DEVICE_SETTINGS_FILE + " are empty or incorrect - aborting")
 	}
 
 	return nil
@@ -164,7 +164,7 @@ loadGenSettings is the function that initializes the global variables of the Gen
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
 func loadGenSettings(server bool) error {
-	var settings_file string = _GEN_SETTINGS_FILE_CLIENT
+	var settings_file string = GEN_SETTINGS_FILE_CLIENT
 	if server {
 		settings_file = _GEN_SETTINGS_FILE_SERVER
 	}
@@ -193,7 +193,7 @@ saveGenSettings is the function that saves the global variables of the GenSettin
   - server – true if the generated settings were successfully saved, false otherwise
 */
 func saveGenSettings(server bool) bool {
-	var settings_file string = _GEN_SETTINGS_FILE_CLIENT
+	var settings_file string = GEN_SETTINGS_FILE_CLIENT
 	if server {
 		settings_file = _GEN_SETTINGS_FILE_SERVER
 	}

@@ -135,7 +135,9 @@ func loadUserSettings() bool {
 	}
 
 	user_settings_json = *p_user_settings_json
-	if !SettingsSync.LoadUserSettings(user_settings_json) {
+	if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
+		log.Println("Error loading user settings:", err)
+
 		return false
 	}
 

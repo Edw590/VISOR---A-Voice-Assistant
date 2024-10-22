@@ -3,7 +3,7 @@
 	// Place it on the server's bin folder. The client will retrieve it from the server and keep it updated locally.
 	// The comments can stay. They're filtered by VISOR.
 
-	"PersonalConsts": {
+	"General": {
 		// VISOR_email_addr is VISOR's email address
 		"VISOR_email_addr": "visor@email.address",
 		// VISOR_email_pw is VISOR's email password
@@ -36,8 +36,8 @@
 		"Mails_to": [
 			// List of emails to send all the notifications to.
 
-			"email1@gmail.com",
-			"email2@gmail.com"
+			"some@email.address",
+			"another@email.address"
 		],
 		"Feeds_info": [
 			// Format notes:
