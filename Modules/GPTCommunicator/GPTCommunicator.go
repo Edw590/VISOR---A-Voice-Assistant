@@ -277,9 +277,9 @@ func init() {realMain =
 		memorizeThings := func(input_text string) {
 			device_id = Utils.Device_settings_GL.Device_ID
 			memorizing = true
-			var text string = "Profile the USER based on their input. Write detailed user information as BULLET " +
-				"points (no + or - or anything. ONLY *). Format the output as \"* The user [detail]\". Example: " +
-				"\"* The user likes bags\". User input: \"" + input_text + "\"."
+			var text string = "User input: \"" + input_text + "\". Profile the USER based on their input. Write " +
+				"DETAILED user information as BULLET points (no + or - or anything. ONLY *). Format the output as " +
+				"\"* The user [detail]\". Example: \"* The user likes bags\"."
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer_dumb.WriteString(text + "\n")
 			_ = writer_dumb.Flush()
