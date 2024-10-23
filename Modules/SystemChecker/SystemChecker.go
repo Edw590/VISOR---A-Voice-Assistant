@@ -135,6 +135,8 @@ func init() {realMain =
 				device_info_GL.Last_time_used_s = time.Now().Unix()
 			}
 
+			// TODO: Add delay because of the wifi checking sometimes not finding the networks
+
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
 			}

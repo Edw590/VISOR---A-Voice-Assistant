@@ -21,8 +21,8 @@
 
 package ModsFileInfo
 
-const MOD_7_STATE_READY int = 0
-const MOD_7_STATE_STARTING int = 1
+const MOD_7_STATE_STARTING int = 0
+const MOD_7_STATE_READY int = 1
 const MOD_7_STATE_BUSY int = 2
 const MOD_7_STATE_STOPPING int = 3
 

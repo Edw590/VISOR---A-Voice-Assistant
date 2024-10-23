@@ -650,6 +650,10 @@ func IsModSupportedMODULES(mod_num int) bool {
 
 			return output.Exit_code == 0
 		case NUM_MOD_GPTCommunicator:
+			if runtime.GOOS == "windows" {
+				return false
+			}
+
 			// Check if the command "llama-cli" is available
 			output, err := ExecCmdSHELL([]string{"llama-cli{{EXE}} --version"})
 			if err != nil {

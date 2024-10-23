@@ -94,8 +94,6 @@ func init() {realMain =
 			}
 		}()
 
-		// FIXME: The server is starting twice... (server logs do servidor, 2 times stopping). See why. Print PIDs.
-
 		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 		defer cancel()
 

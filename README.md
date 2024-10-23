@@ -27,11 +27,11 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 | 4 | **RSS Feed Notifier** | Server | Checks RSS feeds and queues an email about any news. Currently it's tested on YouTube channels *and playlists* (something YouTube didn't do nor does), and on StackExchange feeds. May work in others, but I didn't test (haven't needed so far).
 | 5 | **Email Sender** | Server | Sends the emails that are queued for it to send. It works with cURL (the `curl` command), so it must be installed on the system and be on the PATH. It also works by sending an EML file containing the raw email information.
 | 6 | **Online Information Checker** | Server | Checks the Internet for information like weather and news and updates a file with the information it got. This file can then be read by apps to get the information back, already ready for usage.
-| 7 | **GPT Communicator** | Server | Sends and receives text to and from a local LLM (Large Language Model), like Llama3.2 through the llama.cpp project. Use with any Llama3.1 or 3.2 model.
+| 7 | **GPT Communicator** | Server (Linux only) | Sends and receives text to and from a local LLM (Large Language Model), like Llama3.2 through the llama.cpp project. Use with any Llama3.1 or 3.2 model.
 | 8 | **Website Backend** | Server | It's the backend of VISOR's website. It is responsible for handling the requests from the frontend.
 | 9 | **Tasks Executor** | Client | Checks tasks and warns/executes when one is triggered. The tasks are fetched from the server.
-| 10 | **System Checker** | Client | Collects information about the system, like Wi-Fi networks and Bluetooth devices in range. Or the state of the Wi-Fi adapter and the Bluetooth adapter. Or the screen brightness. Or others. The client can then use this information to determine where the device is and if it's being used or not.
-| 11 | **Speech Recognition** | Client | Currently only checks if the phrase "Hey VISOR" is spoken and shows the UI, but later should be used to detect normal speech to interact with VISOR.
+| 10 | **System Checker** | Client (Windows only) | Collects information about the system, like Wi-Fi networks and Bluetooth devices in range. Or the state of the Wi-Fi adapter and the Bluetooth adapter. Or the screen brightness. Or others. The client can then use this information to determine where the device is and if it's being used or not.
+| 11 | **Speech Recognition** | Client (Windows only) | Currently only checks if the phrase "Hey VISOR" is spoken and shows the UI, but later should be used to detect normal speech to interact with VISOR.
 | 12 | **User Locator** | Client | Locates the user based on everything the client knows about the user (the user must configure some things first) and on system information. For example, if the phone is communicating and the user is always with the phone (the "AlwaysWith" device), then the user is near the phone whether it's being used or not. With the computer, it must be being used because the user may leave the computer and go have lunch but not the phone.
 | 13 | **Commands Executor** | Client | Executes commands from a sentence given to it. The commands are processed by the ACD library.
 
@@ -59,10 +59,11 @@ This began as a Python project (in 2020), but even using an IDE got the project 
 - Start the client or the server executables and that's it.
 
 #### - Requirements for some modules to work
+Check on the modules list if they work for your operating system first!
+
 | Module | Requirement(s)
 |-|-|
 | S.M.A.R.T. Checker | The `smartctl` program must be on the PATH.
-| Speech | Only works on Windows, at least for now.
 | Email Sender | The `curl` program must be on the PATH.
 | Online Information Checker | The `chromedriver` program must be on the PATH.
 | GPT Communicator | The `llama-cli` (llama.cpp project) program must be on the PATH.
@@ -71,9 +72,11 @@ This began as a Python project (in 2020), but even using an IDE got the project 
 - Unix-like systems
 - Windows (Win7+)
 
+**NOTE:** if you want full VISOR functionality on Windows with the server, run it in WSL (Win10+ only) and not natively on Windows. It will work just fine (does with me). If you do this, copy the GGUF file into WSL or it will load VERY slowly.
+
 The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project) - on Windows, the minimum is Windows 7, 32 or 64 bits. If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the ",Names and IDs of each module and library.txt" file. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
 
-To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the `bin` folder and configure the device-specific settings on DeviceSettings_EOG.json (like the path to VISOR, for example). Nothing else needs to be done to change things from running on either OS.
+To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the `bin` folder and configure the device-specific settings on DeviceSettings_EOG.json. Nothing else needs to be done to change things from running on either OS.
 
 ## About
 ### - License

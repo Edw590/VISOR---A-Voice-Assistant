@@ -46,7 +46,7 @@ func StartConAppPROCESSES(path GPath, arg string) bool {
 			return false
 		}
 	} else {
-		cmd := exec.Command(GetShell("", ""), "-c", "nohup " + path.GPathToStringConversion() + " </dev/null >/dev/null 2>&1 &")
+		cmd := exec.Command(GetShellSHELL("", ""), "-c", "nohup " + path.GPathToStringConversion() + " </dev/null >/dev/null 2>&1 &")
 		err := cmd.Run()
 		if err != nil {
 			return false

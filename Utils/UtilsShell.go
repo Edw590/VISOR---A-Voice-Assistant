@@ -86,7 +86,7 @@ ExecCmdSHELL for more information.
   - the CmdOutput struct containing the stdout, stderr and error code of the command. Note that their string versions
 */
 func ExecCmdMainSHELL(commands_list[] string, windows_shell string, linux_shell string) (CmdOutput, error) {
-	var shell string = GetShell(windows_shell, linux_shell)
+	var shell string = GetShellSHELL(windows_shell, linux_shell)
 
 	var commands_str string = ""
 	for _, command := range commands_list {
@@ -136,15 +136,15 @@ func ExecCmdMainSHELL(commands_list[] string, windows_shell string, linux_shell 
 }
 
 /*
-GetShell returns the shell to use in the current OS.
+GetShellSHELL returns the shell to use in the current OS.
 
 -----------------------------------------------------------
 
 – Params:
   - windows_shell – the Windows shell, or "" to use the default (powershell.exe)
   - linux_shell – the Linux shell, or "" to use the default (bash)
- */
-func GetShell(windows_shell string, linux_shell string) string {
+*/
+func GetShellSHELL(windows_shell string, linux_shell string) string {
 	if windows_shell == "" {
 		windows_shell = "powershell.exe"
 	}

@@ -395,7 +395,7 @@ func init() {realMain =
 
 func startLlama(instance_type string, ctx_size int, threads int, temp float32, model_loc string, memories string,
 				visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
-	cmd := exec.Command(Utils.GetShell("", ""))
+	cmd := exec.Command(Utils.GetShellSHELL("", ""))
 	stdin, _ := cmd.StdinPipe()
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
