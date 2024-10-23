@@ -31,6 +31,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -155,11 +156,24 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var mutex sync.Mutex
+
+	sendData := func(message_type int, bytes []byte) bool {
+		mutex.Lock()
+		defer mutex.Unlock()
+
+		if err = conn.WriteMessage(message_type, bytes); err != nil {
+			return false
+		}
+
+		return true
+	}
+
 	go func() {
 		for {
 			select {
 				case <- ticker.C:
-					if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+					if !sendData(websocket.PingMessage, nil) {
 						log.Println("Ping error:", err)
 
 						return
@@ -177,13 +191,13 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 					var index_bar int = strings.Index(string(message), "|")
 					var truncated_msg []byte = message[index_bar + 1:]
 
-					if err := conn.WriteMessage(websocket.BinaryMessage, truncated_msg); err != nil {
+					if sendData(websocket.BinaryMessage, truncated_msg) {
+						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(truncated_msg),
+							CRC16.Result(truncated_msg, "CCIT_ZERO"), truncated_msg[:strings.Index(string(truncated_msg), "|")])
+					} else {
 						log.Println("Write error:", err)
 
 						return
-					} else {
-						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(truncated_msg),
-							CRC16.Result(truncated_msg, "CCIT_ZERO"), truncated_msg[:strings.Index(string(truncated_msg), "|")])
 					}
 			}
 		}
@@ -235,7 +249,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
 
-			if err := conn.WriteMessage(websocket.BinaryMessage, response); err == nil {
+			if sendData(websocket.BinaryMessage, response) {
 				log.Printf("Message sent 1. Length: %d; CRC16: %d; Content: %s", len(response),
 					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
 			} else {
