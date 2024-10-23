@@ -274,12 +274,12 @@ func init() {realMain =
 			}
 		}
 
-		memorizeThings := func(input_text string) {
+		memorizeThings := func(input_text string, erase_mem bool) {
 			device_id = Utils.Device_settings_GL.Device_ID
 			memorizing = true
 			var text string = "User input: \"" + input_text + "\". Profile the USER based on their input. Write " +
-				"DETAILED user information as BULLET points (no + or - or anything. ONLY *). Format the output as " +
-				"\"* The user [detail]\". Example: \"* The user likes bags\"."
+				"USEFUL but summarized user information as BULLET points (no + or - or anything. ONLY *). Format the " +
+				"output as \"* The user [detail]\". Example: \"* The user likes bags\"."
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer_dumb.WriteString(text + "\n")
 			_ = writer_dumb.Flush()
@@ -289,7 +289,9 @@ func init() {realMain =
 			}
 			memorizing = false
 
-			modGenInfo_GL.Memories = nil
+			if erase_mem {
+				modGenInfo_GL.Memories = nil
+			}
 			var memories_split []string = strings.Split(to_memorize, "\n")
 			for _, memory := range memories_split {
 				if UtilsSWA.StringHasLettersGENERAL(memory) && strings.Contains(memory, "* ") &&
@@ -343,18 +345,18 @@ func init() {realMain =
 						shut_down = true
 					} else if text == "/mem" {
 						// Memorize and clear the context
-
-						// Summarize the list of memories too (sometimes VISOR may memorize useless sentences, so
-						// this will cut them out)
-						var memories_str string = ""
-						if len(modGenInfo_GL.Memories) > 0 {
-							memories_str = strings.Join(modGenInfo_GL.Memories, ". ")
-						}
-						if memories_str != "" || user_text != "" {
-							memorizeThings(memories_str + ". " + user_text)
+						if user_text != "" {
+							memorizeThings(user_text, false)
 						}
 
 						shut_down = true
+					} else if text == "/memmem" {
+						// Summarize the list of memories (sometimes VISOR may memorize useless sentences, so this will
+						// cut them out - will cut out other things too though, so use with caution).
+						if len(modGenInfo_GL.Memories) > 0 {
+							var memories_str string = strings.Join(modGenInfo_GL.Memories, ". ")
+							memorizeThings(memories_str, true)
+						}
 					} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
 						// Ask Wolfram Alpha the question
 						var question string = text[len(ASK_WOLFRAM_ALPHA):]
