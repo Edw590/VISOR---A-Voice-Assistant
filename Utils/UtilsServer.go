@@ -26,7 +26,6 @@ import (
 	"encoding/base64"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -82,7 +81,7 @@ func startCommunicatorInternalSERVER() bool {
 
 	// Define the WebSocket server address
 	u := url.URL{Scheme: "wss", Host: User_settings_GL.General.Website_domain + ":3234", Path: "/ws"}
-	log.Printf("Connecting to %s", u.String())
+	//log.Printf("Connecting to %s", u.String())
 
 	// Create Basic Auth credentials (username:password)
 	username := "VISOR"
@@ -180,7 +179,7 @@ func startCommunicatorInternalSERVER() bool {
 				}
 			}
 
-			err := conn.WriteMessage(websocket.BinaryMessage, message)
+			err = conn.WriteMessage(websocket.BinaryMessage, message)
 			if err != nil {
 				//log.Println("Write error:", err)
 				srvComm_stop_GL = true
@@ -192,7 +191,7 @@ func startCommunicatorInternalSERVER() bool {
 		routines_working[1] = false
 	}()
 
-	log.Println("Communicator started")
+	//log.Println("Communicator started")
 
 	srvComm_connected_GL = true
 
@@ -204,7 +203,7 @@ func startCommunicatorInternalSERVER() bool {
 			_ = conn.Close()
 			for {
 				if !routines_working[0] && !routines_working[1] {
-					log.Println("Communicator stopped")
+					//log.Println("Communicator stopped")
 
 					srvComm_started_GL = false
 					srvComm_stopping_GL = false

@@ -59,7 +59,7 @@ func Home() fyne.CanvasObject {
 	var communicator_checkbox *widget.Check = widget.NewCheck("Communicator connected", func(checked bool) {
 	})
 
-	var no_website_info_text *canvas.Text = canvas.NewText("", color.White)
+	var no_website_info_label *widget.Label = widget.NewLabel("")
 	var domain_entry *widget.Entry = widget.NewEntry()
 	domain_entry.SetPlaceHolder("Website domain (example: localhost)")
 	var password_entry *widget.Entry = widget.NewPasswordEntry()
@@ -79,12 +79,12 @@ func Home() fyne.CanvasObject {
 					domain_entry.Enable()
 					password_entry.Enable()
 					save_button.Enable()
-					no_website_info_text.Text = "No website info exists. Please enter it to activate full functionality."
+					no_website_info_label.SetText("No website info exists. Please enter it to activate full functionality.")
 				} else {
 					domain_entry.Disable()
 					password_entry.Disable()
 					save_button.Disable()
-					no_website_info_text.Text = "Website info exists"
+					no_website_info_label.SetText("Website info exists")
 				}
 			}
 
@@ -101,7 +101,7 @@ func Home() fyne.CanvasObject {
 	var content *fyne.Container = container.NewVBox(
 		container.NewVBox(text),
 		communicator_checkbox,
-		no_website_info_text,
+		no_website_info_label,
 		domain_entry,
 		password_entry,
 		save_button,
