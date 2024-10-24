@@ -73,6 +73,7 @@ func init() {realMain =
 		}
 		if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
 			log.Println("Failed to load user settings. Using empty ones...")
+			log.Println(err)
 		}
 
 		//////////////////////////////////////////
@@ -98,13 +99,7 @@ func init() {realMain =
 		//////////////////////////////////////////
 		// No terminal window from here on
 
-		go func() {
-			for {
-				Utils.StartCommunicatorSERVER()
-
-				time.Sleep(1 * time.Second)
-			}
-		}()
+		Utils.StartCommunicatorSERVER()
 
 		// Keep syncing the user settings with the server.
 		SettingsSync.SyncUserSettings()
@@ -225,7 +220,7 @@ func init() {realMain =
 					return
 				}
 
-				Utils.SaveUserSettings()
+				Utils.WriteUserSettings()
 
 				time.Sleep(5 * time.Second)
 			}

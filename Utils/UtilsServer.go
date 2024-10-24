@@ -44,19 +44,34 @@ var srvComm_started_GL bool = false
 var srvComm_connected_GL bool = false
 
 /*
-StartCommunicatorSERVER starts the communicator.
+StartCommunicatorSERVER keeps the server communicator running in background, unless it's requested to stop.
+*/
+func StartCommunicatorSERVER() {
+	go func() {
+		for {
+			if startCommunicatorInternalSERVER() {
+				break
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+}
+
+/*
+startCommunicatorInternalSERVER starts the communicator.
 
 This function does not return until the communicator is stopped, or returns in case the communicator is already started.
 
 -----------------------------------------------------------
 
 – Returns:
-  - bool – true if the communicator was started or was already started, false if it an error occurred and it did not
-    start
+  - bool – true if the communicator was requested to stop, false if it was already started or if it an error occurred
+    and it did not start
 */
-func StartCommunicatorSERVER() bool {
+func startCommunicatorInternalSERVER() bool {
 	if srvComm_started_GL {
-		return true
+		return false
 	}
 	srvComm_started_GL = true
 

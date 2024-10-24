@@ -23,36 +23,13 @@ package UtilsSWA
 
 import (
 	"Utils"
-	"time"
 )
 
 /*
-StartCommunicatorSERVER starts the server communicator.
-
-This function does not return until the communicator is stopped.
-
------------------------------------------------------------
-
-– Returns:
-  - bool – true if the communicator was started or was already started, false if it an error occurred and it did not
-	start
+StartCommunicatorSERVER keeps the server communicator running in background, unless it's requested to stop.
 */
-func StartCommunicatorSERVER() bool {
-	return Utils.StartCommunicatorSERVER()
-}
-
-/*
-StartCommunicatorForeverSERVER starts the server communicator in a new thread, in intervals of 1 second in case it's not
-starting.
-*/
-func StartCommunicatorForeverSERVER() {
-	go func() {
-		for {
-			Utils.StartCommunicatorSERVER()
-
-			time.Sleep(1 * time.Second)
-		}
-	}()
+func StartCommunicatorSERVER() {
+	Utils.StartCommunicatorSERVER()
 }
 
 /*

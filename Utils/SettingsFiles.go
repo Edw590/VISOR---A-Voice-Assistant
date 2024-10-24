@@ -93,7 +93,7 @@ type _GeneralConsts struct {
 }
 
 /*
-loadDeviceSettings is the function that initializes the global variables of the DeviceSettings structs.
+readDeviceSettings is the function that initializes the global variables of the DeviceSettings structs.
 
 Call this before SettingsSync.LoadUserSettings.
 
@@ -105,7 +105,7 @@ Call this before SettingsSync.LoadUserSettings.
 – Returns:
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
-func loadDeviceSettings() error {
+func readDeviceSettings() error {
 	bytes, err := os.ReadFile(DEVICE_SETTINGS_FILE)
 	if err != nil {
 		cwd, err := os.Getwd()
@@ -119,14 +119,14 @@ func loadDeviceSettings() error {
 }
 
 /*
-SaveUserSettings is the function that saves the global variables of the UserSettings struct.
+WriteUserSettings is the function that saves the global variables of the UserSettings struct.
 
 -----------------------------------------------------------
 
 – Returns:
   - true if the user settings were successfully saved, false otherwise
- */
-func SaveUserSettings() bool {
+*/
+func WriteUserSettings() bool {
 	var p_string *string = ToJsonGENERAL(User_settings_GL)
 	if p_string == nil {
 		return false
@@ -174,14 +174,14 @@ func loadGenSettings(server bool) error {
 }
 
 /*
-saveGenSettings is the function that saves the global variables of the GenSettings struct to the _GEN_SETTINGS_FILE file.
+writeGenSettings is the function that saves the global variables of the GenSettings struct to the _GEN_SETTINGS_FILE file.
 
 -----------------------------------------------------------
 
 – Params:
   - server – true if the generated settings were successfully saved, false otherwise
 */
-func saveGenSettings(server bool) bool {
+func writeGenSettings(server bool) bool {
 	var settings_file string = GEN_SETTINGS_FILE_CLIENT
 	if server {
 		settings_file = _GEN_SETTINGS_FILE_SERVER

@@ -32,11 +32,7 @@ func main() {
 	Utils.LoadDeviceUserSettings(false)
 	Utils.InitializeCommsChannels()
 
-	go func() {
-		for {
-			Utils.StartCommunicatorSERVER()
-		}
-	}()
+	Utils.StartCommunicatorSERVER()
 	time.Sleep(4 * time.Second)
 	//Utils.StopCommunicatorSERVER()
 

@@ -34,7 +34,7 @@ var last_crc16_GL []byte = nil
 var stop_GL bool = false
 
 /*
-SyncUserSettings keeps synchronizing the remote user settings file with the local one in background.
+SyncUserSettings keeps synchronizing the remote user settings file with the local settings in memory in background.
 
 -----------------------------------------------------------
 
