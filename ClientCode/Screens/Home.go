@@ -72,18 +72,20 @@ func Home() fyne.CanvasObject {
 
 	go func() {
 		for {
-			communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
+			if Current_screen_GL == home_canvas_object_GL {
+				communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
 
-			if !SettingsSync.IsWebsiteInfoEmpty() {
-				domain_entry.Disable()
-				password_entry.Disable()
-				save_button.Disable()
-				no_website_info_text.Text = "Website info exists"
-			} else {
-				domain_entry.Enable()
-				password_entry.Enable()
-				save_button.Enable()
-				no_website_info_text.Text = "No website info exists. Please enter it to activate full funcionality."
+				if !SettingsSync.IsWebsiteInfoEmpty() {
+					domain_entry.Disable()
+					password_entry.Disable()
+					save_button.Disable()
+					no_website_info_text.Text = "Website info exists"
+				} else {
+					domain_entry.Enable()
+					password_entry.Enable()
+					save_button.Enable()
+					no_website_info_text.Text = "No website info exists. Please enter it to activate full funcionality."
+				}
 			}
 
 			time.Sleep(1 * time.Second)

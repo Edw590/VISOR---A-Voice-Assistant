@@ -64,6 +64,18 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		//////////////////////////////////////////
+		// Get the user settings
+
+		var user_settings_json string = ""
+		var p_user_settings_json *string = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadTextFile()
+		if p_user_settings_json != nil {
+			user_settings_json = *p_user_settings_json
+		}
+		if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
+			log.Println("Failed to load user settings. Using empty ones...")
+		}
+
+		//////////////////////////////////////////
 		// Prepare to hide the window
 
 		if !isOpenGLSupport() {
