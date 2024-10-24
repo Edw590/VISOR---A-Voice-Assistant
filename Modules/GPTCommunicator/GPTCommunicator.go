@@ -275,7 +275,7 @@ func init() {realMain =
 		}
 
 		memorizeThings := func(input_text string, erase_mem bool) {
-			device_id = Utils.Device_settings_GL.Device_ID
+			device_id = Utils.Device_settings_GL.Device_ID // To not speak in any device the memorization strings
 			memorizing = true
 			var text string = "User input: \"" + input_text + "\". Profile the USER based on their input. Write " +
 				"USEFUL but summarized user information as BULLET points (no + or - or anything. ONLY *). Format the " +
