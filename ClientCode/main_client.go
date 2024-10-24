@@ -126,8 +126,7 @@ func init() {realMain =
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		var content_label *widget.Label = widget.NewLabel("Welcome!")
-		var content_container *fyne.Container = container.NewVBox(content_label)
+		var content_container *fyne.Container = container.NewVBox(Screens.Home())
 
 		// Create the navigation bar
 		var nav_bar *fyne.Container = container.NewVBox(
