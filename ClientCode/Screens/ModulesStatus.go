@@ -99,20 +99,15 @@ func ModulesStatus(modules []Utils.Module) fyne.CanvasObject {
 func getCheckBoxes(modules []Utils.Module) []fyne.CanvasObject {
 	var check_boxes []fyne.CanvasObject
 
-	// Couldn't do it automatically. So here they are manually...
-
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_Speech), func(b bool) {
-		modules[Utils.NUM_MOD_Speech].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_TasksExecutor), func(b bool) {
-		modules[Utils.NUM_MOD_TasksExecutor].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_SystemChecker), func(b bool) {
-		modules[Utils.NUM_MOD_SystemChecker].Enabled = b
-	}))
-	check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(Utils.NUM_MOD_SpeechRecognition), func(b bool) {
-		modules[Utils.NUM_MOD_SpeechRecognition].Enabled = b
-	}))
+	for i := 2; i < len(modules); i++ {
+		// Keep this variable here. Or it won't work.
+		var num int = i
+		if Utils.MOD_NUMS_SUPPORT[num] & Utils.MOD_CLIENT != 0 {
+			check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(num), func(b bool) {
+				modules[num].Enabled = b
+			}))
+		}
+	}
 
 	return check_boxes
 }
