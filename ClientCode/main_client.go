@@ -25,12 +25,9 @@ import (
 	"ModulesManager"
 	"SettingsSync/SettingsSync"
 	"Utils"
-	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
-	"bufio"
-	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -67,47 +64,6 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		//////////////////////////////////////////
-		// Get the user settings
-
-		go func() {
-			for {
-				Utils.StartCommunicatorSERVER()
-
-				time.Sleep(1 * time.Second)
-			}
-		}()
-
-		if Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
-			var user_settings_json string = ""
-			var p_user_settings_json *string = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadTextFile()
-			if p_user_settings_json != nil {
-				user_settings_json = *p_user_settings_json
-			}
-			if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
-				log.Println("Failed to load user settings. Attempting to retrieve them from the server...")
-				log.Println("Please enter VISOR's website domain")
-				var website_domain string
-				_, _ = fmt.Scanln(&website_domain)
-
-				log.Println("Please enter VISOR's website password")
-				var website_password string
-				_, _ = fmt.Scanln(&website_password)
-
-				Utils.User_settings_GL.General.Website_domain = website_domain
-				Utils.User_settings_GL.General.Website_pw = website_password
-
-				UtilsSWA.WaitForNetwork(10)
-
-				// Load or sync the user settings
-				if !SettingsSync.SyncUserSettings(false) {
-					log.Println("Failed to obtain user settings. Proceeding with empty ones... Press Enter to " +
-						"continue or Ctrl+C to abort.")
-					_, _ = bufio.NewReader(os.Stdin).ReadString('\n')
-				}
-			}
-		}
-
-		//////////////////////////////////////////
 		// Prepare to hide the window
 
 		if !isOpenGLSupport() {
@@ -129,6 +85,14 @@ func init() {realMain =
 
 		//////////////////////////////////////////
 		// No terminal window from here on
+
+		go func() {
+			for {
+				Utils.StartCommunicatorSERVER()
+
+				time.Sleep(1 * time.Second)
+			}
+		}()
 
 		// Keep syncing the user settings with the server.
 		go func() {

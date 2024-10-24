@@ -33,7 +33,7 @@ StartConAppPROCESSES starts a new separate and independent console process with 
 
 – Params:
   - path – the full path of the program to start
-  - arg – an optional argument to pass to the program
+  - arg – an optional argument to pass to the program (ONLY FOR WINDOWS)
 
 – Returns:
   - true if the process was started correctly, false otherwise

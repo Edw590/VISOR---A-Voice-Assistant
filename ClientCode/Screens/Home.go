@@ -22,6 +22,7 @@
 package Screens
 
 import (
+	"SettingsSync/SettingsSync"
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -58,9 +59,32 @@ func Home() fyne.CanvasObject {
 	var communicator_checkbox *widget.Check = widget.NewCheck("Communicator connected", func(checked bool) {
 	})
 
+	var no_website_info_text *canvas.Text = canvas.NewText("", color.White)
+	var domain_entry *widget.Entry = widget.NewEntry()
+	domain_entry.SetPlaceHolder("Website domain (example: localhost)")
+	var password_entry *widget.Entry = widget.NewPasswordEntry()
+	password_entry.SetPlaceHolder("Website password")
+	var save_button *widget.Button = widget.NewButton("Save", func() {
+		SettingsSync.SetWebsiteInfo(domain_entry.Text, password_entry.Text)
+		domain_entry.SetText("")
+		password_entry.SetText("")
+	})
+
 	go func() {
 		for {
 			communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
+
+			if !SettingsSync.IsWebsiteInfoEmpty() {
+				domain_entry.Disable()
+				password_entry.Disable()
+				save_button.Disable()
+				no_website_info_text.Text = "Website info exists"
+			} else {
+				domain_entry.Enable()
+				password_entry.Enable()
+				save_button.Enable()
+				no_website_info_text.Text = "No website info exists. Please enter it to activate full funcionality."
+			}
 
 			time.Sleep(1 * time.Second)
 		}
@@ -75,6 +99,10 @@ func Home() fyne.CanvasObject {
 	var content *fyne.Container = container.NewVBox(
 		container.NewVBox(text),
 		communicator_checkbox,
+		no_website_info_text,
+		domain_entry,
+		password_entry,
+		save_button,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
