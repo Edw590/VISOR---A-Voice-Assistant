@@ -22,10 +22,13 @@
 package Screens
 
 import (
+	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 	"image/color"
+	"time"
 )
 
 // Current_screen_GL is the current app screen. It's currently used to let threads specific to each screen know if they
@@ -52,6 +55,17 @@ func Home() fyne.CanvasObject {
 	text.Alignment = fyne.TextAlignCenter
 	text.TextStyle.Bold = true
 
+	var communicator_checkbox *widget.Check = widget.NewCheck("Communicator connected", func(checked bool) {
+	})
+
+	go func() {
+		for {
+			communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +74,7 @@ func Home() fyne.CanvasObject {
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
 		container.NewVBox(text),
+		communicator_checkbox,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
