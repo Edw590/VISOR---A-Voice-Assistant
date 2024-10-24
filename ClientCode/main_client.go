@@ -214,7 +214,6 @@ func init() {realMain =
 			for {
 				if *module_stop {
 					SettingsSync.StopUserSettingsSyncer()
-					Utils.StopCommunicatorSERVER()
 					quitApp(modules)
 
 					return

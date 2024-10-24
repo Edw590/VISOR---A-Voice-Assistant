@@ -37,20 +37,17 @@ const COMMS_MAP_SRV_KEY string = "SrvComm"
 
 var srvComm_gen_ch_in_GL chan []byte
 var srvComm_gen_ch_out_GL chan []byte
-var srvComm_stop_GL bool = false
 var srvComm_stopping_GL bool = false
 var srvComm_started_GL bool = false
 var srvComm_connected_GL bool = false
 
 /*
-StartCommunicatorSERVER keeps the server communicator running in background, unless it's requested to stop.
+StartCommunicatorSERVER keeps the server communicator running in background.
 */
 func StartCommunicatorSERVER() {
 	go func() {
 		for {
-			if startCommunicatorInternalSERVER() {
-				break
-			}
+			startCommunicatorInternalSERVER()
 
 			time.Sleep(1 * time.Second)
 		}
@@ -68,16 +65,16 @@ This function does not return until the communicator is stopped, or returns in c
   - bool – true if the communicator was requested to stop, false if it was already started or if it an error occurred
     and it did not start
 */
-func startCommunicatorInternalSERVER() bool {
+func startCommunicatorInternalSERVER() {
 	if srvComm_started_GL {
-		return false
+		return
 	}
 	srvComm_started_GL = true
 
-	srvComm_stop_GL = false
 	srvComm_gen_ch_in_GL = make(chan []byte)
 	srvComm_gen_ch_out_GL = make(chan []byte, 1000)
 	var routines_working [2]bool
+	var stop bool = false
 
 	// Define the WebSocket server address
 	u := url.URL{Scheme: "wss", Host: User_settings_GL.General.Website_domain + ":3234", Path: "/ws"}
@@ -109,7 +106,7 @@ func startCommunicatorInternalSERVER() bool {
 
 		srvComm_started_GL = false
 
-		return false
+		return
 	}
 	defer conn.Close()
 
@@ -119,7 +116,7 @@ func startCommunicatorInternalSERVER() bool {
 			message_type, message, err := conn.ReadMessage()
 			if err != nil {
 				//log.Println("Read error:", err)
-				srvComm_stop_GL = true
+				stop = true
 
 				break
 			}
@@ -182,7 +179,7 @@ func startCommunicatorInternalSERVER() bool {
 			err = conn.WriteMessage(websocket.BinaryMessage, message)
 			if err != nil {
 				//log.Println("Write error:", err)
-				srvComm_stop_GL = true
+				stop = true
 
 				break
 			}
@@ -196,7 +193,7 @@ func startCommunicatorInternalSERVER() bool {
 	srvComm_connected_GL = true
 
 	for {
-		if WaitWithStopTIMEDATE(&srvComm_stop_GL, 1000000000) {
+		if WaitWithStopTIMEDATE(&stop, 1000000000) {
 			srvComm_stopping_GL = true
 			close(srvComm_gen_ch_in_GL)
 			close(srvComm_gen_ch_out_GL)
@@ -209,7 +206,7 @@ func startCommunicatorInternalSERVER() bool {
 					srvComm_stopping_GL = false
 					srvComm_connected_GL = false
 
-					return true
+					return
 				}
 
 				time.Sleep(500 * time.Millisecond)
@@ -291,13 +288,6 @@ func QueueNoResponseMessageSERVER(message []byte) {
 
 	var new_msg []byte = append([]byte("N|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
-}
-
-/*
-StopCommunicatorSERVER stops the communicator.
-*/
-func StopCommunicatorSERVER() {
-	srvComm_stop_GL = true
 }
 
 /*
