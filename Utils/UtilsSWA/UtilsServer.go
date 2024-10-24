@@ -58,13 +58,6 @@ func GetGeneralMessageSERVER() []byte {
 }
 
 /*
-StopCommunicatorSERVER stops the communicator.
-*/
-func StopCommunicatorSERVER() {
-	Utils.StopCommunicatorSERVER()
-}
-
-/*
 IsCommunicatorConnectedSERVER checks if the communicator is connected.
 
 -----------------------------------------------------------
