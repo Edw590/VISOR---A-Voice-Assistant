@@ -96,6 +96,10 @@ func PathFILESDIRS(describes_dir bool, separator string, sub_paths ...any) GPath
 		return GPath{}
 	}
 
+	if separator == "" {
+		separator = string(os.PathSeparator)
+	}
+
 	if describes_dir {
 		// If the path describes a directory, make sure it ends with a path separator.
 		if !strings.HasSuffix(sub_paths_str[len(sub_paths_str)-1], separator) {
@@ -118,10 +122,6 @@ func PathFILESDIRS(describes_dir bool, separator string, sub_paths ...any) GPath
 		ends_in_separator = true
 	}
 
-	if separator == "" {
-		separator = string(os.PathSeparator)
-	}
-
 	// The call to Join() is on purpose - it correctly joins *and cleans* the final path string (only if it's used with
 	// the OS path separator - which is always the case).
 	var gPath GPath = GPath{
@@ -129,7 +129,6 @@ func PathFILESDIRS(describes_dir bool, separator string, sub_paths ...any) GPath
 		s:   separator,
 		dir: false,
 	}
-	gPath.dir = gPath.DescribesDir()
 
 	// Check if the path describes a directory and if it does, make sure the path separator is at the end (especially
 	// since Join() removes it if it's there).
@@ -143,6 +142,8 @@ func PathFILESDIRS(describes_dir bool, separator string, sub_paths ...any) GPath
 			gPath.p += gPath.s
 		}
 	}
+
+	gPath.dir = gPath.DescribesDir()
 
 	return gPath
 }
@@ -406,7 +407,13 @@ func (gPath GPath) Create(create_file bool) error {
 	}
 
 	// Create all parent directories if they don't exist.
-	if !PathFILESDIRS(true, "", gPath.p[:FindAllIndexesGENERAL(gPath.p, gPath.s)[len(path_list)-1]+1]).Exists() {
+	var path_before_file string = gPath.p
+	var all_separators_idx []int = FindAllIndexesGENERAL(gPath.p, gPath.s)
+	var after_last_bar_idx int = all_separators_idx[len(all_separators_idx)-1]+1
+	if after_last_bar_idx < len(gPath.p) {
+		path_before_file = gPath.p[:after_last_bar_idx]
+	}
+	if !PathFILESDIRS(true, "", path_before_file).Exists() {
 		var current_path GPath = GPath{}
 		if strings.HasPrefix(gPath.p, gPath.s) {
 			current_path.p = gPath.s

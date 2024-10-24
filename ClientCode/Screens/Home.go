@@ -61,7 +61,7 @@ func Home() fyne.CanvasObject {
 
 	var no_website_info_label *widget.Label = widget.NewLabel("")
 	var domain_entry *widget.Entry = widget.NewEntry()
-	domain_entry.SetPlaceHolder("Website domain (example: localhost)")
+	domain_entry.SetPlaceHolder("Website domain or IP (example: localhost)")
 	var password_entry *widget.Entry = widget.NewPasswordEntry()
 	password_entry.SetPlaceHolder("Website password")
 	var save_button *widget.Button = widget.NewButton("Save", func() {
