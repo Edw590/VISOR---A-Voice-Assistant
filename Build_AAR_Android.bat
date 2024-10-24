@@ -18,6 +18,7 @@ gomobile bind^
  "ACD/ACD"^
  "OICComm/OICComm"^
  "GPTComm/GPTComm"^
+ "SettingsSync/SettingsSync"^
  "SpeechQueue/SpeechQueue"^
  "TEHelper/TEHelper"
 

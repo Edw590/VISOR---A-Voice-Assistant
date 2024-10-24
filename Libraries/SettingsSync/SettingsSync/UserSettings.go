@@ -34,61 +34,56 @@ var last_crc16_GL []byte = nil
 var stop_GL bool = false
 
 /*
-SyncUserSettings keeps synchronizing the remote user settings file with the local one.
+SyncUserSettings keeps synchronizing the remote user settings file with the local one in background.
 
 -----------------------------------------------------------
 
 – Params:
   - loop – if true, the function will keep running until it's stopped with StopUserSettingsSyncer()
-
-– Returns:
-  - true if the user settings were successfully synchronized, false otherwise
 */
-func SyncUserSettings(loop bool) bool {
-	if !loop && !Utils.IsCommunicatorConnectedSERVER() {
-		return false
-	}
+func SyncUserSettings() {
+	go func() {
+		var last_get_settings_when_s int64 = 0
+		for {
+			var update_settings bool = false
+			if time.Now().Unix() >= last_get_settings_when_s + _GET_SETTINGS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
+				update_settings = true
 
-	var last_get_settings_when_s int64 = 0
-	for {
-		var update_settings bool = false
-		if time.Now().Unix() >= last_get_settings_when_s + _GET_SETTINGS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
-			update_settings = true
-
-			last_get_settings_when_s = time.Now().Unix()
-		}
-
-		if update_settings {
-			Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|false|US"))
-			var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
-			if comms_map == nil {
-				return false
-			}
-			map_value, ok := comms_map[Utils.COMMS_MAP_SRV_KEY]
-			if !ok {
-				continue
+				last_get_settings_when_s = time.Now().Unix()
 			}
 
-			var new_crc16 []byte = map_value.([]byte)
-			if !bytes.Equal(new_crc16, last_crc16_GL) {
-				last_crc16_GL = new_crc16
-
-				Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|true|US"))
-				comms_map = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
+			if update_settings {
+				Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|false|US"))
+				var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
 				if comms_map == nil {
-					return false
+					return
+				}
+				map_value, ok := comms_map[Utils.COMMS_MAP_SRV_KEY]
+				if !ok {
+					continue
 				}
 
-				var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+				var new_crc16 []byte = map_value.([]byte)
+				if !bytes.Equal(new_crc16, last_crc16_GL) {
+					last_crc16_GL = new_crc16
 
-				return Utils.FromJsonGENERAL(json, &Utils.User_settings_GL) == nil
+					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|true|US"))
+					comms_map = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
+					if comms_map == nil {
+						return
+					}
+
+					var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+
+					_ = Utils.FromJsonGENERAL(json, &Utils.User_settings_GL)
+				}
+			}
+
+			if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
+				return
 			}
 		}
-
-		if !loop || Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
-			return false
-		}
-	}
+	}()
 }
 
 /*

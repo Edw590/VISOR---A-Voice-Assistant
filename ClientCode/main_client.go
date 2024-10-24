@@ -107,9 +107,7 @@ func init() {realMain =
 		}()
 
 		// Keep syncing the user settings with the server.
-		go func() {
-			SettingsSync.SyncUserSettings(true)
-		}()
+		SettingsSync.SyncUserSettings()
 
 		ClientRegKeys.RegisterValues()
 
