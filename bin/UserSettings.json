@@ -13,7 +13,7 @@
 		"User_email_addr": "your@email.address",
 
 		// Website_domain is the domain of the VISOR server (or your IP address if you don't have a domain)
-		"Website_domain": "myserver.domain",
+		"Website_domain": "localhost",
 		// Website_pw is the password for the VISOR server
 		"Website_pw": "a_random_letters_and_numbers_strong_password",
 
