@@ -21,9 +21,16 @@
 
 package Utils
 
+import Tcef "github.com/Edw590/TryCatch-go"
+
 func QueueNotificationNOTIFS(title string, text string) {
-	ModsCommsChannels_GL[NUM_MOD_VISOR] <- map[string]any{
-		// Send a message to LIB_2 saying the GPT just started writing
-		"Notification": []string{title, text},
-	}
+	Tcef.Tcef{
+		// Ignore the panic of writing on closed a channel
+		Try: func() {
+			ModsCommsChannels_GL[NUM_MOD_VISOR] <- map[string]any{
+				// Send a message to LIB_2 saying the GPT just started writing
+				"Notification": []string{title, text},
+			}
+		},
+	}.Do()
 }

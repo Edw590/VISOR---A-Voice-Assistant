@@ -145,8 +145,8 @@ func startCommunicatorInternalSERVER() {
 				continue
 			}
 
-			// Sometimes this may try to write to closed channels. Ignore that.
 			Tcef.Tcef{
+				// Ignore the panic of writing on closed a channel
 				Try: func() {
 					if !srvComm_stopping_GL {
 						if to_mod {

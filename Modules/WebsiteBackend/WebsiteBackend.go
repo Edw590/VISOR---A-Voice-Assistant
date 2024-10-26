@@ -316,9 +316,14 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 
 			if bytes != nil {
-				Utils.ModsCommsChannels_GL[Utils.NUM_MOD_GPTCommunicator] <- map[string]any{
-					"ToProcess": Utils.DecompressString(bytes),
-				}
+				Tcef.Tcef{
+					// Ignore the panic of writing on closed a channel
+					Try: func() {
+						Utils.ModsCommsChannels_GL[Utils.NUM_MOD_GPTCommunicator] <- map[string]any{
+							"ToProcess": Utils.DecompressString(bytes),
+						}
+					},
+				}.Do()
 			}
 
 			return ret

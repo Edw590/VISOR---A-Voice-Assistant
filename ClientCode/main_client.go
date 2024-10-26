@@ -155,12 +155,16 @@ func init() {realMain =
 				content_container.Objects = []fyne.CanvasObject{Screens.Calendar()}
 				content_container.Refresh()
 			}),
-			widget.NewButton("Global values", func() {
+			widget.NewButton("Registry", func() {
 				content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues()}
 				content_container.Refresh()
 			}),
 			widget.NewButton("System State", func() {
 				content_container.Objects = []fyne.CanvasObject{Screens.SystemState()}
+				content_container.Refresh()
+			}),
+			widget.NewButton("Settings", func() {
+				content_container.Objects = []fyne.CanvasObject{Screens.Settings()}
 				content_container.Refresh()
 			}),
 		)

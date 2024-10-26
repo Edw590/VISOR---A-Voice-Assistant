@@ -22,38 +22,30 @@
 package Screens
 
 import (
-	"Speech"
-	"SpeechQueue/SpeechQueue"
+	"Utils/UtilsSWA"
+	"VISOR_Client/ClientRegKeys"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"time"
 )
 
-var file_path_GL string = ""
+var settings_canvas_object_GL fyne.CanvasObject = nil
 
-var dev_mode_canvas_object_GL fyne.CanvasObject = nil
-
-func DevMode(window fyne.Window) fyne.CanvasObject {
-	Current_screen_GL = dev_mode_canvas_object_GL
-	if dev_mode_canvas_object_GL != nil {
-		return dev_mode_canvas_object_GL
+func Settings() fyne.CanvasObject {
+	Current_screen_GL = settings_canvas_object_GL
+	if settings_canvas_object_GL != nil {
+		return settings_canvas_object_GL
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// Entry and Button section
-	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
-	entry_txt_to_speech.PlaceHolder = "Enter text to speak"
-	entry_txt_to_speech.Text = "This is an example."
-	var btn_speak_min *widget.Button = widget.NewButton("Speak (min priority)", func() {
-		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_LOW, SpeechQueue.MODE_DEFAULT, "", 0)
-	})
-	var btn_speak_high *widget.Button = widget.NewButton("Speak (high priority)", func() {
-		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE_DEFAULT, "", 0)
-	})
-	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
-		Speech.SkipCurrentSpeech()
-	})
+	go func() {
+		for {
+			if Current_screen_GL == settings_canvas_object_GL {
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
 
 
 
@@ -62,31 +54,49 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		entry_txt_to_speech,
-		btn_speak_min,
-		btn_speak_high,
-		btn_skip_speech,
+		createChooser(ClientRegKeys.K_SPEECH_NORMAL_VOL),
+		createChooser(ClientRegKeys.K_SPEECH_CRITICAL_VOL),
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	dev_mode_canvas_object_GL = main_scroll
-	Current_screen_GL = dev_mode_canvas_object_GL
+	settings_canvas_object_GL = main_scroll
+	Current_screen_GL = settings_canvas_object_GL
 
-	return dev_mode_canvas_object_GL
+	return settings_canvas_object_GL
 }
 
-func showFilePicker(w fyne.Window) {
-	dialog.ShowFileOpen(func(f fyne.URIReadCloser, err error) {
-		file_path_GL = ""
-		if err != nil {
-			dialog.ShowError(err, w)
-			return
+func createChooser(key string) *fyne.Container {
+	var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(key)
+	var label *widget.Label = widget.NewLabel("Name: " + value.Pretty_name + "\nType: " + value.Type_)
+	var content []fyne.CanvasObject = []fyne.CanvasObject{label}
+
+	var entry *widget.Entry = nil
+	var check *widget.Check = nil
+	switch value.Type_ {
+		case UtilsSWA.TYPE_INT: fallthrough
+		case UtilsSWA.TYPE_LONG: fallthrough
+		case UtilsSWA.TYPE_STRING: fallthrough
+		case UtilsSWA.TYPE_FLOAT: fallthrough
+		case UtilsSWA.TYPE_DOUBLE:
+			entry = widget.NewEntry()
+			content = append(content, entry)
+		case UtilsSWA.TYPE_BOOL:
+			check = widget.NewCheck("Check", nil)
+			content = append(content, check)
+	}
+
+	// Save button
+	content = append(content, widget.NewButton("Save", func() {
+		if entry != nil {
+			value.SetData(entry.Text, false)
+		} else if check != nil {
+			value.SetBool(check.Checked, false)
 		}
-		if f == nil {
-			return
-		}
-		file_path_GL = f.URI().Path()
-	}, w)
+	}))
+
+	return container.NewVBox(
+		content...
+	)
 }

@@ -69,7 +69,7 @@ func init() {realMain =
 				last_and = ""
 			}
 
-			var speech_priority int = SpeechQueue.PRIORITY_MEDIUM
+			var speech_priority int32 = SpeechQueue.PRIORITY_MEDIUM
 			var sentence_str string = ""
 			if map_value, ok := comms_map["SentenceInternal"]; ok {
 				sentence_str = map_value.(string)
@@ -112,7 +112,7 @@ func init() {realMain =
 			if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
 				var speak string = "WARNING! There was a problem processing the commands Sir. This needs a fix. The " +
 					"error was the following: " + cmds_info_str + ". You said: " + sentence_str
-				Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 				log.Println("EXECUTOR - ERR_PROC_CMDS")
 
 				time.Sleep(1 * time.Second)
@@ -139,14 +139,14 @@ func init() {realMain =
 			if send_to_GPT {
 				if !Utils.IsCommunicatorConnectedSERVER() {
 					var speak string = "GPT unavailable. Communicator not connected."
-					Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+					Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 					return
 				}
 
 				if !GPTComm.SendText(sentence_str, true) {
 					Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.",
-						speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+						speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 				}
 
 				return
@@ -196,7 +196,7 @@ func init() {realMain =
 
 					case CMD_ASK_BATTERY_PERCENT:
 						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
-							GetData(true, nil).(int)
+							GetInt(true)
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
 						speakInternal(speak, speech_priority, speech_mode2, true)
 
@@ -317,17 +317,17 @@ func init() {realMain =
 	}
 }
 
-func speakInternal(txt_to_speak string, speech_priority int, mode int, auto_gpt bool) {
+func speakInternal(txt_to_speak string, speech_priority int32, mode int32, auto_gpt bool) {
 	if auto_gpt && Utils.IsCommunicatorConnectedSERVER() && GPTComm.SendText("", false) {
 		var text string = "Rephrase the following to maintain its meaning but change its wording: \"" + txt_to_speak +
 			"\". Current device: user's " + Utils.Device_settings_GL.Device_type + "."
 		if !GPTComm.SendText(text, false) {
 			Speech.QueueSpeech("Sorry, the GPT is busy at the moment.", speech_priority,
-				SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 
 		return
 	}
 
-	Speech.QueueSpeech(txt_to_speak, speech_priority, mode)
+	Speech.QueueSpeech(txt_to_speak, speech_priority, mode, "", 0)
 }

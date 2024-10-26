@@ -59,20 +59,21 @@ type Value struct {
 // Normal functions
 
 /*
-RegisterValueREGISTRY registers a value in the registry.
+RegisterValueREGISTRY registers a Value in the registry.
 
 -----------------------------------------------------------
 
 – Params:
   - key – the key of the value
-  - pretty_name – the pretty name of the value
-  - description – the description of the value
-  - value_type – the type of the value
+  - pretty_name – the pretty name of the Value
+  - description – the description of the Value
+  - value_type – the type of the Value
+  - init_value – the initial current value of the Value
 
 – Returns:
-  - the created value or nil if the value already exists
+  - the created value or nil if the Value already exists
 */
-func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string) *Value {
+func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string, init_data string) *Value {
 	if value := GetValueREGISTRY(key); value != nil {
 		return nil
 	}
@@ -87,16 +88,24 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 	switch value.Type_ {
 		case TYPE_BOOL:
 			value.Prev_data = "false"
-			value.Curr_data = "false"
+			if init_data == "" {
+				value.Curr_data = "false"
+			} else {
+				value.Curr_data = init_data
+			}
 		case TYPE_INT: fallthrough
 		case TYPE_LONG: fallthrough
 		case TYPE_FLOAT: fallthrough
 		case TYPE_DOUBLE:
 			value.Prev_data = "-1"
-			value.Curr_data = "-1"
+			if init_data == "" {
+				value.Curr_data = "-1"
+			} else {
+				value.Curr_data = init_data
+			}
 		case TYPE_STRING:
 			value.Prev_data = ""
-			value.Curr_data = ""
+			value.Curr_data = init_data
 	}
 
 
@@ -635,7 +644,7 @@ func (value *Value) SetString(data string, update_if_same bool) bool {
 }
 
 /*
-SetData sets the value and converts it to the right type automatically.
+SetData sets the value directly in string without conversion.
 
 -----------------------------------------------------------
 
@@ -646,22 +655,13 @@ SetData sets the value and converts it to the right type automatically.
 - Returns:
   - whether the data was set
 */
-func (value *Value) SetData(data any, update_if_same bool) bool {
-	switch value.Type_ {
-		case TYPE_BOOL:
-			return value.SetBool(data.(bool), update_if_same)
-		case TYPE_INT:
-			return value.SetInt(data.(int), update_if_same)
-		case TYPE_LONG:
-			return value.SetLong(data.(int64), update_if_same)
-		case TYPE_FLOAT:
-			return value.SetFloat(data.(float32), update_if_same)
-		case TYPE_DOUBLE:
-			return value.SetDouble(data.(float64), update_if_same)
-		case TYPE_STRING:
-			return value.SetString(data.(string), update_if_same)
+func (value *Value) SetData(data string, update_if_same bool) bool {
+	if !update_if_same && value.Curr_data == data {
+		return false
 	}
 
-	// Won't happen
-	return false
+	value.setInternal(data)
+	value.Curr_data = data
+
+	return true
 }

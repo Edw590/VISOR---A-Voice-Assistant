@@ -23,24 +23,28 @@ package SpeechQueue
 
 // Speech represents a speech in the speech queue
 type Speech struct {
-	// id is the id of the speech
+	// id is the ID of the speech
 	id string
 	// text is the text of the speech
 	text string
 	// time is the time the speech was added in milliseconds
 	time int64
 	// priority is the priority of the speech
-	priority int
+	priority int32
 	// mode is the mode of the speech - an OR operation of different mode numbers
-	mode int
-	// task_id is the task id related to the speech
-	task_id string
+	mode int32
+	// task_id is the task ID related to the speech
+	task_id int32
 	// interrupted_times is the number of times the speech was interrupted
-	interrupted_times int
+	interrupted_times int32
+	// audio_stream is the stream on which to speak the speech, if applicable
+	audio_stream int32
+	// stopped is a flag that indicates if the speech was stopped or not
+	stopped bool
 }
 
 /*
-GetID gets the id of the speech
+GetID gets the ID of the speech.
 
 -----------------------------------------------------------
 
@@ -52,7 +56,7 @@ func (speech *Speech) GetID() string {
 }
 
 /*
-GetText gets the text of the speech
+GetText gets the text of the speech.
 
 -----------------------------------------------------------
 
@@ -64,7 +68,7 @@ func (speech *Speech) GetText() string {
 }
 
 /*
-GetTime gets the time the speech was added in milliseconds
+GetTime gets the time the speech was added in milliseconds.
 
 -----------------------------------------------------------
 
@@ -76,39 +80,75 @@ func (speech *Speech) GetTime() int64 {
 }
 
 /*
-GetPriority gets the priority of the speech
+GetPriority gets the priority of the speech.
 
 -----------------------------------------------------------
 
 – Returns:
   - the priority of the speech
  */
-func (speech *Speech) GetPriority() int {
+func (speech *Speech) GetPriority() int32 {
 	return speech.priority
 }
 
 /*
-GetMode gets the mode of the speech
+GetMode gets the mode of the speech.
 
 -----------------------------------------------------------
 
 – Returns:
   - the mode of the speech
  */
-func (speech *Speech) GetMode() int {
+func (speech *Speech) GetMode() int32 {
 	return speech.mode
 }
 
 /*
-GetTaskID gets the task id related to the speech
+GetTaskID gets the task ID related to the speech.
 
 -----------------------------------------------------------
 
 – Returns:
   - the task id related to the speech
  */
-func (speech *Speech) GetTaskID() string {
+func (speech *Speech) GetTaskID() int32 {
 	return speech.task_id
+}
+
+/*
+GetAudioStream gets the audio stream of the speech.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the task id related to the speech
+*/
+func (speech *Speech) GetAudioStream() int32 {
+	return speech.audio_stream
+}
+
+/*
+GetStopped gets the stopped flag of the speech.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the value of the stopped flag
+*/
+func (speech *Speech) GetStopped() bool {
+	return speech.stopped
+}
+
+/*
+SetStopped sets the stopped flag of the speech.
+
+-----------------------------------------------------------
+
+– Params:
+  - stopped – the new value for the stopped flag
+*/
+func (speech *Speech) SetStopped(stopped bool) {
+	speech.stopped = stopped
 }
 
 /*

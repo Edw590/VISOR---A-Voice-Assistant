@@ -31,7 +31,6 @@ import (
 	"github.com/itchyny/volume-go"
 	"github.com/schollz/wifiscan"
 	"github.com/yusufpapurcu/wmi"
-	"runtime"
 	"strings"
 	"time"
 )
@@ -98,8 +97,8 @@ func init() {realMain =
 			// Battery information
 			var battery_level int = getBatteryInfo().level
 			var power_connected bool = getBatteryInfo().power_connected
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetData(battery_level, false)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetData(power_connected, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetInt(battery_level, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetBool(power_connected, false)
 
 			device_info_GL.System_state.Battery_info = ModsFileInfo.BatteryInfo{
 				Level:           battery_level,
@@ -107,8 +106,8 @@ func init() {realMain =
 			}
 
 			// Monitor information
-			var screen_brightness int = getBrightness()
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetData(screen_brightness, false)
+			var screen_brightness int = getBrightness(device_info_GL.System_state.Monitor_info.Brightness)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetInt(screen_brightness, false)
 
 			device_info_GL.System_state.Monitor_info = ModsFileInfo.MonitorInfo{
 				Screen_on:  true,
@@ -116,10 +115,10 @@ func init() {realMain =
 			}
 
 			// Sound information
-			var sound_volume int = getSoundVolume()
-			var sound_muted bool = getSoundMuted()
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetData(sound_volume, false)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetData(sound_muted, false)
+			var sound_volume int = getSoundVolume(device_info_GL.System_state.Sound_info.Volume)
+			var sound_muted bool = getSoundMuted(device_info_GL.System_state.Sound_info.Muted)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetInt(sound_volume, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetBool(sound_muted, false)
 
 			device_info_GL.System_state.Sound_info = ModsFileInfo.SoundInfo{
 				Volume: sound_volume,
@@ -134,8 +133,6 @@ func init() {realMain =
 
 				device_info_GL.Last_time_used_s = time.Now().Unix()
 			}
-
-			// TODO: Add delay because of the wifi checking sometimes not finding the networks
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 				return
@@ -162,37 +159,33 @@ func getBatteryInfo() _Battery {
 	}
 }
 
-func getBrightness() int {
-	if runtime.GOOS != "windows" {
-		return -1
-	}
-
+func getBrightness(prev int) int {
 	var dst []WmiMonitorBrightness
 	err := wmi.QueryNamespace("SELECT CurrentBrightness FROM WmiMonitorBrightness", &dst, "root/wmi")
 	if err != nil {
-		return -1
+		return prev
 	}
 
 	if len(dst) > 0 {
 		return int(dst[0].CurrentBrightness)
 	}
 
-	return -1
+	return prev
 }
 
-func getSoundVolume() int {
+func getSoundVolume(prev int) int {
 	vol, err := volume.GetVolume()
 	if err != nil {
-		return -1
+		return prev
 	}
 
 	return vol
 }
 
-func getSoundMuted() bool {
+func getSoundMuted(prev bool) bool {
 	muted, err := volume.GetMuted()
 	if err != nil {
-		return false
+		return prev
 	}
 
 	return muted

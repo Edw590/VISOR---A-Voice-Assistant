@@ -27,23 +27,25 @@ import (
 	"time"
 )
 
-const PRIORITY_LOW int = 0
-const PRIORITY_MEDIUM int = 1
-const PRIORITY_USER_ACTION int = 2
-const PRIORITY_HIGH int = 3
-const PRIORITY_CRITICAL int = 4
+const (
+	PRIORITY_LOW int32   = iota
+	PRIORITY_MEDIUM
+	PRIORITY_USER_ACTION
+	PRIORITY_HIGH
+	PRIORITY_CRITICAL
 
-const NUM_PRIORITIES int = PRIORITY_CRITICAL + 1
+	NUM_PRIORITIES
+)
 
 // MODE_DEFAULT represents all default modes. The default of MODE1 is to only notify if he can't speak. The default of
 //MODE2 is to not bypass the sound.
-const MODE_DEFAULT int = 0;
+const MODE_DEFAULT int32 = 0;
 // MODE1_NO_NOTIF doesn't notify even if he can't speak
-const MODE1_NO_NOTIF int = 1 << 0;
+const MODE1_NO_NOTIF int32 = 1 << 0;
 // MODE1_ALWAYS_NOTIFY always notifies, even if he can speak
-const MODE1_ALWAYS_NOTIFY int = 1 << 1;
+const MODE1_ALWAYS_NOTIFY int32 = 1 << 1;
 // MODE2_BYPASS_NO_SND bypasses the no-sound state in case the device is in a no-sound state
-const MODE2_BYPASS_NO_SND int = 1 << 2;
+const MODE2_BYPASS_NO_SND int32 = 1 << 2;
 
 var speech_queue_GL []*Speech = nil
 
@@ -62,7 +64,7 @@ AddSpeech adds a speech to the speech queue.
 – Returns:
   - the id of the speech
  */
-func AddSpeech(text string, millis int64, priority int, mode int, task_id string) string {
+func AddSpeech(text string, millis int64, priority int32, mode int32, audio_stream int32, task_id int32) string {
 	var id = Utils.RandStringGENERAL(2048)
 
 	if millis == 0 {
@@ -75,6 +77,7 @@ func AddSpeech(text string, millis int64, priority int, mode int, task_id string
 		time: millis,
 		priority: priority,
 		mode: mode,
+		audio_stream: audio_stream,
 		task_id: task_id,
 	}
 
@@ -113,18 +116,22 @@ RemoveSpeech removes a speech from the speech queue.
   - id – the id of the speech
 
 – Returns:
-  - true if the speech was removed, false if the speech does not exist
+  - the speech or nil if the speech does not exist
  */
-func RemoveSpeech(id string) bool {
+func RemoveSpeech(id string) *Speech {
+	if id == "" {
+		return nil
+	}
+
 	for i, speech := range speech_queue_GL {
 		if speech.id == id {
 			Utils.DelElemSLICES(&speech_queue_GL, i)
 
-			return true
+			return speech
 		}
 	}
 
-	return false
+	return nil
 }
 
 /*
@@ -133,12 +140,22 @@ GetNextSpeech gets the next/oldest speech in the speech queue based on the prior
 -----------------------------------------------------------
 
 – Params:
-  - priority – the priority of the speech
+  - priority – the priority of the speech or -1 to get the next highest priority speech
 
 – Returns:
   - the next speech or nil if there are no speeches with the priority
  */
-func GetNextSpeech(priority int) *Speech {
+func GetNextSpeech(priority int32) *Speech {
+	if priority == -1 {
+		for i := NUM_PRIORITIES - 1; i >= 0; i-- {
+			if speech := GetNextSpeech(i); speech != nil {
+				return speech
+			}
+		}
+
+		return nil
+	}
+
 	var oldest_time int64 = math.MaxInt64
 	var oldest_speech *Speech = nil
 	for _, speech := range speech_queue_GL {

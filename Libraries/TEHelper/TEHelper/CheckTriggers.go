@@ -77,17 +77,17 @@ func formatCondition(condition string) string {
 	for _, value := range registry_values {
 		var value_str string = "ERROR"
 		if value.Type_ == UtilsSWA.TYPE_STRING {
-			value_str = value.GetData(true, nil).(string)
+			value_str = value.GetString(true)
 		} else if value.Type_ == UtilsSWA.TYPE_INT {
-			value_str = strconv.Itoa(value.GetData(true, nil).(int))
+			value_str = strconv.Itoa(value.GetInt(true))
 		} else if value.Type_ == UtilsSWA.TYPE_LONG {
-			value_str = strconv.Itoa(int(value.GetData(true, nil).(int64)))
+			value_str = strconv.Itoa(int(value.GetLong(true)))
 		} else if value.Type_ == UtilsSWA.TYPE_BOOL {
-			value_str = strconv.FormatBool(value.GetData(true, nil).(bool))
+			value_str = strconv.FormatBool(value.GetBool(true))
 		} else if value.Type_ == UtilsSWA.TYPE_FLOAT {
-			value_str = strconv.FormatFloat(value.GetData(true, nil).(float64), 'f', -1, 32)
+			value_str = strconv.FormatFloat(float64(value.GetFloat(true)), 'f', -1, 32)
 		} else if value.Type_ == UtilsSWA.TYPE_DOUBLE {
-			value_str = strconv.FormatFloat(value.GetData(true, nil).(float64), 'f', -1, 64)
+			value_str = strconv.FormatFloat(value.GetDouble(true), 'f', -1, 64)
 		}
 
 		condition = strings.Replace(condition, strings.ToLower(value.Key), value_str, -1)

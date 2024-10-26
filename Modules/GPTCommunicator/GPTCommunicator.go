@@ -27,6 +27,7 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
+	Tcef "github.com/Edw590/TryCatch-go"
 
 	// Standard library imports
 	"bufio"
@@ -208,10 +209,15 @@ func init() {realMain =
 					reduceGptTextTxt(gpt_text_txt)
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
 
-					Utils.ModsCommsChannels_GL[Utils.NUM_MOD_WebsiteBackend] <- map[string]any{
-						// Send a message to LIB_2 saying the GPT just started writing
-						"Message": []byte(device_id + "|L_2|start"),
-					}
+					Tcef.Tcef{
+						// Ignore the panic of writing on closed a channel
+						Try: func() {
+							Utils.ModsCommsChannels_GL[Utils.NUM_MOD_WebsiteBackend] <- map[string]any{
+								// Send a message to LIB_2 saying the GPT just started writing
+								"Message": []byte(device_id + "|L_2|start"),
+							}
+						},
+					}.Do()
 				} else if strings.Contains(last_answer, _END_TOKENS) {
 					is_writing = false
 

@@ -29,6 +29,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	Tcef "github.com/Edw590/TryCatch-go"
 	"time"
 )
 
@@ -45,34 +46,39 @@ func Communicator() fyne.CanvasObject {
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
-		Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
-			"Sentence": entry_txt_to_speech.Text,
-		}
+		Tcef.Tcef{
+			// Ignore the panic of writing on closed a channel
+			Try: func() {
+				Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
+					"Sentence": entry_txt_to_speech.Text,
+				}
+			},
+		}.Do()
 	})
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to GPT (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. Communicator not connected."
-			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 			return
 		}
 
 		if !GPTComm.SendText(entry_txt_to_speech.Text, true) {
 			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
-				SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 	})
 	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to GPT (dumb)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. Communicator not connected."
-			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY)
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 			return
 		}
 
 		if !GPTComm.SendText(entry_txt_to_speech.Text, false) {
 			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
-				SpeechQueue.MODE1_ALWAYS_NOTIFY)
+				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 	})
 

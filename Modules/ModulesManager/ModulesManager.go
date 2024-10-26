@@ -45,7 +45,7 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE).SetData(int64(0), false)
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE).SetLong(0, false)
 
 		// Check all modules' support and put on a list to later warn if there were changes of support or not.
 		var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
