@@ -167,8 +167,6 @@ func init() {realMain =
 /*
 QueueSpeech adds a speech to the speech queue.
 
-Note: this function enforces the SpeechQueue.MODE1_ALWAYS_NOTIFY mode. Explanation on the function code.
-
 -----------------------------------------------------------
 
 – Params:
@@ -179,11 +177,6 @@ Note: this function enforces the SpeechQueue.MODE1_ALWAYS_NOTIFY mode. Explanati
 func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, task_id int32) {
 	mutex.Lock()
 	defer mutex.Unlock()
-
-	// Add the ALWAYS_NOTIFY mode always. If there's music playing on the computer (no way to know that), the speech
-	// won't be heard. So just always notify it.
-	// Or actually there's a way, but it's harder - listen and check if there's music playing. Some time.
-	mode = mode | SpeechQueue.MODE1_ALWAYS_NOTIFY
 
 	var speech_id_to_use string = ""
 	if speech_id == "" {

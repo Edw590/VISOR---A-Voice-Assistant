@@ -46,6 +46,22 @@ type CmdOutput struct {
 }
 
 /*
+CheckCmdOutput checks if the command was executed successfully.
+
+-----------------------------------------------------------
+
+– Params:
+  - cmd_output – the CmdOutput struct to check
+  - err – the error returned by the command execution
+
+– Returns:
+  - true if the command was executed successfully, false otherwise
+ */
+func CheckCmdOutput(cmd_output CmdOutput, err error) bool {
+	return err == nil && cmd_output.Exit_code == 0
+}
+
+/*
 ExecCmdSHELL executes a list of commands in a shell and returns the stdout and stderr.
 
 On Windows, the command is executed in powershell.exe; on Linux, it's executed in bash. All elements of the list are

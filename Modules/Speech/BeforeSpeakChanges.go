@@ -26,7 +26,6 @@ import (
 	"Utils"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
-	"github.com/itchyny/volume-go"
 	"log"
 	"strconv"
 )
@@ -81,7 +80,7 @@ func setToSpeakChanges(speech_id string) bool {
 		} else {
 			volumeMutedState_GL.was_muted = 0
 		}
-		_ = volume.Unmute()
+		Utils.SetMutedVOLUME(false)
 
 		// Set the volume
 		var old_volume int = Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume
@@ -90,8 +89,8 @@ func setToSpeakChanges(speech_id string) bool {
 
 		setResetWillChangeVolume(true)
 
-		if new_volume != old_volume {
-			_ = volume.SetVolume(new_volume)
+		if old_volume != new_volume {
+			Utils.SetVolumeVOLUME(new_volume)
 		}
 	} else {
 		if curr_speech.GetMode() & SpeechQueue.MODE2_BYPASS_NO_SND != 0 {
@@ -100,8 +99,7 @@ func setToSpeakChanges(speech_id string) bool {
 			} else {
 				volumeMutedState_GL.was_muted = 0
 			}
-			err := volume.Unmute()
-			if err != nil {
+			if !Utils.SetMutedVOLUME(false) {
 				still_notify = true
 			}
 		}
@@ -121,9 +119,8 @@ func setToSpeakChanges(speech_id string) bool {
 
 				setResetWillChangeVolume(true)
 
-				err := volume.SetVolume(new_volume)
-				if err != nil {
-					log.Println("Error setting the volume to speak: " + err.Error())
+				if !Utils.SetVolumeVOLUME(new_volume) {
+					log.Println("Error setting the volume to speak")
 					still_notify = true
 				}
 			}

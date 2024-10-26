@@ -23,7 +23,7 @@ package Speech
 
 import (
 	"SpeechQueue/SpeechQueue"
-	"github.com/itchyny/volume-go"
+	"Utils"
 	"log"
 	"time"
 )
@@ -64,18 +64,17 @@ func resetToSpeakChanges() {
 	log.Println("user_changed_volume_GL:", user_changed_volume_GL)
 	if volumeMutedState_GL.old_volume != _DEFAULT_VALUE && !user_changed_volume_GL {
 		log.Println("Setting the volume back to the previous value...")
-		err := volume.SetVolume(volumeMutedState_GL.old_volume)
-		if err != nil {
-			log.Println("Error setting the volume back to the previous value:", err)
+		if !Utils.SetVolumeVOLUME(volumeMutedState_GL.old_volume) {
+			log.Println("Error setting the volume back to the previous value")
 		}
 	}
 
 	// Reset the muted state
 	if volumeMutedState_GL.was_muted != _DEFAULT_VALUE {
 		if volumeMutedState_GL.was_muted == 1 {
-			_ = volume.Mute()
+			Utils.SetMutedVOLUME(true)
 		} else {
-			_ = volume.Unmute()
+			Utils.SetMutedVOLUME(false)
 		}
 	}
 

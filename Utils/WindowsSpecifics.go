@@ -24,9 +24,11 @@
 package Utils
 
 import (
+	"github.com/itchyny/volume-go"
 	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
 	"os/exec"
+	"strconv"
 	"syscall"
 )
 
@@ -187,4 +189,53 @@ func toggleNetworkInterfaceCONNECTIVITY(interface_name string, enable bool) bool
 	}
 
 	return cmd_output.Exit_code == 0
+}
+
+/*
+SetVolumeVOLUME sets the system volume.
+
+-----------------------------------------------------------
+
+– Params:
+  - vol – the volume to set (0-100)
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
+func SetVolumeVOLUME(vol int) bool {
+	err := volume.SetVolume(vol)
+	if err != nil {
+		var vol_nircmd int = vol * 65535 / 100
+		return CheckCmdOutput(ExecCmdSHELL([]string{"nircmdc{{EXE}} setsysvolume " + strconv.Itoa(vol_nircmd)}))
+	}
+
+	return true
+}
+
+/*
+SetMutedVOLUME mutes or unmutes the system volume.
+
+-----------------------------------------------------------
+
+– Params:
+  - mute – true to mute the volume, false to unmute it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
+func SetMutedVOLUME(mute bool) bool {
+	var err error
+	if mute {
+		err = volume.Mute()
+		if err != nil {
+			return CheckCmdOutput(ExecCmdSHELL([]string{"nircmdc{{EXE}} mutesysvolume 1"}))
+		}
+	} else {
+		err = volume.Unmute()
+		if err != nil {
+			return CheckCmdOutput(ExecCmdSHELL([]string{"nircmdc{{EXE}} mutesysvolume 0"}))
+		}
+	}
+
+	return true
 }
