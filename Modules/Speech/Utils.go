@@ -54,6 +54,7 @@ func processVolumeChanges() {
 		}
 
 		processing_volume_GL = true
+		stop_volume_processing_GL = false
 
 		// Detect user changes only after some time after the assistant changed the volume to speak, since the first
 		// volume change to be detected would be the assistant himself changing the volume - in case he changed the
