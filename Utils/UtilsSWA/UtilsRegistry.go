@@ -44,6 +44,8 @@ type Value struct {
 	Description string
 	// Type_ is the type of the value
 	Type_ string
+	// Auto_set is true if the value is automatically set by VISOR, false if it is set by the user
+	Auto_set bool
 
 	// Prev_data is the previous data of the value
 	Prev_data string
@@ -73,7 +75,8 @@ RegisterValueREGISTRY registers a Value in the registry.
 – Returns:
   - the created value or nil if the Value already exists
 */
-func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string, init_data string) *Value {
+func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string, init_data string,
+						   auto_set bool) *Value {
 	if value := GetValueREGISTRY(key); value != nil {
 		return nil
 	}
@@ -83,6 +86,7 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 		Pretty_name: pretty_name,
 		Description: description,
 		Type_:       value_type,
+		Auto_set:    auto_set,
 	}
 
 	switch value.Type_ {
@@ -107,7 +111,6 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 			value.Prev_data = ""
 			value.Curr_data = init_data
 	}
-
 
 	Utils.Gen_settings_GL.Registry = append(Utils.Gen_settings_GL.Registry, (*Utils.Value) (value))
 
@@ -172,7 +175,7 @@ func RemoveValueREGISTRY(key string) {
 }
 
 /*
-GetRegistryTextREGISTRY gets a text representation of the registry.
+GetRegistryTextREGISTRY returns a text representation of the registry.
 
 -----------------------------------------------------------
 
@@ -185,6 +188,7 @@ func GetRegistryTextREGISTRY() string {
 	for _, value := range Utils.Gen_settings_GL.Registry {
 		text += "Name: " + value.Pretty_name + "\n" +
 			"Type: " + value.Type_ + "\n" +
+			"Auto set: " + strconv.FormatBool(value.Auto_set) + "\n" +
 			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
 			"Prev data: " + value.Prev_data + "\n" +
 			"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_curr) + "\n" +

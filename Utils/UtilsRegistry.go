@@ -34,6 +34,8 @@ type Value struct {
 	Description string
 	// Type_ is the type of the value
 	Type_ string
+	// Auto_set is true if the value is automatically set by VISOR, false if it is set by the user
+	Auto_set bool
 
 	// Prev_data is the previous data of the value
 	Prev_data string

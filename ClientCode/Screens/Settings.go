@@ -23,11 +23,9 @@ package Screens
 
 import (
 	"Utils/UtilsSWA"
-	"VISOR_Client/ClientRegKeys"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"time"
 )
 
 var settings_canvas_object_GL fyne.CanvasObject = nil
@@ -38,25 +36,17 @@ func Settings() fyne.CanvasObject {
 		return settings_canvas_object_GL
 	}
 
-	go func() {
-		for {
-			if Current_screen_GL == settings_canvas_object_GL {
-			}
-
-			time.Sleep(1 * time.Second)
-		}
-	}()
-
-
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
-		createChooser(ClientRegKeys.K_SPEECH_NORMAL_VOL),
-		createChooser(ClientRegKeys.K_SPEECH_CRITICAL_VOL),
-	)
+	var objects []fyne.CanvasObject = nil
+	for _, value := range UtilsSWA.GetValuesREGISTRY() {
+		if !value.Auto_set {
+			objects = append(objects, createChooser(value.Key))
+		}
+	}
+	var content *fyne.Container = container.NewVBox(objects...)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)

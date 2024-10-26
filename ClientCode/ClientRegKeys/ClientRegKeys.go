@@ -60,19 +60,19 @@ RegisterValues registers the client values in the registry.
  */
 func RegisterValues() {
 	// Modules Manager
-	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary) [AUTO]", UtilsSWA.TYPE_LONG, "")
+	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", UtilsSWA.TYPE_LONG, "", true)
 
 	// Speech
-	UtilsSWA.RegisterValueREGISTRY(K_LAST_SPEECH, "Last speech", "The last speech that was spoken [AUTO]", UtilsSWA.TYPE_STRING, "")
+	UtilsSWA.RegisterValueREGISTRY(K_LAST_SPEECH, "Last speech", "The last speech that was spoken", UtilsSWA.TYPE_STRING, "", true)
 
 	// System Checker
-	UtilsSWA.RegisterValueREGISTRY(K_BATTERY_LEVEL, "Power - Battery level", "The battery level [AUTO]", UtilsSWA.TYPE_INT, "")
-	UtilsSWA.RegisterValueREGISTRY(K_POWER_CONNECTED, "Power - Power connected", "Whether the power is connected [AUTO]", UtilsSWA.TYPE_BOOL, "")
-	UtilsSWA.RegisterValueREGISTRY(K_SCREEN_BRIGHTNESS, "Screen brightness", "The screen brightness [AUTO]", UtilsSWA.TYPE_INT, "")
-	UtilsSWA.RegisterValueREGISTRY(K_SOUND_VOLUME, "Sound volume", "The sound volume [AUTO]", UtilsSWA.TYPE_INT, "")
-	UtilsSWA.RegisterValueREGISTRY(K_SOUND_MUTED, "Sound muted", "Whether the sound is muted [AUTO]", UtilsSWA.TYPE_BOOL, "")
+	UtilsSWA.RegisterValueREGISTRY(K_BATTERY_LEVEL, "Power - Battery level", "The battery level", UtilsSWA.TYPE_INT, "", true)
+	UtilsSWA.RegisterValueREGISTRY(K_POWER_CONNECTED, "Power - Power connected", "Whether the power is connected", UtilsSWA.TYPE_BOOL, "", true)
+	UtilsSWA.RegisterValueREGISTRY(K_SCREEN_BRIGHTNESS, "Screen brightness", "The screen brightness", UtilsSWA.TYPE_INT, "", true)
+	UtilsSWA.RegisterValueREGISTRY(K_SOUND_VOLUME, "Sound volume", "The sound volume", UtilsSWA.TYPE_INT, "", true)
+	UtilsSWA.RegisterValueREGISTRY(K_SOUND_MUTED, "Sound muted", "Whether the sound is muted", UtilsSWA.TYPE_BOOL, "", true)
 
 	// Speech
-	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_NORMAL_VOL, "Speech - Normal volume", "The volume at which to speak non-critical speeches [MANUAL]", UtilsSWA.TYPE_INT, "25")
-	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_CRITICAL_VOL, "Speech - Critical volume", "The volume at which to speak critical speeches [MANUAL]", UtilsSWA.TYPE_INT, "50")
+	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_NORMAL_VOL, "Speech - Normal volume", "The volume at which to speak non-critical speeches", UtilsSWA.TYPE_INT, "25", false)
+	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_CRITICAL_VOL, "Speech - Critical volume", "The volume at which to speak critical speeches", UtilsSWA.TYPE_INT, "50", false)
 }

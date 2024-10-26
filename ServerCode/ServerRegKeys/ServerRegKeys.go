@@ -32,5 +32,5 @@ const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 RegisterValues registers the server values in the registry.
  */
 func RegisterValues() {
-	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", UtilsSWA.TYPE_LONG)
+	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "Modules active", "The modules that are active (in binary)", UtilsSWA.TYPE_LONG, "", true)
 }
