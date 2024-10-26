@@ -74,5 +74,5 @@ func RegisterValues() {
 
 	// Speech
 	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_NORMAL_VOL, "Speech - Normal volume", "The volume at which to speak non-critical speeches", UtilsSWA.TYPE_INT, "25", false)
-	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_CRITICAL_VOL, "Speech - Critical volume", "The volume at which to speak critical speeches", UtilsSWA.TYPE_INT, "50", false)
+	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_CRITICAL_VOL, "Speech - Critical volume", "The volume at which to speak critical speeches", UtilsSWA.TYPE_INT, "100", false)
 }

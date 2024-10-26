@@ -51,6 +51,9 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 	var btn_speak_high *widget.Button = widget.NewButton("Speak (high priority)", func() {
 		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE_DEFAULT, "", 0)
 	})
+	var btn_speak_critical *widget.Button = widget.NewButton("Speak (critical priority)", func() {
+		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_CRITICAL, SpeechQueue.MODE_DEFAULT, "", 0)
+	})
 	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
 		Speech.SkipCurrentSpeech()
 	})
@@ -65,6 +68,7 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 		entry_txt_to_speech,
 		btn_speak_min,
 		btn_speak_high,
+		btn_speak_critical,
 		btn_skip_speech,
 	)
 
