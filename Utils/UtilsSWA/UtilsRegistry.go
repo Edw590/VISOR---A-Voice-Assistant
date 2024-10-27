@@ -24,6 +24,7 @@ package UtilsSWA
 import (
 	"Utils"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -183,6 +184,25 @@ func GetValuesREGISTRY() []Value {
 }
 
 /*
+GetKeysREGISTRY gets all the keys in the registry.
+
+-----------------------------------------------------------
+
+– Returns:
+  - all the keys in the registry separated by "|"
+ */
+func GetKeysREGISTRY() string {
+	var keys string = ""
+
+	for _, value := range Utils.Gen_settings_GL.Registry {
+		keys += value.Key + "|"
+	}
+	keys = keys[:len(keys) - 1]
+
+	return keys
+}
+
+/*
 RemoveValueREGISTRY removes a value from the registry based on its key.
 
 -----------------------------------------------------------
@@ -202,20 +222,21 @@ func RemoveValueREGISTRY(key string) {
 }
 
 /*
-GetRegistryTextREGISTRY returns a text representation of the registry.
+GetRegistryTextREGISTRY returns a text representation of the Registry.
 
 -----------------------------------------------------------
 
 – Returns:
-  - a text representation of the registry
+  - a text representation of the Registry
  */
 func GetRegistryTextREGISTRY() string {
 	var text string = ""
 
 	for _, value := range Utils.Gen_settings_GL.Registry {
 		text += "Name: " + value.Pretty_name + "\n" +
-			"Type: " + value.Type_ + "\n" +
+			"Key: " + strings.ToLower(value.Key) + "\n" +
 			"Auto set: " + strconv.FormatBool(value.Auto_set) + "\n" +
+			"Type: " + strings.ToLower(value.Type_[len("TYPE_"):]) + "\n" +
 			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
 			"Prev data: " + value.Prev_data + "\n" +
 			"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_curr) + "\n" +
