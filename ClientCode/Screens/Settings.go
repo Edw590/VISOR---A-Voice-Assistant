@@ -59,7 +59,8 @@ func Settings() fyne.CanvasObject {
 
 func createChooser(key string) *fyne.Container {
 	var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(key)
-	var label *widget.Label = widget.NewLabel("Name: " + value.Pretty_name + "\nType: " + value.Type_)
+	var label *widget.Label = widget.NewLabel("Name: " + value.Pretty_name + "\nType: " + value.Type_ +
+		"\nDescription: " + value.Description)
 	var content []fyne.CanvasObject = []fyne.CanvasObject{label}
 
 	var entry *widget.Entry = nil
@@ -71,9 +72,11 @@ func createChooser(key string) *fyne.Container {
 		case UtilsSWA.TYPE_FLOAT: fallthrough
 		case UtilsSWA.TYPE_DOUBLE:
 			entry = widget.NewEntry()
+			entry.SetText(value.Curr_data)
 			content = append(content, entry)
 		case UtilsSWA.TYPE_BOOL:
 			check = widget.NewCheck("Check", nil)
+			check.SetChecked(value.GetBool(true))
 			content = append(content, check)
 	}
 
