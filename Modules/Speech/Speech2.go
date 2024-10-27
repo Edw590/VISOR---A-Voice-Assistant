@@ -181,10 +181,9 @@ func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, 
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	// Add the ALWAYS_NOTIFY mode always. If there's music playing on the computer (no way to know that), the speech
-	// won't be heard. So just always notify it.
-	// Or actually there's a way, but it's harder - listen and check if there's music playing. Some time.
-	mode = mode | SpeechQueue.MODE1_ALWAYS_NOTIFY
+	if UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_ALWAYS_NOTIFY).GetBool(true) {
+		mode = mode | SpeechQueue.MODE1_ALWAYS_NOTIFY
+	}
 
 	var speech_id_to_use string = ""
 	if speech_id == "" {
