@@ -63,14 +63,16 @@ type Value struct {
 /*
 RegisterValueREGISTRY registers a Value in the registry.
 
+In case the value already exists, the pretty name and the description will be updated with the given ones.
+
 -----------------------------------------------------------
 
 – Params:
-  - key – the key of the value
+  - key – the key of the Value
   - pretty_name – the pretty name of the Value
   - description – the description of the Value
   - value_type – the type of the Value
-  - init_value – the initial current value of the Value
+  - init_data – the initial current data of the Value
 
 – Returns:
   - the created value or nil if the Value already exists
@@ -78,6 +80,31 @@ RegisterValueREGISTRY registers a Value in the registry.
 func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string, init_data string,
 						   auto_set bool) *Value {
 	if value := GetValueREGISTRY(key); value != nil {
+		if value.Time_updated_curr == 0 {
+			// If the value was never changed, update the initial data in case there was a change.
+			switch value.Type_ {
+				case TYPE_BOOL:
+					if init_data == "" {
+						value.Curr_data = "false"
+					} else {
+						value.Curr_data = init_data
+					}
+				case TYPE_INT: fallthrough
+				case TYPE_LONG: fallthrough
+				case TYPE_FLOAT: fallthrough
+				case TYPE_DOUBLE:
+					if init_data == "" {
+						value.Curr_data = "-1"
+					} else {
+						value.Curr_data = init_data
+					}
+				case TYPE_STRING:
+					value.Curr_data = init_data
+			}
+		}
+		value.Pretty_name = pretty_name
+		value.Description = description
+
 		return nil
 	}
 
