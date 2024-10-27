@@ -214,10 +214,6 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 			// Keep reloading the device settings and saving the generated settings global variables in case it's MOD_0
 			// that's running.
 			for {
-				if module.Stop {
-					break
-				}
-
 				// Always reload the device settings
 				err := readDeviceSettings()
 				if err != nil {
@@ -225,6 +221,10 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 					log.Println("warning: Error obtaining device settings - aborting")
 
+					break
+				}
+
+				if module.Stop {
 					break
 				}
 
