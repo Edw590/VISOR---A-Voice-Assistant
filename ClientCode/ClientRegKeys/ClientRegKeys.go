@@ -91,4 +91,10 @@ func RegisterValues() {
 		"The volume at which to speak critical speeches", UtilsSWA.TYPE_INT, "100", false)
 	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_ALWAYS_NOTIFY, "Speech - Always notify",
 		"Always notify speeches (useful if media is playing)", UtilsSWA.TYPE_BOOL, "true", false)
+
+
+	/////////////////////////////////////////////
+	// Clean the registry
+
+	UtilsSWA.CleanRegistryREGISTRY()
 }

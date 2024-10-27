@@ -35,6 +35,8 @@ const TYPE_FLOAT string = "TYPE_FLOAT"
 const TYPE_DOUBLE string = "TYPE_DOUBLE"
 const TYPE_STRING string = "TYPE_STRING"
 
+var keys_added_GL []string = nil
+
 // Value represents a value in the registry
 type Value struct {
 	// Key is the Key of the value
@@ -62,9 +64,11 @@ type Value struct {
 // Normal functions
 
 /*
-RegisterValueREGISTRY registers a Value in the registry.
+RegisterValueREGISTRY registers a Value in the Registry.
 
 In case the value already exists, the pretty name and the description will be updated with the given ones.
+
+After registering all necessary Values, call CleanRegistryREGISTRY().
 
 -----------------------------------------------------------
 
@@ -80,6 +84,7 @@ In case the value already exists, the pretty name and the description will be up
 */
 func RegisterValueREGISTRY(key string, pretty_name string, description string, value_type string, init_data string,
 						   auto_set bool) *Value {
+	keys_added_GL = append(keys_added_GL, key)
 	if value := GetValueREGISTRY(key); value != nil {
 		if value.Time_updated_curr == 0 {
 			// If the value was never changed, update the initial data in case there was a change.
@@ -143,6 +148,26 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 	Utils.Gen_settings_GL.Registry = append(Utils.Gen_settings_GL.Registry, (*Utils.Value) (value))
 
 	return value
+}
+
+/*
+CleanRegistryREGISTRY cleans the registry by removing old unused Values that were not registered in the current session.
+
+Useful for when a Value is removed from the code but is still on users' Gen Settings.
+
+Call this after registering all necessary Values.
+ */
+func CleanRegistryREGISTRY() {
+	var registry []*Utils.Value
+	for _, value := range Utils.Gen_settings_GL.Registry {
+		for _, key := range keys_added_GL {
+			if value.Key == key {
+				registry = append(registry, value)
+				break
+			}
+		}
+	}
+	Utils.Gen_settings_GL.Registry = registry
 }
 
 /*
@@ -213,10 +238,16 @@ RemoveValueREGISTRY removes a value from the registry based on its key.
 func RemoveValueREGISTRY(key string) {
 	for i, value := range Utils.Gen_settings_GL.Registry {
 		if value.Key == key {
-			Utils.Gen_settings_GL.Registry = append(Utils.Gen_settings_GL.Registry[:i],
-				Utils.Gen_settings_GL.Registry[i+1:]...)
+			Utils.DelElemSLICES(&Utils.Gen_settings_GL.Registry, i)
 
-			return
+			break
+		}
+	}
+	for i, key_added := range keys_added_GL {
+		if key_added == key {
+			Utils.DelElemSLICES(&keys_added_GL, i)
+
+			break
 		}
 	}
 }
@@ -234,7 +265,7 @@ func GetRegistryTextREGISTRY() string {
 
 	for _, value := range Utils.Gen_settings_GL.Registry {
 		text += "Name: " + value.Pretty_name + "\n" +
-			"Key: " + strings.ToLower(value.Key) + "\n" +
+			"Key: " + value.Key + "\n" +
 			"Auto set: " + strconv.FormatBool(value.Auto_set) + "\n" +
 			"Type: " + strings.ToLower(value.Type_[len("TYPE_"):]) + "\n" +
 			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
