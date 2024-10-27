@@ -27,6 +27,9 @@ import (
 
 const _SETTINGS_PREFIX string = "MANUAL_"
 
+/////////////////////////////////////////////////////////////////////////////
+// Automatic values
+
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 
@@ -34,12 +37,6 @@ const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
 
 // Type: string
 const K_LAST_SPEECH string = "LAST_SPEECH"
-// Type: int
-const K_SPEECH_NORMAL_VOL string = _SETTINGS_PREFIX + "SPEECH_NORMAL_VOL"
-// Type: int
-const K_SPEECH_CRITICAL_VOL string = _SETTINGS_PREFIX + "SPEECH_CRITICAL_VOL"
-// Type: bool
-const K_SPEECH_ALWAYS_NOTIFY string = _SETTINGS_PREFIX + "SPEECH_ALWAYS_NOTIFY"
 
 // System Checker
 
@@ -53,6 +50,16 @@ const K_SCREEN_BRIGHTNESS string = "SCREEN_BRIGHTNESS"
 const K_SOUND_VOLUME string = "SOUND_VOLUME"
 // Type: bool
 const K_SOUND_MUTED string = "SOUND_MUTED"
+
+/////////////////////////////////////////////////////////////////////////////
+// Manual values
+
+// Type: int
+const K_SPEECH_NORMAL_VOL string = _SETTINGS_PREFIX + "SPEECH_NORMAL_VOL"
+// Type: int
+const K_SPEECH_CRITICAL_VOL string = _SETTINGS_PREFIX + "SPEECH_CRITICAL_VOL"
+// Type: bool
+const K_SPEECH_ALWAYS_NOTIFY string = _SETTINGS_PREFIX + "SPEECH_ALWAYS_NOTIFY"
 
 /*
 RegisterValues registers the client values in the registry.
