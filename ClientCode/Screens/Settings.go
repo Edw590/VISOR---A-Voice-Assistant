@@ -41,7 +41,9 @@ func Settings() fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var objects []fyne.CanvasObject = nil
-	for _, value := range UtilsSWA.GetValuesREGISTRY() {
+	var values []UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	for i := len(values) - 1; i >= 0; i-- {
+		var value *UtilsSWA.Value = &values[i]
 		if !value.Auto_set {
 			objects = append(objects, createChooser(value.Key))
 		}
