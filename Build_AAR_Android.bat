@@ -20,6 +20,7 @@ gomobile bind^
  "GPTComm/GPTComm"^
  "SettingsSync/SettingsSync"^
  "SpeechQueue/SpeechQueue"^
- "TEHelper/TEHelper"
+ "TEHelper/TEHelper"^
+ "ULHelper/ULHelper"
 
 echo Error code: %ERRORLEVEL%

@@ -30,8 +30,6 @@ import (
 	"log"
 )
 
-// Tasks Executor //
-
 var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo

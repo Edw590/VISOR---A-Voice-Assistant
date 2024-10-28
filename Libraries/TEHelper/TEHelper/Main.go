@@ -22,7 +22,7 @@
 package TEHelper
 
 import (
-	"UserLocator"
+	"ULHelper/ULHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"strings"
@@ -41,6 +41,10 @@ var prev_prev_last_known_user_loc_GL string = user_location_GL.Prev_location
 
 var stop_GL bool = false
 
+var (
+	modUserInfo_GL *ModsFileInfo.Mod9UserInfo = &Utils.User_settings_GL.TasksExecutor
+)
+
 /*
 CheckDueTasks checks if any Task is due.
 
@@ -53,7 +57,7 @@ This function will block until a Task is due. When that happens, the Task is ret
  */
 func CheckDueTasks() *ModsFileInfo.Task {
 	for {
-		tasks_GL = Utils.User_settings_GL.TasksExecutor.Tasks
+		tasks_GL = modUserInfo_GL.Tasks
 
 		// Location trigger - if the user location changed, check if any task is triggered
 		var curr_last_known_user_loc string = user_location_GL.Curr_location
@@ -126,7 +130,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			} else {
 				// Check if the task has a location and the user is at that location.
 				var curr_user_loc string = user_location_GL.Curr_location
-				if curr_user_loc != UserLocator.UNKNOWN_LOCATION {
+				if curr_user_loc != ULHelper.UNKNOWN_LOCATION {
 					condition_loc = checkLocation(task.User_location, curr_user_loc)
 				}
 			}

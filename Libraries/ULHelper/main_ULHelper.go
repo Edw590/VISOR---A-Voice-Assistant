@@ -19,30 +19,7 @@
  * under the License.
  ******************************************************************************/
 
-package UserLocator
+package main
 
-import (
-	"ULHelper/ULHelper"
-	"Utils"
-)
-
-var (
-	realMain       Utils.RealMain = nil
-	moduleInfo_GL  Utils.ModuleInfo
-)
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-
-		go func() {
-			ULHelper.CheckUserLocation()
-		}()
-
-		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
-				return
-			}
-		}
-	}
+func main() {
 }
