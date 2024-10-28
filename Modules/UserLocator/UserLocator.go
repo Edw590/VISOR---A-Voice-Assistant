@@ -36,11 +36,13 @@ func init() {realMain =
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
 		go func() {
-			ULHelper.CheckUserLocation()
+			ULHelper.UpdateUserLocation()
 		}()
 
 		for {
 			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
+				ULHelper.StopChecker()
+
 				return
 			}
 		}

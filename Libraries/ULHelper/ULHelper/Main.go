@@ -42,13 +42,19 @@ type _IntDeviceInfo struct {
 	Last_known_location string
 }
 
+var stop_GL bool = false
+
 var (
 	modGenInfo_GL  *ModsFileInfo.Mod12GenInfo = &Utils.Gen_settings_GL.MOD_12
 	modUserInfo_GL *ModsFileInfo.Mod12UserInfo = &Utils.User_settings_GL.UserLocator
 )
 
-func CheckUserLocation() {
+/*
+UpdateUserLocation updates the internal user location based on the internal device information.
+*/
+func UpdateUserLocation() {
 	var device_info *ModsFileInfo.DeviceInfo = &Utils.Gen_settings_GL.MOD_10.Device_info
+	stop_GL = false
 
 	for {
 		//log.Println("--------------------------------")
@@ -109,7 +115,9 @@ func CheckUserLocation() {
 		log.Println("Current user location:", curr_user_location)
 		updateUserLocation(&modGenInfo_GL.User_location, curr_user_location)
 
-		time.Sleep(time.Duration(TIME_SLEEP_S) * time.Second)
+		if Utils.WaitWithStopTIMEDATE(&stop_GL, TIME_SLEEP_S) {
+			return
+		}
 	}
 }
 
@@ -139,4 +147,8 @@ func updateUserLocation(user_location *ModsFileInfo.UserLocation, new_location s
 		user_location.Curr_location = new_location
 	}
 	user_location.Last_time_checked_s = time.Now().Unix()
+}
+
+func StopChecker() {
+	stop_GL = true
 }
