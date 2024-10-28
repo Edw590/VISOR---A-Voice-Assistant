@@ -56,6 +56,7 @@ AddSpeech adds a speech to the speech queue.
 
 – Params:
   - text – the text of the speech
+  - id – the ID to use for the speech - make sure to use one that is not repeated!
   - millis – the time at which the speech was added in milliseconds
   - priority – the priority of the speech
   - mode – the mode of the speech - an OR operation of different mode numbers
@@ -64,8 +65,10 @@ AddSpeech adds a speech to the speech queue.
 – Returns:
   - the id of the speech
  */
-func AddSpeech(text string, millis int64, priority int32, mode int32, audio_stream int32, task_id int32) string {
-	var id = Utils.RandStringGENERAL(2048)
+func AddSpeech(text string, id string, millis int64, priority int32, mode int32, audio_stream int32, task_id int32) string {
+	if id == "" {
+		id = GenerateSpeechID()
+	}
 
 	if millis == 0 {
 		millis = time.Now().UnixMilli()
@@ -98,6 +101,10 @@ GetSpeech gets a speech from the speech queue.
   - the speech or nil if the speech does not exist
  */
 func GetSpeech(id string) *Speech {
+	if id == "" {
+		return nil
+	}
+
 	for _, speech := range speech_queue_GL {
 		if speech.id == id {
 			return speech
@@ -166,4 +173,23 @@ func GetNextSpeech(priority int32) *Speech {
 	}
 
 	return oldest_speech
+}
+
+/*
+GenerateSpeechID generates a speech ID.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the speech ID
+ */
+func GenerateSpeechID() string {
+	return Utils.RandStringGENERAL(2048)
+}
+
+/*
+ClearQueue clears the speeches queue.
+ */
+func ClearQueue() {
+	speech_queue_GL = nil
 }
