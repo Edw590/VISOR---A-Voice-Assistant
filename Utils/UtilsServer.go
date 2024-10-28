@@ -24,7 +24,6 @@ package Utils
 import (
 	"crypto/tls"
 	"encoding/base64"
-	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"net/url"
@@ -145,18 +144,13 @@ func startCommunicatorInternalSERVER() {
 				continue
 			}
 
-			Tcef.Tcef{
-				// Ignore the panic of writing on closed a channel
-				Try: func() {
-					if !srvComm_stopping_GL {
-						if to_mod {
-							ModsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
-						} else {
-							LibsCommsChannels_GL[num] <- map[string]any{COMMS_MAP_SRV_KEY: truncated_msg}
-						}
-					}
-				},
-			}.Do()
+			if !srvComm_stopping_GL {
+				if to_mod {
+					SendToModChannel(num, COMMS_MAP_SRV_KEY, truncated_msg)
+				} else {
+					SendToLibChannel(num, COMMS_MAP_SRV_KEY, truncated_msg)
+				}
+			}
 		}
 		routines_working[0] = false
 	}()

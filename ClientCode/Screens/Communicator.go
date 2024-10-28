@@ -29,7 +29,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	Tcef "github.com/Edw590/TryCatch-go"
 	"time"
 )
 
@@ -46,14 +45,7 @@ func Communicator() fyne.CanvasObject {
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
-		Tcef.Tcef{
-			// Ignore the panic of writing on closed a channel
-			Try: func() {
-				Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
-					"Sentence": entry_txt_to_speech.Text,
-				}
-			},
-		}.Do()
+		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", entry_txt_to_speech.Text)
 	})
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to GPT (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {

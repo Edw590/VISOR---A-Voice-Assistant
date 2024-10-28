@@ -21,6 +21,8 @@
 
 package Utils
 
+import Tcef "github.com/Edw590/TryCatch-go"
+
 var ModsCommsChannels_GL [MODS_ARRAY_SIZE]chan map[string]any = [MODS_ARRAY_SIZE]chan map[string]any{}
 var LibsCommsChannels_GL [LIBS_ARRAY_SIZE]chan map[string]any = [LIBS_ARRAY_SIZE]chan map[string]any{}
 
@@ -46,4 +48,46 @@ func CloseCommsChannels() {
 	for i := 0; i < LIBS_ARRAY_SIZE; i++ {
 		close(LibsCommsChannels_GL[i])
 	}
+}
+
+/*
+SendToModChannel sends data to a module channel.
+
+-----------------------------------------------------------
+
+– Params:
+  - mod_num – the module number
+  - key – the key of the data
+  - data – the data to send
+ */
+func SendToModChannel(mod_num int, key string, data any) {
+	// Ignore the panic of writing to closed channels (sometimes happens when the app is shutting down).
+	Tcef.Tcef{
+		Try: func() {
+			ModsCommsChannels_GL[mod_num] <- map[string]any{
+				key: data,
+			}
+		},
+	}.Do()
+}
+
+/*
+SendToLibChannel sends data to a library channel.
+
+-----------------------------------------------------------
+
+– Params:
+  - lib_num – the library number
+  - key – the key of the data
+  - data – the data to send
+ */
+func SendToLibChannel(lib_num int, key string, data any) {
+	// Ignore the panic of writing to closed channels (sometimes happens when the app is shutting down).
+	Tcef.Tcef{
+		Try: func() {
+			LibsCommsChannels_GL[lib_num] <- map[string]any{
+				key: data,
+			}
+		},
+	}.Do()
 }

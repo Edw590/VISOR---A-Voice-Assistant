@@ -27,7 +27,6 @@ import (
 	"TEHelper/TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
-	Tcef "github.com/Edw590/TryCatch-go"
 	"log"
 )
 
@@ -56,14 +55,7 @@ func init() {realMain =
 				}
 
 				if task.Command != "" {
-					Tcef.Tcef{
-						// Ignore the panic of writing on closed a channel
-						Try: func() {
-							Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor] <- map[string]any{
-								"SentenceInternal": task.Command,
-							}
-						},
-					}.Do()
+					Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "SentenceInternal", task.Command)
 				}
 			}
 		}()

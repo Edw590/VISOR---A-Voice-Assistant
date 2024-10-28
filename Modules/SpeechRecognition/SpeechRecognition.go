@@ -23,7 +23,6 @@ package SpeechRecognition
 
 import (
 	"Utils"
-	Tcef "github.com/Edw590/TryCatch-go"
 	porcupine "github.com/Picovoice/porcupine/binding/go/v3"
 	"github.com/gordonklaus/portaudio"
 )
@@ -72,14 +71,7 @@ func init() {realMain =
 		for {
 			keywordIndex, _ := porcupine_.Process(getNextFrameAudio())
 			if keywordIndex >= 0 {
-				Tcef.Tcef{
-					// Ignore the panic of writing on closed a channel
-					Try: func() {
-						Utils.ModsCommsChannels_GL[Utils.NUM_MOD_VISOR] <- map[string]any{
-							"ShowApp": nil,
-						}
-					},
-				}.Do()
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "ShowApp", nil)
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 0) {
