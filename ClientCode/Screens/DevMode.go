@@ -24,6 +24,7 @@ package Screens
 import (
 	"Speech"
 	"SpeechQueue/SpeechQueue"
+	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
@@ -57,6 +58,9 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
 		Speech.SkipCurrentSpeech()
 	})
+	var btn_config_tts *widget.Button = widget.NewButton("Configure Windows SAPI TTS", func() {
+		_, _ = Utils.ExecCmdSHELL([]string{"control.exe C:\\Windows\\System32\\Speech\\SpeechUX\\sapi.cpl"})
+	})
 
 
 
@@ -70,6 +74,7 @@ func DevMode(window fyne.Window) fyne.CanvasObject {
 		btn_speak_high,
 		btn_speak_critical,
 		btn_skip_speech,
+		btn_config_tts,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
