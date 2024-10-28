@@ -13,14 +13,15 @@ gomobile bind^
  -v^
  -ldflags="-v -s -w -compressdwarf=true"^
  -o="bin/MainLibraries.aar"^
- "Utils/ModsFileInfo"^
- "Utils/UtilsSWA"^
  "ACD/ACD"^
- "OICComm/OICComm"^
  "GPTComm/GPTComm"^
+ "OICComm/OICComm"^
+ "SCLink/SCLink"^
  "SettingsSync/SettingsSync"^
  "SpeechQueue/SpeechQueue"^
  "TEHelper/TEHelper"^
- "ULHelper/ULHelper"
+ "ULHelper/ULHelper"^
+ "Utils/ModsFileInfo"^
+ "Utils/UtilsSWA"
 
 echo Error code: %ERRORLEVEL%

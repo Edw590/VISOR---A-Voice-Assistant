@@ -28,6 +28,8 @@ const (
 	NUM_LIB_SpeechQueue
 	NUM_LIB_TEHelper
 	NUM_LIB_SettingsSync
+	NUM_LIB_ULHelper
+	NUM_LIB_SCLink
 
 	LIBS_ARRAY_SIZE
 )
@@ -39,4 +41,6 @@ var LIB_NUMS_NAMES map[int]string = map[int]string{
 	NUM_LIB_SpeechQueue:  "Speech Queue",
 	NUM_LIB_TEHelper:     "Tasks Executor Helper",
 	NUM_LIB_SettingsSync: "Settings Synchronizer",
+	NUM_LIB_ULHelper:     "User Locator Helper",
+	NUM_LIB_SCLink:       "System Checker Link",
 }

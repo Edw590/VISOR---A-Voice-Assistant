@@ -21,3 +21,5 @@ Libraries:
 03 = Speech Queue
 04 = Tasks Executor Helper
 05 = Settings Synchronizer
+06 = User Locator Helper
+07 = System Checker Link

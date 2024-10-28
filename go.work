@@ -16,14 +16,15 @@ use (
 	./Modules/TasksExecutor
 	./Modules/UserLocator
 	./Modules/WebsiteBackend
-	ClientCode
-	Libraries/ACD
+	./ClientCode
+	./Libraries/ACD
 	./Libraries/SettingsSync
-	Libraries/GPTComm
-	Libraries/OICComm
-	Libraries/SpeechQueue
-	Libraries/TEHelper
-	Libraries/ULHelper
-	ServerCode
-	Utils
+	./Libraries/GPTComm
+	./Libraries/OICComm
+	./Libraries/SCLink
+	./Libraries/SpeechQueue
+	./Libraries/TEHelper
+	./Libraries/ULHelper
+	./ServerCode
+	./Utils
 )
