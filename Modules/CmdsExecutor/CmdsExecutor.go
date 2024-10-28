@@ -85,6 +85,8 @@ func init() {realMain =
 			log.Println(cmds_info_str)
 			var cmds_info []string = strings.Split(cmds_info_str, ACD.INFO_CMDS_SEPARATOR)
 			if len(cmds_info) < 2 {
+				sendToGPT(sentence_str)
+
 				time.Sleep(1 * time.Second)
 
 				continue
@@ -109,18 +111,16 @@ func init() {realMain =
 			log.Println(last_and)
 			log.Println("*****************************")
 
+			var send_to_GPT bool = false
 			if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
 				var speak string = "WARNING! There was a problem processing the commands Sir. This needs a fix. The " +
 					"error was the following: " + cmds_info_str + ". You said: " + sentence_str
 				Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 				log.Println("EXECUTOR - ERR_PROC_CMDS")
 
-				time.Sleep(1 * time.Second)
-
-				continue
+				send_to_GPT = true
 			}
 
-			var send_to_GPT bool = false
 			if len(detected_cmds) == 0 || detected_cmds[0] == "" {
 				send_to_GPT = true
 			} else {
@@ -137,17 +137,7 @@ func init() {realMain =
 				// If there are only WARN_-started constants (nevative numbers), send to GPT
 			}
 			if send_to_GPT {
-				if !Utils.IsCommunicatorConnectedSERVER() {
-					var speak string = "GPT unavailable. Communicator not connected."
-					Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
-
-					return
-				}
-
-				if !GPTComm.SendText(sentence_str, true) {
-					Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.",
-						speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
-				}
+				sendToGPT(sentence_str)
 
 				return
 			}
@@ -330,4 +320,18 @@ func speakInternal(txt_to_speak string, speech_priority int32, mode int32, auto_
 	}
 
 	Speech.QueueSpeech(txt_to_speak, speech_priority, mode, "", 0)
+}
+
+func sendToGPT(txt_to_send string) {
+	if !Utils.IsCommunicatorConnectedSERVER() {
+		var speak string = "GPT unavailable. Communicator not connected."
+		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+
+		return
+	}
+
+	if !GPTComm.SendText(txt_to_send, true) {
+		Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
+			SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+	}
 }

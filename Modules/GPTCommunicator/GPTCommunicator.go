@@ -334,6 +334,7 @@ func init() {realMain =
 				device_id = params_split[0]
 				var use_smart bool = params_split[1] == "true"
 				var text string = to_process[strings.Index(to_process, "]") + 1:]
+				text = strings.Replace(text, "\n", "\\n", -1)
 
 				if use_smart && strings.HasPrefix(text, "/") {
 					// Control commands begin with a slash

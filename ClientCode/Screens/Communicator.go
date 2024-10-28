@@ -42,10 +42,13 @@ func Communicator() fyne.CanvasObject {
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// _Entry and Button section
-	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
-	entry_txt_to_speech.PlaceHolder = "Text to send to the assistant"
+
+	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
+	text_to_send.Wrapping = fyne.TextWrapWord
+	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
+	text_to_send.PlaceHolder = "Text to send to the assistant"
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
-		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", entry_txt_to_speech.Text)
+		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", text_to_send.Text)
 	})
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to GPT (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
@@ -55,7 +58,7 @@ func Communicator() fyne.CanvasObject {
 			return
 		}
 
-		if !GPTComm.SendText(entry_txt_to_speech.Text, true) {
+		if !GPTComm.SendText(text_to_send.Text, true) {
 			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
@@ -68,7 +71,7 @@ func Communicator() fyne.CanvasObject {
 			return
 		}
 
-		if !GPTComm.SendText(entry_txt_to_speech.Text, false) {
+		if !GPTComm.SendText(text_to_send.Text, false) {
 			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
@@ -100,7 +103,7 @@ func Communicator() fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		entry_txt_to_speech,
+		text_to_send,
 		btn_send_text,
 		btn_send_text_gpt_smart,
 		btn_send_text_gpt_dumb,
