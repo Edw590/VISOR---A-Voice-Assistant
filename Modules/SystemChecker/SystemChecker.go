@@ -35,10 +35,6 @@ import (
 	"time"
 )
 
-// System Checker //
-
-const _TIME_SLEEP_S int = 5
-
 const SCAN_WIFI_EACH_S int64 = 30
 var last_check_wifi_when_s int64 = 0
 
@@ -134,7 +130,7 @@ func init() {realMain =
 				device_info_GL.Last_time_used_s = time.Now().Unix()
 			}
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
 				return
 			}
 		}
