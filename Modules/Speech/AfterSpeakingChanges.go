@@ -41,6 +41,17 @@ func speechTreatment(speech_id string) {
 	var next_speech *SpeechQueue.Speech = SpeechQueue.GetNextSpeech(-1)
 	log.Println("next_speech != nil?", next_speech != nil)
 	if next_speech != nil {
+		if volume_mute_done_GL && (last_speech == nil && next_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL) ||
+				(last_speech != nil && last_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL) {
+			// This if statement is for when a CRITICAL speech comes after or came before the current speech. In that
+			// case, the volume/mute state may be changed because of the CRITICAL speech. So we have to reset it before
+			// speaking the CRITICAL speech (because before came a normal speech that changed the volume), and reset it
+			// after speaking it to then speak normal speeches.
+			// This is because the volume/mute state is saved only once and not in a queue. So to know the previous
+			// states, we have to reset it before changing it again.
+			resetToSpeakChanges()
+		}
+
 		QueueSpeech("", 0, 0, next_speech.GetID(), 0)
 
 		// This is a break between speeches so they're not all at once without a small break in between (which is awkward,
@@ -80,13 +91,13 @@ func resetToSpeakChanges() {
 
 	setVoluneMutedStateDefaults()
 
-	volume_muted_done_GL = false
+	volume_mute_done_GL = false
 }
 
 func allSpeechesFinished() {
 	is_speaking_GL = false
 
-	if volume_muted_done_GL {
+	if volume_mute_done_GL {
 		resetToSpeakChanges()
 	}
 

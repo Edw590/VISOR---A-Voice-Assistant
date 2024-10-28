@@ -65,7 +65,7 @@ var assist_changed_volume_time_ms_GL int64 = math.MaxInt64 - VOLUME_CHANGE_INTER
 var assist_will_change_volume_GL bool = false
 var user_changed_volume_GL bool = false
 var is_speaking_GL bool = false
-var volume_muted_done_GL bool = false
+var volume_mute_done_GL bool = false
 var higher_priority_came_GL bool = false
 
 var curr_speech_GL *SpeechQueue.Speech = nil
@@ -101,26 +101,27 @@ func init() {realMain =
 		go func() {
 			for {
 				if curr_speech_GL != nil {
+					var curr_speech *SpeechQueue.Speech = curr_speech_GL
 					//log.Println("Speaking speech with priority " + strconv.Itoa(int(curr_speech.GetPriority())) + " and ID " +
 					//	curr_speech.GetID()[:10] + "(...)...")
 
-					var notified bool = rightBeforeSpeaking(curr_speech_GL.GetID())
+					var notified bool = rightBeforeSpeaking(curr_speech.GetID())
 					log.Println("Notified:", notified)
 
-					if _, err := tts_GL.Speak(curr_speech_GL.GetText(), sapi.SVSFDefault); err != nil {
+					if _, err := tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err != nil {
 						log.Println("Error speaking speech:", err)
 						if !notified {
-							Utils.QueueNotificationNOTIFS("Speeches", curr_speech_GL.GetText())
+							Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
 						}
 					}
 
-					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_LAST_SPEECH).SetString(curr_speech_GL.GetText(), true)
+					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
 
-					var speech_id string = curr_speech_GL.GetID()
+					var speech_id string = curr_speech.GetID()
 					if higher_priority_came_GL {
 						higher_priority_came_GL = false
 
-						curr_speech_GL.RephraseInterrSpeech()
+						curr_speech.RephraseInterrSpeech()
 						speech_id = ""
 					}
 
@@ -187,11 +188,12 @@ func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, 
 	}
 
 	var speech_id_to_use string = ""
-	if speech_id == "" {
-		// Is a new speech then
-		speech_id_to_use = SpeechQueue.AddSpeech(to_speak, "", time.Now().UnixMilli(), priority, mode, 0, task_id)
-	} else {
+	if speech_id != "" {
 		speech_id_to_use = speech_id
+	}
+	if SpeechQueue.GetSpeech(speech_id_to_use) == nil {
+		// If it's a new speech, add to the lists.
+		speech_id_to_use = SpeechQueue.AddSpeech(to_speak, "", time.Now().UnixMilli(), priority, mode, 0, task_id)
 	}
 
 	if curr_speech_GL == nil {

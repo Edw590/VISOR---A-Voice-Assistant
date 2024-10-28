@@ -52,7 +52,7 @@ func rightBeforeSpeaking(speech_id string) bool {
 		// If it's to speak, prepare the app to speak.
 		log.Println("(curr_speech.GetMode() & SpeechQueue.MODE1_NO_NOTIF == 0):", curr_speech.GetMode() & SpeechQueue.MODE1_NO_NOTIF == 0)
 		var still_notify = false
-		if !volume_muted_done_GL {
+		if !volume_mute_done_GL {
 			still_notify = setToSpeakChanges(speech_id)
 		}
 		if still_notify || (curr_speech.GetMode() & SpeechQueue.MODE1_ALWAYS_NOTIFY != 0) {
@@ -127,7 +127,7 @@ func setToSpeakChanges(speech_id string) bool {
 		}
 	}
 
-	volume_muted_done_GL = true
+	volume_mute_done_GL = true
 
 	log.Println("Still notify:", still_notify)
 
