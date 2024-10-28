@@ -42,14 +42,14 @@ const _TIME_SLEEP_S int = 60
 var (
 	realMain        Utils.RealMain = nil
 	moduleInfo_GL   Utils.ModuleInfo
-	modGenInfo_GL   *ModsFileInfo.Mod2GenInfo
-	modUserInfo_GL  *ModsFileInfo.Mod2UserInfo
+	modGenInfo_GL   *ModsFileInfo.Mod3GenInfo
+	modUserInfo_GL  *ModsFileInfo.Mod3UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_2
+		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_3
 		modUserInfo_GL = &Utils.User_settings_GL.SMARTChecker
 
 		if !Utils.RunningAsAdminPROCESSES() {

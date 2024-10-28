@@ -58,8 +58,8 @@ const _MOD_GEN_ERROR_CODE int = 3234
 const (
 	NUM_MOD_VISOR           int = iota // This is a special one. Includes both the client and the server version main apps
 	NUM_MOD_ModManager
-	NUM_MOD_SMARTChecker
 	NUM_MOD_Speech
+	NUM_MOD_SMARTChecker
 	NUM_MOD_RssFeedNotifier
 	NUM_MOD_EmailSender
 	NUM_MOD_OnlineInfoChk
@@ -77,8 +77,8 @@ const (
 var MOD_NUMS_NAMES map[int]string = map[int]string{
 	NUM_MOD_VISOR:             "V.I.S.O.R.",
 	NUM_MOD_ModManager:        "Modules Manager",
-	NUM_MOD_SMARTChecker:      "S.M.A.R.T. Checker",
 	NUM_MOD_Speech:            "Speech",
+	NUM_MOD_SMARTChecker:      "S.M.A.R.T. Checker",
 	NUM_MOD_RssFeedNotifier:   "RSS Feed Notifier",
 	NUM_MOD_EmailSender:       "Email Sender",
 	NUM_MOD_OnlineInfoChk:     "Online Information Checker",
@@ -101,8 +101,8 @@ const (
 var MOD_NUMS_SUPPORT map[int]int = map[int]int{
 	NUM_MOD_VISOR:             MOD_BOTH,
 	NUM_MOD_ModManager:        MOD_BOTH,
-	NUM_MOD_SMARTChecker:      MOD_SERVER,
 	NUM_MOD_Speech:            MOD_CLIENT,
+	NUM_MOD_SMARTChecker:      MOD_SERVER,
 	NUM_MOD_RssFeedNotifier:   MOD_SERVER,
 	NUM_MOD_EmailSender:       MOD_SERVER,
 	NUM_MOD_OnlineInfoChk:     MOD_SERVER,

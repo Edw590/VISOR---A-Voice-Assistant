@@ -48,7 +48,7 @@ type DeviceSettings struct {
 
 type UserSettings struct {
 	General         _GeneralConsts
-	SMARTChecker    ModsFileInfo.Mod2UserInfo
+	SMARTChecker    ModsFileInfo.Mod3UserInfo
 	RSSFeedNotifier ModsFileInfo.Mod4UserInfo
 	OnlineInfoChk   ModsFileInfo.Mod6UserInfo
 	GPTCommunicator ModsFileInfo.Mod7UserInfo
@@ -58,14 +58,14 @@ type UserSettings struct {
 }
 
 type GenSettings struct {
-	MOD_2  ModsFileInfo.Mod2GenInfo
-	MOD_4  ModsFileInfo.Mod4GenInfo
-	MOD_5  ModsFileInfo.Mod5GenInfo
-	MOD_6  ModsFileInfo.Mod6GenInfo
-	MOD_7  ModsFileInfo.Mod7GenInfo
-	MOD_9  ModsFileInfo.Mod9GenInfo
-	MOD_10 ModsFileInfo.Mod10GenInfo
-	MOD_12 ModsFileInfo.Mod12GenInfo
+	MOD_3    ModsFileInfo.Mod3GenInfo
+	MOD_4    ModsFileInfo.Mod4GenInfo
+	MOD_5    ModsFileInfo.Mod5GenInfo
+	MOD_6    ModsFileInfo.Mod6GenInfo
+	MOD_7    ModsFileInfo.Mod7GenInfo
+	MOD_9    ModsFileInfo.Mod9GenInfo
+	MOD_10   ModsFileInfo.Mod10GenInfo
+	MOD_12   ModsFileInfo.Mod12GenInfo
 	Registry []*Value
 }
 

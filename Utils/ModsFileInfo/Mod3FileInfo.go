@@ -21,8 +21,8 @@
 
 package ModsFileInfo
 
-// Mod2UserInfo is the format of the custom information file about this specific module.
-type Mod2UserInfo struct {
+// Mod3UserInfo is the format of the custom information file about this specific module.
+type Mod3UserInfo struct {
 	// Disks_info is the information about the disks. It maps the disk serial number to the disk information struct.
 	Disks_info map[string]DiskInfo
 }
@@ -34,8 +34,8 @@ type DiskInfo struct {
 	Is_HDD bool
 }
 
-// Mod2GenInfo is the format of the custom generated information about this specific module.
-type Mod2GenInfo struct {
+// Mod3GenInfo is the format of the custom generated information about this specific module.
+type Mod3GenInfo struct {
 	// Disks_info is the information about the disks. It maps the disk serial number to an array with the first element
 	// being the last short test timestamp and the second element being the last long test timestamp. The timestamps are
 	// in seconds.
