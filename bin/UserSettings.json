@@ -104,13 +104,43 @@
 		"Key_file": "/etc/ssl/private/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.key"
 	},
 	"TasksExecutor": {
-		// Variables: battery_percent (int), power_connected (bool), brightness (int), sound_volume (int), sound_muted (bool)
+		// The available variables are all the ones in the Registry, in lower case (example: battery_level (int)).
 		// Put the booleans inside "bool()", like the examples below.
 		"Tasks": [
 			{
+				"Id": 10,
+				"Device_IDs": "3234_ALL",
+				"Message": "Attention! Below 20% of battery. Please connect the charger.",
+				"Command": "tell me the battery percentage",
+				"Time": "",
+				"Repeat_each_min": 0,
+				"User_location": "",
+				"Device_condition": "bool(battery_level < 20) && bool(!power_connected)"
+			},
+			{
+				"Id": 9,
+				"Device_IDs": "3234_ALL",
+				"Message": "WARNING! EXTREMELY LOW BATTERY! Please connect the charger now!",
+				"Command": "tell me the battery percentage",
+				"Time": "",
+				"Repeat_each_min": 0,
+				"User_location": "",
+				"Device_condition": "bool(battery_level <= 5) && bool(!power_connected)"
+			},
+			{
+				"Id": 7,
+				"Device_IDs": "3234_ALL",
+				"Message": "Attention! Device fully charged! Please disconnect the charger.",
+				"Command": "",
+				"Time": "",
+				"Repeat_each_min": 0,
+				"User_location": "",
+				"Device_condition": "bool(battery_level == 100) && bool(power_connected)"
+			},
+			{
 				"Id": 6,
 				"Device_IDs": "3234_ALL",
-				"Message": "Battery levels already above 80%. Please disconnect the charger.",
+				"Message": "Attention! Above 80% of battery reached!. Please disconnect the charger.",
 				"Command": "tell me the battery percentage",
 				"Time": "",
 				"Repeat_each_min": 0,
