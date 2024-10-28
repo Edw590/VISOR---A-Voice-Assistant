@@ -59,9 +59,7 @@ func init() {realMain =
 		}()
 
 		for {
-			TEHelper.UpdateUserLocation(&Utils.Gen_settings_GL.MOD_12.User_location)
-
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
 				TEHelper.StopChecker()
 
 				return
