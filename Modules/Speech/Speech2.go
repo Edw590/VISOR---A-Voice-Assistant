@@ -157,6 +157,7 @@ func init() {realMain =
 		for {
 			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
 				stop_volume_processing_GL = true
+				SpeechQueue.ClearQueue()
 
 				return
 			}
@@ -188,7 +189,7 @@ func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, 
 	var speech_id_to_use string = ""
 	if speech_id == "" {
 		// Is a new speech then
-		speech_id_to_use = SpeechQueue.AddSpeech(to_speak, time.Now().UnixMilli(), priority, mode, 0, task_id)
+		speech_id_to_use = SpeechQueue.AddSpeech(to_speak, "", time.Now().UnixMilli(), priority, mode, 0, task_id)
 	} else {
 		speech_id_to_use = speech_id
 	}

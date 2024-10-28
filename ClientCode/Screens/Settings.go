@@ -26,6 +26,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"strings"
 )
 
 var settings_canvas_object_GL fyne.CanvasObject = nil
@@ -61,7 +62,9 @@ func Settings() fyne.CanvasObject {
 
 func createChooser(key string) *fyne.Container {
 	var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(key)
-	var label *widget.Label = widget.NewLabel("Name: " + value.Pretty_name + "\nType: " + value.Type_ +
+	var label *widget.Label = widget.NewLabel(
+		"Name: " + value.Pretty_name +
+		"\nType: " + strings.ToLower(value.Type_[len("TYPE_"):]) +
 		"\nDescription: " + value.Description)
 	var content []fyne.CanvasObject = []fyne.CanvasObject{label}
 
