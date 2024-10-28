@@ -81,8 +81,6 @@ func init() {realMain =
 			Tcef.Tcef{
 				Try: func() {
 					// Try to register. If it's already registered, ignore the panic.
-					http.HandleFunc("/add_comment1", handleComment1) // Personal stuff - delete it
-					http.HandleFunc("/add_comment2", handleComment2) // Personal stuff - delete it
 					http.HandleFunc("/ws", basicAuth(webSocketsHandler))
 				},
 			}.Do()
