@@ -30,7 +30,7 @@ import (
 )
 
 var tasks_GL []ModsFileInfo.Task
-var user_location_GL ModsFileInfo.UserLocation
+var user_location_GL *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
 
 var tasks_info_list_GL map[int]int64 = make(map[int]int64)
 
@@ -56,6 +56,7 @@ This function will block until a Task is due. When that happens, the Task is ret
   - the Task that is due or nil if the checker was stopped
  */
 func CheckDueTasks() *ModsFileInfo.Task {
+	stop_GL = false
 	for {
 		tasks_GL = modUserInfo_GL.Tasks
 
@@ -151,18 +152,6 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			return nil
 		}
 	}
-}
-
-/*
-UpdateUserLocation updates the internal user location.
-
------------------------------------------------------------
-
-– Params:
-  - user_location – the new user location
- */
-func UpdateUserLocation(user_location *ModsFileInfo.UserLocation) {
-	user_location_GL = *user_location
 }
 
 /*
