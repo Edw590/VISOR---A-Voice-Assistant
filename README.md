@@ -48,7 +48,7 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 This began as a Python project (in 2020), but even using an IDE got the project confusing. So I translated it to Go because using Go solves the issues I was having (forces me to organize the code well enough to not have cyclic imports, since it won't compile if they exist, and forces the types on variables - ah, and I can mess with pointers, and that's nice).
 
 ### - To use the project
-- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here]`). For the server, just go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move the file to the `bin` folder. Then for the client:
+- Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here] VISOR`). For the server, just go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move the file to the `bin` folder. Then for the client:
   - [Install Fyne](https://docs.fyne.io/started/)
   - In MSYS2, install the portaudio package (for Windows x64, the package is [this one](https://packages.msys2.org/packages/mingw-w64-x86_64-portaudio))
   - Go to the `ClientCode` folder and run the command `go build -tags=client .` (it will take some time the first time)
