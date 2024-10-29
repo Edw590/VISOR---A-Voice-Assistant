@@ -42,7 +42,7 @@ func (d *date) onSelected(t time.Time) {
 	d.dateChosen.SetText(t.Format("Mon 02 Jan 2006"))
 }
 
-func Calendar() fyne.CanvasObject {
+func Calendar(param any) fyne.CanvasObject {
 	Current_screen_GL = calendar_canvas_object_GL
 	if calendar_canvas_object_GL != nil {
 		return calendar_canvas_object_GL

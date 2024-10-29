@@ -131,43 +131,51 @@ func init() {realMain =
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		var content_container *fyne.Container = container.NewVBox(Screens.Home())
+		var content_container *fyne.Container = container.NewVBox(Screens.Home(nil))
 
-		// Create the navigation bar
-		var nav_bar *fyne.Container = container.NewVBox(
-			widget.NewButton("Home", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.Home()}
+		nav_bar := &widget.Tree{
+			ChildUIDs: func(uid string) []string {
+				return tree_index[uid]
+			},
+			IsBranch: func(uid string) bool {
+				children, ok := tree_index[uid]
+
+				return ok && len(children) > 0
+			},
+			CreateNode: func(branch bool) fyne.CanvasObject {
+				return widget.NewLabel("Collection Widgets")
+			},
+			UpdateNode: func(uid string, branch bool, obj fyne.CanvasObject) {
+				t, ok := screens_GL[uid]
+				if !ok {
+					fyne.LogError("Missing tutorial panel: " + uid, nil)
+					return
+				}
+				obj.(*widget.Label).SetText(t.Title)
+			},
+			OnSelected: func(uid string) {
+				switch uid {
+				case "home":
+					content_container.Objects = []fyne.CanvasObject{Screens.Home(nil)}
+				case "dev_mode":
+					content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
+				case "communicator":
+					content_container.Objects = []fyne.CanvasObject{Screens.Communicator(nil)}
+				case "mod_status":
+					content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
+				case "calendar":
+					content_container.Objects = []fyne.CanvasObject{Screens.Calendar(nil)}
+				case "registry":
+					content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues(nil)}
+				case "sys_state":
+					content_container.Objects = []fyne.CanvasObject{Screens.SystemState(nil)}
+				case "settings":
+					content_container.Objects = []fyne.CanvasObject{Screens.Settings(nil)}
+
+				}
 				content_container.Refresh()
-			}),
-			widget.NewButton("Dev Mode", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
-				content_container.Refresh()
-			}),
-			widget.NewButton("Communicator", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.Communicator()}
-				content_container.Refresh()
-			}),
-			widget.NewButton("Modules Status", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
-				content_container.Refresh()
-			}),
-			widget.NewButton("Calendar", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.Calendar()}
-				content_container.Refresh()
-			}),
-			widget.NewButton("Registry", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues()}
-				content_container.Refresh()
-			}),
-			widget.NewButton("System State", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.SystemState()}
-				content_container.Refresh()
-			}),
-			widget.NewButton("Settings", func() {
-				content_container.Objects = []fyne.CanvasObject{Screens.Settings()}
-				content_container.Refresh()
-			}),
-		)
+			},
+		}
 
 		// Create a split container to hold the navigation bar and the content
 		var split *container.Split = container.NewHSplit(nav_bar, content_container)

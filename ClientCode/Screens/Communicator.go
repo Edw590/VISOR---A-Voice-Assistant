@@ -34,7 +34,7 @@ import (
 
 var comm_canvas_object_GL fyne.CanvasObject = nil
 
-func Communicator() fyne.CanvasObject {
+func Communicator(param any) fyne.CanvasObject {
 	Current_screen_GL = comm_canvas_object_GL
 	if comm_canvas_object_GL != nil {
 		return comm_canvas_object_GL

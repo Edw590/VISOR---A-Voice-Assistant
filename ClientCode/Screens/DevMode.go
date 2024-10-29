@@ -35,7 +35,7 @@ var file_path_GL string = ""
 
 var dev_mode_canvas_object_GL fyne.CanvasObject = nil
 
-func DevMode(window fyne.Window) fyne.CanvasObject {
+func DevMode(param any) fyne.CanvasObject {
 	Current_screen_GL = dev_mode_canvas_object_GL
 	if dev_mode_canvas_object_GL != nil {
 		return dev_mode_canvas_object_GL

@@ -31,7 +31,7 @@ import (
 
 var system_state_canvas_object_GL fyne.CanvasObject = nil
 
-func SystemState() fyne.CanvasObject {
+func SystemState(param any) fyne.CanvasObject {
 	Current_screen_GL = system_state_canvas_object_GL
 	if system_state_canvas_object_GL != nil {
 		return system_state_canvas_object_GL
@@ -39,11 +39,7 @@ func SystemState() fyne.CanvasObject {
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
-	var registry_text *widget.Label = widget.NewLabel("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed " +
-		"do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud " +
-		"exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit " +
-		"in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non " +
-		"proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+	var registry_text *widget.Label = widget.NewLabel("")
 	registry_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 	var scroll_text *container.Scroll = container.NewVScroll(registry_text)
 	scroll_text.SetMinSize(screens_size_GL) // Set the minimum size for the scroll container

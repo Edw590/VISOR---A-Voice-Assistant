@@ -32,11 +32,13 @@ import (
 
 var module_status_canvas_object_GL fyne.CanvasObject = nil
 
-func ModulesStatus(modules []Utils.Module) fyne.CanvasObject {
+func ModulesStatus(param any) fyne.CanvasObject {
 	Current_screen_GL = module_status_canvas_object_GL
 	if module_status_canvas_object_GL != nil {
 		return module_status_canvas_object_GL
 	}
+
+	var modules []Utils.Module = param.([]Utils.Module)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
