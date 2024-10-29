@@ -91,7 +91,9 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 				var device_id_matches bool = checkDeviceID(task)
 
-				if condition_loc && condition && device_id_matches {
+				var condition_device_active bool = checkDeviceActive(task)
+
+				if condition_loc && condition && device_id_matches && condition_device_active {
 					return &task
 				}
 			}
@@ -144,7 +146,9 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 			var device_id_matches bool = checkDeviceID(task)
 
-			if condition_time && condition_loc && condition && device_id_matches {
+			var condition_device_active bool = checkDeviceActive(task)
+
+			if condition_time && condition_loc && condition && device_id_matches && condition_device_active {
 				// Set the last reminded time to the test time
 				tasks_info_list_GL[task.Id] = test_time
 

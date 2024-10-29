@@ -28,7 +28,16 @@ import (
 	"github.com/apaxa-go/eval"
 	"strconv"
 	"strings"
+	"time"
 )
+
+func checkDeviceActive(task ModsFileInfo.Task) bool {
+	if !task.Device_active {
+		return true
+	}
+
+	return Utils.Gen_settings_GL.MOD_10.Device_info.Last_time_used_s + 5 > time.Now().Unix()
+}
 
 func checkDeviceID(task ModsFileInfo.Task) bool {
 	if len(task.Device_IDs) == 0 || task.Device_IDs[0] == "3234_ALL" {

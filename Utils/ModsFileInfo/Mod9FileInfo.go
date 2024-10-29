@@ -41,6 +41,8 @@ type Task struct {
 	Id 		    int
 	// Enabled is whether the task is enabled
 	Enabled     bool
+	// Device_active is whether the device must be active to trigger the task
+	Device_active bool
 	// Device_IDs are the devices the task is set for, separated by "|"
 	Device_IDs  []string
 	// Message is the task message

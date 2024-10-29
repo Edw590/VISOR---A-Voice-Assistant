@@ -110,6 +110,7 @@
 			{
 				"Id": 10,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -123,6 +124,7 @@
 			{
 				"Id": 9,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -136,6 +138,7 @@
 			{
 				"Id": 7,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -149,6 +152,7 @@
 			{
 				"Id": 6,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -162,6 +166,7 @@
 			{
 				"Id": 1,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -175,6 +180,7 @@
 			{
 				"Id": 2,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -188,6 +194,7 @@
 			{
 				"Id": 3,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -201,6 +208,7 @@
 			{
 				"Id": 4,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
@@ -214,6 +222,7 @@
 			{
 				"Id": 5,
 				"Enabled": true,
+				"Device_active": false,
 				"Device_IDs": [
 					"3234_ALL"
 				],
