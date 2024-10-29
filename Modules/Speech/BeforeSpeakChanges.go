@@ -85,7 +85,7 @@ func setToSpeakChanges(speech_id string) bool {
 		// Set the volume
 		var curr_volume int = Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume
 		volumeMutedState_GL.old_volume = curr_volume
-		var new_volume int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_CRITICAL_VOL).GetInt(true)
+		var new_volume int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_CRITICAL_VOL).GetInt(true))
 
 		if curr_volume < new_volume {
 			setResetWillChangeVolume(true)
@@ -111,7 +111,7 @@ func setToSpeakChanges(speech_id string) bool {
 
 			log.Println("GGGGGGGGGGGGGGGGGGGGGGGGG")
 
-			var new_volume int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_NORMAL_VOL).GetInt(true)
+			var new_volume int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_NORMAL_VOL).GetInt(true))
 			if curr_volume < new_volume {
 				volumeMutedState_GL.old_volume = curr_volume
 

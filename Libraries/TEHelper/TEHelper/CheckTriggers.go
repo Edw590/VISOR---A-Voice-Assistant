@@ -87,9 +87,9 @@ func formatCondition(condition string) string {
 		if value.Type_ == UtilsSWA.TYPE_STRING {
 			value_str = value.GetString(true)
 		} else if value.Type_ == UtilsSWA.TYPE_INT {
-			value_str = strconv.Itoa(value.GetInt(true))
+			value_str = strconv.FormatInt(int64(value.GetInt(true)), 10)
 		} else if value.Type_ == UtilsSWA.TYPE_LONG {
-			value_str = strconv.Itoa(int(value.GetLong(true)))
+			value_str = strconv.FormatInt(value.GetLong(true), 10)
 		} else if value.Type_ == UtilsSWA.TYPE_BOOL {
 			value_str = strconv.FormatBool(value.GetBool(true))
 		} else if value.Type_ == UtilsSWA.TYPE_FLOAT {

@@ -93,7 +93,7 @@ func init() {realMain =
 			// Battery information
 			var battery_level int = getBatteryInfo().level
 			var power_connected bool = getBatteryInfo().power_connected
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetInt(battery_level, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetInt(int32(battery_level), false)
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetBool(power_connected, false)
 
 			device_info_GL.System_state.Battery_info = ModsFileInfo.BatteryInfo{
@@ -103,7 +103,7 @@ func init() {realMain =
 
 			// Monitor information
 			var screen_brightness int = getBrightness(device_info_GL.System_state.Monitor_info.Brightness)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetInt(screen_brightness, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetInt(int32(screen_brightness), false)
 
 			device_info_GL.System_state.Monitor_info = ModsFileInfo.MonitorInfo{
 				Screen_on:  true,
@@ -113,7 +113,7 @@ func init() {realMain =
 			// Sound information
 			var sound_volume int = getSoundVolume(device_info_GL.System_state.Sound_info.Volume)
 			var sound_muted bool = getSoundMuted(device_info_GL.System_state.Sound_info.Muted)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetInt(sound_volume, false)
+			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetInt(int32(sound_volume), false)
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetBool(sound_muted, false)
 
 			device_info_GL.System_state.Sound_info = ModsFileInfo.SoundInfo{

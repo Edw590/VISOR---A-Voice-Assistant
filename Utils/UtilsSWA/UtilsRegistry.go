@@ -379,7 +379,7 @@ GetInt returns the integer value of the Value.
 – Returns:
   - the integer value of the Value
 */
-func (value *Value) GetInt(curr_data bool) int {
+func (value *Value) GetInt(curr_data bool) int32 {
 	var data string
 	if curr_data {
 		data = value.Curr_data
@@ -387,12 +387,12 @@ func (value *Value) GetInt(curr_data bool) int {
 		data = value.Prev_data
 	}
 
-	i, err := strconv.Atoi(data)
+	i, err := strconv.ParseInt(data, 10, 32)
 	if err != nil {
 		return -1
 	}
 
-	return i
+	return int32(i)
 }
 
 /*
@@ -561,16 +561,9 @@ func (value *Value) SetBool(data bool, update_if_same bool) bool {
 		return false
 	}
 
-	var data_str string = strconv.FormatBool(data)
-	if !update_if_same && value.Curr_data == data_str {
+	var new_data string = strconv.FormatBool(data)
+	if !update_if_same && value.Curr_data == new_data {
 		return false
-	}
-
-	var new_data string
-	if data {
-		new_data = "true"
-	} else {
-		new_data = "false"
 	}
 
 	value.setInternal(new_data)
@@ -591,17 +584,15 @@ SetInt sets the value to an integer.
 - Returns:
   - whether the data was set
 */
-func (value *Value) SetInt(data int, update_if_same bool) bool {
+func (value *Value) SetInt(data int32, update_if_same bool) bool {
 	if value.Type_ != TYPE_INT {
 		return false
 	}
 
-	var data_str string = strconv.Itoa(data)
-	if !update_if_same && value.Curr_data == data_str {
+	var new_data string = strconv.FormatInt(int64(data), 10)
+	if !update_if_same && value.Curr_data == new_data {
 		return false
 	}
-
-	var new_data string = strconv.Itoa(data)
 
 	value.setInternal(new_data)
 	value.Curr_data = new_data
@@ -626,12 +617,10 @@ func (value *Value) SetLong(data int64, update_if_same bool) bool {
 		return false
 	}
 
-	var data_str string = strconv.FormatInt(data, 10)
-	if !update_if_same && value.Curr_data == data_str {
+	var new_data string = strconv.FormatInt(data, 10)
+	if !update_if_same && value.Curr_data == new_data {
 		return false
 	}
-
-	var new_data string = strconv.FormatInt(data, 10)
 
 	value.setInternal(new_data)
 	value.Curr_data = new_data
@@ -656,12 +645,10 @@ func (value *Value) SetFloat(data float32, update_if_same bool) bool {
 		return false
 	}
 
-	var data_str string = strconv.FormatFloat(float64(data), 'f', -1, 32)
-	if !update_if_same && value.Curr_data == data_str {
+	var new_data string = strconv.FormatFloat(float64(data), 'f', -1, 32)
+	if !update_if_same && value.Curr_data == new_data {
 		return false
 	}
-
-	var new_data string = strconv.FormatFloat(float64(data), 'f', -1, 32)
 
 	value.setInternal(new_data)
 	value.Curr_data = new_data
@@ -686,12 +673,10 @@ func (value *Value) SetDouble(data float64, update_if_same bool) bool {
 		return false
 	}
 
-	var data_str string = strconv.FormatFloat(data, 'f', -1, 64)
-	if !update_if_same && value.Curr_data == data_str {
+	var new_data string = strconv.FormatFloat(data, 'f', -1, 64)
+	if !update_if_same && value.Curr_data == new_data {
 		return false
 	}
-
-	var new_data string = strconv.FormatFloat(data, 'f', -1, 64)
 
 	value.setInternal(new_data)
 	value.Curr_data = new_data

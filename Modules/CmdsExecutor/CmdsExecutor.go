@@ -185,8 +185,8 @@ func init() {realMain =
 						}
 
 					case CMD_ASK_BATTERY_PERCENT:
-						var battery_percentage int = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
-							GetInt(true)
+						var battery_percentage int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
+							GetInt(true))
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
 						speakInternal(speak, speech_priority, speech_mode2, true)
 
