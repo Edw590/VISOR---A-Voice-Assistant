@@ -199,10 +199,10 @@ GetValuesREGISTRY gets all the values in the registry.
 – Returns:
   - all the values in the registry
  */
-func GetValuesREGISTRY() []Value {
-	var values []Value
+func GetValuesREGISTRY() []*Value {
+	var values []*Value
 	for _, value := range Utils.Gen_settings_GL.Registry {
-		values = append(values, (Value) (*value))
+		values = append(values, (*Value)(value))
 	}
 
 	return values

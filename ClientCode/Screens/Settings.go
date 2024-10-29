@@ -35,9 +35,9 @@ func Settings(param any) fyne.CanvasObject {
 	Current_screen_GL = settings_canvas_object_GL
 
 	var objects []fyne.CanvasObject = nil
-	var values []UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
 	for i := len(values) - 1; i >= 0; i-- {
-		var value *UtilsSWA.Value = &values[i]
+		var value *UtilsSWA.Value = values[i]
 		if !value.Auto_set {
 			objects = append(objects, createValueChooser(value))
 		}

@@ -81,7 +81,7 @@ func computeCondition(condition string) bool {
 }
 
 func formatCondition(condition string) string {
-	var registry_values []UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	var registry_values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
 	for _, value := range registry_values {
 		var value_str string = "ERROR"
 		if value.Type_ == UtilsSWA.TYPE_STRING {
