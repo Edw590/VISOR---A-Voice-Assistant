@@ -49,9 +49,6 @@ func UpdateUserLocation() {
 	stop_GL = false
 
 	for {
-		//log.Println("--------------------------------")
-
-		// Update some information
 		var curr_location = UNKNOWN_LOCATION
 
 		for _, location_info := range modUserInfo_GL.Locs_info {
@@ -87,7 +84,7 @@ func UpdateUserLocation() {
 			if beacon_found != nil {
 				var distance int = UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon_found.RSSI, UtilsSWA.DEFAULT_TX_POWER)
 
-				if distance <= location_info.Max_distance {
+				if distance <= location_info.Max_distance_m {
 					// If the device is near the location, then the user is near the location.
 					distance_match = true
 				}

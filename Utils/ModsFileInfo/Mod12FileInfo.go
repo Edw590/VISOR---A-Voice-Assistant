@@ -59,11 +59,10 @@ type _LocInfo struct {
 	Name string
 	// Address is the address of the detection (e.g. the Wi-Fi BSSID) in the format XX:XX:XX:XX:XX:XX
 	Address string
-	// Last_detection_s is the maximum amount of time in seconds without location detections in which the device may
-	// still be in the specified location
+	// Last_detection_s is how long the network may not be found but the user may still be in the location
 	Last_detection_s int64
-	// Max_distance is the maximum distance in meters in which the device is in the specified location
-	Max_distance int
+	// Max_distance_m is the maximum distance in meters in which the device is in the specified location
+	Max_distance_m int
 	// Location is where the device is (e.g. "home")
 	Location string
 }

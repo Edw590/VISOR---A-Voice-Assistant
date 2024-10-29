@@ -242,16 +242,15 @@
 			{
 				// Type can be "wifi" or "bluetooth"
 				"Type": "wifi",
-				// Name is the name of the network
+				// Name is the name of the network (optional if you insert an Address)
 				"Name": "Wifi-Name",
-				// Address is the MAC address of the network. Leave empty to check by the name. Fill to ignore the name
-				// and check by the MAC
+				// Address is the MAC address of the network (optional if you insert a Name)
 				"Address": "XX:XX:XX:XX:XX:XX",
 				// Last_detection is how long the network may not be found but the user may still be in the location
-				"Last_detection": 0,
+				"Last_detection_s": 0,
 				// Max_distance is the maximum distance in meters the user can be from the network router to be
 				// considered to in the location
-				"Max_distance": 10,
+				"Max_distance_m": 10,
 				// Location is the location name the network is associated with
 				"Location": "home_lisbon"
 			}
