@@ -66,18 +66,19 @@ func UpdateUserLocation() {
 
 			var beacon_found *ModsFileInfo.ExtBeacon = nil
 			for _, beacon := range beacon_list {
+				var address_match bool = true
+				var name_match bool = true
 				if location_info.Address != "" {
-					if beacon.Address == location_info.Address {
-						beacon_found = &beacon
+					address_match = beacon.Address == location_info.Address
+				}
+				if location_info.Name != "" {
+					name_match = beacon.Name == location_info.Name
+				}
 
-						break
-					}
-				} else {
-					if beacon.Name == location_info.Name {
-						beacon_found = &beacon
+				if address_match && name_match {
+					beacon_found = &beacon
 
-						break
-					}
+					break
 				}
 			}
 
