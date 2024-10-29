@@ -29,7 +29,6 @@ import (
 	"time"
 )
 
-var tasks_GL []ModsFileInfo.Task
 var user_location_GL *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
 
 var tasks_info_list_GL map[int]int64 = make(map[int]int64)
@@ -58,8 +57,6 @@ This function will block until a Task is due. When that happens, the Task is ret
 func CheckDueTasks() *ModsFileInfo.Task {
 	stop_GL = false
 	for {
-		tasks_GL = modUserInfo_GL.Tasks
-
 		// Location trigger - if the user location changed, check if any task is triggered
 		var curr_last_known_user_loc string = user_location_GL.Curr_location
 		var prev_last_known_user_loc string = user_location_GL.Prev_location
@@ -67,7 +64,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			prev_curr_last_known_user_loc_GL = curr_last_known_user_loc
 			prev_prev_last_known_user_loc_GL = prev_last_known_user_loc
 
-			for _, task := range tasks_GL {
+			for _, task := range modUserInfo_GL.Tasks {
 				// If the task has a time set or has no location, skip it
 				if !task.Enabled || task.Time != "" || task.User_location == "" {
 					continue
@@ -100,7 +97,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 		}
 
 		// Time/condition trigger - if the time changed (it always does), check if any task is triggered
-		for _, task := range tasks_GL {
+		for _, task := range modUserInfo_GL.Tasks {
 			if !task.Enabled {
 				continue
 			}

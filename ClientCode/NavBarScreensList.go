@@ -39,12 +39,15 @@ var screens_GL = map[string]_Screen{
 	"communicator": {"Communicator", Screens.Communicator},
 	"mod_status": {"Modules Status", Screens.ModulesStatus},
 	"calendar": {"Calendar", Screens.Calendar},
-	"registry": {"Registry", Screens.GlobalValues},
+	"registry": {"Registry", Screens.Registry},
+	"tasks": {"Tasks (NOT READY)", Screens.Tasks},
+	"add_task": {"Add task", Screens.Tasks},
 	"sys_state": {"System State", Screens.SystemState},
 	"settings": {"Settings", Screens.Settings},
 }
 
 // tree_index defines how the screens should be laid out in the index tree
 var tree_index = map[string][]string{
-	"": {"home", "dev_mode", "communicator", "mod_status", "calendar", "registry", "sys_state", "settings"},
+	"": {"home", "dev_mode", "communicator", "mod_status", "calendar", "registry", "tasks", "sys_state", "settings"},
+	"tasks": {"add_task"},
 }

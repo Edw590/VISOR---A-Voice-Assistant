@@ -27,16 +27,28 @@ import (
 )
 
 /*
-GetIdsList returns a list of all reminders' IDs.
+GetTasks returns all tasks.
 
 -----------------------------------------------------------
 
 – Returns:
-  - a list of all reminders' IDs separated by "|"
+  - all tasks
+*/
+func GetTasks() []ModsFileInfo.Task {
+	return modUserInfo_GL.Tasks
+}
+
+/*
+GetIdsList returns a list of all tasks' IDs.
+
+-----------------------------------------------------------
+
+– Returns:
+  - a list of all tasks' IDs separated by "|"
 */
 func GetIdsList() string {
 	var ids string
-	for _, task := range tasks_GL {
+	for _, task := range modUserInfo_GL.Tasks {
 		ids += strconv.Itoa(task.Id) + "|"
 	}
 
@@ -44,20 +56,20 @@ func GetIdsList() string {
 }
 
 /*
-GetTaskById returns a reminder by its ID.
+GetTaskById returns a task by its ID.
 
 -----------------------------------------------------------
 
 – Params:
-  - id – the reminder ID
+  - id – the task ID
 
 – Returns:
-  - the reminder or nil if the reminder was not found
+  - the task or nil if the task was not found
 */
 func GetTaskById(id int) *ModsFileInfo.Task {
-	for _, reminder := range tasks_GL {
-		if reminder.Id == id {
-			return &reminder
+	for _, task := range modUserInfo_GL.Tasks {
+		if task.Id == id {
+			return &task
 		}
 	}
 

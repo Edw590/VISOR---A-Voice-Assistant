@@ -31,7 +31,7 @@ import (
 
 var global_values_canvas_object_GL fyne.CanvasObject = nil
 
-func GlobalValues(param any) fyne.CanvasObject {
+func Registry(param any) fyne.CanvasObject {
 	Current_screen_GL = global_values_canvas_object_GL
 	if global_values_canvas_object_GL != nil {
 		return global_values_canvas_object_GL

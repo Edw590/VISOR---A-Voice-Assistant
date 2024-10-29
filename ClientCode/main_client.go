@@ -166,7 +166,11 @@ func init() {realMain =
 				case "calendar":
 					content_container.Objects = []fyne.CanvasObject{Screens.Calendar(nil)}
 				case "registry":
-					content_container.Objects = []fyne.CanvasObject{Screens.GlobalValues(nil)}
+					content_container.Objects = []fyne.CanvasObject{Screens.Registry(nil)}
+				case "tasks":
+					content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
+				case "add_task":
+					content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
 				case "sys_state":
 					content_container.Objects = []fyne.CanvasObject{Screens.SystemState(nil)}
 				case "settings":

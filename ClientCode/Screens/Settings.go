@@ -33,20 +33,13 @@ var settings_canvas_object_GL fyne.CanvasObject = nil
 
 func Settings(param any) fyne.CanvasObject {
 	Current_screen_GL = settings_canvas_object_GL
-	if settings_canvas_object_GL != nil {
-		return settings_canvas_object_GL
-	}
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
 	var objects []fyne.CanvasObject = nil
 	var values []UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
 	for i := len(values) - 1; i >= 0; i-- {
 		var value *UtilsSWA.Value = &values[i]
 		if !value.Auto_set {
-			objects = append(objects, createChooser(value.Key))
+			objects = append(objects, createValueChooser(value))
 		}
 	}
 	var content *fyne.Container = container.NewVBox(objects...)
@@ -60,8 +53,7 @@ func Settings(param any) fyne.CanvasObject {
 	return settings_canvas_object_GL
 }
 
-func createChooser(key string) *fyne.Container {
-	var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(key)
+func createValueChooser(value *UtilsSWA.Value) *fyne.Container {
 	var label *widget.Label = widget.NewLabel(
 		"Name: " + value.Pretty_name +
 		"\nType: " + strings.ToLower(value.Type_[len("TYPE_"):]) +
