@@ -81,9 +81,10 @@ func GetAbstrDistanceRssiLOCRELATIVE(real_distance int) int {
 	}
 }
 
-/* For now I don't see use for the tx_power parameter, so I'm passing always the default one. Some other time might
-implement BLE device detection, on which the value is useful since some devices have a value (not BV9500 it
-seems).*/
+/*
+For now I don't see use for the tx_power parameter, so I'm passing always the default one. Some other time might
+implement BLE device detection, on which the value is useful since some devices have a value (not BV9500 it seems).
+*/
 const DEFAULT_TX_POWER int = -60
 
 /*
@@ -192,6 +193,8 @@ func GetRealDistanceRssiLOCRELATIVE(rssi int, tx_power int) int {
 /*
 GetAveragePingRttLOCRELATIVE gets the average round-trip time (RTT) between the current device and the specified IP
 address.
+
+NOT READY!!! Read the code!
 
 This function pings the specified IP address 50 times, eliminates outlier time values, and finally calculates the
 average of the resulting values (the round-trip time, RTT).

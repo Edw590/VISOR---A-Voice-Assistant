@@ -34,6 +34,8 @@ type UserLocation struct {
 	Curr_location string
 	// Last_time_checked_s is the last time the current location was checked in Unix time
 	Last_time_checked_s int64
+	// Last_detection_when_s is the last time the current location was matched in Unix time
+	Last_detection_when_s int64
 	// Prev_location is the previous location of the user
 	Prev_location string
 	// Prev_last_time_checked_s is the last time the previous location was checked in Unix time
@@ -53,12 +55,12 @@ type Mod12UserInfo struct {
 type _LocInfo struct {
 	// Type is the type of the location "detector" (e.g. wifi)
 	Type string
-	// Name is the name of the detection (e.g. the wifi SSID)
+	// Name is the name of the detection (e.g. the W-Fi SSID)
 	Name string
-	// Address is the address of the detection (e.g. the wifi BSSID) in the format XX:XX:XX:XX:XX:XX
+	// Address is the address of the detection (e.g. the Wi-Fi BSSID) in the format XX:XX:XX:XX:XX:XX
 	Address string
-	// Last_detection_s is the maximum amount of time in seconds without checking in which the device may still be in the
-	// specified location
+	// Last_detection_s is the maximum amount of time in seconds without location detections in which the device may
+	// still be in the specified location
 	Last_detection_s int64
 	// Max_distance is the maximum distance in meters in which the device is in the specified location
 	Max_distance int
