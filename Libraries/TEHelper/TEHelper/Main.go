@@ -69,7 +69,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 			for _, task := range tasks_GL {
 				// If the task has a time set or has no location, skip it
-				if task.Time != "" || task.User_location == "" {
+				if !task.Enabled || task.Time != "" || task.User_location == "" {
 					continue
 				}
 
@@ -99,6 +99,10 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 		// Time/condition trigger - if the time changed (it always does), check if any task is triggered
 		for _, task := range tasks_GL {
+			if !task.Enabled {
+				continue
+			}
+
 			var condition_time bool = false
 			var test_time int64 = 0
 			// If the task has no time set, skip it

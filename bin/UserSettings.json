@@ -109,7 +109,10 @@
 		"Tasks": [
 			{
 				"Id": 10,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "Attention! Below 20% of battery. Please connect the charger.",
 				"Command": "tell me the battery percentage",
 				"Time": "",
@@ -119,7 +122,10 @@
 			},
 			{
 				"Id": 9,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "WARNING! EXTREMELY LOW BATTERY! Please connect the charger now!",
 				"Command": "tell me the battery percentage",
 				"Time": "",
@@ -129,7 +135,10 @@
 			},
 			{
 				"Id": 7,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "Attention! Device fully charged! Please disconnect the charger.",
 				"Command": "",
 				"Time": "",
@@ -139,7 +148,10 @@
 			},
 			{
 				"Id": 6,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "Attention! Above 80% of battery reached!. Please disconnect the charger.",
 				"Command": "tell me the battery percentage",
 				"Time": "",
@@ -149,7 +161,10 @@
 			},
 			{
 				"Id": 1,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "This is a reminder",
 				"Command": "",
 				"Time": "2024-06-27 -- 07:00:00",
@@ -159,7 +174,10 @@
 			},
 			{
 				"Id": 2,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "You arrived at the university",
 				"Command": "",
 				"Time": "",
@@ -169,7 +187,10 @@
 			},
 			{
 				"Id": 3,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "You left the university",
 				"Command": "",
 				"Time": "",
@@ -179,7 +200,10 @@
 			},
 			{
 				"Id": 4,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "You arrived at home",
 				"Command": "",
 				"Time": "",
@@ -189,7 +213,10 @@
 			},
 			{
 				"Id": 5,
-				"Device_IDs": "3234_ALL",
+				"Enabled": true,
+				"Device_IDs": [
+					"3234_ALL"
+				],
 				"Message": "You left home",
 				"Command": "",
 				"Time": "",

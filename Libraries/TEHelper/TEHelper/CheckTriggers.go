@@ -31,12 +31,11 @@ import (
 )
 
 func checkDeviceID(task ModsFileInfo.Task) bool {
-	var device_IDs_split []string = strings.Split(task.Device_IDs, "|")
-	if len(device_IDs_split) == 0 || device_IDs_split[0] == "3234_ALL" {
+	if len(task.Device_IDs) == 0 || task.Device_IDs[0] == "3234_ALL" {
 		return true
 	}
 
-	for _, device_id := range device_IDs_split {
+	for _, device_id := range task.Device_IDs {
 		if device_id == Utils.Device_settings_GL.Device_ID {
 			return true
 		}
