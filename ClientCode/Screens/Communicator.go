@@ -80,6 +80,7 @@ func Communicator(param any) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
+	response_text.PlaceHolder = "Response from the assistant"
 	response_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 	response_text.SetMinRowsVisible(100)
 

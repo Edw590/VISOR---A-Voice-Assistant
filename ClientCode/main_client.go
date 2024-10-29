@@ -80,7 +80,7 @@ func init() {realMain =
 		//////////////////////////////////////////
 		// Prepare to hide the window
 
-		if !isOpenGLSupport() {
+		if !isOpenGLSupported() {
 			log.Println("Required OpenGL version not supported. Exiting...")
 
 			return
@@ -191,11 +191,11 @@ func init() {realMain =
 			}),
 		)
 
-		var side_bar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
+		var sidebar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
 
-		// Create a split container to hold the side bar and the content
-		var split *container.Split = container.NewHSplit(side_bar, content_container)
-		split.SetOffset(0.0)
+		// Create a split container to hold the sidebar and the content
+		var split *container.Split = container.NewHSplit(sidebar, content_container)
+		split.SetOffset(0.2) // Set the split ratio (20% for sidebar, 80% for content)
 
 		// Set the content of the window
 		my_window_GL.SetContent(split)
@@ -206,12 +206,7 @@ func init() {realMain =
 			var icon *fyne.StaticResource = Logo.LogoBlackGmail
 			var menu *fyne.Menu = fyne.NewMenu("Tray",
 				fyne.NewMenuItem("Show", func() {
-					// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
-					// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
-					// fixes whatever the problem is.
-					my_window_GL.Hide()
-					my_window_GL.Show()
-					my_window_GL.RequestFocus()
+					showWindow()
 
 					// Restore the previous screen state
 					Screens.Current_screen_GL = prev_screen
@@ -285,11 +280,12 @@ func processCommsChannel() {
 	}()
 }
 
-func isOpenGLSupport() bool {
+func isOpenGLSupported() bool {
 	err := glfw.Init()
 	if err != nil {
 		return false
 	}
+
 	defer glfw.Terminate()
 	glfw.WindowHint(glfw.Visible, glfw.False)
 	window, err := glfw.CreateWindow(1, 1, "", nil, nil)
@@ -303,9 +299,8 @@ func isOpenGLSupport() bool {
 }
 
 func showWindow() {
-	// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and
-	// showing does it. Maybe this happens because RequestFocus doesn't always work? Who knows. But this
-	// fixes whatever the problem is.
+	// Hide too because in case the window is shown but behind other apps, it won't show. So hiding and showing does it.
+	// Maybe this happens because RequestFocus doesn't always work? Who knows. But this fixes whatever the problem is.
 	my_window_GL.Hide()
 	my_window_GL.Show()
 	my_window_GL.RequestFocus()
