@@ -193,9 +193,9 @@ func init() {realMain =
 
 		var side_bar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
 
-		// Create a split container to hold the navigation bar and the content
+		// Create a split container to hold the side bar and the content
 		var split *container.Split = container.NewHSplit(side_bar, content_container)
-		split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
+		split.SetOffset(0.0)
 
 		// Set the content of the window
 		my_window_GL.SetContent(split)

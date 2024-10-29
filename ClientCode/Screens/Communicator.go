@@ -82,15 +82,17 @@ func Communicator(param any) fyne.CanvasObject {
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
 	response_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 	response_text.SetMinRowsVisible(100)
-	var scroll_text *container.Scroll = container.NewVScroll(response_text)
-	scroll_text.SetMinSize(response_text.MinSize()) // Set the minimum size for the scroll container
 
 	go func() {
+		var old_text string = ""
 		for {
 			if Current_screen_GL == comm_canvas_object_GL {
-				response_text.SetText(GPTComm.GetLastText())
+				var new_text string = GPTComm.GetLastText()
+				if old_text != new_text {
+					old_text = new_text
+					response_text.SetText(old_text)
+				}
 			}
-			scroll_text.SetMinSize(response_text.MinSize())
 
 			time.Sleep(1 * time.Second)
 		}
@@ -107,7 +109,7 @@ func Communicator(param any) fyne.CanvasObject {
 		btn_send_text,
 		btn_send_text_gpt_smart,
 		btn_send_text_gpt_dumb,
-		scroll_text,
+		response_text,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
