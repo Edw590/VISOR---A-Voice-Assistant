@@ -39,15 +39,13 @@ func SystemState(param any) fyne.CanvasObject {
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
-	var registry_text *widget.Label = widget.NewLabel("")
-	registry_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
-	var scroll_text *container.Scroll = container.NewVScroll(registry_text)
-	scroll_text.SetMinSize(screens_size_GL) // Set the minimum size for the scroll container
+	var sys_state_text *widget.Label = widget.NewLabel("")
+	sys_state_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 
 	go func() {
 		for {
 			if Current_screen_GL == system_state_canvas_object_GL {
-				registry_text.SetText(SystemChecker.GetDeviceInfoText())
+				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
 			}
 
 			time.Sleep(1 * time.Second)
@@ -61,7 +59,7 @@ func SystemState(param any) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		scroll_text,
+		sys_state_text,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)

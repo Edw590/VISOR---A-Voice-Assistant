@@ -41,8 +41,6 @@ func Registry(param any) fyne.CanvasObject {
 	// Text Display section with vertical scrolling
 	var registry_text *widget.Label = widget.NewLabel("")
 	registry_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
-	var scroll_text *container.Scroll = container.NewVScroll(registry_text)
-	scroll_text.SetMinSize(screens_size_GL) // Set the minimum size for the scroll container
 
 	go func() {
 		for {
@@ -61,7 +59,7 @@ func Registry(param any) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		scroll_text,
+		registry_text,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)

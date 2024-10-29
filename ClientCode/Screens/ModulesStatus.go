@@ -42,10 +42,8 @@ func ModulesStatus(param any) fyne.CanvasObject {
 
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
-	var module_status *widget.Label = widget.NewLabel("")
-	module_status.Wrapping = fyne.TextWrapWord // Enable text wrapping
-	var scroll_text *container.Scroll = container.NewVScroll(module_status)
-	scroll_text.SetMinSize(module_status.MinSize()) // Set the minimum size for the scroll container
+	var module_status_text *widget.Label = widget.NewLabel("")
+	module_status_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 
 	go func() {
 		for {
@@ -58,8 +56,7 @@ func ModulesStatus(param any) fyne.CanvasObject {
 					}
 				}
 				text = text[:len(text)-2] // Remove the last 2 newlines
-				module_status.SetText(text)
-				scroll_text.SetMinSize(module_status.MinSize())
+				module_status_text.SetText(text)
 			}
 
 			time.Sleep(1 * time.Second)
@@ -67,7 +64,7 @@ func ModulesStatus(param any) fyne.CanvasObject {
 	}()
 
 	var canvas_objs []fyne.CanvasObject = []fyne.CanvasObject{
-		scroll_text,
+		module_status_text,
 	}
 	for _, obj := range getCheckBoxes(modules) {
 		canvas_objs = append(canvas_objs, obj)

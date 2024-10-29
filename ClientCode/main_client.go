@@ -127,11 +127,12 @@ func init() {realMain =
 		my_app_GL = app.NewWithID("com.edw590.visor_c")
 		my_app_GL.SetIcon(Logo.LogoBlackGmail)
 		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
+		my_window_GL.Resize(fyne.NewSize(640, 480))
 
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		var content_container *fyne.Container = container.NewVBox(Screens.Home(nil))
+		var content_container *fyne.Container = container.NewBorder(nil, nil, nil, nil, Screens.Home(nil))
 
 		nav_bar := &widget.Tree{
 			ChildUIDs: func(uid string) []string {
@@ -155,27 +156,26 @@ func init() {realMain =
 			},
 			OnSelected: func(uid string) {
 				switch uid {
-				case "home":
-					content_container.Objects = []fyne.CanvasObject{Screens.Home(nil)}
-				case "dev_mode":
-					content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
-				case "communicator":
-					content_container.Objects = []fyne.CanvasObject{Screens.Communicator(nil)}
-				case "mod_status":
-					content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
-				case "calendar":
-					content_container.Objects = []fyne.CanvasObject{Screens.Calendar(nil)}
-				case "registry":
-					content_container.Objects = []fyne.CanvasObject{Screens.Registry(nil)}
-				case "tasks":
-					content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
-				case "add_task":
-					content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
-				case "sys_state":
-					content_container.Objects = []fyne.CanvasObject{Screens.SystemState(nil)}
-				case "settings":
-					content_container.Objects = []fyne.CanvasObject{Screens.Settings(nil)}
-
+					case "home":
+						content_container.Objects = []fyne.CanvasObject{Screens.Home(nil)}
+					case "dev_mode":
+						content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
+					case "communicator":
+						content_container.Objects = []fyne.CanvasObject{Screens.Communicator(nil)}
+					case "mod_status":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
+					case "calendar":
+						content_container.Objects = []fyne.CanvasObject{Screens.Calendar(nil)}
+					case "registry":
+						content_container.Objects = []fyne.CanvasObject{Screens.Registry(nil)}
+					case "tasks":
+						content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
+					case "add_task":
+						content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
+					case "sys_state":
+						content_container.Objects = []fyne.CanvasObject{Screens.SystemState(nil)}
+					case "settings":
+						content_container.Objects = []fyne.CanvasObject{Screens.Settings(nil)}
 				}
 				content_container.Refresh()
 			},
@@ -242,7 +242,6 @@ func init() {realMain =
 		}()
 
 		// Show and run the application
-		my_window_GL.Resize(fyne.NewSize(640, 480))
 		my_window_GL.ShowAndRun()
 	}
 }
