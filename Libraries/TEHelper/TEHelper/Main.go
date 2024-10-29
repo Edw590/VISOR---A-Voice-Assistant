@@ -103,7 +103,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			}
 
 			var condition_time bool = false
-			var test_time int64 = 0
+			var test_time_min int64 = 0
 			// If the task has no time set, skip it
 			if task.Time == "" {
 				condition_time = true
@@ -112,18 +112,18 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				var task_time string = task.Time
 				var format string = "2006-01-02 -- 15:04:05"
 				t, _ := time.ParseInLocation(format, task_time, time.Local)
-				test_time = t.Unix() / 60
+				test_time_min = t.Unix() / 60
 				if task.Repeat_each_min > 0 {
 					for {
-						if test_time + task.Repeat_each_min <= curr_time {
-							test_time += task.Repeat_each_min
+						if test_time_min + task.Repeat_each_min <= curr_time {
+							test_time_min += task.Repeat_each_min
 						} else {
 							break
 						}
 					}
 				}
 
-				condition_time = curr_time >= test_time && tasks_info_list_GL[task.Id] != test_time
+				condition_time = curr_time >= test_time_min && tasks_info_list_GL[task.Id] != test_time_min
 			}
 
 			// Check if the task is due and if it was already reminded
@@ -147,7 +147,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 			if condition_time && condition_loc && condition && device_id_matches && condition_device_active {
 				// Set the last reminded time to the test time
-				tasks_info_list_GL[task.Id] = test_time
+				tasks_info_list_GL[task.Id] = test_time_min
 
 				return &task
 			}

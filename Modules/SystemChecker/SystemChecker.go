@@ -31,11 +31,12 @@ import (
 	"github.com/itchyny/volume-go"
 	"github.com/schollz/wifiscan"
 	"github.com/yusufpapurcu/wmi"
+	"runtime"
 	"strings"
 	"time"
 )
 
-const SCAN_WIFI_EACH_S int64 = 30
+const SCAN_WIFI_EACH_S int64 = 60
 var last_check_wifi_when_s int64 = 0
 
 var device_info_GL *ModsFileInfo.DeviceInfo
@@ -188,7 +189,21 @@ func getSoundMuted(prev bool) bool {
 }
 
 func getWifiNetworks() (bool, []ModsFileInfo.ExtBeacon) {
-	for i := 0; i < 10; i++ {
+	if runtime.GOOS == "windows" {
+		// Request a Wi-Fi scan first (wifiscan.Scan() doesn't do it on Windows)
+		_, _ = Utils.ExecCmdSHELL([]string{".\\external\\WlanScan.exe"})
+	}
+
+	// Then get the cached results on Windows or request a scan and get results
+	// on Linux.
+	var num_tries int = 1
+	if runtime.GOOS == "windows" {
+		// I don't know how much time after the scan the results are ready, so
+		// 10 seconds seems like a good number.
+		// If it's on Linux, shouldn't have problem I think.
+		num_tries = 10
+	}
+	for i := 0; i < num_tries; i++ {
 		wifi_nets, err := wifiscan.Scan()
 		if err != nil {
 			return false, nil

@@ -149,6 +149,9 @@ func updateUserLocation(user_location *ModsFileInfo.UserLocation, new_location s
 	user_location.Last_time_checked_s = time.Now().Unix()
 }
 
+/*
+StopChecker stops the user location checker.
+ */
 func StopChecker() {
 	stop_GL = true
 }
