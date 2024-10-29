@@ -26,6 +26,7 @@ import (
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/widget"
 	"sort"
 	"strconv"
@@ -81,10 +82,16 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 	var entry_time *widget.Entry = widget.NewEntry()
 	entry_time.SetText(task.Time)
 	entry_time.SetPlaceHolder("Time trigger (format: 2024-12-31 -- 23:59:59)")
+	entry_time.Validator = validation.NewRegexp(`^\d{4}-\d{2}-\d{2} -- \d{2}:\d{2}:\d{2}$`, "wrong format")
 
 	var entry_repeat_each_min *widget.Entry = widget.NewEntry()
-	entry_repeat_each_min.SetText(strconv.Itoa(int(task.Repeat_each_min)))
+	entry_repeat_each_min.SetText(strconv.FormatInt(task.Repeat_each_min, 10))
 	entry_repeat_each_min.SetPlaceHolder("Repeat each X minutes")
+	entry_repeat_each_min.Validator = func(s string) error {
+		_, err := strconv.ParseInt(s, 10, 64)
+
+		return err
+	}
 
 	var entry_user_location *widget.Entry = widget.NewEntry()
 	entry_user_location.SetText(task.User_location)
