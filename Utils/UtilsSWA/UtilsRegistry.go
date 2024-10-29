@@ -743,6 +743,30 @@ func (value *Value) SetData(data string, update_if_same bool) bool {
 		return false
 	}
 
+	// Check if the data is valid
+	switch value.Type_ {
+		case TYPE_BOOL:
+			if _, err := strconv.ParseBool(data); err != nil {
+				return false
+			}
+		case TYPE_INT:
+			if _, err := strconv.ParseInt(data, 10, 32); err != nil {
+				return false
+			}
+		case TYPE_LONG:
+			if _, err := strconv.ParseInt(data, 10, 64); err != nil {
+				return false
+			}
+		case TYPE_FLOAT:
+			if _, err := strconv.ParseFloat(data, 32); err != nil {
+				return false
+			}
+		case TYPE_DOUBLE:
+			if _, err := strconv.ParseFloat(data, 64); err != nil {
+				return false
+			}
+	}
+
 	value.setInternal(data)
 	value.Curr_data = data
 
