@@ -32,6 +32,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"log"
@@ -134,7 +135,7 @@ func init() {realMain =
 		// Create the content area with a label to display different screens
 		var content_container *fyne.Container = container.NewBorder(nil, nil, nil, nil, Screens.Home(nil))
 
-		nav_bar := &widget.Tree{
+		var nav_bar *widget.Tree = &widget.Tree{
 			ChildUIDs: func(uid string) []string {
 				return tree_index[uid]
 			},
@@ -181,8 +182,19 @@ func init() {realMain =
 			},
 		}
 
+		var themes *fyne.Container = container.NewGridWithColumns(2,
+			widget.NewButton("Dark", func() {
+				my_app_GL.Settings().SetTheme(theme.DarkTheme())
+			}),
+			widget.NewButton("Light", func() {
+				my_app_GL.Settings().SetTheme(theme.LightTheme())
+			}),
+		)
+
+		var side_bar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
+
 		// Create a split container to hold the navigation bar and the content
-		var split *container.Split = container.NewHSplit(nav_bar, content_container)
+		var split *container.Split = container.NewHSplit(side_bar, content_container)
 		split.SetOffset(0.2) // Set the split ratio (20% for nav, 80% for content)
 
 		// Set the content of the window
