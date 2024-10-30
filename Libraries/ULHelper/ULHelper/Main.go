@@ -36,6 +36,7 @@ const LAST_UNUSED_MAX_S int64 = 5 * 60
 var stop_GL bool = false
 
 var device_info_GL *ModsFileInfo.DeviceInfo = &Utils.Gen_settings_GL.MOD_10.Device_info
+var user_location_GL *ModsFileInfo.UserLocation = &modGenInfo_GL.User_location
 
 var (
 	modGenInfo_GL  *ModsFileInfo.Mod12GenInfo = &Utils.Gen_settings_GL.MOD_12
@@ -52,17 +53,17 @@ func UpdateUserLocation() {
 		var curr_location = UNKNOWN_LOCATION
 
 		for _, location_info := range modUserInfo_GL.Locs_info {
-			var beacon_list []ModsFileInfo.ExtBeacon
+			var beacons_list []ModsFileInfo.ExtBeacon
 			if location_info.Type == "wifi" {
-				beacon_list = device_info_GL.System_state.Connectivity_info.Wifi_networks
+				beacons_list = device_info_GL.System_state.Connectivity_info.Wifi_networks
 			} else if location_info.Type == "bluetooth" {
-				beacon_list = device_info_GL.System_state.Connectivity_info.Bluetooth_devices
+				beacons_list = device_info_GL.System_state.Connectivity_info.Bluetooth_devices
 			} else {
 				continue
 			}
 
 			var beacon_found *ModsFileInfo.ExtBeacon = nil
-			for _, beacon := range beacon_list {
+			for _, beacon := range beacons_list {
 				var address_match bool = true
 				var name_match bool = true
 				if location_info.Address != "" {
@@ -79,34 +80,37 @@ func UpdateUserLocation() {
 				}
 			}
 
-			var distance_match bool = false
-			var may_still_be_in_location bool = false
 			if beacon_found != nil {
 				var distance int = UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon_found.RSSI, UtilsSWA.DEFAULT_TX_POWER)
 
 				if distance <= location_info.Max_distance_m {
-					// If the device is near the location, then the user is near the location.
-					distance_match = true
-				}
-			} else {
-				if curr_location != UNKNOWN_LOCATION {
-					if modGenInfo_GL.User_location.Last_detection_when_s+ location_info.Last_detection_s >= time.Now().Unix() {
-						may_still_be_in_location = true
+					// If the device is near the beacon, then the user may be near the location.
+					curr_location = location_info.Location
+					if checkUserLocation(curr_location) {
+						user_location_GL.Last_detection_when_s = time.Now().Unix()
 					}
+
+					break
 				}
 			}
+		}
 
-			if distance_match || may_still_be_in_location {
-				curr_location = location_info.Location
+		// If no beacon was found, check if the user may still be in the location based on the time the location was
+		// last detected.
+		if curr_location == UNKNOWN_LOCATION {
+			for _, location_info := range modUserInfo_GL.Locs_info {
+				if user_location_GL.Curr_location == location_info.Location &&
+					user_location_GL.Last_detection_when_s + location_info.Last_detection_s >= time.Now().Unix() {
+					curr_location = location_info.Location
+
+					break
+				}
 			}
 		}
 
-		if curr_location != UNKNOWN_LOCATION {
-			modGenInfo_GL.User_location.Last_known_location = curr_location
-			modGenInfo_GL.User_location.Last_detection_when_s = time.Now().Unix()
+		if checkUserLocation(curr_location) {
+			updateUserLocation(curr_location)
 		}
-
-		updateUserLocation(computeUserLocation(curr_location))
 
 		if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
 			return
@@ -114,34 +118,35 @@ func UpdateUserLocation() {
 	}
 }
 
-func computeUserLocation(location string) string {
-	if modUserInfo_GL.AlwaysWith_device == Utils.Device_settings_GL.Device_ID && location != UNKNOWN_LOCATION {
-		return location
+func checkUserLocation(location string) bool {
+	if location == UNKNOWN_LOCATION {
+		return true
 	}
 
-	var curr_location string = UNKNOWN_LOCATION
-	if location != UNKNOWN_LOCATION && device_info_GL.Last_time_used_s + LAST_UNUSED_MAX_S >= time.Now().Unix() {
-		curr_location = location
+	if modUserInfo_GL.AlwaysWith_device == Utils.Device_settings_GL.Device_ID {
+		return true
 	}
 
-	return curr_location
+	var approved bool = false
+	if device_info_GL.Last_time_used_s + LAST_UNUSED_MAX_S >= time.Now().Unix() {
+		approved = true
+	}
+
+	return approved
 }
 
 func updateUserLocation(new_location string) {
-	var user_location *ModsFileInfo.UserLocation = &modGenInfo_GL.User_location
-
 	if new_location != UNKNOWN_LOCATION {
-		user_location.Last_detection_when_s = time.Now().Unix()
-		user_location.Last_known_location = user_location.Curr_location
+		user_location_GL.Last_known_location = user_location_GL.Curr_location
 	}
 
-	if new_location != user_location.Curr_location {
-		user_location.Prev_location = user_location.Curr_location
-		user_location.Prev_last_time_checked_s = user_location.Last_time_checked_s
+	if new_location != user_location_GL.Curr_location {
+		user_location_GL.Prev_location = user_location_GL.Curr_location
+		user_location_GL.Prev_last_time_checked_s = user_location_GL.Last_time_checked_s
 
-		user_location.Curr_location = new_location
+		user_location_GL.Curr_location = new_location
 	}
-	user_location.Last_time_checked_s = time.Now().Unix()
+	user_location_GL.Last_time_checked_s = time.Now().Unix()
 }
 
 /*
