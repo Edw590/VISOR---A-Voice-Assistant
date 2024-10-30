@@ -119,7 +119,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Device_condition": "bool(battery_level < 20) && bool(!power_connected)"
+				"Programmable_condition": "bool(battery_level < 20) && bool(!power_connected)"
 			},
 			{
 				"Id": 9,
@@ -133,7 +133,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Device_condition": "bool(battery_level <= 5) && bool(!power_connected)"
+				"Programmable_condition": "bool(battery_level <= 5) && bool(!power_connected)"
 			},
 			{
 				"Id": 7,
@@ -147,7 +147,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Device_condition": "bool(battery_level == 100) && bool(power_connected)"
+				"Programmable_condition": "bool(battery_level == 100) && bool(power_connected)"
 			},
 			{
 				"Id": 6,
@@ -161,7 +161,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Device_condition": "bool(battery_level > 80) && bool(power_connected)"
+				"Programmable_condition": "bool(battery_level > 80) && bool(power_connected)"
 			},
 			{
 				"Id": 1,
@@ -175,7 +175,7 @@
 				"Time": "2024-06-27 -- 07:00:00",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Device_condition": ""
+				"Programmable_condition": ""
 			},
 			{
 				"Id": 2,
@@ -189,7 +189,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "+university",
-				"Device_condition": ""
+				"Programmable_condition": ""
 			},
 			{
 				"Id": 3,
@@ -203,7 +203,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "-university",
-				"Device_condition": ""
+				"Programmable_condition": ""
 			},
 			{
 				"Id": 4,
@@ -217,7 +217,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "+home_*",
-				"Device_condition": ""
+				"Programmable_condition": ""
 			},
 			{
 				"Id": 5,
@@ -231,7 +231,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "-home_*",
-				"Device_condition": ""
+				"Programmable_condition": ""
 			}
 		]
 	},

@@ -31,16 +31,13 @@ import (
 
 var user_location_GL *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
 
-var tasks_info_list_GL map[int]int64 = make(map[int]int64)
-
-var conditions_were_true_GL map[int]bool = make(map[int]bool)
-
 var prev_curr_last_known_user_loc_GL string = user_location_GL.Curr_location
 var prev_prev_last_known_user_loc_GL string = user_location_GL.Prev_location
 
 var stop_GL bool = false
 
 var (
+	modGenInfo_GL  *ModsFileInfo.Mod9GenInfo = &Utils.Gen_settings_GL.MOD_9
 	modUserInfo_GL *ModsFileInfo.Mod9UserInfo = &Utils.User_settings_GL.TasksExecutor
 )
 
@@ -55,6 +52,13 @@ This function will block until a Task is due. When that happens, the Task is ret
   - the Task that is due or nil if the checker was stopped
  */
 func CheckDueTasks() *ModsFileInfo.Task {
+	if modGenInfo_GL.Tasks_info == nil {
+		modGenInfo_GL.Tasks_info = make(map[int]int64)
+	}
+	if modGenInfo_GL.Conds_were_true == nil {
+		modGenInfo_GL.Conds_were_true = make(map[int]bool)
+	}
+
 	stop_GL = false
 	for {
 		// Location trigger - if the user location changed, check if any task is triggered
@@ -84,14 +88,20 @@ func CheckDueTasks() *ModsFileInfo.Task {
 					continue
 				}
 
-				var condition bool = checkCondition(task, conditions_were_true_GL)
+				var condition bool = checkCondition(task)
 
 				var device_id_matches bool = checkDeviceID(task)
 
 				var condition_device_active bool = checkDeviceActive(task)
 
 				if condition_loc && condition && device_id_matches && condition_device_active {
-					return &task
+					if modGenInfo_GL.Tasks_info[task.Id] == 0 {
+						modGenInfo_GL.Tasks_info[task.Id] = time.Now().Unix() / 60
+
+						return &task
+					}
+				} else {
+					modGenInfo_GL.Tasks_info[task.Id] = 0
 				}
 			}
 		}
@@ -123,7 +133,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 					}
 				}
 
-				condition_time = curr_time >= test_time_min && tasks_info_list_GL[task.Id] != test_time_min
+				condition_time = curr_time >= test_time_min && modGenInfo_GL.Tasks_info[task.Id] < test_time_min
 			}
 
 			// Check if the task is due and if it was already reminded
@@ -139,7 +149,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				}
 			}
 
-			var condition bool = checkCondition(task, conditions_were_true_GL)
+			var condition bool = checkCondition(task)
 
 			var device_id_matches bool = checkDeviceID(task)
 
@@ -147,7 +157,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 			if condition_time && condition_loc && condition && device_id_matches && condition_device_active {
 				// Set the last reminded time to the test time
-				tasks_info_list_GL[task.Id] = test_time_min
+				modGenInfo_GL.Tasks_info[task.Id] = test_time_min
 
 				return &task
 			}

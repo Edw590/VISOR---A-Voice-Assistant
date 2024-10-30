@@ -24,7 +24,9 @@ package ModsFileInfo
 // Mod9GenInfo is the format of the custom generated information about this specific module.
 type Mod9GenInfo struct {
 	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
-	Tasks_info map[string]int64
+	Tasks_info map[int]int64
+	// Conds_were_true maps the task ID to whether its programmable condition was true
+	Conds_were_true map[int]bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,6 +57,6 @@ type Task struct {
 	Repeat_each_min int64
 	// User_location is the location the user must be in for the task to be triggered
 	User_location string
-	// Device_condition is an additional "advanced" condition for the task in Go language
-	Device_condition string
+	// Programmable_condition is an additional "advanced" condition for the task in Go language
+	Programmable_condition string
 }

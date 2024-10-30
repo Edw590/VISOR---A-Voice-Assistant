@@ -104,21 +104,23 @@ func formatCondition(condition string) string {
 	return condition
 }
 
-func checkCondition(task ModsFileInfo.Task, conditions_were_true map[int]bool) bool {
+func checkCondition(task ModsFileInfo.Task) bool {
+	var conds_were_true map[int]bool = modGenInfo_GL.Conds_were_true
+
 	var condition bool = false
-	if task.Device_condition != "" {
-		if ok := conditions_were_true[task.Id]; !ok {
-			conditions_were_true[task.Id] = false
+	if task.Programmable_condition != "" {
+		if ok := conds_were_true[task.Id]; !ok {
+			conds_were_true[task.Id] = false
 		}
 
-		if computeCondition(task.Device_condition) {
-			if !conditions_were_true[task.Id] {
-				conditions_were_true[task.Id] = true
+		if computeCondition(task.Programmable_condition) {
+			if !conds_were_true[task.Id] {
+				conds_were_true[task.Id] = true
 
 				condition = true
 			}
 		} else {
-			conditions_were_true[task.Id] = false
+			conds_were_true[task.Id] = false
 		}
 	} else {
 		condition = true

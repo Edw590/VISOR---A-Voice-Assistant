@@ -97,9 +97,9 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 	entry_user_location.SetText(task.User_location)
 	entry_user_location.SetPlaceHolder("User location trigger")
 
-	var entry_device_condition *widget.Entry = widget.NewEntry()
-	entry_device_condition.SetText(task.Device_condition)
-	entry_device_condition.SetPlaceHolder("Programmable condition (in Go)")
+	var entry_programmable_condition *widget.Entry = widget.NewEntry()
+	entry_programmable_condition.SetText(task.Programmable_condition)
+	entry_programmable_condition.SetPlaceHolder("Programmable condition (in Go)")
 
 	// Save button
 	var button_save *widget.Button = widget.NewButton("Save", func() {
@@ -111,7 +111,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 		task.Time = entry_time.Text
 		task.Repeat_each_min, _ = strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 		task.User_location = entry_user_location.Text
-		task.Device_condition = entry_device_condition.Text
+		task.Programmable_condition = entry_programmable_condition.Text
 	})
 
 	return container.NewVBox(
@@ -124,7 +124,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 		entry_time,
 		entry_repeat_each_min,
 		entry_user_location,
-		entry_device_condition,
+		entry_programmable_condition,
 		button_save,
 	)
 }
