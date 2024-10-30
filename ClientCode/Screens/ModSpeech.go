@@ -32,18 +32,13 @@ import (
 	"strings"
 )
 
-var mod_speech_canvas_object_GL fyne.CanvasObject = nil
-
 func ModSpeech() fyne.CanvasObject {
-	var tabs *container.AppTabs = container.NewAppTabs(
+	Current_screen_GL = NUM_SPEECH
+
+	return container.NewAppTabs(
 		container.NewTabItem("Main", speechCreateMainTab()),
 		container.NewTabItem("Settings", speechCreateSettingsTab()),
 	)
-
-	mod_speech_canvas_object_GL = tabs
-	Current_screen_GL = mod_speech_canvas_object_GL
-
-	return mod_speech_canvas_object_GL
 }
 
 func speechCreateMainTab() *container.Scroll {

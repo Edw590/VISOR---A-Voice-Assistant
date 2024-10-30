@@ -32,17 +32,12 @@ import (
 	"time"
 )
 
-var mod_gpt_communicator_canvas_object_GL fyne.CanvasObject = nil
-
 func ModGPTCommunicator() fyne.CanvasObject {
-	var tabs *container.AppTabs = container.NewAppTabs(
+	Current_screen_GL = NUM_GPT_COMMUNICATOR
+
+	return container.NewAppTabs(
 		container.NewTabItem("Communicator", gptCommunicatorCreateCommunicatorTab()),
 	)
-
-	mod_gpt_communicator_canvas_object_GL = tabs
-	Current_screen_GL = mod_gpt_communicator_canvas_object_GL
-
-	return mod_gpt_communicator_canvas_object_GL
 }
 
 func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
@@ -86,10 +81,9 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	response_text.SetMinRowsVisible(100)
 
 	go func() {
-		time.Sleep(500 * time.Millisecond)
 		var old_text string = ""
 		for {
-			if Current_screen_GL == mod_gpt_communicator_canvas_object_GL {
+			if Current_screen_GL == NUM_GPT_COMMUNICATOR {
 				var new_text string = GPTComm.GetLastText()
 				if old_text != new_text {
 					old_text = new_text

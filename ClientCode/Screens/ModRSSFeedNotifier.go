@@ -31,17 +31,12 @@ import (
 	"strconv"
 )
 
-var mod_rss_feed_notifier_canvas_object_GL fyne.CanvasObject = nil
-
 func ModRSSFeedNotifier() fyne.CanvasObject {
-	var tabs *container.AppTabs = container.NewAppTabs(
+	Current_screen_GL = NUM_RSS_FEED_NOTIFIER
+
+	return container.NewAppTabs(
 		container.NewTabItem("Feeds list", rssFeedNotifierCreateFeedsListTab()),
 	)
-
-	mod_rss_feed_notifier_canvas_object_GL = tabs
-	Current_screen_GL = mod_rss_feed_notifier_canvas_object_GL
-
-	return mod_rss_feed_notifier_canvas_object_GL
 }
 
 func rssFeedNotifierCreateFeedsListTab() *container.Scroll {

@@ -30,19 +30,14 @@ import (
 	"time"
 )
 
-var module_status_canvas_object_GL fyne.CanvasObject = nil
+func ModModulesManager(param any) fyne.CanvasObject {
+	Current_screen_GL = NUM_MODULES_MANAGER
 
-func ModulesStatus(param any) fyne.CanvasObject {
 	var modules []Utils.Module = param.([]Utils.Module)
 
-	var tabs *container.AppTabs = container.NewAppTabs(
+	return container.NewAppTabs(
 		container.NewTabItem("Modules status", modulesManagerCreateModulesStatusTab(modules)),
 	)
-
-	module_status_canvas_object_GL = tabs
-	Current_screen_GL = module_status_canvas_object_GL
-
-	return module_status_canvas_object_GL
 }
 
 func modulesManagerCreateModulesStatusTab(modules []Utils.Module) *container.Scroll {
@@ -50,9 +45,8 @@ func modulesManagerCreateModulesStatusTab(modules []Utils.Module) *container.Scr
 	module_status_text.Wrapping = fyne.TextWrapWord
 
 	go func() {
-		time.Sleep(500 * time.Millisecond)
 		for {
-			if Current_screen_GL == module_status_canvas_object_GL {
+			if Current_screen_GL == NUM_MODULES_MANAGER {
 				var text string = ""
 				for i, module := range modules {
 					if Utils.MOD_NUMS_SUPPORT[i] & Utils.MOD_CLIENT != 0 {

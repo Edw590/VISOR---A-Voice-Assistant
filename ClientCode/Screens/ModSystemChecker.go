@@ -29,17 +29,12 @@ import (
 	"time"
 )
 
-var mod_system_checker_canvas_object_GL fyne.CanvasObject = nil
-
 func ModSystemChecker() fyne.CanvasObject {
-	var tabs *container.AppTabs = container.NewAppTabs(
+	Current_screen_GL = NUM_SYSTEM_CHECKER
+
+	return container.NewAppTabs(
 		container.NewTabItem("System state", systemCheckerCreateSystemStateTab()),
 	)
-
-	mod_system_checker_canvas_object_GL = tabs
-	Current_screen_GL = mod_system_checker_canvas_object_GL
-
-	return mod_system_checker_canvas_object_GL
 }
 
 func systemCheckerCreateSystemStateTab() *container.Scroll {
@@ -47,9 +42,8 @@ func systemCheckerCreateSystemStateTab() *container.Scroll {
 	sys_state_text.Wrapping = fyne.TextWrapWord
 
 	go func() {
-		time.Sleep(500 * time.Millisecond)
 		for {
-			if Current_screen_GL == mod_system_checker_canvas_object_GL {
+			if Current_screen_GL == NUM_SYSTEM_CHECKER {
 				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
 			} else {
 				break

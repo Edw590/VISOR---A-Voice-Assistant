@@ -33,17 +33,12 @@ import (
 	"strings"
 )
 
-var tasks_executor_canvas_object_GL fyne.CanvasObject = nil
-
 func ModTasksExecutor() fyne.CanvasObject {
-	var tabs *container.AppTabs = container.NewAppTabs(
+	Current_screen_GL = NUM_TASKS_EXECUTOR
+
+	return container.NewAppTabs(
 		container.NewTabItem("Tasks list", tasksExecutorCreateTasksListTab()),
 	)
-
-	tasks_executor_canvas_object_GL = tabs
-	Current_screen_GL = tasks_executor_canvas_object_GL
-
-	return tasks_executor_canvas_object_GL
 }
 
 func tasksExecutorCreateTasksListTab() *container.Scroll {

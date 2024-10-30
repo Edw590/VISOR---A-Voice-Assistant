@@ -21,38 +21,21 @@
 
 package Screens
 
-import (
-	"Utils/UtilsSWA"
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
-	"time"
+import "fyne.io/fyne/v2"
+
+// Current_screen_GL is the current app screen. It's currently used to let threads specific to each screen know if they
+// should continue processing data or not (they don't stop, they just keep waiting for the screen to become active again).
+var Current_screen_GL int = -1
+
+var screens_size_GL fyne.Size = fyne.NewSize(550, 480)
+
+const (
+	NUM_HOME = iota
+	NUM_MODULES_MANAGER
+	NUM_SPEECH
+	NUM_RSS_FEED_NOTIFIER
+	NUM_GPT_COMMUNICATOR
+	NUM_TASKS_EXECUTOR
+	NUM_SYSTEM_CHECKER
+	NUM_REGISTRY
 )
-
-func Registry() fyne.CanvasObject {
-	Current_screen_GL = NUM_REGISTRY
-
-	return container.NewAppTabs(
-		container.NewTabItem("All values", registryCreateAllValuesTab()),
-	)
-}
-
-func registryCreateAllValuesTab() *container.Scroll {
-	var registry_text *widget.Label = widget.NewLabel("")
-	registry_text.Wrapping = fyne.TextWrapWord
-
-	go func() {
-		time.Sleep(500 * time.Millisecond)
-		for {
-			if Current_screen_GL == NUM_REGISTRY {
-				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY())
-			} else {
-				break
-			}
-
-			time.Sleep(1 * time.Second)
-		}
-	}()
-
-	return createMainContentScrollUTILS(registry_text)
-}

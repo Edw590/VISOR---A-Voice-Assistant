@@ -160,7 +160,7 @@ func init() {realMain =
 					case "home":
 						content_container.Objects = []fyne.CanvasObject{Screens.Home()}
 					case "mod_mod_manager":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
+						content_container.Objects = []fyne.CanvasObject{Screens.ModModulesManager(modules)}
 					case "mod_speech":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech()}
 					case "mod_rss_feed_notifier":
@@ -196,7 +196,7 @@ func init() {realMain =
 		// Set the content of the window
 		my_window_GL.SetContent(split)
 
-		var prev_screen fyne.CanvasObject = nil
+		var prev_screen int = -1
 		// Add system tray functionality
 		if desk, ok := my_app_GL.(desktop.App); ok {
 			var icon *fyne.StaticResource = Logo.LogoBlackGmail
@@ -219,7 +219,7 @@ func init() {realMain =
 		my_window_GL.SetCloseIntercept(func() {
 			// Store the previous screen before hiding
 			prev_screen = Screens.Current_screen_GL
-			Screens.Current_screen_GL = nil
+			Screens.Current_screen_GL = -1
 			my_window_GL.Hide()
 
 			// Create and send one-time notification
