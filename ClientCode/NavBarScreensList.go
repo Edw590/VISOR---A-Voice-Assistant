@@ -31,7 +31,6 @@ var screens_GL = map[string]string{
 	"tasks_executor": "Tasks Executor",
 	"sys_checker": "System Checker",
 	"registry": "Registry",
-	"settings": "Settings",
 }
 
 // tree_index defines how the screens should be laid out in the index tree
@@ -45,6 +44,5 @@ var tree_index = map[string][]string{
 		"tasks_executor",
 		"sys_checker",
 		"registry",
-		"settings",
 	},
 }

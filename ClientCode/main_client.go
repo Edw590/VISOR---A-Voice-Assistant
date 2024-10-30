@@ -162,7 +162,7 @@ func init() {realMain =
 					case "mod_mod_manager":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
 					case "mod_speech":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech(my_window_GL)}
+						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech()}
 					case "mod_rss_feed_notifier":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModRSSFeedNotifier()}
 					case "mod_gpt_comm":
@@ -173,8 +173,6 @@ func init() {realMain =
 						content_container.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
 					case "registry":
 						content_container.Objects = []fyne.CanvasObject{Screens.Registry()}
-					case "settings":
-						content_container.Objects = []fyne.CanvasObject{Screens.Settings()}
 				}
 				content_container.Refresh()
 			},

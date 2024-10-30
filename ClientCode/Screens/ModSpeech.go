@@ -25,24 +25,33 @@ import (
 	"Speech"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
+	"Utils/UtilsSWA"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+	"strings"
 )
-
-var file_path_GL string = ""
 
 var mod_speech_canvas_object_GL fyne.CanvasObject = nil
 
-func ModSpeech(param any) fyne.CanvasObject {
+func ModSpeech() fyne.CanvasObject {
 	Current_screen_GL = mod_speech_canvas_object_GL
 	if mod_speech_canvas_object_GL != nil {
 		return mod_speech_canvas_object_GL
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// Entry and Button section
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Main", speechCreateMainTab()),
+		container.NewTabItem("Settings", speechCreateSettingsTab()),
+	)
+
+	mod_speech_canvas_object_GL = tabs
+	Current_screen_GL = mod_speech_canvas_object_GL
+
+	return mod_speech_canvas_object_GL
+}
+
+func speechCreateMainTab() *container.Scroll {
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
 	entry_txt_to_speech.PlaceHolder = "Enter text to speak"
 	entry_txt_to_speech.Text = "This is an example."
@@ -58,44 +67,34 @@ func ModSpeech(param any) fyne.CanvasObject {
 	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
 		Speech.SkipCurrentSpeech()
 	})
-	var btn_config_tts *widget.Button = widget.NewButton("Configure Windows SAPI TTS", func() {
-		_, _ = Utils.ExecCmdSHELL([]string{"control.exe C:\\Windows\\System32\\Speech\\SpeechUX\\sapi.cpl"})
-	})
 
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
+	return createMainVScrollUTILS(container.NewVBox(
 		entry_txt_to_speech,
 		btn_speak_min,
 		btn_speak_high,
 		btn_speak_critical,
 		btn_skip_speech,
-		btn_config_tts,
-	)
-
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	mod_speech_canvas_object_GL = main_scroll
-	Current_screen_GL = mod_speech_canvas_object_GL
-
-	return mod_speech_canvas_object_GL
+	))
 }
 
-func showFilePicker(w fyne.Window) {
-	dialog.ShowFileOpen(func(f fyne.URIReadCloser, err error) {
-		file_path_GL = ""
-		if err != nil {
-			dialog.ShowError(err, w)
-			return
+func speechCreateSettingsTab() *container.Scroll {
+	var label_exxplanation *widget.Label = widget.NewLabel("(These are device-specific settings and hence not synced)")
+
+	var btn_config_tts *widget.Button = widget.NewButton("Configure Windows SAPI TTS", func() {
+		_, _ = Utils.ExecCmdSHELL([]string{"control.exe C:\\Windows\\System32\\Speech\\SpeechUX\\sapi.cpl"})
+	})
+
+	var objects []fyne.CanvasObject = []fyne.CanvasObject{
+		label_exxplanation,
+		btn_config_tts,
+	}
+	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	for i := len(values) - 1; i >= 0; i-- {
+		var value *UtilsSWA.Value = values[i]
+		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, "Speech - ") {
+			objects = append(objects, createValueChooserUTILS(value))
 		}
-		if f == nil {
-			return
-		}
-		file_path_GL = f.URI().Path()
-	}, w)
+	}
+
+	return createMainVScrollUTILS(container.NewVBox(objects...))
 }
