@@ -295,7 +295,6 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 				break
 			}
 
-			log.Println("File read")
 			if get_crc16 {
 				return getCRC16([]byte(*p_file_contents))
 			} else {
@@ -319,7 +318,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 
 			return ret
 		case "JSON":
-			// Get user settings.
+			// Get settings.
 			// Example: "[true to get file contents, false to get CRC16 checksum]|[one of the strings below]"
 			// Allowed strings: "US" (User Settings), "Weather" (Weather), "News" (News)
 			// Returns: the user settings in JSON format compressed
@@ -336,18 +335,28 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
-
-					return []byte("Invalid JSON origin")
 			}
 			if get_json {
 				return Utils.CompressString(json)
 			} else {
 				return getCRC16([]byte(json))
 			}
+		case "S_JSON":
+			// Set settings.
+			// Example: "[one of the strings below]|[a compressed JSON string]"
+			// Allowed strings: "US" (User Settings)
+			// Returns: nothing
+			var bytes_split []string = strings.Split(string(bytes), "|")
+			var json_origin string = bytes_split[0]
+			var json string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
+			switch json_origin {
+				case "US":
+					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL)
+			}
 	}
 
 	// Just to return something
-	return []byte("OK")
+	return nil
 }
 
 func registerChannel() int {

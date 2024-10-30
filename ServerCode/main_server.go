@@ -92,8 +92,7 @@ func init() {realMain =
 				printModulesStatus(modules)
 			}
 
-			// Keep reloading the user settings
-			loadUserSettings()
+			Utils.WriteUserSettings()
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 5) {
 				break

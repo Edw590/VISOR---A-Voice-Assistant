@@ -40,7 +40,7 @@ var screens_GL = map[string]_Screen{
 	"mod_status": {"Modules Status", Screens.ModulesStatus},
 	"calendar": {"Calendar", Screens.Calendar},
 	"registry": {"Registry", Screens.Registry},
-	"tasks": {"Tasks (NOT READY)", Screens.Tasks},
+	"tasks": {"Tasks", Screens.Tasks},
 	"add_task": {"Add task", Screens.Tasks},
 	"sys_state": {"System State", Screens.SystemState},
 	"settings": {"Settings", Screens.Settings},

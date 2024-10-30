@@ -28,9 +28,9 @@ import (
 	"time"
 )
 
-const _GET_SETTINGS_EACH_S int64 = 30
+const _GET_SETTINGS_EACH_S int64 = 1
 
-var last_crc16_GL []byte = nil
+var last_remote_crc16_GL []byte = nil
 var stop_GL bool = false
 
 /*
@@ -44,6 +44,7 @@ SyncUserSettings keeps synchronizing the remote user settings file with the loca
 func SyncUserSettings() {
 	go func() {
 		var last_get_settings_when_s int64 = 0
+		var last_user_settings_json string = GetJsonUserSettings()
 		for {
 			var update_settings bool = false
 			if time.Now().Unix() >= last_get_settings_when_s + _GET_SETTINGS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
@@ -53,22 +54,14 @@ func SyncUserSettings() {
 			}
 
 			if update_settings {
-				Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|false|US"))
-				var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
-				if comms_map == nil {
-					return
-				}
-				map_value, ok := comms_map[Utils.COMMS_MAP_SRV_KEY]
-				if !ok {
-					continue
-				}
-
-				var new_crc16 []byte = map_value.([]byte)
-				if !bytes.Equal(new_crc16, last_crc16_GL) {
-					last_crc16_GL = new_crc16
+				if remoteSettingsChanged() {
+					if !Utils.IsCommunicatorConnectedSERVER() {
+						// Check again the communicator. Trying to prevent deadlocks.
+						continue
+					}
 
 					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|true|US"))
-					comms_map = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
+					var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
 					if comms_map == nil {
 						return
 					}
@@ -76,6 +69,16 @@ func SyncUserSettings() {
 					var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 					_ = Utils.FromJsonGENERAL(json, &Utils.User_settings_GL)
+					last_user_settings_json = GetJsonUserSettings()
+				} else {
+					var new_user_settings_json string = GetJsonUserSettings()
+					if last_user_settings_json != new_user_settings_json {
+						last_user_settings_json = new_user_settings_json
+
+						var message []byte = []byte("S_JSON|US|")
+						message = append(message, Utils.CompressString(last_user_settings_json)...)
+						Utils.QueueNoResponseMessageSERVER(message)
+					}
 				}
 			}
 
@@ -84,6 +87,27 @@ func SyncUserSettings() {
 			}
 		}
 	}()
+}
+
+func remoteSettingsChanged() bool {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|false|US"))
+	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
+	if comms_map == nil {
+		return false
+	}
+	map_value, ok := comms_map[Utils.COMMS_MAP_SRV_KEY]
+	if !ok {
+		return false
+	}
+
+	var new_crc16 []byte = map_value.([]byte)
+	if !bytes.Equal(new_crc16, last_remote_crc16_GL) {
+		last_remote_crc16_GL = new_crc16
+
+		return true
+	}
+
+	return false
 }
 
 /*
