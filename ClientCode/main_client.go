@@ -158,23 +158,21 @@ func init() {realMain =
 			OnSelected: func(uid string) {
 				switch uid {
 					case "home":
-						content_container.Objects = []fyne.CanvasObject{Screens.Home(nil)}
+						content_container.Objects = []fyne.CanvasObject{Screens.Home()}
 					case "mod_mod_manager":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
 					case "mod_speech":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech(my_window_GL)}
 					case "mod_gpt_comm":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator(nil)}
+						content_container.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator()}
 					case "tasks_executor":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor(nil)}
-					case "add_task":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor(nil)}
+						content_container.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor()}
 					case "sys_checker":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModSystemChecker(nil)}
+						content_container.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
 					case "registry":
-						content_container.Objects = []fyne.CanvasObject{Screens.Registry(nil)}
+						content_container.Objects = []fyne.CanvasObject{Screens.Registry()}
 					case "settings":
-						content_container.Objects = []fyne.CanvasObject{Screens.Settings(nil)}
+						content_container.Objects = []fyne.CanvasObject{Screens.Settings()}
 				}
 				content_container.Refresh()
 			},

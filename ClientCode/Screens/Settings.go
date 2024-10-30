@@ -33,7 +33,7 @@ import (
 
 var settings_canvas_object_GL fyne.CanvasObject = nil
 
-func Settings(param any) fyne.CanvasObject {
+func Settings() fyne.CanvasObject {
 	Current_screen_GL = settings_canvas_object_GL
 
 	var objects []fyne.CanvasObject = nil

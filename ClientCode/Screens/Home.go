@@ -40,7 +40,7 @@ var screens_size_GL fyne.Size = fyne.NewSize(550, 480)
 
 var home_canvas_object_GL fyne.CanvasObject = nil
 
-func Home(param any) fyne.CanvasObject {
+func Home() fyne.CanvasObject {
 	Current_screen_GL = home_canvas_object_GL
 	if home_canvas_object_GL != nil {
 		return home_canvas_object_GL

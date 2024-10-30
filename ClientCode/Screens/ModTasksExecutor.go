@@ -35,7 +35,7 @@ import (
 
 var tasks_executor_canvas_object_GL fyne.CanvasObject = nil
 
-func ModTasksExecutor(param any) fyne.CanvasObject {
+func ModTasksExecutor() fyne.CanvasObject {
 	Current_screen_GL = tasks_executor_canvas_object_GL
 
 	var objects []fyne.CanvasObject = nil

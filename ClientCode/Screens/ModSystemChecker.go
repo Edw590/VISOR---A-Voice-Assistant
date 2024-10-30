@@ -31,7 +31,7 @@ import (
 
 var mod_system_checker_canvas_object_GL fyne.CanvasObject = nil
 
-func ModSystemChecker(param any) fyne.CanvasObject {
+func ModSystemChecker() fyne.CanvasObject {
 	Current_screen_GL = mod_system_checker_canvas_object_GL
 	if mod_system_checker_canvas_object_GL != nil {
 		return mod_system_checker_canvas_object_GL

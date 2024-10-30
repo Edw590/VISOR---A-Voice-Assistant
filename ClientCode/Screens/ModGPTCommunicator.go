@@ -34,7 +34,7 @@ import (
 
 var mod_gpt_communicator_canvas_object_GL fyne.CanvasObject = nil
 
-func ModGPTCommunicator(param any) fyne.CanvasObject {
+func ModGPTCommunicator() fyne.CanvasObject {
 	Current_screen_GL = mod_gpt_communicator_canvas_object_GL
 	if mod_gpt_communicator_canvas_object_GL != nil {
 		return mod_gpt_communicator_canvas_object_GL
