@@ -65,6 +65,9 @@ func ModRSSFeedNotifier() fyne.CanvasObject {
 func createFeedInfo(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 	var label_id *widget.Label = widget.NewLabel("Feed ID: " + strconv.Itoa(feed_info.Feed_num))
 
+	var check_enabled *widget.Check = widget.NewCheck("Feed enabled", nil)
+	check_enabled.SetChecked(feed_info.Feed_enabled)
+
 	var entry_name *widget.Entry = widget.NewEntry()
 	entry_name.SetText(feed_info.Feed_name)
 	entry_name.PlaceHolder = "Feed name"
@@ -83,6 +86,7 @@ func createFeedInfo(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 
 	// Save button
 	var button_save *widget.Button = widget.NewButton("Save", func() {
+		feed_info.Feed_enabled = check_enabled.Checked
 		feed_info.Feed_name = entry_name.Text
 		feed_info.Feed_type = entry_type.Text
 		feed_info.Feed_url = entry_url.Text
@@ -91,6 +95,7 @@ func createFeedInfo(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 
 	return container.NewVBox(
 		label_id,
+		check_enabled,
 		entry_name,
 		entry_type,
 		entry_url,

@@ -47,6 +47,8 @@ type Mod4UserInfo struct {
 type FeedInfo struct {
 	// Feed_num is the number of the feed, beginning in 1 (no special reason, but could be useful some time)
 	Feed_num int
+	// Feed_enabled is whether the feed is enabled
+	Feed_enabled bool
 	// Feed_name is the user-given name of the feed
 	Feed_name string
 	// Feed_url is the URL of the feed

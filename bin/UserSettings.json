@@ -52,7 +52,11 @@
 
 			// ---------- StackExchange ----------
 			{// Reverse Engineering Stack Exchange
-				"Feed_num": 1, "Feed_type": "General", "Feed_url": "https://reverseengineering.stackexchange.com/feeds",
+				"Feed_num": 1,
+				"Feed_enabled": true,
+				"Feed_name": "Reverse Engineering (Stack Exchange)",
+				"Feed_type": "General",
+				"Feed_url": "https://reverseengineering.stackexchange.com/feeds",
 				"Custom_msg_subject": "Nova publicação em Reverse Engineering (Stack Exchange)"},
 
 
@@ -60,13 +64,23 @@
 			// ----- Channels -----
 
 			{// ElectroBOOM
-				"Feed_num": 6, "Feed_type": "YouTube CH +S", "Feed_url": "UCJ0-OtVpF0wOKEqT2Z1HEtA", "Custom_msg_subject": ""
+				"Feed_num": 2,
+				"Feed_enabled": true,
+				"Feed_name": "ElectroBOOM",
+				"Feed_type": "YouTube CH +S",
+				"Feed_url": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+				"Custom_msg_subject": ""
 			},
 
 			// ----- Playlists -----
 
 			{// PROJECT: MJOLNIR --> Installation00
-				"Feed_num": 15, "Feed_type": "YouTube PL +S", "Feed_url": "PLLasqfX0uirPQeVu8erOCdLPFY_2kFL8-", "Custom_msg_subject": ""
+				"Feed_num": 3,
+				"Feed_enabled": true,
+				"Feed_name": "PROJECT: MJOLNIR --> Installation00",
+				"Feed_type": "YouTube PL",
+				"Feed_url": "PLLasqfX0uirPQeVu8erOCdLPFY_2kFL8-",
+				"Custom_msg_subject": ""
 			}
 		]
 	},

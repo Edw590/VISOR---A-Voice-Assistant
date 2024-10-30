@@ -96,6 +96,10 @@ func init() {realMain =
 		for {
 
 			for _, feedInfo := range modUserInfo_GL.Feeds_info {
+				if !feedInfo.Feed_enabled {
+					continue
+				}
+
 				//if feedInfo.Feed_num != 8 {
 				//	continue
 				//}
