@@ -59,6 +59,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 		modGenInfo_GL.Conds_were_true = make(map[int]bool)
 	}
 
+	var task_return ModsFileInfo.Task
 	stop_GL = false
 	for {
 		// Location trigger - if the user location changed, check if any task is triggered
@@ -98,7 +99,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 					if modGenInfo_GL.Tasks_info[task.Id] == 0 {
 						modGenInfo_GL.Tasks_info[task.Id] = time.Now().Unix() / 60
 
-						return &task
+						task_return = task
 					}
 				} else {
 					modGenInfo_GL.Tasks_info[task.Id] = 0
@@ -159,8 +160,12 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				// Set the last reminded time to the test time
 				modGenInfo_GL.Tasks_info[task.Id] = test_time_min
 
-				return &task
+				task_return = task
 			}
+		}
+
+		if task_return.Id != 0 {
+			return &task_return
 		}
 
 		if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
