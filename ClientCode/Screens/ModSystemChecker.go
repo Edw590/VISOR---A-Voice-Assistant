@@ -65,7 +65,11 @@ func ModSystemChecker(param any) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	mod_system_checker_canvas_object_GL = main_scroll
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("System state", main_scroll),
+	)
+
+	mod_system_checker_canvas_object_GL = tabs
 	Current_screen_GL = mod_system_checker_canvas_object_GL
 
 	return mod_system_checker_canvas_object_GL

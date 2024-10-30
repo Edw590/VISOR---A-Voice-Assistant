@@ -76,7 +76,11 @@ func ModulesStatus(param any) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	module_status_canvas_object_GL = main_scroll
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Modules status", main_scroll),
+	)
+
+	module_status_canvas_object_GL = tabs
 	Current_screen_GL = module_status_canvas_object_GL
 
 	return module_status_canvas_object_GL

@@ -133,7 +133,7 @@ func init() {realMain =
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		var content_container *fyne.Container = container.NewBorder(nil, nil, nil, nil, Screens.Home(nil))
+		var content_container *fyne.Container = container.NewStack(Screens.Home(nil))
 
 		var nav_bar *widget.Tree = &widget.Tree{
 			ChildUIDs: func(uid string) []string {
