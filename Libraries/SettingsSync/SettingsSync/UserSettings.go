@@ -28,7 +28,7 @@ import (
 	"time"
 )
 
-const _GET_SETTINGS_EACH_S int64 = 1
+const _GET_SETTINGS_EACH_S int64 = 30
 
 var last_remote_crc16_GL []byte = nil
 var stop_GL bool = false

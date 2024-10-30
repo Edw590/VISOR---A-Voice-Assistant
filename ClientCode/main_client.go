@@ -133,7 +133,7 @@ func init() {realMain =
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		var content_container *fyne.Container = container.NewStack(Screens.Home(nil))
+		var content_container *fyne.Container = container.NewStack(Screens.Home())
 
 		var nav_bar *widget.Tree = &widget.Tree{
 			ChildUIDs: func(uid string) []string {
@@ -163,6 +163,8 @@ func init() {realMain =
 						content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
 					case "mod_speech":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech(my_window_GL)}
+					case "mod_rss_feed_notifier":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModRSSFeedNotifier()}
 					case "mod_gpt_comm":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator()}
 					case "tasks_executor":
