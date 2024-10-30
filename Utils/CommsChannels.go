@@ -53,6 +53,8 @@ func CloseCommsChannels() {
 /*
 SendToModChannel sends data to a module channel.
 
+In case the module is not supported this function does nothing (to prevent deadlock sending to unused channels).
+
 -----------------------------------------------------------
 
 – Params:
@@ -61,6 +63,10 @@ SendToModChannel sends data to a module channel.
   - data – the data to send
  */
 func SendToModChannel(mod_num int, key string, data any) {
+	if !IsModSupportedMODULES(mod_num) {
+		return
+	}
+
 	// Ignore the panic of writing to closed channels (sometimes happens when the app is shutting down).
 	Tcef.Tcef{
 		Try: func() {
