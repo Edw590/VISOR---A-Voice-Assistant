@@ -29,12 +29,12 @@ import (
 	"time"
 )
 
-var system_state_canvas_object_GL fyne.CanvasObject = nil
+var mod_system_checker_canvas_object_GL fyne.CanvasObject = nil
 
-func SystemState(param any) fyne.CanvasObject {
-	Current_screen_GL = system_state_canvas_object_GL
-	if system_state_canvas_object_GL != nil {
-		return system_state_canvas_object_GL
+func ModSystemChecker(param any) fyne.CanvasObject {
+	Current_screen_GL = mod_system_checker_canvas_object_GL
+	if mod_system_checker_canvas_object_GL != nil {
+		return mod_system_checker_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ func SystemState(param any) fyne.CanvasObject {
 
 	go func() {
 		for {
-			if Current_screen_GL == system_state_canvas_object_GL {
+			if Current_screen_GL == mod_system_checker_canvas_object_GL {
 				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
 			}
 
@@ -65,8 +65,8 @@ func SystemState(param any) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	system_state_canvas_object_GL = main_scroll
-	Current_screen_GL = system_state_canvas_object_GL
+	mod_system_checker_canvas_object_GL = main_scroll
+	Current_screen_GL = mod_system_checker_canvas_object_GL
 
-	return system_state_canvas_object_GL
+	return mod_system_checker_canvas_object_GL
 }

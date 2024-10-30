@@ -21,33 +21,32 @@
 
 package main
 
-import (
-	"VISOR_Client/Screens"
-	"fyne.io/fyne/v2"
-)
-
-// _Screen defines the data structure for a tutorial
-type _Screen struct {
-	Title string
-	View func(param any) fyne.CanvasObject
-}
-
 // screens_GL defines the metadata for each screen
-var screens_GL = map[string]_Screen{
-	"home": {"Home", Screens.Home},
-	"dev_mode": {"Dev Mode", Screens.DevMode},
-	"communicator": {"Communicator", Screens.Communicator},
-	"mod_status": {"Modules Status", Screens.ModulesStatus},
-	"calendar": {"Calendar", Screens.Calendar},
-	"registry": {"Registry", Screens.Registry},
-	"tasks": {"Tasks", Screens.Tasks},
-	"add_task": {"Add task", Screens.Tasks},
-	"sys_state": {"System State", Screens.SystemState},
-	"settings": {"Settings", Screens.Settings},
+var screens_GL = map[string]string{
+	"home": "Home",
+	"mod_mod_manager": "Modules Manager",
+	"mod_speech": "Speech",
+	"mod_gpt_comm": "GPT Communicator",
+	"tasks_executor": "Tasks Executor",
+		"add_task": "Add task",
+	"sys_checker": "System Checker",
+	"registry": "Registry",
+	"settings": "Settings",
 }
 
 // tree_index defines how the screens should be laid out in the index tree
 var tree_index = map[string][]string{
-	"": {"home", "dev_mode", "communicator", "mod_status", "calendar", "registry", "tasks", "sys_state", "settings"},
-	"tasks": {"add_task"},
+	"": {
+		"home",
+		"mod_mod_manager",
+		"mod_speech",
+		"mod_gpt_comm",
+		"tasks_executor",
+		"sys_checker",
+		"registry",
+		"settings",
+	},
+	"tasks": {
+		"add_task",
+	},
 }

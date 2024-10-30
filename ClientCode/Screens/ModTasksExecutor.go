@@ -33,10 +33,10 @@ import (
 	"strings"
 )
 
-var tasks_canvas_object_GL fyne.CanvasObject = nil
+var tasks_executor_canvas_object_GL fyne.CanvasObject = nil
 
-func Tasks(param any) fyne.CanvasObject {
-	Current_screen_GL = tasks_canvas_object_GL
+func ModTasksExecutor(param any) fyne.CanvasObject {
+	Current_screen_GL = tasks_executor_canvas_object_GL
 
 	var objects []fyne.CanvasObject = nil
 	var tasks []ModsFileInfo.Task = TEHelper.GetTasks()
@@ -51,10 +51,10 @@ func Tasks(param any) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	tasks_canvas_object_GL = main_scroll
-	Current_screen_GL = tasks_canvas_object_GL
+	tasks_executor_canvas_object_GL = main_scroll
+	Current_screen_GL = tasks_executor_canvas_object_GL
 
-	return tasks_canvas_object_GL
+	return tasks_executor_canvas_object_GL
 }
 
 func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {

@@ -32,12 +32,12 @@ import (
 	"time"
 )
 
-var comm_canvas_object_GL fyne.CanvasObject = nil
+var mod_gpt_communicator_canvas_object_GL fyne.CanvasObject = nil
 
-func Communicator(param any) fyne.CanvasObject {
-	Current_screen_GL = comm_canvas_object_GL
-	if comm_canvas_object_GL != nil {
-		return comm_canvas_object_GL
+func ModGPTCommunicator(param any) fyne.CanvasObject {
+	Current_screen_GL = mod_gpt_communicator_canvas_object_GL
+	if mod_gpt_communicator_canvas_object_GL != nil {
+		return mod_gpt_communicator_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -80,14 +80,14 @@ func Communicator(param any) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Text Display section with vertical scrolling
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
-	response_text.PlaceHolder = "Response from the assistant"
+	response_text.PlaceHolder = "Response from the assistant's LLM/GPT"
 	response_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
 	response_text.SetMinRowsVisible(100)
 
 	go func() {
 		var old_text string = ""
 		for {
-			if Current_screen_GL == comm_canvas_object_GL {
+			if Current_screen_GL == mod_gpt_communicator_canvas_object_GL {
 				var new_text string = GPTComm.GetLastText()
 				if old_text != new_text {
 					old_text = new_text
@@ -116,8 +116,8 @@ func Communicator(param any) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	comm_canvas_object_GL = main_scroll
-	Current_screen_GL = comm_canvas_object_GL
+	mod_gpt_communicator_canvas_object_GL = main_scroll
+	Current_screen_GL = mod_gpt_communicator_canvas_object_GL
 
-	return comm_canvas_object_GL
+	return mod_gpt_communicator_canvas_object_GL
 }

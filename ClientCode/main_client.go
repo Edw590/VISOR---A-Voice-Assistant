@@ -153,28 +153,26 @@ func init() {realMain =
 					fyne.LogError("Missing tutorial panel: " + uid, nil)
 					return
 				}
-				obj.(*widget.Label).SetText(t.Title)
+				obj.(*widget.Label).SetText(t)
 			},
 			OnSelected: func(uid string) {
 				switch uid {
 					case "home":
 						content_container.Objects = []fyne.CanvasObject{Screens.Home(nil)}
-					case "dev_mode":
-						content_container.Objects = []fyne.CanvasObject{Screens.DevMode(my_window_GL)}
-					case "communicator":
-						content_container.Objects = []fyne.CanvasObject{Screens.Communicator(nil)}
-					case "mod_status":
+					case "mod_mod_manager":
 						content_container.Objects = []fyne.CanvasObject{Screens.ModulesStatus(modules)}
-					case "calendar":
-						content_container.Objects = []fyne.CanvasObject{Screens.Calendar(nil)}
+					case "mod_speech":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech(my_window_GL)}
+					case "mod_gpt_comm":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator(nil)}
+					case "tasks_executor":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor(nil)}
+					case "add_task":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor(nil)}
+					case "sys_checker":
+						content_container.Objects = []fyne.CanvasObject{Screens.ModSystemChecker(nil)}
 					case "registry":
 						content_container.Objects = []fyne.CanvasObject{Screens.Registry(nil)}
-					case "tasks":
-						content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
-					case "add_task":
-						content_container.Objects = []fyne.CanvasObject{Screens.Tasks(nil)}
-					case "sys_state":
-						content_container.Objects = []fyne.CanvasObject{Screens.SystemState(nil)}
 					case "settings":
 						content_container.Objects = []fyne.CanvasObject{Screens.Settings(nil)}
 				}

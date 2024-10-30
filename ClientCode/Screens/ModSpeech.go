@@ -33,12 +33,12 @@ import (
 
 var file_path_GL string = ""
 
-var dev_mode_canvas_object_GL fyne.CanvasObject = nil
+var mod_speech_canvas_object_GL fyne.CanvasObject = nil
 
-func DevMode(param any) fyne.CanvasObject {
-	Current_screen_GL = dev_mode_canvas_object_GL
-	if dev_mode_canvas_object_GL != nil {
-		return dev_mode_canvas_object_GL
+func ModSpeech(param any) fyne.CanvasObject {
+	Current_screen_GL = mod_speech_canvas_object_GL
+	if mod_speech_canvas_object_GL != nil {
+		return mod_speech_canvas_object_GL
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -80,10 +80,10 @@ func DevMode(param any) fyne.CanvasObject {
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 
-	dev_mode_canvas_object_GL = main_scroll
-	Current_screen_GL = dev_mode_canvas_object_GL
+	mod_speech_canvas_object_GL = main_scroll
+	Current_screen_GL = mod_speech_canvas_object_GL
 
-	return dev_mode_canvas_object_GL
+	return mod_speech_canvas_object_GL
 }
 
 func showFilePicker(w fyne.Window) {
