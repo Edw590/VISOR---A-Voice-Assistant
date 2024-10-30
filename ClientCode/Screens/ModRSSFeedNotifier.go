@@ -34,11 +34,17 @@ import (
 var mod_rss_feed_notifier_canvas_object_GL fyne.CanvasObject = nil
 
 func ModRSSFeedNotifier() fyne.CanvasObject {
-	Current_screen_GL = mod_rss_feed_notifier_canvas_object_GL
-	if mod_rss_feed_notifier_canvas_object_GL != nil {
-		return mod_rss_feed_notifier_canvas_object_GL
-	}
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Feeds list", rssFeedNotifierCreateFeedsListTab()),
+	)
 
+	mod_rss_feed_notifier_canvas_object_GL = tabs
+	Current_screen_GL = mod_rss_feed_notifier_canvas_object_GL
+
+	return mod_rss_feed_notifier_canvas_object_GL
+}
+
+func rssFeedNotifierCreateFeedsListTab() *container.Scroll {
 	var objects []fyne.CanvasObject = nil
 	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
 	sort.Slice(feeds_info, func(i, j int) bool {
@@ -47,19 +53,8 @@ func ModRSSFeedNotifier() fyne.CanvasObject {
 	for i := len(feeds_info) - 1; i >= 0; i-- {
 		objects = append(objects, createFeedInfo(&feeds_info[i]))
 	}
-	var content *fyne.Container = container.NewVBox(objects...)
 
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	var tabs *container.AppTabs = container.NewAppTabs(
-		container.NewTabItem("Feeds list", main_scroll),
-	)
-
-	mod_rss_feed_notifier_canvas_object_GL = tabs
-	Current_screen_GL = mod_rss_feed_notifier_canvas_object_GL
-
-	return mod_rss_feed_notifier_canvas_object_GL
+	return createMainContentScrollUTILS(objects...)
 }
 
 func createFeedInfo(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {

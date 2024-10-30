@@ -29,44 +29,35 @@ import (
 	"time"
 )
 
-var global_values_canvas_object_GL fyne.CanvasObject = nil
+var registry_canvas_object_GL fyne.CanvasObject = nil
 
 func Registry() fyne.CanvasObject {
-	Current_screen_GL = global_values_canvas_object_GL
-	if global_values_canvas_object_GL != nil {
-		return global_values_canvas_object_GL
-	}
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("All values", registryCreateAllValuesTab()),
+	)
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// Text Display section with vertical scrolling
+	registry_canvas_object_GL = tabs
+	Current_screen_GL = registry_canvas_object_GL
+
+	return registry_canvas_object_GL
+}
+
+func registryCreateAllValuesTab() *container.Scroll {
 	var registry_text *widget.Label = widget.NewLabel("")
-	registry_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
+	registry_text.Wrapping = fyne.TextWrapWord
 
 	go func() {
+		time.Sleep(500 * time.Millisecond)
 		for {
-			if Current_screen_GL == global_values_canvas_object_GL {
+			if Current_screen_GL == registry_canvas_object_GL {
 				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY())
+			} else {
+				break
 			}
 
 			time.Sleep(1 * time.Second)
 		}
 	}()
 
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
-		registry_text,
-	)
-
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	global_values_canvas_object_GL = main_scroll
-	Current_screen_GL = global_values_canvas_object_GL
-
-	return global_values_canvas_object_GL
+	return createMainContentScrollUTILS(registry_text)
 }

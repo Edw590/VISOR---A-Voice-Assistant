@@ -33,19 +33,24 @@ import (
 var module_status_canvas_object_GL fyne.CanvasObject = nil
 
 func ModulesStatus(param any) fyne.CanvasObject {
-	Current_screen_GL = module_status_canvas_object_GL
-	if module_status_canvas_object_GL != nil {
-		return module_status_canvas_object_GL
-	}
-
 	var modules []Utils.Module = param.([]Utils.Module)
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// Text Display section with vertical scrolling
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Modules status", modulesManagerCreateModulesStatusTab(modules)),
+	)
+
+	module_status_canvas_object_GL = tabs
+	Current_screen_GL = module_status_canvas_object_GL
+
+	return module_status_canvas_object_GL
+}
+
+func modulesManagerCreateModulesStatusTab(modules []Utils.Module) *container.Scroll {
 	var module_status_text *widget.Label = widget.NewLabel("")
-	module_status_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
+	module_status_text.Wrapping = fyne.TextWrapWord
 
 	go func() {
+		time.Sleep(500 * time.Millisecond)
 		for {
 			if Current_screen_GL == module_status_canvas_object_GL {
 				var text string = ""
@@ -57,31 +62,13 @@ func ModulesStatus(param any) fyne.CanvasObject {
 				}
 				text = text[:len(text)-2] // Remove the last 2 newlines
 				module_status_text.SetText(text)
+			} else {
+				break
 			}
 
 			time.Sleep(1 * time.Second)
 		}
 	}()
 
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
-		module_status_text,
-	)
-
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	var tabs *container.AppTabs = container.NewAppTabs(
-		container.NewTabItem("Modules status", main_scroll),
-	)
-
-	module_status_canvas_object_GL = tabs
-	Current_screen_GL = module_status_canvas_object_GL
-
-	return module_status_canvas_object_GL
+	return createMainContentScrollUTILS(module_status_text)
 }

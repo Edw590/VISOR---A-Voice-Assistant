@@ -41,11 +41,17 @@ var screens_size_GL fyne.Size = fyne.NewSize(550, 480)
 var home_canvas_object_GL fyne.CanvasObject = nil
 
 func Home() fyne.CanvasObject {
-	Current_screen_GL = home_canvas_object_GL
-	if home_canvas_object_GL != nil {
-		return home_canvas_object_GL
-	}
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Home", homeCreateHomeTab()),
+	)
 
+	home_canvas_object_GL = tabs
+	Current_screen_GL = home_canvas_object_GL
+
+	return home_canvas_object_GL
+}
+
+func homeCreateHomeTab() *container.Scroll {
 	var text *canvas.Text = canvas.NewText("V.I.S.O.R. Systems", color.RGBA{
 		R: 34,
 		G: 177,
@@ -71,6 +77,7 @@ func Home() fyne.CanvasObject {
 	})
 
 	go func() {
+		time.Sleep(500 * time.Millisecond)
 		for {
 			if Current_screen_GL == home_canvas_object_GL {
 				communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
@@ -86,19 +93,15 @@ func Home() fyne.CanvasObject {
 					save_button.Disable()
 					no_website_info_label.SetText("Website info exists")
 				}
+			} else {
+				break
 			}
 
 			time.Sleep(1 * time.Second)
 		}
 	}()
 
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
+	return createMainContentScrollUTILS(
 		container.NewVBox(text),
 		communicator_checkbox,
 		no_website_info_label,
@@ -106,12 +109,4 @@ func Home() fyne.CanvasObject {
 		password_entry,
 		save_button,
 	)
-
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	home_canvas_object_GL = main_scroll
-	Current_screen_GL = home_canvas_object_GL
-
-	return home_canvas_object_GL
 }

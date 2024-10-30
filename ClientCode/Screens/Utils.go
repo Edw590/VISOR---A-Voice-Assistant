@@ -89,7 +89,9 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 	)
 }
 
-func createMainVScrollUTILS(content *fyne.Container) *container.Scroll {
+func createMainContentScrollUTILS(objects... fyne.CanvasObject) *container.Scroll {
+	var content *fyne.Container = container.NewVBox(objects...)
+
 	var main_scroll *container.Scroll = container.NewVScroll(content)
 	main_scroll.SetMinSize(screens_size_GL)
 

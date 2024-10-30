@@ -32,45 +32,32 @@ import (
 var mod_system_checker_canvas_object_GL fyne.CanvasObject = nil
 
 func ModSystemChecker() fyne.CanvasObject {
-	Current_screen_GL = mod_system_checker_canvas_object_GL
-	if mod_system_checker_canvas_object_GL != nil {
-		return mod_system_checker_canvas_object_GL
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////
-	// Text Display section with vertical scrolling
-	var sys_state_text *widget.Label = widget.NewLabel("")
-	sys_state_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
-
-	go func() {
-		for {
-			if Current_screen_GL == mod_system_checker_canvas_object_GL {
-				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
-			}
-
-			time.Sleep(1 * time.Second)
-		}
-	}()
-
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
-		sys_state_text,
-	)
-
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
 	var tabs *container.AppTabs = container.NewAppTabs(
-		container.NewTabItem("System state", main_scroll),
+		container.NewTabItem("System state", systemCheckerCreateSystemStateTab()),
 	)
 
 	mod_system_checker_canvas_object_GL = tabs
 	Current_screen_GL = mod_system_checker_canvas_object_GL
 
 	return mod_system_checker_canvas_object_GL
+}
+
+func systemCheckerCreateSystemStateTab() *container.Scroll {
+	var sys_state_text *widget.Label = widget.NewLabel("")
+	sys_state_text.Wrapping = fyne.TextWrapWord
+
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		for {
+			if Current_screen_GL == mod_system_checker_canvas_object_GL {
+				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
+			} else {
+				break
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	return createMainContentScrollUTILS(sys_state_text)
 }

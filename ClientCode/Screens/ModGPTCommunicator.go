@@ -35,14 +35,17 @@ import (
 var mod_gpt_communicator_canvas_object_GL fyne.CanvasObject = nil
 
 func ModGPTCommunicator() fyne.CanvasObject {
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Communicator", gptCommunicatorCreateCommunicatorTab()),
+	)
+
+	mod_gpt_communicator_canvas_object_GL = tabs
 	Current_screen_GL = mod_gpt_communicator_canvas_object_GL
-	if mod_gpt_communicator_canvas_object_GL != nil {
-		return mod_gpt_communicator_canvas_object_GL
-	}
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// _Entry and Button section
+	return mod_gpt_communicator_canvas_object_GL
+}
 
+func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
@@ -77,14 +80,13 @@ func ModGPTCommunicator() fyne.CanvasObject {
 		}
 	})
 
-	//////////////////////////////////////////////////////////////////////////////////
-	// Text Display section with vertical scrolling
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
 	response_text.PlaceHolder = "Response from the assistant's LLM/GPT"
-	response_text.Wrapping = fyne.TextWrapWord // Enable text wrapping
+	response_text.Wrapping = fyne.TextWrapWord
 	response_text.SetMinRowsVisible(100)
 
 	go func() {
+		time.Sleep(500 * time.Millisecond)
 		var old_text string = ""
 		for {
 			if Current_screen_GL == mod_gpt_communicator_canvas_object_GL {
@@ -99,25 +101,11 @@ func ModGPTCommunicator() fyne.CanvasObject {
 		}
 	}()
 
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////////////
-	// Combine all sections into a vertical box container
-	var content *fyne.Container = container.NewVBox(
+	return createMainContentScrollUTILS(
 		text_to_send,
 		btn_send_text,
 		btn_send_text_gpt_smart,
 		btn_send_text_gpt_dumb,
 		response_text,
 	)
-
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	mod_gpt_communicator_canvas_object_GL = main_scroll
-	Current_screen_GL = mod_gpt_communicator_canvas_object_GL
-
-	return mod_gpt_communicator_canvas_object_GL
 }

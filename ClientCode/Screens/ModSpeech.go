@@ -35,11 +35,6 @@ import (
 var mod_speech_canvas_object_GL fyne.CanvasObject = nil
 
 func ModSpeech() fyne.CanvasObject {
-	Current_screen_GL = mod_speech_canvas_object_GL
-	if mod_speech_canvas_object_GL != nil {
-		return mod_speech_canvas_object_GL
-	}
-
 	var tabs *container.AppTabs = container.NewAppTabs(
 		container.NewTabItem("Main", speechCreateMainTab()),
 		container.NewTabItem("Settings", speechCreateSettingsTab()),
@@ -68,13 +63,13 @@ func speechCreateMainTab() *container.Scroll {
 		Speech.SkipCurrentSpeech()
 	})
 
-	return createMainVScrollUTILS(container.NewVBox(
+	return createMainContentScrollUTILS(
 		entry_txt_to_speech,
 		btn_speak_min,
 		btn_speak_high,
 		btn_speak_critical,
 		btn_skip_speech,
-	))
+	)
 }
 
 func speechCreateSettingsTab() *container.Scroll {
@@ -96,5 +91,5 @@ func speechCreateSettingsTab() *container.Scroll {
 		}
 	}
 
-	return createMainVScrollUTILS(container.NewVBox(objects...))
+	return createMainContentScrollUTILS(objects...)
 }

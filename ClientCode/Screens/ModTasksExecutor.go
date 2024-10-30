@@ -36,8 +36,17 @@ import (
 var tasks_executor_canvas_object_GL fyne.CanvasObject = nil
 
 func ModTasksExecutor() fyne.CanvasObject {
+	var tabs *container.AppTabs = container.NewAppTabs(
+		container.NewTabItem("Tasks list", tasksExecutorCreateTasksListTab()),
+	)
+
+	tasks_executor_canvas_object_GL = tabs
 	Current_screen_GL = tasks_executor_canvas_object_GL
 
+	return tasks_executor_canvas_object_GL
+}
+
+func tasksExecutorCreateTasksListTab() *container.Scroll {
 	var objects []fyne.CanvasObject = nil
 	var tasks []ModsFileInfo.Task = TEHelper.GetTasks()
 	sort.Slice(tasks, func(i, j int) bool {
@@ -46,19 +55,8 @@ func ModTasksExecutor() fyne.CanvasObject {
 	for i := len(tasks) - 1; i >= 0; i-- {
 		objects = append(objects, createTaskSetter(&tasks[i]))
 	}
-	var content *fyne.Container = container.NewVBox(objects...)
 
-	var main_scroll *container.Scroll = container.NewVScroll(content)
-	main_scroll.SetMinSize(screens_size_GL)
-
-	var tabs *container.AppTabs = container.NewAppTabs(
-		container.NewTabItem("Tasks list", main_scroll),
-	)
-
-	tasks_executor_canvas_object_GL = tabs
-	Current_screen_GL = tasks_executor_canvas_object_GL
-
-	return tasks_executor_canvas_object_GL
+	return createMainContentScrollUTILS(objects...)
 }
 
 func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
