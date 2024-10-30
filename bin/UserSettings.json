@@ -170,11 +170,11 @@
 				"Device_IDs": [
 					"3234_ALL"
 				],
-				"Message": "This is a reminder",
+				"Message": "This is a reminder for when you're home",
 				"Command": "",
 				"Time": "2024-06-27 -- 07:00:00",
 				"Repeat_each_min": 0,
-				"User_location": "",
+				"User_location": "home_*",
 				"Programmable_condition": ""
 			},
 			{

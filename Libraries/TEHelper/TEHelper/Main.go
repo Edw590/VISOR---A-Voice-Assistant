@@ -117,9 +117,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			}
 
 			condition_time, test_time_min := checkTime(task)
-
-			// Check if the task is due and if it was already reminded
-
+			
 			var condition_loc bool = false
 			if task.User_location == "" {
 				condition_loc = true
