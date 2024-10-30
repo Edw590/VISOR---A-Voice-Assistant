@@ -31,6 +31,35 @@ import (
 	"time"
 )
 
+func checkTime(task ModsFileInfo.Task) (bool, int64) {
+	var test_time_min int64 = 0
+	// If the task has no time set, skip it
+	if task.Time == "" {
+		return true, 0
+	} else {
+		var curr_time int64 = time.Now().Unix() / 60
+		var task_time string = task.Time
+		var format string = "2006-01-02 -- 15:04:05"
+		t, err := time.ParseInLocation(format, task_time, time.Local)
+		if err != nil {
+			return false, 0
+		}
+
+		test_time_min = t.Unix() / 60
+		if task.Repeat_each_min > 0 {
+			for {
+				if test_time_min + task.Repeat_each_min <= curr_time {
+					test_time_min += task.Repeat_each_min
+				} else {
+					break
+				}
+			}
+		}
+
+		return curr_time >= test_time_min && modGenInfo_GL.Tasks_info[task.Id] < test_time_min, test_time_min
+	}
+}
+
 func checkDeviceActive(task ModsFileInfo.Task) bool {
 	if !task.Device_active {
 		return true
@@ -115,7 +144,7 @@ func formatCondition(condition string) string {
 	return condition
 }
 
-func checkCondition(task ModsFileInfo.Task) bool {
+func checkProgrammableCondition(task ModsFileInfo.Task) bool {
 	var conds_were_true map[int]bool = modGenInfo_GL.Conds_were_true
 
 	var condition bool = false

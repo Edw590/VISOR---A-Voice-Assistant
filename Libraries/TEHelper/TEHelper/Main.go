@@ -89,13 +89,13 @@ func CheckDueTasks() *ModsFileInfo.Task {
 					continue
 				}
 
-				var condition bool = checkCondition(task)
+				var programmable_condition bool = checkProgrammableCondition(task)
 
 				var device_id_matches bool = checkDeviceID(task)
 
 				var condition_device_active bool = checkDeviceActive(task)
 
-				if condition_loc && condition && device_id_matches && condition_device_active {
+				if condition_loc && programmable_condition && device_id_matches && condition_device_active {
 					if modGenInfo_GL.Tasks_info[task.Id] == 0 {
 						modGenInfo_GL.Tasks_info[task.Id] = time.Now().Unix() / 60
 
@@ -113,29 +113,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				continue
 			}
 
-			var condition_time bool = false
-			var test_time_min int64 = 0
-			// If the task has no time set, skip it
-			if task.Time == "" {
-				condition_time = true
-			} else {
-				var curr_time int64 = time.Now().Unix() / 60
-				var task_time string = task.Time
-				var format string = "2006-01-02 -- 15:04:05"
-				t, _ := time.ParseInLocation(format, task_time, time.Local)
-				test_time_min = t.Unix() / 60
-				if task.Repeat_each_min > 0 {
-					for {
-						if test_time_min + task.Repeat_each_min <= curr_time {
-							test_time_min += task.Repeat_each_min
-						} else {
-							break
-						}
-					}
-				}
-
-				condition_time = curr_time >= test_time_min && modGenInfo_GL.Tasks_info[task.Id] < test_time_min
-			}
+			condition_time, test_time_min := checkTime(task)
 
 			// Check if the task is due and if it was already reminded
 
@@ -150,13 +128,13 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				}
 			}
 
-			var condition bool = checkCondition(task)
+			var programmable_condition bool = checkProgrammableCondition(task)
 
 			var device_id_matches bool = checkDeviceID(task)
 
 			var condition_device_active bool = checkDeviceActive(task)
 
-			if condition_time && condition_loc && condition && device_id_matches && condition_device_active {
+			if condition_time && condition_loc && programmable_condition && device_id_matches && condition_device_active {
 				// Set the last reminded time to the test time
 				modGenInfo_GL.Tasks_info[task.Id] = test_time_min
 
