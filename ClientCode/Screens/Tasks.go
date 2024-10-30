@@ -81,7 +81,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 
 	var entry_time *widget.Entry = widget.NewEntry()
 	entry_time.SetText(task.Time)
-	entry_time.SetPlaceHolder("Time trigger (format: 2024-12-31 -- 23:59:59)")
+	entry_time.SetPlaceHolder("Time trigger (format: \"2024-12-31 -- 23:59:59\")")
 	entry_time.Validator = validation.NewRegexp(`^(\d{4}-\d{2}-\d{2} -- \d{2}:\d{2}:\d{2})?$`, "wrong format")
 
 	var entry_repeat_each_min *widget.Entry = widget.NewEntry()

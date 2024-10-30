@@ -1,8 +1,8 @@
 Modules:
 00 = V.I.S.O.R.                 (client/server)
 01 = Modules Manager            (client/server)
-02 = S.M.A.R.T. Checker         (server)
-03 = Speech                     (client)        [Windows only]
+02 = Speech                     (client)        [Windows only]
+03 = S.M.A.R.T. Checker         (server)
 04 = RSS Feed Notifier          (server)
 05 = Email Sender               (server)
 06 = Online Information Checker (server)

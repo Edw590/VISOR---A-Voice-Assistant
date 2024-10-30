@@ -57,18 +57,6 @@ type UserSettings struct {
 	UserLocator     ModsFileInfo.Mod12UserInfo
 }
 
-type GenSettings struct {
-	MOD_3    ModsFileInfo.Mod3GenInfo
-	MOD_4    ModsFileInfo.Mod4GenInfo
-	MOD_5    ModsFileInfo.Mod5GenInfo
-	MOD_6    ModsFileInfo.Mod6GenInfo
-	MOD_7    ModsFileInfo.Mod7GenInfo
-	MOD_9    ModsFileInfo.Mod9GenInfo
-	MOD_10   ModsFileInfo.Mod10GenInfo
-	MOD_12   ModsFileInfo.Mod12GenInfo
-	Registry []*Value
-}
-
 ///////////////////////////////////////////////////////////////
 
 type _GeneralConsts struct {
