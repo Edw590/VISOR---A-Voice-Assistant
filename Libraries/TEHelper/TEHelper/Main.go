@@ -97,9 +97,12 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 				if condition_loc && programmable_condition && device_id_matches && condition_device_active {
 					if modGenInfo_GL.Tasks_info[task.Id] == 0 {
-						modGenInfo_GL.Tasks_info[task.Id] = time.Now().Unix() / 60
+						if task_return.Id == 0 {
+							// Only set the last reminded time if no other task was triggered
+							modGenInfo_GL.Tasks_info[task.Id] = time.Now().Unix() / 60
 
-						task_return = task
+							task_return = task
+						}
 					}
 				} else {
 					modGenInfo_GL.Tasks_info[task.Id] = 0
@@ -135,10 +138,12 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			var condition_device_active bool = checkDeviceActive(task)
 
 			if condition_time && condition_loc && programmable_condition && device_id_matches && condition_device_active {
-				// Set the last reminded time to the test time
-				modGenInfo_GL.Tasks_info[task.Id] = test_time_min
+				if task_return.Id == 0 {
+					// Only set the last reminded time if no other task was triggered
+					modGenInfo_GL.Tasks_info[task.Id] = test_time_min
 
-				task_return = task
+					task_return = task
+				}
 			}
 		}
 
