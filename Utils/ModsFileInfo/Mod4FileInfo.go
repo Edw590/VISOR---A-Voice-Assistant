@@ -40,13 +40,15 @@ type Mod4UserInfo struct {
 	// Mails_info is the information about the mails to send the feeds info to
 	Mails_to   []string
 	// Feed_info is the information about the feeds
-	Feeds_info []_FeedInfo
+	Feeds_info []FeedInfo
 }
 
-// _FeedInfo is the information about a feed.
-type _FeedInfo struct {
+// FeedInfo is the information about a feed.
+type FeedInfo struct {
 	// Feed_num is the number of the feed, beginning in 1 (no special reason, but could be useful some time)
 	Feed_num int
+	// Feed_name is the user-given name of the feed
+	Feed_name string
 	// Feed_url is the URL of the feed
 	Feed_url string
 	// Feed_type is the type of the feed (one of the TYPE_ constants)
