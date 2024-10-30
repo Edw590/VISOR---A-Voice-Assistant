@@ -37,8 +37,6 @@ type NewsInfo struct {
 
 // Mod4UserInfo is the format of the custom information file about this specific module.
 type Mod4UserInfo struct {
-	// Mails_info is the information about the mails to send the feeds info to
-	Mails_to   []string
 	// Feed_info is the information about the feeds
 	Feeds_info []FeedInfo
 }

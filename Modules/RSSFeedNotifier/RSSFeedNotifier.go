@@ -196,8 +196,7 @@ func init() {realMain =
 						// If the feed is a newly added one, don't send emails for ALL the items in the feed - which are
 						// being treated for the first time.
 						//log.Println("Queuing email: " + email_info.Subject)
-						error_notifying = !queueEmailAllRecps(email_info.Sender, email_info.Subject, email_info.Html,
-							modUserInfo_GL.Mails_to)
+						error_notifying = !queueEmailAllRecps(email_info.Sender, email_info.Subject, email_info.Html)
 					}
 
 					if !error_notifying {
@@ -288,47 +287,45 @@ queueEmailAllRecps queues an email to be sent to all recipients.
 – Returns:
   - true if the email was queued successfully, false otherwise
  */
-func queueEmailAllRecps(sender_name string, subject string, html string, mails_to []string) bool {
-	for _, mail_to := range mails_to {
-		// This is to add the images to the email using CIDs instead of using URLs which could/can go down at any time.
-		// Except most email clients don't support CIDs... So I'll leave this here in case the images stop working with
-		// the URLs and then either this or embeded Base64 on the src attribute of the <img> tag or hosted in the server
-		// or something.
-		// Still, the CID way seems better than the Base64 one. With CIDs, only Gmail Notified Pro wasn't showing them.
-		// With Base64, Gmail (web or app) wasn't showing them (don't remember about the notifier). But I didn't test in
-		// Hotmail or others.
-		//var multiparts []Utils.Multipart = nil
-		//if youtube {
-		//	// Add the YouTube images to the email instead of using URLs which could/can go down at any time.
-		//	var files_add []string = []string{"transparent_pixel.png", "twitter_email_icon_grey.png",
-		//		"youtube_email_icon_grey.png", "youtubelogo_60.png"}
-		//	for _, file_add := range files_add {
-		//		var multipart Utils.Multipart = Utils.Multipart{
-		//			Content_type: "image/png",
-		//			Content_transfer_encoding: "base64",
-		//			Content_id: file_add,
-		//		}
-		//		data, _ := os.ReadFile(modStartInfo_GL.Dir.Add("", "yt_email_images/", file_add).
-		//			GPathToStringConversion())
-		//		multipart.Body = base64.StdEncoding.EncodeToString(data)
-		//
-		//		multiparts = append(multiparts, multipart)
-		//	}
-		//}
+func queueEmailAllRecps(sender_name string, subject string, html string) bool {
+	// This is to add the images to the email using CIDs instead of using URLs which could/can go down at any time.
+	// Except most email clients don't support CIDs... So I'll leave this here in case the images stop working with
+	// the URLs and then either this or embeded Base64 on the src attribute of the <img> tag or hosted in the server
+	// or something.
+	// Still, the CID way seems better than the Base64 one. With CIDs, only Gmail Notified Pro wasn't showing them.
+	// With Base64, Gmail (web or app) wasn't showing them (don't remember about the notifier). But I didn't test in
+	// Hotmail or others.
+	//var multiparts []Utils.Multipart = nil
+	//if youtube {
+	//	// Add the YouTube images to the email instead of using URLs which could/can go down at any time.
+	//	var files_add []string = []string{"transparent_pixel.png", "twitter_email_icon_grey.png",
+	//		"youtube_email_icon_grey.png", "youtubelogo_60.png"}
+	//	for _, file_add := range files_add {
+	//		var multipart Utils.Multipart = Utils.Multipart{
+	//			Content_type: "image/png",
+	//			Content_transfer_encoding: "base64",
+	//			Content_id: file_add,
+	//		}
+	//		data, _ := os.ReadFile(modStartInfo_GL.Dir.Add("", "yt_email_images/", file_add).
+	//			GPathToStringConversion())
+	//		multipart.Body = base64.StdEncoding.EncodeToString(data)
+	//
+	//		multiparts = append(multiparts, multipart)
+	//	}
+	//}
 
-		// Write the HTML to a file in case debugging is needed.
-		_ = moduleInfo_GL.ModDirsInfo.Temp.Add2(false, "last_html_queued.html").WriteTextFile(html, false)
+	// Write the HTML to a file in case debugging is needed.
+	_ = moduleInfo_GL.ModDirsInfo.Temp.Add2(false, "last_html_queued.html").WriteTextFile(html, false)
 
-		err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
-			Sender:  sender_name,
-			Mail_to: mail_to,
-			Subject: subject,
-			Html:    html,
-			Multiparts: nil,
-		})
-		if nil != err {
-			return false
-		}
+	err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
+		Sender:  sender_name,
+		Mail_to: Utils.User_settings_GL.General.User_email_addr,
+		Subject: subject,
+		Html:    html,
+		Multiparts: nil,
+	})
+	if nil != err {
+		return false
 	}
 
 	return true
