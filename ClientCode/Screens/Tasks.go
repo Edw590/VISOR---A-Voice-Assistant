@@ -82,7 +82,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 	var entry_time *widget.Entry = widget.NewEntry()
 	entry_time.SetText(task.Time)
 	entry_time.SetPlaceHolder("Time trigger (format: 2024-12-31 -- 23:59:59)")
-	entry_time.Validator = validation.NewRegexp(`^\d{4}-\d{2}-\d{2} -- \d{2}:\d{2}:\d{2}$`, "wrong format")
+	entry_time.Validator = validation.NewRegexp(`^(\d{4}-\d{2}-\d{2} -- \d{2}:\d{2}:\d{2})?$`, "wrong format")
 
 	var entry_repeat_each_min *widget.Entry = widget.NewEntry()
 	entry_repeat_each_min.SetText(strconv.FormatInt(task.Repeat_each_min, 10))
@@ -100,6 +100,15 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 	var entry_programmable_condition *widget.Entry = widget.NewEntry()
 	entry_programmable_condition.SetText(task.Programmable_condition)
 	entry_programmable_condition.SetPlaceHolder("Programmable condition (in Go)")
+	entry_programmable_condition.Validator = func(s string) error {
+		if s == "" {
+			return nil
+		}
+
+		_, err := TEHelper.ComputeCondition(s)
+
+		return err
+	}
 
 	// Save button
 	var button_save *widget.Button = widget.NewButton("Save", func() {

@@ -65,19 +65,30 @@ func checkLocation(task_loc string, location string) bool {
 	return task_loc == location
 }
 
-func computeCondition(condition string) bool {
+/*
+ComputeCondition computes the result of a condition.
+
+-----------------------------------------------------------
+
+- Params:
+  - condition – the condition to compute
+
+- Returns:
+  - the result of the condition
+  - an error if the condition is invalid
+ */
+func ComputeCondition(condition string) (bool, error) {
 	condition = formatCondition(condition)
-	//log.Println("Condition:", condition)
 	expr, err := eval.ParseString(condition, "")
 	if err != nil {
-		return false
+		return false, err
 	}
 	r, err := expr.EvalToInterface(nil)
 	if err != nil {
-		return false
+		return false, err
 	}
 
-	return r.(bool)
+	return r.(bool), nil
 }
 
 func formatCondition(condition string) string {
@@ -113,7 +124,8 @@ func checkCondition(task ModsFileInfo.Task) bool {
 			conds_were_true[task.Id] = false
 		}
 
-		if computeCondition(task.Programmable_condition) {
+		cond_result, _ := ComputeCondition(task.Programmable_condition)
+		if cond_result {
 			if !conds_were_true[task.Id] {
 				conds_were_true[task.Id] = true
 
