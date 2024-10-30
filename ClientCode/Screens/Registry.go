@@ -30,7 +30,7 @@ import (
 )
 
 func Registry() fyne.CanvasObject {
-	Current_screen_GL = NUM_REGISTRY
+	Current_screen_GL = ID_REGISTRY
 
 	return container.NewAppTabs(
 		container.NewTabItem("All values", registryCreateAllValuesTab()),
@@ -44,7 +44,7 @@ func registryCreateAllValuesTab() *container.Scroll {
 	go func() {
 		time.Sleep(500 * time.Millisecond)
 		for {
-			if Current_screen_GL == NUM_REGISTRY {
+			if Current_screen_GL == ID_REGISTRY {
 				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY())
 			} else {
 				break

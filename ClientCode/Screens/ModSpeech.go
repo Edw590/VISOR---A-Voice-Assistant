@@ -33,7 +33,7 @@ import (
 )
 
 func ModSpeech() fyne.CanvasObject {
-	Current_screen_GL = NUM_SPEECH
+	Current_screen_GL = ID_MOD_SPEECH
 
 	return container.NewAppTabs(
 		container.NewTabItem("Main", speechCreateMainTab()),

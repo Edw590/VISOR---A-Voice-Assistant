@@ -33,7 +33,7 @@ import (
 )
 
 func ModGPTCommunicator() fyne.CanvasObject {
-	Current_screen_GL = NUM_GPT_COMMUNICATOR
+	Current_screen_GL = ID_MOD_GPT_COMM
 
 	return container.NewAppTabs(
 		container.NewTabItem("Communicator", gptCommunicatorCreateCommunicatorTab()),
@@ -83,7 +83,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	go func() {
 		var old_text string = ""
 		for {
-			if Current_screen_GL == NUM_GPT_COMMUNICATOR {
+			if Current_screen_GL == ID_MOD_GPT_COMM {
 				var new_text string = GPTComm.GetLastText()
 				if old_text != new_text {
 					old_text = new_text

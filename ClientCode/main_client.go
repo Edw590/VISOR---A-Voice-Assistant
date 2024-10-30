@@ -45,11 +45,14 @@ import (
 var my_app_GL fyne.App = nil
 var my_window_GL fyne.Window = nil
 
+var modules_GL []Utils.Module = nil
+
+var content_container_GL *fyne.Container = nil
+
 var (
 	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
 )
-
 func main() {
 	var module Utils.Module = Utils.Module{
 		Num:     Utils.NUM_MOD_VISOR,
@@ -107,9 +110,8 @@ func init() {realMain =
 
 		ClientRegKeys.RegisterValues()
 
-		var modules []Utils.Module
 		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
-			modules = append(modules, Utils.Module{
+			modules_GL = append(modules_GL, Utils.Module{
 				Num:     i,
 				Name:    Utils.GetModNameMODULES(i),
 				Stop:    true,
@@ -117,12 +119,12 @@ func init() {realMain =
 				Enabled: true,
 			})
 		}
-		modules[Utils.NUM_MOD_VISOR].Stop = false
-		modules[Utils.NUM_MOD_VISOR].Stopped = false
+		modules_GL[Utils.NUM_MOD_VISOR].Stop = false
+		modules_GL[Utils.NUM_MOD_VISOR].Stopped = false
 		// The Manager needs to be started first. It'll handle the others.
-		modules[Utils.NUM_MOD_ModManager].Stop = false
+		modules_GL[Utils.NUM_MOD_ModManager].Stop = false
 
-		ModulesManager.Start(modules)
+		ModulesManager.Start(modules_GL)
 
 		// Create a new application
 		my_app_GL = app.NewWithID("com.edw590.visor_c")
@@ -133,7 +135,7 @@ func init() {realMain =
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		var content_container *fyne.Container = container.NewStack(Screens.Home())
+		content_container_GL = container.NewStack(Screens.Home())
 
 		var nav_bar *widget.Tree = &widget.Tree{
 			ChildUIDs: func(uid string) []string {
@@ -156,25 +158,7 @@ func init() {realMain =
 				obj.(*widget.Label).SetText(t)
 			},
 			OnSelected: func(uid string) {
-				switch uid {
-					case "home":
-						content_container.Objects = []fyne.CanvasObject{Screens.Home()}
-					case "mod_mod_manager":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModModulesManager(modules)}
-					case "mod_speech":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModSpeech()}
-					case "mod_rss_feed_notifier":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModRSSFeedNotifier()}
-					case "mod_gpt_comm":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator()}
-					case "tasks_executor":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor()}
-					case "sys_checker":
-						content_container.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
-					case "registry":
-						content_container.Objects = []fyne.CanvasObject{Screens.Registry()}
-				}
-				content_container.Refresh()
+				prepareScreen(uid)
 			},
 		}
 
@@ -190,13 +174,13 @@ func init() {realMain =
 		var sidebar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
 
 		// Create a split container to hold the sidebar and the content
-		var split *container.Split = container.NewHSplit(sidebar, content_container)
+		var split *container.Split = container.NewHSplit(sidebar, content_container_GL)
 		split.SetOffset(0.2) // Set the split ratio (20% for sidebar, 80% for content)
 
 		// Set the content of the window
 		my_window_GL.SetContent(split)
 
-		var prev_screen int = -1
+		var prev_screen string = ""
 		// Add system tray functionality
 		if desk, ok := my_app_GL.(desktop.App); ok {
 			var icon *fyne.StaticResource = Logo.LogoBlackGmail
@@ -208,7 +192,7 @@ func init() {realMain =
 					Screens.Current_screen_GL = prev_screen
 				}),
 				fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
-					quitApp(modules)
+					quitApp(modules_GL)
 				}),
 			)
 			desk.SetSystemTrayMenu(menu)
@@ -219,7 +203,7 @@ func init() {realMain =
 		my_window_GL.SetCloseIntercept(func() {
 			// Store the previous screen before hiding
 			prev_screen = Screens.Current_screen_GL
-			Screens.Current_screen_GL = -1
+			Screens.Current_screen_GL = ""
 			my_window_GL.Hide()
 
 			// Create and send one-time notification
@@ -233,7 +217,7 @@ func init() {realMain =
 			for {
 				if *module_stop {
 					SettingsSync.StopUserSettingsSyncer()
-					quitApp(modules)
+					quitApp(modules_GL)
 
 					return
 				}
@@ -249,6 +233,28 @@ func init() {realMain =
 	}
 }
 
+func prepareScreen(uid string) {
+	switch uid {
+		case Screens.ID_HOME:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.Home()}
+		case Screens.ID_MOD_MOD_MANAGER:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModModulesManager(modules_GL)}
+		case Screens.ID_MOD_SPEECH:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSpeech()}
+		case Screens.ID_MOD_RSS_FEED_NOTIFIER:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModRSSFeedNotifier()}
+		case Screens.ID_MOD_GPT_COMM:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator()}
+		case Screens.ID_MOD_TASKS_EXECUTOR:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor()}
+		case Screens.ID_MOD_SYS_CHECKER:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
+		case Screens.ID_REGISTRY:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.Registry()}
+	}
+	content_container_GL.Refresh()
+}
+
 /*
 processCommsChannel processes in a different thread the communications channel.
 */
@@ -259,18 +265,17 @@ func processCommsChannel() {
 			if comms_map == nil {
 				return
 			}
-			map_value, ok := comms_map["Notification"]
-			if ok {
+
+			if map_value, ok := comms_map["Notification"]; ok {
 				var notif_info []string = map_value.([]string)
 				notification := fyne.NewNotification(notif_info[0], notif_info[1])
 				my_app_GL.SendNotification(notification)
 
 				time.Sleep(5 * time.Second)
-			} else {
-				map_value, ok = comms_map["ShowApp"]
-				if ok {
-					showWindow()
-				}
+			} else if map_value, ok = comms_map["ShowApp"]; ok {
+				showWindow()
+			} else if map_value, ok = comms_map["Redraw"]; ok {
+				prepareScreen(Screens.Current_screen_GL)
 			}
 		}
 	}()

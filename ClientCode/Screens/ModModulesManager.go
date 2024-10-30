@@ -31,7 +31,7 @@ import (
 )
 
 func ModModulesManager(param any) fyne.CanvasObject {
-	Current_screen_GL = NUM_MODULES_MANAGER
+	Current_screen_GL = ID_MOD_MOD_MANAGER
 
 	var modules []Utils.Module = param.([]Utils.Module)
 
@@ -46,7 +46,7 @@ func modulesManagerCreateModulesStatusTab(modules []Utils.Module) *container.Scr
 
 	go func() {
 		for {
-			if Current_screen_GL == NUM_MODULES_MANAGER {
+			if Current_screen_GL == ID_MOD_MOD_MANAGER {
 				var text string = ""
 				for i, module := range modules {
 					if Utils.MOD_NUMS_SUPPORT[i] & Utils.MOD_CLIENT != 0 {

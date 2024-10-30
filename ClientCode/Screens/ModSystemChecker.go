@@ -30,7 +30,7 @@ import (
 )
 
 func ModSystemChecker() fyne.CanvasObject {
-	Current_screen_GL = NUM_SYSTEM_CHECKER
+	Current_screen_GL = ID_MOD_SYS_CHECKER
 
 	return container.NewAppTabs(
 		container.NewTabItem("System state", systemCheckerCreateSystemStateTab()),
@@ -43,7 +43,7 @@ func systemCheckerCreateSystemStateTab() *container.Scroll {
 
 	go func() {
 		for {
-			if Current_screen_GL == NUM_SYSTEM_CHECKER {
+			if Current_screen_GL == ID_MOD_SYS_CHECKER {
 				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
 			} else {
 				break

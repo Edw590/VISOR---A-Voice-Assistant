@@ -33,7 +33,7 @@ import (
 )
 
 func Home() fyne.CanvasObject {
-	Current_screen_GL = NUM_HOME
+	Current_screen_GL = ID_HOME
 
 	return container.NewAppTabs(
 		container.NewTabItem("Home", homeCreateHomeTab()),
@@ -67,7 +67,7 @@ func homeCreateHomeTab() *container.Scroll {
 
 	go func() {
 		for {
-			if Current_screen_GL == NUM_HOME {
+			if Current_screen_GL == ID_HOME {
 				communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
 
 				if SettingsSync.IsWebsiteInfoEmpty() {

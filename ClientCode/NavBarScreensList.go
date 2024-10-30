@@ -21,28 +21,30 @@
 
 package main
 
+import "VISOR_Client/Screens"
+
 // screens_GL defines the metadata for each screen
 var screens_GL = map[string]string{
-	"home": "Home",
-	"mod_mod_manager": "Modules Manager",
-	"mod_speech": "Speech",
-	"mod_rss_feed_notifier": "RSS Feed Notifier",
-	"mod_gpt_comm": "GPT Communicator",
-	"tasks_executor": "Tasks Executor",
-	"sys_checker": "System Checker",
-	"registry": "Registry",
+	Screens.ID_HOME:                  "Home",
+	Screens.ID_MOD_MOD_MANAGER:       "Modules Manager",
+	Screens.ID_MOD_SPEECH:            "Speech",
+	Screens.ID_MOD_RSS_FEED_NOTIFIER: "RSS Feed Notifier",
+	Screens.ID_MOD_GPT_COMM:          "GPT Communicator",
+	Screens.ID_MOD_TASKS_EXECUTOR:    "Tasks Executor",
+	Screens.ID_MOD_SYS_CHECKER:       "System Checker",
+	Screens.ID_REGISTRY:              "Registry",
 }
 
 // tree_index defines how the screens should be laid out in the index tree
 var tree_index = map[string][]string{
 	"": {
-		"home",
-		"mod_mod_manager",
-		"mod_speech",
-		"mod_rss_feed_notifier",
-		"mod_gpt_comm",
-		"tasks_executor",
-		"sys_checker",
-		"registry",
+		Screens.ID_HOME,
+		Screens.ID_MOD_MOD_MANAGER,
+		Screens.ID_MOD_SPEECH,
+		Screens.ID_MOD_RSS_FEED_NOTIFIER,
+		Screens.ID_MOD_GPT_COMM,
+		Screens.ID_MOD_TASKS_EXECUTOR,
+		Screens.ID_MOD_SYS_CHECKER,
+		Screens.ID_REGISTRY,
 	},
 }
