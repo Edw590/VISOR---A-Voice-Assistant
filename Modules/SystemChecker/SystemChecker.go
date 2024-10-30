@@ -71,12 +71,11 @@ func init() {realMain =
 
 		device_info_GL = &modGenInfo_GL.Device_info
 
-		var wifi_on bool
 		var wifi_networks []ModsFileInfo.ExtBeacon
 		for {
 			if time.Now().Unix() >= last_check_wifi_when_s + SCAN_WIFI_EACH_S {
 				// Every 3 minutes, update the wifi networks
-				wifi_on, wifi_networks = getWifiNetworks()
+				wifi_networks = getWifiNetworks()
 
 				last_check_wifi_when_s = time.Now().Unix()
 			}
@@ -84,7 +83,7 @@ func init() {realMain =
 			// Connectivity information
 			device_info_GL.System_state.Connectivity_info = ModsFileInfo.ConnectivityInfo{
 				Airplane_mode_enabled: false,
-				Wifi_enabled:          wifi_on,
+				Wifi_enabled:          getWifiEnabled(),
 				Bluetooth_enabled:     false,
 				Mobile_data_enabled:   false,
 				Wifi_networks:         wifi_networks,
@@ -188,7 +187,12 @@ func getSoundMuted(prev bool) bool {
 	return muted
 }
 
-func getWifiNetworks() (bool, []ModsFileInfo.ExtBeacon) {
+func getWifiNetworks() []ModsFileInfo.ExtBeacon {
+	var wifi_was_enabled = getWifiEnabled()
+	if !wifi_was_enabled {
+		setWifiEnabled(true)
+	}
+
 	if runtime.GOOS == "windows" {
 		// Request a Wi-Fi scan first (wifiscan.Scan() doesn't do it on Windows)
 		_, _ = Utils.ExecCmdSHELL([]string{".\\external\\WlanScan.exe"})
@@ -198,19 +202,18 @@ func getWifiNetworks() (bool, []ModsFileInfo.ExtBeacon) {
 	// on Linux.
 	var num_tries int = 1
 	if runtime.GOOS == "windows" {
-		// I don't know how much time after the scan the results are ready, so
-		// 10 seconds seems like a good number.
-		// If it's on Linux, shouldn't have problem I think.
+		// I don't know how much time after the scan the results are ready, so 10 seconds seems like a good number. If
+		// it's on Linux, there shouldn't be a problem I think.
 		num_tries = 10
 	}
+	var wifi_networks []ModsFileInfo.ExtBeacon = nil
 	for i := 0; i < num_tries; i++ {
-		wifi_nets, err := wifiscan.Scan()
+		wifilist, err := wifiscan.Scan()
 		if err != nil {
-			return false, nil
+			break
 		}
 
-		var wifi_networks []ModsFileInfo.ExtBeacon = nil
-		for _, wifi_net := range wifi_nets {
+		for _, wifi_net := range wifilist {
 			wifi_networks = append(wifi_networks, ModsFileInfo.ExtBeacon{
 				Name:    wifi_net.SSID,
 				Address: strings.ToUpper(wifi_net.BSSID),
@@ -219,11 +222,50 @@ func getWifiNetworks() (bool, []ModsFileInfo.ExtBeacon) {
 		}
 
 		if len(wifi_networks) != 0 {
-			return true, wifi_networks
+			break
 		}
 
 		time.Sleep(1 * time.Second)
 	}
 
-	return true, nil
+	if !wifi_was_enabled {
+		setWifiEnabled(false)
+	}
+
+	return wifi_networks
+}
+
+func getWifiEnabled() bool {
+	if runtime.GOOS == "windows" {
+		cmd_output, err := Utils.ExecCmdSHELL([]string{"netsh.exe wlan show networks mode=Bssid"})
+
+		return err == nil && cmd_output.Exit_code == 0
+	}
+
+	cmd_output, err := Utils.ExecCmdSHELL([]string{"nmcli radio  wifi"})
+	if err != nil {
+		return false
+	}
+
+	return strings.Contains(cmd_output.Stdout_str, "enabled")
+}
+
+func setWifiEnabled(enabled bool) bool {
+	var cmd_output Utils.CmdOutput
+	var err error
+	if runtime.GOOS == "windows" {
+		if enabled {
+			cmd_output, err = Utils.ExecCmdSHELL([]string{"netsh interface set interface name=Wi-Fi admin=enabled"})
+		} else {
+			cmd_output, err  = Utils.ExecCmdSHELL([]string{"netsh interface set interface name=Wi-Fi admin=disabled"})
+		}
+	} else {
+		if enabled {
+			cmd_output, err  = Utils.ExecCmdSHELL([]string{"nmcli radio wifi on"})
+		} else {
+			cmd_output, err  = Utils.ExecCmdSHELL([]string{"nmcli radio wifi off"})
+		}
+	}
+
+	return err == nil && cmd_output.Exit_code == 0
 }

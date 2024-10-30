@@ -63,19 +63,6 @@ func ModulesStatus(param any) fyne.CanvasObject {
 		}
 	}()
 
-	var canvas_objs []fyne.CanvasObject = []fyne.CanvasObject{
-		module_status_text,
-	}
-	for _, obj := range getCheckBoxes(modules) {
-		canvas_objs = append(canvas_objs, obj)
-	}
-
-	for _, obj := range canvas_objs {
-		if checkbox, ok := obj.(*widget.Check); ok {
-			checkbox.SetChecked(true)
-		}
-	}
-
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +70,7 @@ func ModulesStatus(param any) fyne.CanvasObject {
 	//////////////////////////////////////////////////////////////////////////////////
 	// Combine all sections into a vertical box container
 	var content *fyne.Container = container.NewVBox(
-		canvas_objs...
+		module_status_text,
 	)
 
 	var main_scroll *container.Scroll = container.NewVScroll(content)
@@ -93,20 +80,4 @@ func ModulesStatus(param any) fyne.CanvasObject {
 	Current_screen_GL = module_status_canvas_object_GL
 
 	return module_status_canvas_object_GL
-}
-
-func getCheckBoxes(modules []Utils.Module) []fyne.CanvasObject {
-	var check_boxes []fyne.CanvasObject
-
-	for i := 2; i < len(modules); i++ {
-		// Keep this variable here. Or it won't work.
-		var num int = i
-		if Utils.MOD_NUMS_SUPPORT[num] & Utils.MOD_CLIENT != 0 {
-			check_boxes = append(check_boxes, widget.NewCheck(Utils.GetModNameMODULES(num), func(b bool) {
-				modules[num].Enabled = b
-			}))
-		}
-	}
-
-	return check_boxes
 }
