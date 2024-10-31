@@ -27,6 +27,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
 	"time"
@@ -37,6 +38,60 @@ func Home() fyne.CanvasObject {
 
 	return container.NewAppTabs(
 		container.NewTabItem("Home", homeCreateHomeTab()),
+		container.NewTabItem("Settings", homeCreateSettingsTab()),
+	)
+}
+
+func homeCreateSettingsTab() *container.Scroll {
+	var entry_visor_email_addr *widget.Entry = widget.NewEntry()
+	entry_visor_email_addr.SetPlaceHolder("V.I.S.O.R. email address")
+	entry_visor_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, "Invalid email address")
+	entry_visor_email_addr.SetText(Utils.User_settings_GL.General.VISOR_email_addr)
+
+	var entry_visor_email_pw *widget.Entry = widget.NewPasswordEntry()
+	entry_visor_email_pw.SetPlaceHolder("V.I.S.O.R. email password (2FA password if enabled)")
+	entry_visor_email_pw.SetText(Utils.User_settings_GL.General.VISOR_email_pw)
+
+	var entry_user_email_addr *widget.Entry = widget.NewEntry()
+	entry_user_email_addr.SetPlaceHolder("User email address (used for all email communication)")
+	entry_user_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, "Invalid email address")
+	entry_user_email_addr.SetText(Utils.User_settings_GL.General.User_email_addr)
+
+	var entry_server_domain *widget.Entry = widget.NewEntry()
+	entry_server_domain.SetPlaceHolder("Server domain or IP (example: localhost)")
+	entry_server_domain.SetText(Utils.User_settings_GL.General.Website_domain)
+
+	var entry_server_pw *widget.Entry = widget.NewPasswordEntry()
+	entry_server_pw.SetPlaceHolder("Server password (strong letters and numbers password)")
+	entry_server_pw.SetText(Utils.User_settings_GL.General.Website_pw)
+
+	var entry_wolframalpha_appid *widget.Entry = widget.NewEntry()
+	entry_wolframalpha_appid.SetPlaceHolder("WolframAlpha App ID")
+	entry_wolframalpha_appid.SetText(Utils.User_settings_GL.General.WolframAlpha_AppID)
+
+	var entry_picovoice_api_key *widget.Entry = widget.NewEntry()
+	entry_picovoice_api_key.SetPlaceHolder("Picovoice API key")
+	entry_picovoice_api_key.SetText(Utils.User_settings_GL.General.Picovoice_API_key)
+
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		Utils.User_settings_GL.General.VISOR_email_addr = entry_visor_email_addr.Text
+		Utils.User_settings_GL.General.VISOR_email_pw = entry_visor_email_pw.Text
+		Utils.User_settings_GL.General.User_email_addr = entry_user_email_addr.Text
+		Utils.User_settings_GL.General.Website_domain = entry_server_domain.Text
+		Utils.User_settings_GL.General.Website_pw = entry_server_pw.Text
+		Utils.User_settings_GL.General.WolframAlpha_AppID = entry_wolframalpha_appid.Text
+		Utils.User_settings_GL.General.Picovoice_API_key = entry_picovoice_api_key.Text
+	})
+
+	return createMainContentScrollUTILS(
+		entry_visor_email_addr,
+		entry_visor_email_pw,
+		entry_user_email_addr,
+		entry_server_domain,
+		entry_server_pw,
+		entry_wolframalpha_appid,
+		entry_picovoice_api_key,
+		btn_save,
 	)
 }
 
@@ -51,19 +106,10 @@ func homeCreateHomeTab() *container.Scroll {
 	text.Alignment = fyne.TextAlignCenter
 	text.TextStyle.Bold = true
 
-	var communicator_checkbox *widget.Check = widget.NewCheck("Communicator connected", func(checked bool) {
+	var communicator_checkbox *widget.Check = widget.NewCheck("Connected to the server", func(checked bool) {
 	})
 
 	var no_website_info_label *widget.Label = widget.NewLabel("")
-	var domain_entry *widget.Entry = widget.NewEntry()
-	domain_entry.SetPlaceHolder("Website domain or IP (example: localhost)")
-	var password_entry *widget.Entry = widget.NewPasswordEntry()
-	password_entry.SetPlaceHolder("Website password")
-	var save_button *widget.Button = widget.NewButton("Save", func() {
-		SettingsSync.SetWebsiteInfo(domain_entry.Text, password_entry.Text)
-		domain_entry.SetText("")
-		password_entry.SetText("")
-	})
 
 	go func() {
 		for {
@@ -71,15 +117,9 @@ func homeCreateHomeTab() *container.Scroll {
 				communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
 
 				if SettingsSync.IsWebsiteInfoEmpty() {
-					domain_entry.Enable()
-					password_entry.Enable()
-					save_button.Enable()
-					no_website_info_label.SetText("No website info exists. Please enter it to activate full functionality.")
+					no_website_info_label.SetText("No server info exists. Enter it to activate full functionality.")
 				} else {
-					domain_entry.Disable()
-					password_entry.Disable()
-					save_button.Disable()
-					no_website_info_label.SetText("Website info exists")
+					no_website_info_label.SetText("Server info exists")
 				}
 			} else {
 				break
@@ -93,8 +133,5 @@ func homeCreateHomeTab() *container.Scroll {
 		container.NewVBox(text),
 		communicator_checkbox,
 		no_website_info_label,
-		domain_entry,
-		password_entry,
-		save_button,
 	)
 }
