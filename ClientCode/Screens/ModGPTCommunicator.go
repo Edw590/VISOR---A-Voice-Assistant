@@ -45,21 +45,21 @@ func ModGPTCommunicator() fyne.CanvasObject {
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var entry_smart_model_loc *widget.Entry = widget.NewEntry()
 	entry_smart_model_loc.Validator = validation.NewRegexp(`^.*\.gguf$`, "The model location must end with .gguf")
-	entry_smart_model_loc.PlaceHolder = "Model location for the smart LLM GGUF file on the server"
-	entry_smart_model_loc.Text = Utils.User_settings_GL.GPTCommunicator.Model_smart_loc
+	entry_smart_model_loc.SetPlaceHolder("Model location for the smart LLM GGUF file on the server")
+	entry_smart_model_loc.SetText(Utils.User_settings_GL.GPTCommunicator.Model_smart_loc)
 
 	var entry_dumb_model_loc *widget.Entry = widget.NewEntry()
 	entry_dumb_model_loc.Validator = validation.NewRegexp(`^.*\.gguf$`, "The model location must end with .gguf")
-	entry_dumb_model_loc.PlaceHolder = "Model location for the dumb LLM GGUF file on the server"
-	entry_dumb_model_loc.Text = Utils.User_settings_GL.GPTCommunicator.Model_dumb_loc
+	entry_dumb_model_loc.SetPlaceHolder("Model location for the dumb LLM GGUF file on the server")
+	entry_dumb_model_loc.SetText(Utils.User_settings_GL.GPTCommunicator.Model_dumb_loc)
 
 	var entry_system_info *widget.Entry = widget.NewEntry()
-	entry_system_info.PlaceHolder = "LLM system information"
-	entry_system_info.Text = Utils.User_settings_GL.GPTCommunicator.System_info
+	entry_system_info.SetPlaceHolder("LLM system information")
+	entry_system_info.SetText(Utils.User_settings_GL.GPTCommunicator.System_info)
 
 	var entry_user_nickname *widget.Entry = widget.NewEntry()
-	entry_user_nickname.PlaceHolder = "User nickname"
-	entry_user_nickname.Text = Utils.User_settings_GL.GPTCommunicator.User_nickname
+	entry_user_nickname.SetPlaceHolder("User nickname")
+	entry_user_nickname.SetText(Utils.User_settings_GL.GPTCommunicator.User_nickname)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		Utils.User_settings_GL.GPTCommunicator.Model_smart_loc = entry_smart_model_loc.Text
@@ -81,7 +81,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
-	text_to_send.PlaceHolder = "Text to send to the assistant"
+	text_to_send.SetPlaceHolder("Text to send to the assistant")
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", text_to_send.Text)
 	})
@@ -113,7 +113,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	})
 
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
-	response_text.PlaceHolder = "Response from the assistant's LLM/GPT"
+	response_text.SetPlaceHolder("Response from the assistant's LLM/GPT")
 	response_text.Wrapping = fyne.TextWrapWord
 	response_text.SetMinRowsVisible(100)
 

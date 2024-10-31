@@ -42,18 +42,18 @@ func ModUserLocator() fyne.CanvasObject {
 
 func userLocatorCreateAddLocationTab() *container.Scroll {
 	var entry_type *widget.Entry = widget.NewEntry()
-	entry_type.PlaceHolder = "Beacon type (\"wifi\" or \"bluetooth\")"
+	entry_type.SetPlaceHolder("Beacon type (\"wifi\" or \"bluetooth\")")
 	entry_type.Validator = validation.NewRegexp(`^(wifi|bluetooth)$`, "The location type must be either \"wifi\" or \"bluetooth\"")
 
 	var entry_name *widget.Entry = widget.NewEntry()
-	entry_name.PlaceHolder = "Beacon name (Wi-Fi SSID or Bluetooth device name)"
+	entry_name.SetPlaceHolder("Beacon name (Wi-Fi SSID or Bluetooth device name)")
 
 	var entry_address *widget.Entry = widget.NewEntry()
-	entry_address.PlaceHolder = "Beacon address (Wi-Fi BSSID or Bluetooth device address)"
+	entry_address.SetPlaceHolder("Beacon address (Wi-Fi BSSID or Bluetooth device address)")
 	entry_address.Validator = validation.NewRegexp(`^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$`, "The address must be in the format XX:XX:XX:XX:XX:XX")
 
 	var entry_last_detection_s *widget.Entry = widget.NewEntry()
-	entry_last_detection_s.PlaceHolder = "How long the beacon is not found but user may still be in the location (in seconds)"
+	entry_last_detection_s.SetPlaceHolder("How long the beacon is not found but user may still be in the location (in seconds)")
 	entry_last_detection_s.Validator = func(s string) error {
 		_, err := strconv.ParseInt(s, 10, 64)
 
@@ -61,7 +61,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 	}
 
 	var entry_max_distance *widget.Entry = widget.NewEntry()
-	entry_max_distance.PlaceHolder = "Maximum distance from the beacon to the user (in meters)"
+	entry_max_distance.SetPlaceHolder("Maximum distance from the beacon to the user (in meters)")
 	entry_max_distance.Validator = func(s string) error {
 		_, err := strconv.ParseInt(s, 10, 32)
 
@@ -69,7 +69,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 	}
 
 	var entry_location_name *widget.Entry = widget.NewEntry()
-	entry_location_name.PlaceHolder = "Location name"
+	entry_location_name.SetPlaceHolder("Location name")
 
 
 	last_detection_s, _ := strconv.ParseInt(entry_last_detection_s.Text, 10, 64)
@@ -110,21 +110,21 @@ func userLocatorCreateLocationsListTab() *container.Scroll {
 
 func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyne.Container {
 	var entry_type *widget.Entry = widget.NewEntry()
-	entry_type.PlaceHolder = "Beacon type (\"wifi\" or \"bluetooth\")"
+	entry_type.SetPlaceHolder("Beacon type (\"wifi\" or \"bluetooth\")")
 	entry_type.Validator = validation.NewRegexp(`^(wifi|bluetooth)$`, "The location type must be either \"wifi\" or \"bluetooth\"")
-	entry_type.Text = loc_info.Type
+	entry_type.SetText(loc_info.Type)
 
 	var entry_name *widget.Entry = widget.NewEntry()
-	entry_name.PlaceHolder = "Beacon name (Wi-Fi SSID or Bluetooth device name)"
-	entry_name.Text = loc_info.Name
+	entry_name.SetPlaceHolder("Beacon name (Wi-Fi SSID or Bluetooth device name)")
+	entry_name.SetText(loc_info.Name)
 
 	var entry_address *widget.Entry = widget.NewEntry()
-	entry_address.PlaceHolder = "Beacon address (Wi-Fi BSSID or Bluetooth device address)"
+	entry_address.SetPlaceHolder("Beacon address (Wi-Fi BSSID or Bluetooth device address)")
 	entry_address.Validator = validation.NewRegexp(`^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$`, "The address must be in the format XX:XX:XX:XX:XX:XX")
-	entry_address.Text = loc_info.Address
+	entry_address.SetText(loc_info.Address)
 
 	var entry_last_detection_s *widget.Entry = widget.NewEntry()
-	entry_last_detection_s.PlaceHolder = "How long the beacon is not found but user may still be in the location (in seconds)"
+	entry_last_detection_s.SetPlaceHolder("How long the beacon is not found but user may still be in the location (in seconds)")
 	entry_last_detection_s.Validator = func(s string) error {
 		_, err := strconv.ParseInt(s, 10, 64)
 
@@ -133,17 +133,17 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 	entry_last_detection_s.Text = strconv.FormatInt(loc_info.Last_detection_s, 10)
 
 	var entry_max_distance *widget.Entry = widget.NewEntry()
-	entry_max_distance.PlaceHolder = "Maximum distance from the beacon to the user (in meters)"
+	entry_max_distance.SetPlaceHolder("Maximum distance from the beacon to the user (in meters)")
 	entry_max_distance.Validator = func(s string) error {
 		_, err := strconv.ParseInt(s, 10, 32)
 
 		return err
 	}
-	entry_max_distance.Text = strconv.Itoa(loc_info.Max_distance_m)
+	entry_max_distance.SetText(strconv.Itoa(loc_info.Max_distance_m))
 
 	var entry_location_name *widget.Entry = widget.NewEntry()
-	entry_location_name.PlaceHolder = "Location name"
-	entry_location_name.Text = loc_info.Location
+	entry_location_name.SetPlaceHolder("Location name")
+	entry_location_name.SetText(loc_info.Location)
 
 	var button_save *widget.Button = widget.NewButton("Save", func() {
 		loc_info.Type = entry_type.Text

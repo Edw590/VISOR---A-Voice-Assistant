@@ -130,7 +130,7 @@ func homeCreateHomeTab() *container.Scroll {
 	}()
 
 	return createMainContentScrollUTILS(
-		container.NewVBox(text),
+		text,
 		communicator_checkbox,
 		no_website_info_label,
 	)

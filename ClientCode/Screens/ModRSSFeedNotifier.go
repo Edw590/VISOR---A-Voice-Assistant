@@ -54,16 +54,16 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 	check_enabled.SetChecked(true)
 
 	var entry_feed_name *widget.Entry = widget.NewEntry()
-	entry_feed_name.PlaceHolder = "Feed name (just for identification)"
+	entry_feed_name.SetPlaceHolder("Feed name (just for identification)")
 
 	var entry_feed_type *widget.Entry = widget.NewEntry()
-	entry_feed_type.PlaceHolder = "Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")"
+	entry_feed_type.SetPlaceHolder("Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")")
 
 	var entry_feed_url *widget.Entry = widget.NewEntry()
-	entry_feed_url.PlaceHolder = "Feed URL or YouTube playlist/channel ID"
+	entry_feed_url.SetPlaceHolder("Feed URL or YouTube playlist/channel ID")
 
 	var entry_custom_msg_subject *widget.Entry = widget.NewEntry()
-	entry_custom_msg_subject.PlaceHolder = "Custom message subject (for YT it's automatic)"
+	entry_custom_msg_subject.SetPlaceHolder("Custom message subject (for YT it's automatic)")
 
 	var button_save *widget.Button = widget.NewButton("Add", func() {
 		Utils.User_settings_GL.RSSFeedNotifier.Feeds_info = append(Utils.User_settings_GL.RSSFeedNotifier.Feeds_info,
@@ -111,19 +111,19 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 
 	var entry_name *widget.Entry = widget.NewEntry()
 	entry_name.SetText(feed_info.Feed_name)
-	entry_name.PlaceHolder = "Feed name (just for identification)"
+	entry_name.SetPlaceHolder("Feed name (just for identification)")
 
 	var entry_type *widget.Entry = widget.NewEntry()
 	entry_type.SetText(feed_info.Feed_type)
-	entry_type.PlaceHolder = "Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")"
+	entry_type.SetPlaceHolder("Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")")
 
 	var entry_url *widget.Entry = widget.NewEntry()
 	entry_url.SetText(feed_info.Feed_url)
-	entry_url.PlaceHolder = "Feed URL or YouTube playlist/channel ID"
+	entry_url.SetPlaceHolder("Feed URL or YouTube playlist/channel ID")
 
 	var entry_custom_msg_subject *widget.Entry = widget.NewEntry()
 	entry_custom_msg_subject.SetText(feed_info.Custom_msg_subject)
-	entry_custom_msg_subject.PlaceHolder = "Custom message subject (for YT it's automatic)"
+	entry_custom_msg_subject.SetPlaceHolder("Custom message subject (for YT it's automatic)")
 
 	var button_save *widget.Button = widget.NewButton("Save", func() {
 		feed_info.Feed_enabled = check_enabled.Checked

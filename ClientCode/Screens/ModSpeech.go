@@ -43,8 +43,8 @@ func ModSpeech() fyne.CanvasObject {
 
 func speechCreateMainTab() *container.Scroll {
 	var entry_txt_to_speech *widget.Entry = widget.NewEntry()
-	entry_txt_to_speech.PlaceHolder = "Enter text to speak"
-	entry_txt_to_speech.Text = "This is an example."
+	entry_txt_to_speech.SetPlaceHolder("Enter text to speak")
+	entry_txt_to_speech.SetText("This is an example.")
 	var btn_speak_min *widget.Button = widget.NewButton("Speak (min priority)", func() {
 		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_LOW, SpeechQueue.MODE_DEFAULT, "", 0)
 	})
