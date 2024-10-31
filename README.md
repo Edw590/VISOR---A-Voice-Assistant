@@ -70,14 +70,12 @@ Check on the modules list if they work for your operating system first!
 | Speech                     | It's recommended that the `nircmdc` program be on the PATH.
 
 #### Supported OSes
-- Unix-like systems
-- Windows (Win7+)
+- Unix-like systems except MacOS (I don't test the client on it though, only the server)
+- Windows (but I don't test the server on it, only the client)
 
-**NOTE:** if you want full VISOR functionality on Windows with the server, run it in WSL (Win10+ only) and not natively on Windows. It will work just fine (does with me). If you do this, copy the GGUF file into WSL or it will load VERY slowly.
+**NOTE:** if you want full VISOR functionality on Windows with the server, run it in WSL (Win10+ only) and not natively on Windows. It will work just fine. If you do this, copy the GGUF file into WSL or it will load VERY slowly.
 
-The entire project is supposed to be able to be run on Unix-like and Windows OSes (multi-platform project) - on Windows, the minimum is Windows 7, 32 or 64 bits. If by chance any module is not supported on any operating system, it will refuse to run on the unsupported OS(es) - even though it can probably still be compiled for them (just not ran). In case there is a module like this, it will be warned on the ",Names and IDs of each module and library.txt" file. This probably just means I haven't had the time or interest to program it for that OS and not because it really can't be run there.
-
-To change it to run on Windows or Linux, just compile to the OS you want, put the binaries in the `bin` folder and configure the device-specific settings on DeviceSettings_EOG.json. Nothing else needs to be done to change things from running on either OS.
+To change VISOR to run on Windows or Linux, just compile to the OS you want and put the binaries in the `bin` folder. Nothing else needs to be done to change things from running on either OS.
 
 ## About
 ### - License
