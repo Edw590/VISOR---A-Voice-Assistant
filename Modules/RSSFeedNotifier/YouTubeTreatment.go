@@ -149,27 +149,27 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 	if is_short {
 		video_short = "Short"
 	} else {
-		video_short = "vídeo"
+		video_short = "video"
 	}
 
 	var msg_subject string = _GEN_ERROR
 	if feedType.type_2 == _TYPE_2_YT_CHANNEL {
 		if things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL] == _VID_TIME_LIVE {
 			// Live video
-			msg_subject = "🔴 " + things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " está agora em direto: " + vid_title + "!"
-			things_replace[Utils.MODEL_YT_VIDEO_HTML_TITLE_EMAIL] = "Em direto no YouTube: " + things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " – " + vid_title + "!"
+			msg_subject = "🔴 " + things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " is now live: " + vid_title + "!"
+			things_replace[Utils.MODEL_YT_VIDEO_HTML_TITLE_EMAIL] = "Live on YouTube: " + things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " – " + vid_title + "!"
 
 			// Change the length rectangle
 			things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_COLOR_EMAIL] = LIVE_COLOR
 			things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL] = "LIVE" // Change the video length to "LIVE"
 		} else {
 			// Normal video
-			msg_subject = things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " acabou de carregar um " + video_short
+			msg_subject = things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " just uploaded a " + video_short
 			things_replace[Utils.MODEL_YT_VIDEO_HTML_TITLE_EMAIL] = msg_subject
 		}
 	} else if feedType.type_2 == _TYPE_2_YT_PLAYLIST {
 		// Playlist video
-		msg_subject = things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " acabou de adicionar um " + video_short + " a " + parsed_feed.Title
+		msg_subject = things_replace[Utils.MODEL_YT_VIDEO_CHANNEL_NAME_EMAIL] + " just added a " + video_short + " to " + parsed_feed.Title
 		things_replace[Utils.MODEL_YT_VIDEO_HTML_TITLE_EMAIL] = msg_subject
 	}
 
