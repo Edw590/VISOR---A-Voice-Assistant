@@ -29,7 +29,7 @@ var screens_GL = map[string]string{
 	Screens.ID_MOD_MOD_MANAGER:       "Modules Manager",
 	Screens.ID_MOD_SPEECH:            "Speech",
 	Screens.ID_MOD_RSS_FEED_NOTIFIER: "RSS Feed Notifier",
-	Screens.ID_MOD_GPT_COMM:          "GPT Communicator",
+	Screens.ID_MOD_GPT_COMM:          "Communicator",
 	Screens.ID_MOD_TASKS_EXECUTOR:    "Tasks Executor",
 	Screens.ID_MOD_USER_LOCATOR:      "User Locator",
 	Screens.ID_ONLINE_INFO_CHK:       "Online Info Checker",
@@ -42,9 +42,9 @@ var screens_GL = map[string]string{
 var tree_index = map[string][]string{
 	"": {
 		Screens.ID_HOME,
+		Screens.ID_MOD_GPT_COMM,
 		Screens.ID_MOD_MOD_MANAGER,
 		Screens.ID_MOD_SPEECH,
-		Screens.ID_MOD_GPT_COMM,
 		Screens.ID_MOD_RSS_FEED_NOTIFIER,
 		Screens.ID_MOD_TASKS_EXECUTOR,
 		Screens.ID_MOD_USER_LOCATOR,
