@@ -157,12 +157,12 @@ GetShellSHELL returns the shell to use in the current OS.
 -----------------------------------------------------------
 
 – Params:
-  - windows_shell – the Windows shell, or "" to use the default (powershell.exe)
+  - windows_shell – the Windows shell, or "" to use the default (cmd.exe)
   - linux_shell – the Linux shell, or "" to use the default (bash)
 */
 func GetShellSHELL(windows_shell string, linux_shell string) string {
 	if windows_shell == "" {
-		windows_shell = "powershell.exe"
+		windows_shell = "cmd.exe"
 	}
 	if linux_shell == "" {
 		linux_shell = "bash"
