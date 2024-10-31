@@ -33,19 +33,38 @@ func Registry() fyne.CanvasObject {
 	Current_screen_GL = ID_REGISTRY
 
 	return container.NewAppTabs(
-		container.NewTabItem("All values", registryCreateAllValuesTab()),
+		container.NewTabItem("Automatic values", registryCreateAutomaticValuesTab()),
+		container.NewTabItem("Manual values", registryCreateManualValuesTab()),
 	)
 }
 
-func registryCreateAllValuesTab() *container.Scroll {
+func registryCreateAutomaticValuesTab() *container.Scroll {
 	var registry_text *widget.Label = widget.NewLabel("")
 	registry_text.Wrapping = fyne.TextWrapWord
 
 	go func() {
-		time.Sleep(500 * time.Millisecond)
 		for {
 			if Current_screen_GL == ID_REGISTRY {
-				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY())
+				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(1))
+			} else {
+				break
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	return createMainContentScrollUTILS(registry_text)
+}
+
+func registryCreateManualValuesTab() *container.Scroll {
+	var registry_text *widget.Label = widget.NewLabel("")
+	registry_text.Wrapping = fyne.TextWrapWord
+
+	go func() {
+		for {
+			if Current_screen_GL == ID_REGISTRY {
+				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(2))
 			} else {
 				break
 			}

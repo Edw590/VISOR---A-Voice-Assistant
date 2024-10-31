@@ -257,13 +257,21 @@ GetRegistryTextREGISTRY returns a text representation of the Registry.
 
 -----------------------------------------------------------
 
+– Params:
+  - type_ – the type of the values to include (0 for all, 1 for only auto-set values, 2 for only manually-set values)
+
 – Returns:
   - a text representation of the Registry
  */
-func GetRegistryTextREGISTRY() string {
+func GetRegistryTextREGISTRY(type_ int) string {
 	var text string = ""
 
 	for _, value := range Utils.Gen_settings_GL.Registry {
+		if type_ == 1 && !value.Auto_set {
+			continue
+		} else if type_ == 2 && value.Auto_set {
+			continue
+		}
 		text += "Name: " + value.Pretty_name + "\n" +
 			"Key: " + value.Key + "\n" +
 			"Auto set: " + strconv.FormatBool(value.Auto_set) + "\n" +
