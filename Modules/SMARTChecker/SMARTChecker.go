@@ -70,7 +70,7 @@ func init() {realMain =
 		}
 
 		for {
-			var disks_to_chk map[string]*ModsFileInfo.DiskInfo = modUserInfo_GL.Disks_info
+			var disks_to_chk []ModsFileInfo.DiskInfo = modUserInfo_GL.Disks_info
 			if len(disks_to_chk) == 0 {
 				//log.Println("No disks to check.")
 
@@ -80,7 +80,7 @@ func init() {realMain =
 			//log.Println("Checking listed disks...")
 			//log.Println()
 
-			for disk_serial, disk_user_info := range disks_to_chk {
+			for _, disk_user_info := range disks_to_chk {
 				//log.Println("------------------------------------")
 				//log.Println("Disk serial: " + disk_serial)
 				//log.Println("Disk label: " + disk_user_info.Label)
@@ -88,7 +88,7 @@ func init() {realMain =
 				var partitions_list []string = getAllAvailablePartitions()
 				var disksSerialPartitions map[string]string = getDiskSerialPartitions(partitions_list)
 
-				disk_partition, ok := disksSerialPartitions[disk_serial]
+				disk_partition, ok := disksSerialPartitions[disk_user_info.Id]
 				if !ok {
 					//log.Println("Disk not found on the system")
 
@@ -101,12 +101,12 @@ func init() {realMain =
 				}
 
 				// Check which test to execute, or execute none if the time hasn't passed yet.
-				var disk_gen_info []int64 = modGenInfo_GL.Disks_info[disk_serial]
+				var disk_gen_info []int64 = modGenInfo_GL.Disks_info[disk_user_info.Id]
 				if disk_gen_info == nil {
 					disk_gen_info = make([]int64, 2)
 					disk_gen_info[SHORT_TEST] = 0
 					disk_gen_info[LONG_TEST] = 0
-					modGenInfo_GL.Disks_info[disk_serial] = disk_gen_info
+					modGenInfo_GL.Disks_info[disk_user_info.Id] = disk_gen_info
 				}
 				var test_type int = NO_TEST
 				if !no_test {
@@ -219,7 +219,7 @@ func init() {realMain =
 
 				var things_replace = map[string]string{
 					Utils.MODEL_DISKS_SMART_DISK_LABEL_EMAIL:       disk_user_info.Label,
-					Utils.MODEL_DISKS_SMART_DISK_SERIAL_EMAIL:      disk_serial,
+					Utils.MODEL_DISKS_SMART_DISK_SERIAL_EMAIL:      disk_user_info.Id,
 					Utils.MODEL_DISKS_SMART_DISK_PARTITION_EMAIL:   disk_partition,
 					Utils.MODEL_DISKS_SMART_DISKS_SMART_HTML_EMAIL: html_report,
 				}

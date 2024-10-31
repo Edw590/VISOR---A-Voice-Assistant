@@ -24,13 +24,15 @@ package ModsFileInfo
 // Mod3UserInfo is the format of the custom information file about this specific module.
 type Mod3UserInfo struct {
 	// Disks_info is the information about the disks. It maps the disk serial number to the disk information struct.
-	Disks_info map[string]*DiskInfo
+	Disks_info []DiskInfo
 }
 
 type DiskInfo struct {
-	// Disk label
+	// Id is the disk serial number
+	Id string
+	// Label is the disk label
 	Label string
-	// Is the disk an HDD?
+	// Is_HDD is true if the disk is an HDD, false otherwise
 	Is_HDD bool
 }
 

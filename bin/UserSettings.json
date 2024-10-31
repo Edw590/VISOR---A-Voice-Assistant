@@ -24,13 +24,14 @@
 		"Picovoice_API_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/56yHGr565RTttt=="
 	},
 	"SMARTChecker": {
-		"Disks_info": {
-			"DISK_SERIAL_HERE": {
+		"Disks_info": [
+			{
+				"Id": "DISK_SERIAL_HERE",
 				"Label": "A label for the disk",
 				// True if the disk is an HDD (the ones that have a disk spinning inside)
 				"Is_HDD": true
 			}
-		}
+		]
 	},
 	"RSSFeedNotifier": {
 		"Mails_to": [

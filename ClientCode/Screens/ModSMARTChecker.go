@@ -51,8 +51,8 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 	check_is_hdd.SetChecked(true)
 
 	var button_save *widget.Button = widget.NewButton("Add", func() {
-		for id, _ := range Utils.User_settings_GL.SMARTChecker.Disks_info {
-			if id == entry_id.Text {
+		for _, disk := range Utils.User_settings_GL.SMARTChecker.Disks_info {
+			if disk.Id == entry_id.Text {
 				err := errors.New("disk ID already exists")
 				dialog.ShowError(err, Current_window_GL)
 
@@ -60,10 +60,12 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 			}
 		}
 
-		Utils.User_settings_GL.SMARTChecker.Disks_info[entry_id.Text] = &ModsFileInfo.DiskInfo{
-			Label: entry_label.Text,
-			Is_HDD: check_is_hdd.Checked,
-		}
+		Utils.User_settings_GL.SMARTChecker.Disks_info = append(Utils.User_settings_GL.SMARTChecker.Disks_info,
+			ModsFileInfo.DiskInfo{
+				Id:     entry_id.Text,
+				Label:  entry_label.Text,
+				Is_HDD: check_is_hdd.Checked,
+		})
 
 		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
@@ -78,16 +80,16 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 
 func smartCheckerCreateDisksListTab() *container.Scroll {
 	var objects []fyne.CanvasObject = nil
-	var disks map[string]*ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	for id, disk := range disks {
-		objects = append(objects, createDiskSetter(disk, id))
+	var disks []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
+	for i, disk := range disks {
+		objects = append(objects, createDiskSetter(&disk, i))
 	}
 
 	return createMainContentScrollUTILS(objects...)
 }
 
-func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_id string) *fyne.Container {
-	var label_id *widget.Label = widget.NewLabel("Disk ID: " + disk_id)
+func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container {
+	var label_id *widget.Label = widget.NewLabel("Disk ID: " + disk.Id)
 
 	var entry_label *widget.Entry = widget.NewEntry()
 	entry_label.SetPlaceHolder("Disk label")
@@ -97,18 +99,14 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_id string) *fyne.Contain
 	check_is_hdd.SetChecked(disk.Is_HDD)
 
 	var button_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.User_settings_GL.SMARTChecker.Disks_info[disk_id] = &ModsFileInfo.DiskInfo{
-			Label: entry_label.Text,
-			Is_HDD: check_is_hdd.Checked,
-		}
-
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		disk.Label = entry_label.Text
+		disk.Is_HDD = check_is_hdd.Checked
 	})
 
 	var button_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
 			if confirmed {
-				delete(Utils.User_settings_GL.SMARTChecker.Disks_info, disk_id)
+				Utils.DelElemSLICES(&Utils.User_settings_GL.SMARTChecker.Disks_info, disk_idx)
 
 				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 			}
