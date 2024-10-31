@@ -219,6 +219,8 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		})
 	})
 
+	var space *widget.Label = widget.NewLabel("")
+
 	return container.NewVBox(
 		label_id,
 		check_enabled,
@@ -232,5 +234,6 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		entry_programmable_condition,
 		button_save,
 		button_delete,
+		space,
 	)
 }

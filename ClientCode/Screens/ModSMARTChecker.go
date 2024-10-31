@@ -113,11 +113,14 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 		})
 	})
 
+	var space *widget.Label = widget.NewLabel("")
+
 	return container.NewVBox(
 		label_id,
 		entry_label,
 		check_is_hdd,
 		button_save,
 		button_delete,
+		space,
 	)
 }

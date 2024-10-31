@@ -84,6 +84,10 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 		}
 	}))
 
+	var space *widget.Label = widget.NewLabel("")
+
+	content = append(content, space)
+
 	return container.NewVBox(
 		content...
 	)

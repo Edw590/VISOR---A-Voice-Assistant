@@ -164,6 +164,8 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		})
 	})
 
+	var space *widget.Label = widget.NewLabel("")
+
 	return container.NewVBox(
 		entry_type,
 		entry_name,
@@ -173,5 +175,6 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		entry_location_name,
 		button_save,
 		button_delete,
+		space,
 	)
 }

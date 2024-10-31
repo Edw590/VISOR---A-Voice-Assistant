@@ -143,6 +143,8 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 		})
 	})
 
+	var space *widget.Label = widget.NewLabel("")
+
 	return container.NewVBox(
 		label_id,
 		check_enabled,
@@ -152,5 +154,6 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 		entry_custom_msg_subject,
 		button_save,
 		button_delete,
+		space,
 	)
 }
