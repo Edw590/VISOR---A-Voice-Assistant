@@ -37,7 +37,7 @@ func ModSpeech() fyne.CanvasObject {
 
 	return container.NewAppTabs(
 		container.NewTabItem("Main", speechCreateMainTab()),
-		container.NewTabItem("Settings", speechCreateSettingsTab()),
+		container.NewTabItem("Local settings", speechCreateSettingsTab()),
 	)
 }
 
@@ -68,14 +68,11 @@ func speechCreateMainTab() *container.Scroll {
 }
 
 func speechCreateSettingsTab() *container.Scroll {
-	var label_exxplanation *widget.Label = widget.NewLabel("(These are device-specific settings and hence not synced)")
-
 	var btn_config_tts *widget.Button = widget.NewButton("Configure Windows SAPI TTS", func() {
 		_, _ = Utils.ExecCmdSHELL([]string{"control.exe C:\\Windows\\System32\\Speech\\SpeechUX\\sapi.cpl"})
 	})
 
 	var objects []fyne.CanvasObject = []fyne.CanvasObject{
-		label_exxplanation,
 		btn_config_tts,
 	}
 	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
