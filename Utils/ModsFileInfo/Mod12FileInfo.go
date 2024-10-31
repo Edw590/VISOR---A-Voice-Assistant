@@ -49,10 +49,10 @@ type Mod12UserInfo struct {
 	// AlwaysWith_device is the ID of the device that is always with the user
 	AlwaysWith_device string
 	// Locs_info is the information about the locations
-	Locs_info []_LocInfo
+	Locs_info []LocInfo
 }
 
-type _LocInfo struct {
+type LocInfo struct {
 	// Type is the type of the location "detector" (e.g. wifi)
 	Type string
 	// Name is the name of the detection (e.g. the W-Fi SSID)

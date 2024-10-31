@@ -249,10 +249,12 @@ func prepareScreen(uid string) {
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModGPTCommunicator()}
 		case Screens.ID_MOD_TASKS_EXECUTOR:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor()}
+		case Screens.ID_MOD_USER_LOCATOR:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModUserLocator()}
 		case Screens.ID_MOD_SYS_CHECKER:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
-	case Screens.ID_SMART_CHECKER:
-		content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSMARTChecker()}
+		case Screens.ID_SMART_CHECKER:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSMARTChecker()}
 		case Screens.ID_REGISTRY:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.Registry()}
 	}
