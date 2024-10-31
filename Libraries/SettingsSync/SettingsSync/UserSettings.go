@@ -28,7 +28,7 @@ import (
 	"time"
 )
 
-var get_settings_each_s_GL int64 = 1
+const _GET_SETTINGS_EACH_S int64 = 30
 
 var last_remote_crc16_GL []byte = nil
 var stop_GL bool = false
@@ -46,15 +46,22 @@ func SyncUserSettings() {
 		var last_get_settings_when_s int64 = 0
 		var last_user_settings_json string = GetJsonUserSettings()
 		for {
-			var update_settings bool = false
-			if time.Now().Unix() >= last_get_settings_when_s + get_settings_each_s_GL && Utils.IsCommunicatorConnectedSERVER() {
-				update_settings = true
+			var new_user_settings_json string = GetJsonUserSettings()
+			if last_user_settings_json != new_user_settings_json {
+				last_user_settings_json = new_user_settings_json
 
-				last_get_settings_when_s = time.Now().Unix()
-			}
+				var message []byte = []byte("S_JSON|US|")
+				message = append(message, Utils.CompressString(last_user_settings_json)...)
+				Utils.QueueNoResponseMessageSERVER(message)
+			} else {
+				var update_settings bool = false
+				if time.Now().Unix() >= last_get_settings_when_s + _GET_SETTINGS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
+					update_settings = true
 
-			if update_settings {
-				if remoteSettingsChanged() {
+					last_get_settings_when_s = time.Now().Unix()
+				}
+
+				if update_settings && remoteSettingsChanged() {
 					if !Utils.IsCommunicatorConnectedSERVER() {
 						// Check again the communicator. Trying to prevent deadlocks.
 						continue
@@ -70,15 +77,6 @@ func SyncUserSettings() {
 
 					_ = Utils.FromJsonGENERAL(json, &Utils.User_settings_GL)
 					last_user_settings_json = GetJsonUserSettings()
-				} else {
-					var new_user_settings_json string = GetJsonUserSettings()
-					if last_user_settings_json != new_user_settings_json {
-						last_user_settings_json = new_user_settings_json
-
-						var message []byte = []byte("S_JSON|US|")
-						message = append(message, Utils.CompressString(last_user_settings_json)...)
-						Utils.QueueNoResponseMessageSERVER(message)
-					}
 				}
 			}
 
@@ -87,18 +85,6 @@ func SyncUserSettings() {
 			}
 		}
 	}()
-}
-
-/*
-ChangeSyncInterval changes the interval in seconds between each remote settings check.
-
------------------------------------------------------------
-
-– Params:
-  - new_value – the new interval in seconds
- */
-func ChangeSyncInterval(new_value_s int64) {
-	get_settings_each_s_GL = new_value_s
 }
 
 func remoteSettingsChanged() bool {
