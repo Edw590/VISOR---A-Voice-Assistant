@@ -28,7 +28,7 @@ import (
 	"time"
 )
 
-const _GET_SETTINGS_EACH_S int64 = 30
+var get_settings_each_s_GL int64 = 1
 
 var last_remote_crc16_GL []byte = nil
 var stop_GL bool = false
@@ -47,7 +47,7 @@ func SyncUserSettings() {
 		var last_user_settings_json string = GetJsonUserSettings()
 		for {
 			var update_settings bool = false
-			if time.Now().Unix() >= last_get_settings_when_s + _GET_SETTINGS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
+			if time.Now().Unix() >= last_get_settings_when_s + get_settings_each_s_GL && Utils.IsCommunicatorConnectedSERVER() {
 				update_settings = true
 
 				last_get_settings_when_s = time.Now().Unix()
@@ -87,6 +87,18 @@ func SyncUserSettings() {
 			}
 		}
 	}()
+}
+
+/*
+ChangeSyncInterval changes the interval in seconds between each remote settings check.
+
+-----------------------------------------------------------
+
+– Params:
+  - new_value – the new interval in seconds
+ */
+func ChangeSyncInterval(new_value_s int64) {
+	get_settings_each_s_GL = new_value_s
 }
 
 func remoteSettingsChanged() bool {

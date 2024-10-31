@@ -26,6 +26,7 @@ import (
 	"errors"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"strconv"
 	"strings"
@@ -75,7 +76,6 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 		content = append(content, check)
 	}
 
-	// Save button
 	content = append(content, widget.NewButton("Save", func() {
 		if entry != nil {
 			value.SetData(entry.Text, false)
@@ -96,4 +96,13 @@ func createMainContentScrollUTILS(objects... fyne.CanvasObject) *container.Scrol
 	main_scroll.SetMinSize(screens_size_GL)
 
 	return main_scroll
+}
+
+func createConfirmationUTILS(message string, callback func(bool)) *dialog.ConfirmDialog {
+	cnf := dialog.NewConfirm("Confirmation", message, callback, Current_window_GL)
+	cnf.SetDismissText("Cancel")
+	cnf.SetConfirmText("Yes")
+	cnf.Show()
+
+	return cnf
 }

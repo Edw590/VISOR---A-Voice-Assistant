@@ -57,7 +57,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 	var check_enabled *widget.Check = widget.NewCheck("Task enabled", nil)
 	check_enabled.SetChecked(true)
 
-	var check_device_active *widget.Check = widget.NewCheck("Device(s) must be active", nil)
+	var check_device_active *widget.Check = widget.NewCheck("Device(s) must be in use", nil)
 	check_device_active.SetChecked(false)
 
 	var entry_device_ids *widget.Entry = widget.NewMultiLineEntry()
@@ -97,7 +97,6 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 		return err
 	}
 
-	// Save button
 	repeat_each_min, _ := strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 	var button_save *widget.Button = widget.NewButton("Add", func() {
 		Utils.User_settings_GL.TasksExecutor.Tasks = append(Utils.User_settings_GL.TasksExecutor.Tasks,
@@ -151,7 +150,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 	var check_enabled *widget.Check = widget.NewCheck("Task enabled", nil)
 	check_enabled.SetChecked(task.Enabled)
 
-	var check_device_active *widget.Check = widget.NewCheck("Device(s) must be active", nil)
+	var check_device_active *widget.Check = widget.NewCheck("Device(s) must be in use", nil)
 	check_device_active.SetChecked(task.Device_active)
 
 	var entry_device_ids *widget.Entry = widget.NewMultiLineEntry()
@@ -198,7 +197,6 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		return err
 	}
 
-	// Save button
 	var button_save *widget.Button = widget.NewButton("Save", func() {
 		task.Enabled = check_enabled.Checked
 		task.Device_active = check_device_active.Checked

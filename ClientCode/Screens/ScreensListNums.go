@@ -23,17 +23,18 @@ package Screens
 
 import "fyne.io/fyne/v2"
 
-// Current_screen_GL is the current app screen. It's currently used to let threads specific to each screen know if they
-// should continue processing data or not (they don't stop, they just keep waiting for the screen to become active again).
 var Current_screen_GL string = ""
+
+var Current_window_GL fyne.Window = nil
 
 var screens_size_GL fyne.Size = fyne.NewSize(550, 480)
 
 const ID_HOME string = "home"
-const ID_MOD_MOD_MANAGER string = "mod_mod_manager"
-const ID_MOD_SPEECH string = "mod_speech"
-const ID_MOD_RSS_FEED_NOTIFIER string = "mod_rss_feed_notifier"
-const ID_MOD_GPT_COMM string = "mod_gpt_comm"
+const ID_MOD_MOD_MANAGER string = "mod_manager"
+const ID_MOD_SPEECH string = "speech"
+const ID_MOD_RSS_FEED_NOTIFIER string = "rss_feed_notifier"
+const ID_MOD_GPT_COMM string = "gpt_comm"
 const ID_MOD_TASKS_EXECUTOR string = "tasks_executor"
 const ID_MOD_SYS_CHECKER string = "sys_checker"
+const ID_SMART_CHECKER string = "smart_checker"
 const ID_REGISTRY string = "registry"

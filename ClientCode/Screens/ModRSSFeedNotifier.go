@@ -125,7 +125,6 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 	entry_custom_msg_subject.SetText(feed_info.Custom_msg_subject)
 	entry_custom_msg_subject.PlaceHolder = "Custom message subject (for YT it's automatic)"
 
-	// Save button
 	var button_save *widget.Button = widget.NewButton("Save", func() {
 		feed_info.Feed_enabled = check_enabled.Checked
 		feed_info.Feed_name = entry_name.Text

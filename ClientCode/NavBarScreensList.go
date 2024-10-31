@@ -32,6 +32,7 @@ var screens_GL = map[string]string{
 	Screens.ID_MOD_GPT_COMM:          "GPT Communicator",
 	Screens.ID_MOD_TASKS_EXECUTOR:    "Tasks Executor",
 	Screens.ID_MOD_SYS_CHECKER:       "System Checker",
+	Screens.ID_SMART_CHECKER:         "S.M.A.R.T. Checker",
 	Screens.ID_REGISTRY:              "Registry",
 }
 
@@ -41,10 +42,11 @@ var tree_index = map[string][]string{
 		Screens.ID_HOME,
 		Screens.ID_MOD_MOD_MANAGER,
 		Screens.ID_MOD_SPEECH,
-		Screens.ID_MOD_RSS_FEED_NOTIFIER,
 		Screens.ID_MOD_GPT_COMM,
+		Screens.ID_MOD_RSS_FEED_NOTIFIER,
 		Screens.ID_MOD_TASKS_EXECUTOR,
 		Screens.ID_MOD_SYS_CHECKER,
+		Screens.ID_SMART_CHECKER,
 		Screens.ID_REGISTRY,
 	},
 }

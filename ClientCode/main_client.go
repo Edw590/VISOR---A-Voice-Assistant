@@ -139,6 +139,7 @@ func init() {realMain =
 		// Create the content area with a label to display different screens
 		content_container_GL = container.NewStack(Screens.Home())
 
+		Screens.Current_window_GL = my_window_GL
 		var nav_bar *widget.Tree = &widget.Tree{
 			ChildUIDs: func(uid string) []string {
 				return tree_index[uid]
@@ -250,6 +251,8 @@ func prepareScreen(uid string) {
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor()}
 		case Screens.ID_MOD_SYS_CHECKER:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
+	case Screens.ID_SMART_CHECKER:
+		content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSMARTChecker()}
 		case Screens.ID_REGISTRY:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.Registry()}
 	}

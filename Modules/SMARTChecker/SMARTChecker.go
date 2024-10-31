@@ -70,7 +70,7 @@ func init() {realMain =
 		}
 
 		for {
-			var disks_to_chk map[string]ModsFileInfo.DiskInfo = modUserInfo_GL.Disks_info
+			var disks_to_chk map[string]*ModsFileInfo.DiskInfo = modUserInfo_GL.Disks_info
 			if len(disks_to_chk) == 0 {
 				//log.Println("No disks to check.")
 
