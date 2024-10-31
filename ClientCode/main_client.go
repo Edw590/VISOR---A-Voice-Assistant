@@ -45,6 +45,8 @@ import (
 var my_app_GL fyne.App = nil
 var my_window_GL fyne.Window = nil
 
+var prev_screen_GL string = ""
+
 var modules_GL []Utils.Module = nil
 
 var content_container_GL *fyne.Container = nil
@@ -169,6 +171,9 @@ func init() {realMain =
 			widget.NewButton("Light", func() {
 				my_app_GL.Settings().SetTheme(theme.LightTheme())
 			}),
+			widget.NewButton("Auto", func() {
+				my_app_GL.Settings().SetTheme(theme.DefaultTheme())
+			}),
 		)
 
 		var sidebar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
@@ -180,16 +185,12 @@ func init() {realMain =
 		// Set the content of the window
 		my_window_GL.SetContent(split)
 
-		var prev_screen string = ""
 		// Add system tray functionality
 		if desk, ok := my_app_GL.(desktop.App); ok {
 			var icon *fyne.StaticResource = Logo.LogoBlackGmail
 			var menu *fyne.Menu = fyne.NewMenu("Tray",
 				fyne.NewMenuItem("Show", func() {
 					showWindow()
-
-					// Restore the previous screen state
-					Screens.Current_screen_GL = prev_screen
 				}),
 				fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
 					quitApp(modules_GL)
@@ -202,7 +203,7 @@ func init() {realMain =
 		// Minimize to tray on close
 		my_window_GL.SetCloseIntercept(func() {
 			// Store the previous screen before hiding
-			prev_screen = Screens.Current_screen_GL
+			prev_screen_GL = Screens.Current_screen_GL
 			Screens.Current_screen_GL = ""
 			my_window_GL.Hide()
 
@@ -305,6 +306,11 @@ func showWindow() {
 	my_window_GL.Hide()
 	my_window_GL.Show()
 	my_window_GL.RequestFocus()
+
+	// Restore the previous screen state
+	Screens.Current_screen_GL = prev_screen_GL
+
+	prepareScreen(Screens.Current_screen_GL)
 }
 
 func quitApp(modules []Utils.Module) {
