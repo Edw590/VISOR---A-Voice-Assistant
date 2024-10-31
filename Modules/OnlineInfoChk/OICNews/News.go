@@ -39,14 +39,14 @@ UpdateNews updates the news for the given locations.
 – Returns:
   - the error if any
 */
-func UpdateNews(driver selenium.WebDriver, news_locs []ModsFileInfo.NewsLocs) []ModsFileInfo.News {
+func UpdateNews(driver selenium.WebDriver, news_locs []string) []ModsFileInfo.News {
 	var news []ModsFileInfo.News = nil
 	for _, news_loc := range news_locs {
-		texts, err := findNews(driver, news_loc.News_str)
+		texts, err := findNews(driver, news_loc + " news")
 		if err != nil {
 			panic(err)
 		}
-		//log.Println("Current news in " + news_loc.Location + ":")
+		//log.Println("Current news in " + news_loc + ":")
 		//for _, text := range texts {
 		//	log.Println(text)
 		//}
@@ -54,7 +54,7 @@ func UpdateNews(driver selenium.WebDriver, news_locs []ModsFileInfo.NewsLocs) []
 
 		// write the info to an json struct
 		news = append(news, ModsFileInfo.News{
-			Location: news_loc.Location,
+			Location: news_loc,
 			News:     texts,
 		})
 	}

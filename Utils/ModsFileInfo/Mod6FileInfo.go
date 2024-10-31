@@ -54,13 +54,5 @@ type Mod6UserInfo struct {
 	// Temp_locs is the locations to get the weather from
 	Temp_locs   []string
 	// News_locs is the locations to get the news from
-	News_locs []NewsLocs
-}
-
-// NewsLocs is the information about a news location.
-type NewsLocs struct {
-	// News_str is the news search string
-	News_str string
-	// Location is the location of the news
-	Location string
+	News_locs []string
 }

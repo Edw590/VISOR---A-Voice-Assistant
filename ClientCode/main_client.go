@@ -251,6 +251,8 @@ func prepareScreen(uid string) {
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModTasksExecutor()}
 		case Screens.ID_MOD_USER_LOCATOR:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModUserLocator()}
+		case Screens.ID_ONLINE_INFO_CHK:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModOnlineInfoChk()}
 		case Screens.ID_MOD_SYS_CHECKER:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSystemChecker()}
 		case Screens.ID_SMART_CHECKER:
