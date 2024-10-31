@@ -210,9 +210,13 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 	})
 
 	var button_delete *widget.Button = widget.NewButton("Delete", func() {
-		Utils.DelElemSLICES(&Utils.User_settings_GL.TasksExecutor.Tasks, task_idx)
+		createConfirmationUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
+			if confirmed {
+				Utils.DelElemSLICES(&Utils.User_settings_GL.TasksExecutor.Tasks, task_idx)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+			}
+		})
 	})
 
 	return container.NewVBox(

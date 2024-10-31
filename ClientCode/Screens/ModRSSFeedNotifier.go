@@ -134,9 +134,13 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 	})
 
 	var button_delete *widget.Button = widget.NewButton("Delete", func() {
-		Utils.DelElemSLICES(&Utils.User_settings_GL.RSSFeedNotifier.Feeds_info, feed_idx)
+		createConfirmationUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {
+			if confirmed {
+				Utils.DelElemSLICES(&Utils.User_settings_GL.RSSFeedNotifier.Feeds_info, feed_idx)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+			}
+		})
 	})
 
 	return container.NewVBox(
