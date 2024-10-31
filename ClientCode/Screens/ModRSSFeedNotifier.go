@@ -27,15 +27,12 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"log"
 	"sort"
 	"strconv"
 )
 
 func ModRSSFeedNotifier() fyne.CanvasObject {
 	Current_screen_GL = ID_MOD_RSS_FEED_NOTIFIER
-
-	log.Println("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
 
 	return container.NewAppTabs(
 		container.NewTabItem("Feeds list", rssFeedNotifierCreateFeedsListTab()),
@@ -57,16 +54,16 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 	check_enabled.SetChecked(true)
 
 	var entry_feed_name *widget.Entry = widget.NewEntry()
-	entry_feed_name.PlaceHolder = "Feed name"
+	entry_feed_name.PlaceHolder = "Feed name (just for identification)"
 
 	var entry_feed_type *widget.Entry = widget.NewEntry()
-	entry_feed_type.PlaceHolder = "Feed type"
+	entry_feed_type.PlaceHolder = "Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")"
 
 	var entry_feed_url *widget.Entry = widget.NewEntry()
 	entry_feed_url.PlaceHolder = "Feed URL or YouTube playlist/channel ID"
 
 	var entry_custom_msg_subject *widget.Entry = widget.NewEntry()
-	entry_custom_msg_subject.PlaceHolder = "Custom message subject (YT is automatic)"
+	entry_custom_msg_subject.PlaceHolder = "Custom message subject (for YT it's automatic)"
 
 	var button_save *widget.Button = widget.NewButton("Add", func() {
 		Utils.User_settings_GL.RSSFeedNotifier.Feeds_info = append(Utils.User_settings_GL.RSSFeedNotifier.Feeds_info,
@@ -114,11 +111,11 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 
 	var entry_name *widget.Entry = widget.NewEntry()
 	entry_name.SetText(feed_info.Feed_name)
-	entry_name.PlaceHolder = "Feed name"
+	entry_name.PlaceHolder = "Feed name (just for identification)"
 
 	var entry_type *widget.Entry = widget.NewEntry()
 	entry_type.SetText(feed_info.Feed_type)
-	entry_type.PlaceHolder = "Feed type"
+	entry_type.PlaceHolder = "Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")"
 
 	var entry_url *widget.Entry = widget.NewEntry()
 	entry_url.SetText(feed_info.Feed_url)
@@ -126,7 +123,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 
 	var entry_custom_msg_subject *widget.Entry = widget.NewEntry()
 	entry_custom_msg_subject.SetText(feed_info.Custom_msg_subject)
-	entry_custom_msg_subject.PlaceHolder = "Custom message subject (YT is automatic)"
+	entry_custom_msg_subject.PlaceHolder = "Custom message subject (for YT it's automatic)"
 
 	// Save button
 	var button_save *widget.Button = widget.NewButton("Save", func() {
