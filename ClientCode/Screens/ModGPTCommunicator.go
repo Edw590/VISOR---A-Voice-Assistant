@@ -38,7 +38,35 @@ func ModGPTCommunicator() fyne.CanvasObject {
 
 	return container.NewAppTabs(
 		container.NewTabItem("Communicator", gptCommunicatorCreateCommunicatorTab()),
+		container.NewTabItem("List of commands", gptCommunicatorCreateListCommandsTab()),
 		container.NewTabItem("Settings", gptCommunicatorCreateSettingsTab()),
+	)
+}
+
+func gptCommunicatorCreateListCommandsTab() *container.Scroll {
+	var label_example_command *widget.Label = widget.NewLabel("Example of a complex command VISOR understands " +
+		"(always without punctuation - must not be present): \"turn it on. turn on the wifi, and... and the airplane " +
+		"mode, get it it on. no, don't turn it on. turn off airplane mode and also the wifi, please.\"")
+	label_example_command.Wrapping = fyne.TextWrapWord
+
+	var label_list_commands *widget.Label = widget.NewLabel(
+		"List of all commands and variations available (optional words in [...] and generic descriptions in (...):\n\n" +
+		"(Note: there is more than one way to say a command, with synonyms and random words in between (\"switch on " +
+			"the phone's wifi\", \"what's the current time\", \"terminate the phone call\").)\n\n" +
+		"--> (Ask for the time)\n" +
+		"--> (Ask for the date)\n" +
+		"--> Turn on/off Wi-Fi\n" +
+		"--> (Ask for the battery percentage/status/level(s))\n" +
+		"--> (Ask for the weather)\n" +
+		"--> (Ask for the news)\n" +
+		"--> Turn on/off Ethernet\n" +
+		"--> Turn on/off networking\n",
+	)
+	label_list_commands.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(
+		label_example_command,
+		label_list_commands,
 	)
 }
 
@@ -81,13 +109,13 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
-	text_to_send.SetPlaceHolder("Text to send to the assistant")
+	text_to_send.SetPlaceHolder("Text to send to the assistant (commands or normal text to the LLM)")
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", text_to_send.Text)
 	})
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to GPT (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
-			var speak string = "GPT unavailable. Communicator not connected."
+			var speak string = "GPT unavailable. not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 			return
@@ -100,7 +128,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	})
 	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to GPT (dumb)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
-			var speak string = "GPT unavailable. Communicator not connected."
+			var speak string = "GPT unavailable. not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 			return

@@ -79,7 +79,7 @@ func init() {realMain =
 			} else {
 				continue
 			}
-			var cmds_info_str = ACD.Main(sentence_str, false, true, last_it + "|" + last_and)
+			var cmds_info_str = ACD.Main(strings.ToLower(sentence_str), false, true, last_it + "|" + last_and)
 			log.Println("*****************************")
 			fmt.Println(sentence_str)
 			log.Println(cmds_info_str)
@@ -324,7 +324,7 @@ func speakInternal(txt_to_speak string, speech_priority int32, mode int32, auto_
 
 func sendToGPT(txt_to_send string) {
 	if !Utils.IsCommunicatorConnectedSERVER() {
-		var speak string = "GPT unavailable. Communicator not connected."
+		var speak string = "GPT unavailable. not connected to the server."
 		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 		return

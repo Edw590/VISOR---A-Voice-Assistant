@@ -136,6 +136,18 @@ var cmdi_info map[string]string = map[string]string{
 ///////////////////////////////////////////////////////////////////
 // Prepare commands strings
 
+
+
+
+
+
+// TODO: ADD NEW COMMANDS TO THE LIST OF COMMANDS TAB OF THE COMMUNICATOR SCREEN!!!!!
+
+
+
+
+
+
 func prepareCommandsString() string {
 	var commands = [...][]string{
 		//{CMD_TOGGLE_FLASHLIGHT, ACD.CMDi_TYPE_TURN_ONFF, "", "", "flashlight/lantern"},
