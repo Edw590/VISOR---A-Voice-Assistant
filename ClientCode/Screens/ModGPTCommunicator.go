@@ -37,7 +37,7 @@ func ModGPTCommunicator() fyne.CanvasObject {
 	Current_screen_GL = ID_MOD_GPT_COMM
 
 	return container.NewAppTabs(
-		container.NewTabItem("Communicator", gptCommunicatorCreateCommunicatorTab()),
+		container.NewTabItem("Main", gptCommunicatorCreateCommunicatorTab()),
 		container.NewTabItem("List of commands", gptCommunicatorCreateListCommandsTab()),
 		container.NewTabItem("Memories", gptCommunicatorCreateMemoriesTab()),
 		container.NewTabItem("Settings", gptCommunicatorCreateSettingsTab()),

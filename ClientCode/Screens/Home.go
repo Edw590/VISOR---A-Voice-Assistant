@@ -37,7 +37,7 @@ func Home() fyne.CanvasObject {
 	Current_screen_GL = ID_HOME
 
 	return container.NewAppTabs(
-		container.NewTabItem("Home", homeCreateHomeTab()),
+		container.NewTabItem("Main", homeCreateHomeTab()),
 		container.NewTabItem("Settings", homeCreateSettingsTab()),
 	)
 }
