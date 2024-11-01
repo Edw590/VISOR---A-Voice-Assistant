@@ -239,3 +239,18 @@ func SetMutedVOLUME(mute bool) bool {
 
 	return true
 }
+
+/*
+GetOSVersion gets the OS version.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the major version
+  - the minor version
+ */
+func GetOSVersion() (int, int, int) {
+	maj, min, patch := windows.RtlGetNtVersionNumbers()
+
+	return int(maj), int(min), int(patch)
+}

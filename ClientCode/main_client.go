@@ -91,16 +91,23 @@ func init() {realMain =
 			return
 		}
 
-		// All mainly alright, let's hide the terminal window
-		if runtime.GOOS == "windows" {
-			if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
-				// Restart the process with conhost.exe on Windows to be able to actually hide the window
-				if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])), "--conhost") {
-					return
+		if !Utils.WasArgUsedGENERAL(os.Args, "--nohide") {
+			// All mainly alright, let's hide the terminal window
+			if runtime.GOOS == "windows" {
+				maj, min, patch := Utils.GetOSVersion()
+				if maj >= 10 && min >= 0 && patch >= 19041 {
+					// Restart the process with conhost.exe on Windows to be able to actually hide the window if we're
+					// on Windows 10 Build 2004 or newer (because of the new Windows Terminal).
+					if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
+						if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])),
+								"--conhost") {
+							return
+						}
+					}
 				}
 			}
+			Utils.HideConsoleWindowPROCESSES()
 		}
-		Utils.HideConsoleWindowPROCESSES()
 
 		//////////////////////////////////////////
 		// No terminal window from here on
