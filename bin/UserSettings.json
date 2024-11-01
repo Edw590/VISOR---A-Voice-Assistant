@@ -87,16 +87,14 @@
 	},
 	"OnlineInfoChk": {
 		"Temp_locs": [
-			// List of cities to get the temperature from
-			"A city"
+			// List of cities to get the weather from
+			"Lisbon"
 		],
 		"News_locs": [
-			{
-				// Below, a string that will be used to search for news on Google. The news will be retrieved in the
-				// language used on the string.
-				"News_str": "Europe news",
-				"Location": "Europe"
-			}
+			// List of places to get the news from
+			"Europe",
+			"Portugal",
+			"Lisbon"
 		]
 	},
 	"GPTCommunicator": {
