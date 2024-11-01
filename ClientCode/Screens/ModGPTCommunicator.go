@@ -71,14 +71,16 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 }
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
+	var label_supported_models *widget.Label = widget.NewLabel("Supported models: Llama3.1 and 3.2 only")
+
 	var entry_smart_model_loc *widget.Entry = widget.NewEntry()
 	entry_smart_model_loc.Validator = validation.NewRegexp(`^.*\.gguf$`, "The model location must end with .gguf")
-	entry_smart_model_loc.SetPlaceHolder("Model location for the smart LLM GGUF file on the server")
+	entry_smart_model_loc.SetPlaceHolder("GGUF location for the smart LLM (used for normal conversation)")
 	entry_smart_model_loc.SetText(Utils.User_settings_GL.GPTCommunicator.Model_smart_loc)
 
 	var entry_dumb_model_loc *widget.Entry = widget.NewEntry()
 	entry_dumb_model_loc.Validator = validation.NewRegexp(`^.*\.gguf$`, "The model location must end with .gguf")
-	entry_dumb_model_loc.SetPlaceHolder("Model location for the dumb LLM GGUF file on the server")
+	entry_dumb_model_loc.SetPlaceHolder("GGUF location for the dumb LLM (used to summarize things)")
 	entry_dumb_model_loc.SetText(Utils.User_settings_GL.GPTCommunicator.Model_dumb_loc)
 
 	var entry_system_info *widget.Entry = widget.NewEntry()
@@ -97,6 +99,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	})
 
 	return createMainContentScrollUTILS(
+		label_supported_models,
 		entry_smart_model_loc,
 		entry_dumb_model_loc,
 		entry_system_info,
