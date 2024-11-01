@@ -94,6 +94,10 @@ func init() {realMain =
 		_ = tts_GL.SetRate(0)
 		_ = tts_GL.SetVolume(100)
 
+		// Leave this here. It's necessary for the TTS to work on Windows 7. Might be related to bad usage of
+		// ole.CoInitialize() which is only for single-threaded applications.
+		_, _ = tts_GL.Speak("", sapi.SVSFDefault)
+
 		processVolumeChanges()
 
 		//log.Println("Waiting for speeches to speak...")
