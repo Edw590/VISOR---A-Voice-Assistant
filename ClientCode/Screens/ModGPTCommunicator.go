@@ -109,11 +109,17 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
-	text_to_send.SetPlaceHolder("Text to send to the assistant (commands or normal text to the LLM)")
+	text_to_send.SetPlaceHolder(
+		"Text to send to VISOR (commands or normal text to the LLM)\n" +
+		"- /clear to clear the context by restarting the LLMs\n" +
+		"- /stop to stop the LLM while it's generating text by restarting both\n" +
+		"- /mem to memorize the conversation\n" +
+		"- /memmem to summarize the list of memories (use with caution)\n",
+	)
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", text_to_send.Text)
 	})
-	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to GPT (smart)", func() {
+	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to the LLM (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -126,7 +132,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 	})
-	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to GPT (dumb)", func() {
+	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to the LLM (dumb)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -141,7 +147,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	})
 
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
-	response_text.SetPlaceHolder("Response from the assistant's LLM/GPT")
+	response_text.SetPlaceHolder("Response from the smart LLM")
 	response_text.Wrapping = fyne.TextWrapWord
 	response_text.SetMinRowsVisible(100)
 
