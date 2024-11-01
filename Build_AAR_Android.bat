@@ -8,6 +8,7 @@
 :: sure.
 mkdir bin
 gomobile bind^
+ -tags=client^
  -target=android^
  -x^
  -v^
