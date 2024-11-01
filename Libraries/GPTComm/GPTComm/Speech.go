@@ -75,8 +75,8 @@ func GetNextSpeechSentence() string {
 			return END_ENTRY
 		}
 
-		var response string = string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte))
-		if response == "start" {
+		var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+		if string(response) == "start" {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
 			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Device_settings_GL.Device_ID || device_id == ALL_DEVICES_ID) {
@@ -85,8 +85,10 @@ func GetNextSpeechSentence() string {
 				last_speech_GL = ""
 				ignore_sentence_GL = false
 			}
-		} else if response == "true" || response == "false" {
-			gpt_ready_GL = response
+		} else if string(response) == "true" || string(response) == "false" {
+			gpt_ready_GL = string(response)
+		} else {
+			compressed_memories_GL = response
 		}
 	}
 	if curr_entry_time_ms_GL == -1 {

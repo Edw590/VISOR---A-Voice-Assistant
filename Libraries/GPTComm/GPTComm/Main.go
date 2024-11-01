@@ -29,9 +29,12 @@ import (
 )
 
 var gpt_ready_GL string
+var compressed_memories_GL []byte
 
 /*
 SendText sends the given text to the LLM model.
+
+GetNextSpeechSentence() MUST BE IN LOOP BEFORE CALLING THIS FUNCTION!!!
 
 -----------------------------------------------------------
 
@@ -49,12 +52,52 @@ func SendText(text string, use_smart bool) bool {
 			strconv.FormatBool(use_smart) + "]" + text)...)
 	}
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, message)
-	time.Sleep(1 * time.Second)
+	time.Sleep(500 * time.Millisecond)
 
 	var ret = gpt_ready_GL == "true"
 	gpt_ready_GL = ""
 
 	return ret
+}
+
+/*
+GetMemories gets the memories from the GPT.
+
+GetNextSpeechSentence() MUST BE IN LOOP BEFORE CALLING THIS FUNCTION!!!
+
+-----------------------------------------------------------
+
+– Returns:
+  - the memories separated by new lines
+ */
+func GetMemories() string {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("JSON|true|GPTMem"))
+	time.Sleep(500 * time.Millisecond)
+
+	var bytes []byte = []byte(Utils.DecompressString(compressed_memories_GL))
+
+	var memories []string
+	if err := Utils.FromJsonGENERAL(bytes, &memories); err != nil {
+		return ""
+	}
+
+	return strings.Join(memories, "\n")
+}
+
+/*
+SetMemories sets the memories in the GPT.
+
+-----------------------------------------------------------
+
+– Params:
+  - json – the memories separated by new lines
+ */
+func SetMemories(memories_str string) {
+	var memories []string = strings.Split(memories_str, "\n")
+
+	var message []byte = []byte("S_JSON|GPTMem|")
+	message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(memories))...)
+	Utils.QueueNoResponseMessageSERVER(message)
 }
 
 /*

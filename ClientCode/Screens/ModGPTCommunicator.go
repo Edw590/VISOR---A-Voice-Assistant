@@ -39,7 +39,28 @@ func ModGPTCommunicator() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Communicator", gptCommunicatorCreateCommunicatorTab()),
 		container.NewTabItem("List of commands", gptCommunicatorCreateListCommandsTab()),
+		container.NewTabItem("Memories", gptCommunicatorCreateMemoriesTab()),
 		container.NewTabItem("Settings", gptCommunicatorCreateSettingsTab()),
+	)
+}
+
+func gptCommunicatorCreateMemoriesTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel("List of memories stored for the smart LLM, one per line:")
+
+	var memories_text *widget.Entry = widget.NewMultiLineEntry()
+	memories_text.SetPlaceHolder("Stored memories on the smart LLM")
+	memories_text.Wrapping = fyne.TextWrapWord
+	memories_text.SetMinRowsVisible(100)
+	memories_text.SetText(GPTComm.GetMemories())
+
+	var btn_save *widget.Button = widget.NewButton("Save memories", func() {
+		GPTComm.SetMemories(memories_text.Text)
+	})
+
+	return createMainContentScrollUTILS(
+		label_info,
+		btn_save,
+		memories_text,
 	)
 }
 

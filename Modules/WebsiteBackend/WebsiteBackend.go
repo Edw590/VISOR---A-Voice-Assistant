@@ -333,6 +333,8 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.Weather)
 				case "News":
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
+				case "GPTMem":
+					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}
@@ -352,6 +354,8 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			switch json_origin {
 				case "US":
 					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL)
+				case "GPTMem":
+					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.Gen_settings_GL.MOD_7.Memories)
 			}
 	}
 
