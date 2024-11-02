@@ -144,7 +144,7 @@ func init() {realMain =
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		content_container_GL = container.NewStack(Screens.Home())
+		content_container_GL = container.NewStack(Screens.ModGPTCommunicator())
 
 		Screens.Current_window_GL = my_window_GL
 		var nav_bar *widget.Tree = &widget.Tree{

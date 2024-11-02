@@ -134,15 +134,17 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
 	text_to_send.SetPlaceHolder(
-		"Text to send to VISOR (commands or normal text to the LLM)\n" +
+		"Text to send to VISOR (commands, or normal text to the smart LLM)\n" +
 		"- /clear to clear the context by restarting the LLMs\n" +
 		"- /stop to stop the LLM while it's generating text by restarting both\n" +
 		"- /mem to memorize the conversation\n" +
 		"- /memmem to summarize the list of memories (use with caution)\n",
 	)
+
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", text_to_send.Text)
 	})
+
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to the LLM (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. not connected to the server."
@@ -156,6 +158,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 	})
+
 	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to the LLM (dumb)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. not connected to the server."
