@@ -43,6 +43,11 @@ func Home() fyne.CanvasObject {
 }
 
 func homeCreateSettingsTab() *container.Scroll {
+	var entry_pin *widget.Entry = widget.NewPasswordEntry()
+	entry_pin.SetPlaceHolder("App protection PIN (any number of digits or empty to disable)")
+	entry_pin.SetText(Utils.User_settings_GL.General.Pin)
+	entry_pin.Validator = validation.NewRegexp(`^\d+$`, "PIN must be numberic")
+
 	var entry_visor_email_addr *widget.Entry = widget.NewEntry()
 	entry_visor_email_addr.SetPlaceHolder("V.I.S.O.R. email address")
 	entry_visor_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, "Invalid email address")
@@ -74,6 +79,7 @@ func homeCreateSettingsTab() *container.Scroll {
 	entry_picovoice_api_key.SetText(Utils.User_settings_GL.General.Picovoice_API_key)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		Utils.User_settings_GL.General.Pin = entry_pin.Text
 		Utils.User_settings_GL.General.VISOR_email_addr = entry_visor_email_addr.Text
 		Utils.User_settings_GL.General.VISOR_email_pw = entry_visor_email_pw.Text
 		Utils.User_settings_GL.General.User_email_addr = entry_user_email_addr.Text
@@ -84,6 +90,7 @@ func homeCreateSettingsTab() *container.Scroll {
 	})
 
 	return createMainContentScrollUTILS(
+		entry_pin,
 		entry_visor_email_addr,
 		entry_visor_email_pw,
 		entry_user_email_addr,

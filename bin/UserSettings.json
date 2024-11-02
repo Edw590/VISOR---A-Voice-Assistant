@@ -4,6 +4,8 @@
 	// The comments can stay. They're filtered by VISOR.
 
 	"General": {
+		// Pin is the numeric PIN to access the UIs
+		"Pin": "",
 		// VISOR_email_addr is VISOR's email address
 		"VISOR_email_addr": "visor@email.address",
 		// VISOR_email_pw is VISOR's email password

@@ -60,6 +60,9 @@ type UserSettings struct {
 ///////////////////////////////////////////////////////////////
 
 type _GeneralConsts struct {
+	// Pin is the numeric pin to access the UIs
+	Pin string
+
 	// VISOR_email_addr is VISOR's email address
 	VISOR_email_addr string
 	// VISOR_email_pw is VISOR's email password

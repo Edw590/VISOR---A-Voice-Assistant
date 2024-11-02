@@ -31,6 +31,8 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -44,8 +46,6 @@ import (
 
 var my_app_GL fyne.App = nil
 var my_window_GL fyne.Window = nil
-
-var prev_screen_GL string = ""
 
 var modules_GL []Utils.Module = nil
 
@@ -140,13 +140,17 @@ func init() {realMain =
 		my_app_GL.SetIcon(Logo.LogoBlackGmail)
 		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
 		my_window_GL.Resize(fyne.NewSize(640, 480))
+		Screens.Current_window_GL = my_window_GL
 
 		processCommsChannel()
 
 		// Create the content area with a label to display different screens
-		content_container_GL = container.NewStack(Screens.ModGPTCommunicator())
+		content_container_GL = container.NewStack()
 
-		Screens.Current_window_GL = my_window_GL
+		// Set the initial screen and lock the app right when it starts.
+		Screens.Current_screen_GL = Screens.ID_MOD_GPT_COMM
+		lockApp()
+
 		var nav_bar *widget.Tree = &widget.Tree{
 			ChildUIDs: func(uid string) []string {
 				return tree_index[uid]
@@ -168,7 +172,7 @@ func init() {realMain =
 				obj.(*widget.Label).SetText(t)
 			},
 			OnSelected: func(uid string) {
-				prepareScreen(uid)
+				showScreen(uid)
 			},
 		}
 
@@ -181,6 +185,16 @@ func init() {realMain =
 			}),
 			widget.NewButton("Auto", func() {
 				my_app_GL.Settings().SetTheme(theme.DefaultTheme())
+			}),
+			widget.NewButton("Lock", func() {
+				if Utils.User_settings_GL.General.Pin == "" {
+					dialog.ShowInformation("No PIN set", "You need to set a PIN in the settings to lock the app.",
+						my_window_GL)
+
+					return
+				}
+
+				lockApp()
 			}),
 		)
 
@@ -210,9 +224,6 @@ func init() {realMain =
 
 		// Minimize to tray on close
 		my_window_GL.SetCloseIntercept(func() {
-			// Store the previous screen before hiding
-			prev_screen_GL = Screens.Current_screen_GL
-			Screens.Current_screen_GL = ""
 			my_window_GL.Hide()
 
 			// Create and send one-time notification
@@ -242,8 +253,10 @@ func init() {realMain =
 	}
 }
 
-func prepareScreen(uid string) {
+func showScreen(uid string) {
 	switch uid {
+		case "":
+			content_container_GL.Objects = []fyne.CanvasObject{}
 		case Screens.ID_HOME:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.Home()}
 		case Screens.ID_MOD_MOD_MANAGER:
@@ -290,7 +303,7 @@ func processCommsChannel() {
 			} else if map_value, ok = comms_map["ShowApp"]; ok {
 				showWindow()
 			} else if map_value, ok = comms_map["Redraw"]; ok {
-				prepareScreen(Screens.Current_screen_GL)
+				showScreen(Screens.Current_screen_GL)
 			}
 		}
 	}()
@@ -321,10 +334,7 @@ func showWindow() {
 	my_window_GL.Show()
 	my_window_GL.RequestFocus()
 
-	// Restore the previous screen state
-	Screens.Current_screen_GL = prev_screen_GL
-
-	prepareScreen(Screens.Current_screen_GL)
+	lockApp()
 }
 
 func quitApp(modules []Utils.Module) {
@@ -332,4 +342,43 @@ func quitApp(modules []Utils.Module) {
 	Utils.SignalModulesStopMODULES(modules)
 
 	my_app_GL.Quit()
+}
+
+func lockApp() {
+	showScreen("")
+
+	createPinDialog(func() {
+		showScreen(Screens.Current_screen_GL)
+	})
+}
+
+func createPinDialog(callback func()) {
+	if Utils.User_settings_GL.General.Pin == "" {
+		callback()
+
+		return
+	}
+
+	var entry_pin *widget.Entry = widget.NewPasswordEntry()
+	entry_pin.SetPlaceHolder("PIN")
+	entry_pin.Validator = validation.NewRegexp(`^\d+$`, "PIN must be numberic")
+
+	var form_items []*widget.FormItem = []*widget.FormItem{
+		widget.NewFormItem("PIN", entry_pin),
+	}
+	dialog.ShowForm("Insert PIN", "Unlock", "Cancel", form_items, func(b bool) {
+		if !b {
+			my_window_GL.Hide()
+
+			return
+		}
+
+		if entry_pin.Text == Utils.User_settings_GL.General.Pin {
+			callback()
+		} else {
+			dialog.ShowInformation("Wrong PIN", "The PIN you entered is wrong.", my_window_GL)
+			time.Sleep(3 * time.Second)
+			my_window_GL.Hide()
+		}
+	}, my_window_GL)
 }
