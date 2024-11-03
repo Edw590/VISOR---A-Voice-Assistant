@@ -35,7 +35,7 @@ import (
 
 /*
  * This utility file encrypts and decrypts the given data using the method Scrypt-65536-8-1 + AES-256/CBC/PKCS#5 +
- * HMAC-SHA512 + UTF-7 + randomization.
+ * HMAC-SHA512.
  *
  * Additional information:
  * - Initialization Vector of 128 bits (16 bytes) for both AES-CBC-PKCS#5 and HMAC.
@@ -43,13 +43,6 @@ import (
  * - Key of 512 bits (64 bytes) to calculate the HMAC tag, which has a length of 512 bits (64 bytes).
  * - The keys are wiped from memory as soon as they're no longer needed.
  * - Constant-time preventions not taken in consideration.
- * - Data must be encoded in UTF-7 before being encrypted, and therefore, the result of the decryption will be UTF-7
- * encoded too.
- * - Random bytes with values from 128 to 255 are added to a random index between 0 and 15 each 16 bytes of the given
- * data (hence the UTF-7 encoding), to mitigate the issue that might happen if the IV is reused by chance, even though
- * it's generated using {@link SecureRandom}.
- * This may be unnecessary (https://crypto.stackexchange.com/questions/95061), but for now it's not causing issues. It
- * might be an issue if it starts being too much data to encrypt. In that case, this might be changed.
  *
  * Note: to calculate the keys for AES (256 bits) and HMAC (512 bits), the SHA-512 hashes of 2 passwords are used.
  * Those hashes are then used to calculate the keys using Scrypt (N = 65536; r = 8; p = 1).
@@ -133,7 +126,6 @@ func EncryptBytesCRYPTOENDECRYPT(raw_password1 []byte, raw_password2 []byte, raw
 		raw_aad_ready = getAADReady(raw_aad_suffix)
 	}
 
-	var randomized_raw_data []byte = randomizeData(raw_data)
 	iv, err := getIv()
 	keys, err := getKeys(raw_password1, raw_password2)
 	if err != nil {
@@ -145,7 +137,7 @@ func EncryptBytesCRYPTOENDECRYPT(raw_password1 []byte, raw_password2 []byte, raw
 		return nil
 	}
 
-	randomized_raw_data_padded := pkcs5Padding(randomized_raw_data, cipher_block.BlockSize())
+	randomized_raw_data_padded := pkcs5Padding(raw_data, cipher_block.BlockSize())
 
 	cipher_text := make([]byte, len(randomized_raw_data_padded))
 	cipher_block.CryptBlocks(cipher_text, randomized_raw_data_padded)
@@ -221,10 +213,10 @@ func DecryptBytesCRYPTOENDECRYPT(raw_password1 []byte, raw_password2 []byte, raw
 		return nil
 	}
 
-	randomized_raw_data_padded := make([]byte, len(cipher_text))
-	cipher_block.CryptBlocks(randomized_raw_data_padded, cipher_text)
+	raw_data_padded := make([]byte, len(cipher_text))
+	cipher_block.CryptBlocks(raw_data_padded, cipher_text)
 
-	return derandomizeData(pkcs5Unpadding(randomized_raw_data_padded))
+	return pkcs5Unpadding(raw_data_padded)
 }
 
 /*
