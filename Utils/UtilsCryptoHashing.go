@@ -19,9 +19,12 @@
  * under the License.
  ******************************************************************************/
 
-package UtilsSWA
+package Utils
 
-import "Utils"
+import (
+	"crypto/sha512"
+	"encoding/hex"
+)
 
 /*
 GetHashBytesOfBytesCRYPTOHASHING gets the byte array of the hash of the given byte array, calculated by the SHA-512
@@ -37,7 +40,10 @@ algorithm.
 
 */
 func GetHashBytesOfBytesCRYPTOHASHING(data []byte) []byte {
-	return Utils.GetHashBytesOfBytesCRYPTOHASHING(data)
+	hasher := sha512.New()
+	hasher.Write(data)
+
+	return hasher.Sum(nil)
 }
 
 /*
@@ -51,7 +57,9 @@ algorithm (eg. "32B4A667AA8F").
 
 – Returns:
   - the hash string
-*/
+ */
 func GetHashStringOfBytesCRYPTOHASHING(data []byte) string {
-	return Utils.GetHashStringOfBytesCRYPTOHASHING(data)
+	hash := sha512.Sum512(data)
+
+	return hex.EncodeToString(hash[:])
 }
