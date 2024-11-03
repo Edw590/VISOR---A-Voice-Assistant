@@ -622,51 +622,31 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_ModManager:
 			return true
 		case NUM_MOD_SMARTChecker:
-			// Check if the command "smartctl" is available
-			output, err := ExecCmdSHELL([]string{"smartctl{{EXE}} --version"})
-			if err != nil {
-				return false
-			}
-
-			return output.Exit_code == 0
+			return CheckTerminalProgramAvailable("smartctl")
 		case NUM_MOD_Speech:
 			return runtime.GOOS == "windows"
 		case NUM_MOD_RssFeedNotifier:
 			return true
 		case NUM_MOD_EmailSender:
-			// Check if the command "curl" is available
-			output, err := ExecCmdSHELL([]string{"curl{{EXE}} --version"})
-			if err != nil {
-				return false
-			}
-
-			return output.Exit_code == 0
+			return CheckTerminalProgramAvailable("curl")
 		case NUM_MOD_OnlineInfoChk:
-			// Check if the command "chromedriver" is available
-			output, err := ExecCmdSHELL([]string{"chromedriver{{EXE}} --version"})
-			if err != nil {
-				return false
-			}
-
-			return output.Exit_code == 0
+			return CheckTerminalProgramAvailable("chromedriver")
 		case NUM_MOD_GPTCommunicator:
 			if runtime.GOOS == "windows" {
 				return false
 			}
 
-			// Check if the command "llama-cli" is available
-			output, err := ExecCmdSHELL([]string{"llama-cli{{EXE}} --version"})
-			if err != nil {
-				return false
-			}
-
-			return output.Exit_code == 0
+			return CheckTerminalProgramAvailable("llama-cli")
 		case NUM_MOD_WebsiteBackend:
 			return true
 		case NUM_MOD_TasksExecutor:
 			return true
 		case NUM_MOD_SystemChecker:
-			return runtime.GOOS == "windows"
+			if runtime.GOOS == "windows" {
+				return true
+			}
+
+			return CheckTerminalProgramAvailable("amixer")
 		case NUM_MOD_SpeechRecognition:
 			return runtime.GOOS == "windows"
 		case NUM_MOD_UserLocator:

@@ -32,6 +32,8 @@ const _SETTINGS_PREFIX string = "MANUAL_"
 
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
+// Type: bool
+const K_MINIMIZE_TO_TRAY string = "MINIMIZE_TO_TRAY"
 
 // Speech
 
@@ -68,7 +70,6 @@ func RegisterValues() {
 	/////////////////////////////////////////////
 	// Automatic values
 
-	// Modules Manager
 	UtilsSWA.RegisterValueREGISTRY(K_MODULES_ACTIVE, "General - Modules active",
 		"The modules that are active (in binary)", UtilsSWA.TYPE_LONG, "", true)
 
@@ -90,6 +91,9 @@ func RegisterValues() {
 
 	/////////////////////////////////////////////
 	// Manual values
+
+	UtilsSWA.RegisterValueREGISTRY(K_MINIMIZE_TO_TRAY, "General - Minimize to tray",
+		"Whether to minimize to the system tray", UtilsSWA.TYPE_BOOL, "false", false)
 
 	// Speech
 	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_NORMAL_VOL, "Speech - Normal speech volume",

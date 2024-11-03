@@ -46,15 +46,31 @@ func speechCreateMainTab() *container.Scroll {
 	entry_txt_to_speech.SetPlaceHolder("Enter text to speak")
 	entry_txt_to_speech.SetText("This is an example.")
 	var btn_speak_min *widget.Button = widget.NewButton("Speak (min priority)", func() {
+		if !Utils.IsModSupportedMODULES(Utils.NUM_MOD_Speech) {
+			return
+		}
+
 		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_LOW, SpeechQueue.MODE_DEFAULT, "", 0)
 	})
 	var btn_speak_high *widget.Button = widget.NewButton("Speak (high priority)", func() {
+		if !Utils.IsModSupportedMODULES(Utils.NUM_MOD_Speech) {
+			return
+		}
+
 		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_HIGH, SpeechQueue.MODE_DEFAULT, "", 0)
 	})
 	var btn_speak_critical *widget.Button = widget.NewButton("Speak (critical priority)", func() {
+		if !Utils.IsModSupportedMODULES(Utils.NUM_MOD_Speech) {
+			return
+		}
+
 		Speech.QueueSpeech(entry_txt_to_speech.Text, SpeechQueue.PRIORITY_CRITICAL, SpeechQueue.MODE_DEFAULT, "", 0)
 	})
 	var btn_skip_speech *widget.Button = widget.NewButton("Skip current speech", func() {
+		if !Utils.IsModSupportedMODULES(Utils.NUM_MOD_Speech) {
+			return
+		}
+
 		Speech.SkipCurrentSpeech()
 	})
 

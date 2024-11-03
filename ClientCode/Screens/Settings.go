@@ -21,23 +21,30 @@
 
 package Screens
 
-import "fyne.io/fyne/v2"
+import (
+	"Utils/UtilsSWA"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"strings"
+)
 
-var Current_screen_GL string = ""
+func Settings() fyne.CanvasObject {
+	Current_screen_GL = ID_SETTINGS
 
-var Current_window_GL fyne.Window = nil
+	return container.NewAppTabs(
+		container.NewTabItem("Local settings", settingsCreateMainTab()),
+	)
+}
 
-var screens_size_GL fyne.Size = fyne.NewSize(550, 480)
+func settingsCreateMainTab() *container.Scroll {
+	var objects []fyne.CanvasObject = nil
+	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	for i := len(values) - 1; i >= 0; i-- {
+		var value *UtilsSWA.Value = values[i]
+		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, "General - ") {
+			objects = append(objects, createValueChooserUTILS(value))
+		}
+	}
 
-const ID_HOME string = "home"
-const ID_MOD_MOD_MANAGER string = "mod_manager"
-const ID_MOD_SPEECH string = "speech"
-const ID_MOD_RSS_FEED_NOTIFIER string = "rss_feed_notifier"
-const ID_MOD_GPT_COMM string = "gpt_comm"
-const ID_MOD_TASKS_EXECUTOR string = "tasks_executor"
-const ID_MOD_USER_LOCATOR string = "user_locator"
-const ID_ONLINE_INFO_CHK string = "online_info_chk"
-const ID_MOD_SYS_CHECKER string = "sys_checker"
-const ID_SMART_CHECKER string = "smart_checker"
-const ID_REGISTRY string = "registry"
-const ID_SETTINGS string = "settings"
+	return createMainContentScrollUTILS(objects...)
+}

@@ -1,3 +1,5 @@
+//go:build windows
+
 /*******************************************************************************
  * Copyright 2023-2024 The V.I.S.O.R. authors
  *
@@ -19,18 +21,20 @@
  * under the License.
  ******************************************************************************/
 
-//go:build windows
-
 package Utils
 
 import (
 	"github.com/itchyny/volume-go"
-	"github.com/lxn/win"
 	"golang.org/x/sys/windows"
 	"os/exec"
 	"strconv"
 	"syscall"
 )
+
+// https://learn.microsoft.com/en-us/windows/win32/wmicoreprov/wmimonitorbrightness
+type WmiMonitorBrightness struct {
+	CurrentBrightness uint8
+}
 
 /*
 RunningAsAdminPROCESSES checks if the program is running as administrator/root.
@@ -248,9 +252,31 @@ GetOSVersion gets the OS version.
 – Returns:
   - the major version
   - the minor version
- */
-func GetOSVersion() (int, int, int) {
+*/
+func GetOSVersionSYSTEM() (int, int, int) {
 	maj, min, patch := windows.RtlGetNtVersionNumbers()
 
 	return int(maj), int(min), int(patch)
+}
+
+/*
+GetScreenBrightnessSYSTEM gets the screen brightness.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the screen brightness (0-100) or -1 if it couldn't be retrieved
+ */
+func GetScreenBrightnessSYSTEM() int {
+	var dst []WmiMonitorBrightness
+	err := wmi.QueryNamespace("SELECT CurrentBrightness FROM WmiMonitorBrightness", &dst, "root/wmi")
+	if err != nil {
+		return -1
+	}
+
+	if len(dst) > 0 {
+		return int(dst[0].CurrentBrightness)
+	}
+
+	return -1
 }

@@ -30,7 +30,6 @@ import (
 	"github.com/go-vgo/robotgo"
 	"github.com/itchyny/volume-go"
 	"github.com/schollz/wifiscan"
-	"github.com/yusufpapurcu/wmi"
 	"runtime"
 	"strings"
 	"time"
@@ -49,11 +48,6 @@ type _Battery struct {
 type _MousePosition struct {
 	x int
 	y int
-}
-
-// https://learn.microsoft.com/en-us/windows/win32/wmicoreprov/wmimonitorbrightness
-type WmiMonitorBrightness struct {
-	CurrentBrightness uint8
 }
 
 var (
@@ -102,7 +96,10 @@ func init() {realMain =
 			}
 
 			// Monitor information
-			var screen_brightness int = getBrightness(device_info_GL.System_state.Monitor_info.Brightness)
+			var screen_brightness int = Utils.GetScreenBrightnessSYSTEM()
+			if screen_brightness == -1 {
+				screen_brightness = device_info_GL.System_state.Monitor_info.Brightness
+			}
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetInt(int32(screen_brightness), false)
 
 			device_info_GL.System_state.Monitor_info = ModsFileInfo.MonitorInfo{
@@ -153,20 +150,6 @@ func getBatteryInfo() _Battery {
 		power_connected: b.State.Raw != battery.Discharging,
 		level:           int(b.Current / b.Full * 100),
 	}
-}
-
-func getBrightness(prev int) int {
-	var dst []WmiMonitorBrightness
-	err := wmi.QueryNamespace("SELECT CurrentBrightness FROM WmiMonitorBrightness", &dst, "root/wmi")
-	if err != nil {
-		return prev
-	}
-
-	if len(dst) > 0 {
-		return int(dst[0].CurrentBrightness)
-	}
-
-	return prev
 }
 
 func getSoundVolume(prev int) int {
@@ -257,13 +240,13 @@ func setWifiEnabled(enabled bool) bool {
 		if enabled {
 			cmd_output, err = Utils.ExecCmdSHELL([]string{"netsh interface set interface name=Wi-Fi admin=enabled"})
 		} else {
-			cmd_output, err  = Utils.ExecCmdSHELL([]string{"netsh interface set interface name=Wi-Fi admin=disabled"})
+			cmd_output, err = Utils.ExecCmdSHELL([]string{"netsh interface set interface name=Wi-Fi admin=disabled"})
 		}
 	} else {
 		if enabled {
-			cmd_output, err  = Utils.ExecCmdSHELL([]string{"nmcli radio wifi on"})
+			cmd_output, err = Utils.ExecCmdSHELL([]string{"nmcli radio wifi on"})
 		} else {
-			cmd_output, err  = Utils.ExecCmdSHELL([]string{"nmcli radio wifi off"})
+			cmd_output, err = Utils.ExecCmdSHELL([]string{"nmcli radio wifi off"})
 		}
 	}
 

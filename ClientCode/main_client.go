@@ -25,6 +25,7 @@ import (
 	"ModulesManager"
 	"SettingsSync/SettingsSync"
 	"Utils"
+	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
@@ -46,6 +47,8 @@ import (
 
 var my_app_GL fyne.App = nil
 var my_window_GL fyne.Window = nil
+
+var quitting_GL bool = false
 
 var modules_GL []Utils.Module = nil
 
@@ -94,7 +97,7 @@ func init() {realMain =
 		if !Utils.WasArgUsedGENERAL(os.Args, "--nohide") {
 			// All mainly alright, let's hide the terminal window
 			if runtime.GOOS == "windows" {
-				maj, min, patch := Utils.GetOSVersion()
+				maj, min, patch := Utils.GetOSVersionSYSTEM()
 				if maj >= 10 && min >= 0 && patch >= 19041 {
 					// Restart the process with conhost.exe on Windows to be able to actually hide the window if we're
 					// on Windows 10 Build 2004 or newer (because of the new Windows Terminal).
@@ -224,6 +227,12 @@ func init() {realMain =
 
 		// Minimize to tray on close
 		my_window_GL.SetCloseIntercept(func() {
+			if !UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MINIMIZE_TO_TRAY).GetBool(true) {
+				quitApp(modules_GL)
+
+				return
+			}
+
 			my_window_GL.Hide()
 
 			// Create and send one-time notification
@@ -279,6 +288,8 @@ func showScreen(uid string) {
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSMARTChecker()}
 		case Screens.ID_REGISTRY:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.Registry()}
+		case Screens.ID_SETTINGS:
+			content_container_GL.Objects = []fyne.CanvasObject{Screens.Settings()}
 	}
 	content_container_GL.Refresh()
 }
@@ -338,6 +349,11 @@ func showWindow() {
 }
 
 func quitApp(modules []Utils.Module) {
+	if quitting_GL {
+		return
+	}
+	quitting_GL = true
+
 	Utils.CloseCommsChannels()
 	Utils.SignalModulesStopMODULES(modules)
 
@@ -368,7 +384,7 @@ func createPinDialog(callback func()) {
 	}
 	dialog.ShowForm("Insert PIN", "Unlock", "Cancel", form_items, func(b bool) {
 		if !b {
-			my_window_GL.Hide()
+			lockApp()
 
 			return
 		}
@@ -377,8 +393,7 @@ func createPinDialog(callback func()) {
 			callback()
 		} else {
 			dialog.ShowInformation("Wrong PIN", "The PIN you entered is wrong.", my_window_GL)
-			time.Sleep(3 * time.Second)
-			my_window_GL.Hide()
+			lockApp()
 		}
 	}, my_window_GL)
 }

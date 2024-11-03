@@ -26,6 +26,7 @@ package Utils
 import (
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -127,4 +128,68 @@ func ToggleNetworkingCONNECTIVITY(enable bool) bool {
 	}
 
 	return cmd_output.Exit_code == 0
+}
+
+/*
+SetVolumeVOLUME sets the system volume.
+
+-----------------------------------------------------------
+
+– Params:
+  - vol – the volume to set (0-100)
+
+– Returns:
+  - true if the operation was successful, false otherwise
+ */
+func SetVolumeVOLUME(vol int) bool {
+	return CheckCmdOutput(ExecCmdSHELL([]string{"amixer -c 0 set Master playback " + strconv.Itoa(vol) + "%"}))
+}
+
+/*
+SetMutedVOLUME mutes or unmutes the system volume.
+
+-----------------------------------------------------------
+
+– Params:
+  - mute – true to mute the volume, false to unmute it
+
+– Returns:
+  - true if the operation was successful, false otherwise
+*/
+func SetMutedVOLUME(mute bool) bool {
+	var mute_unmmute string = "unmute"
+	if mute {
+		mute_unmmute = "mute"
+	}
+
+	return CheckCmdOutput(ExecCmdSHELL([]string{"amixer -c 0 set Master playback " + mute_unmmute}))
+}
+
+/*
+GetOSVersion gets the OS version.
+
+NOT IMPLEMENTED IN LINUX!
+
+-----------------------------------------------------------
+
+– Returns:
+  - the major version
+  - the minor version
+*/
+func GetOSVersionSYSTEM() (int, int, int) {
+	return -1, -1, -1
+}
+
+/*
+GetScreenBrightnessSYSTEM gets the screen brightness.
+
+NOT IMPLEMENTED IN LINUX!
+
+-----------------------------------------------------------
+
+– Returns:
+  - the screen brightness (0-100) or -1 if it couldn't be retrieved
+*/
+func GetScreenBrightnessSYSTEM() int {
+	return -1
 }

@@ -176,3 +176,26 @@ func GetShellSHELL(windows_shell string, linux_shell string) string {
 
 	return shell
 }
+
+/*
+CheckTerminalProgramAvailable checks if a terminal program is available in the system.
+
+-----------------------------------------------------------
+
+– Params:
+  - program_name – the name of the program to check
+
+– Returns:
+  - true if the program is available, false otherwise
+ */
+func CheckTerminalProgramAvailable(program_name string) bool {
+	var cmd_output CmdOutput
+	var err error
+	if runtime.GOOS == "windows" {
+		cmd_output, err = ExecCmdSHELL([]string{"where " + program_name + "{{EXE}}"})
+	} else {
+		cmd_output, err = ExecCmdSHELL([]string{"which " + program_name})
+	}
+
+	return CheckCmdOutput(cmd_output, err)
+}
