@@ -1,5 +1,3 @@
-//go:build windows
-
 /*******************************************************************************
  * Copyright 2023-2024 The V.I.S.O.R. authors
  *
@@ -21,10 +19,14 @@
  * under the License.
  ******************************************************************************/
 
+//go:build windows
+
 package Utils
 
 import (
 	"github.com/itchyny/volume-go"
+	"github.com/lxn/win"
+	"github.com/yusufpapurcu/wmi"
 	"golang.org/x/sys/windows"
 	"os/exec"
 	"strconv"
