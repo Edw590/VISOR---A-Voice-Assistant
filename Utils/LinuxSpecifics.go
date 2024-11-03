@@ -142,7 +142,7 @@ SetVolumeVOLUME sets the system volume.
   - true if the operation was successful, false otherwise
  */
 func SetVolumeVOLUME(vol int) bool {
-	return CheckCmdOutput(ExecCmdSHELL([]string{"amixer -c 0 set Master playback " + strconv.Itoa(vol) + "%"}))
+	return CheckCmdOutput(ExecCmdSHELL([]string{"amixer set Master " + strconv.Itoa(vol) + "%"}))
 }
 
 /*
@@ -162,7 +162,7 @@ func SetMutedVOLUME(mute bool) bool {
 		mute_unmmute = "mute"
 	}
 
-	return CheckCmdOutput(ExecCmdSHELL([]string{"amixer -c 0 set Master playback " + mute_unmmute}))
+	return CheckCmdOutput(ExecCmdSHELL([]string{"amixer set Master " + mute_unmmute}))
 }
 
 /*

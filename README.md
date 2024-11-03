@@ -70,10 +70,10 @@ Check on the modules list if they work for your operating system first!
 | GPT Communicator           | The `llama-cli` (llama.cpp project) program must be on the PATH.
 | Online Information Checker | The `chromedriver` program must be on the PATH.
 | S.M.A.R.T. Checker         | The `smartctl` program must be on the PATH.
-| Speech                     | It's recommended that the `nircmdc` program be on the PATH.
+| Speech                     | For Linux, the `festival` program must be on the PATH. For Windows, it's recommended that the `nircmdc` program be on the PATH.
 
 #### Supported OSes
-- Unix-like systems except MacOS (I don't test the client on it though, only the server)
+- Unix-like systems except MacOS (I don't test the client very much on it though, only the server)
 - Windows (but I don't test the server on it, only the client)
 
 **NOTE:** if you want full VISOR functionality on Windows with the server, run it in WSL (Win10+ only) and not natively on Windows. It will work just fine. If you do this, copy the GGUF file into WSL or it will load VERY slowly.

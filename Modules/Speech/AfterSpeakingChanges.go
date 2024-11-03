@@ -41,7 +41,8 @@ func speechTreatment(speech_id string) {
 	var next_speech *SpeechQueue.Speech = SpeechQueue.GetNextSpeech(-1)
 	log.Println("next_speech != nil?", next_speech != nil)
 	if next_speech != nil {
-		if volume_mute_done_GL && (last_speech == nil && next_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL) ||
+		if volume_mute_done_GL && ((last_speech == nil || last_speech.GetPriority() != SpeechQueue.PRIORITY_CRITICAL) &&
+					next_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL) ||
 				(last_speech != nil && last_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL) {
 			// This if statement is for when a CRITICAL speech comes after or came before the current speech. In that
 			// case, the volume/mute state may be changed because of the CRITICAL speech. So we have to reset it before

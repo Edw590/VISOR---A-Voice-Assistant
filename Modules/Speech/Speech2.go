@@ -32,9 +32,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/Edw590/sapi-go"
-	"github.com/go-ole/go-ole"
 )
 
 type _VolumeDndState struct {
@@ -72,8 +69,6 @@ var curr_speech_GL *SpeechQueue.Speech = nil
 
 var mutex sync.Mutex
 
-var tts_GL *sapi.Sapi = nil
-
 var (
 	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
@@ -83,20 +78,7 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		_ = ole.CoInitialize(0)
-		defer ole.CoUninitialize()
-
-		if tts, err := sapi.NewSapi(); err != nil {
-			panic(err)
-		} else {
-			tts_GL = tts
-		}
-		_ = tts_GL.SetRate(0)
-		_ = tts_GL.SetVolume(100)
-
-		// Leave this here. It's necessary for the TTS to work on Windows 7. Might be related to bad usage of
-		// ole.CoInitialize() which is only for single-threaded applications.
-		_, _ = tts_GL.Speak("", sapi.SVSFDefault)
+		initTts()
 
 		processVolumeChanges()
 
@@ -112,7 +94,7 @@ func init() {realMain =
 					var notified bool = rightBeforeSpeaking(curr_speech.GetID())
 					log.Println("Notified:", notified)
 
-					if _, err := tts_GL.Speak(curr_speech.GetText(), sapi.SVSFDefault); err != nil {
+					if err := speak(curr_speech.GetText()); err != nil {
 						log.Println("Error speaking speech:", err)
 						if !notified {
 							Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
@@ -212,8 +194,9 @@ func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, 
 		// stops temporarily to give place to the new one.
 		if priority > curr_speech_GL.GetPriority() {
 			log.Println("Priority: " + strconv.Itoa(int(priority)) + " > " + strconv.Itoa(int(curr_speech_GL.GetPriority())))
-			higher_priority_came_GL = true
-			stopTts()
+			if stopTts() {
+				higher_priority_came_GL = true
+			}
 		}
 	}
 }
@@ -228,15 +211,4 @@ SkipCurrentSpeech skips the current speech.
  */
 func SkipCurrentSpeech() bool {
 	return stopTts()
-}
-
-func stopTts() bool {
-	_, err := tts_GL.Skip(50) // Equivalent to stopping all speeches it seems
-	if err != nil {
-		//log.Println("Error stopping speech: ", err)
-
-		return false
-	}
-
-	return true
 }

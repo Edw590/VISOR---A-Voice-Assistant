@@ -624,7 +624,11 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_SMARTChecker:
 			return CheckTerminalProgramAvailable("smartctl")
 		case NUM_MOD_Speech:
-			return runtime.GOOS == "windows"
+			if runtime.GOOS == "windows" {
+				return true
+			}
+
+			return CheckTerminalProgramAvailable("festival")
 		case NUM_MOD_RssFeedNotifier:
 			return true
 		case NUM_MOD_EmailSender:
