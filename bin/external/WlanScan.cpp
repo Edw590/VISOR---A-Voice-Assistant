@@ -1,4 +1,4 @@
-//Got from https://superuser.com/a/1436051/719714.
+// Got it from https://superuser.com/a/1436051/719714.
 
 #include <tchar.h>
 #include <Windows.h>

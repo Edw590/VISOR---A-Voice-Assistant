@@ -1,0 +1,2 @@
+If VISOR says OpenGL isn't supported on your computer, go to the right folder and copy the DLL to the bin folder and
+execute VISOR again - it might be slower than it should, but at least will launch.
