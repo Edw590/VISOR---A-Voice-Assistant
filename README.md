@@ -51,8 +51,8 @@ This began as a Python project (in 2020), but even using an IDE got the project 
 - Download this main project and the Advanced Commands Detection module (`git clone --recursive [repo link here] VISOR`). For the server, just go to the `ServerCode` folder and run the command `go build -tags=server .`. Finally move the file to the `bin` folder. Then for the client:
   - [Install Fyne](https://docs.fyne.io/started/)
   - About portaudio:
-  - - On Windows in MSYS2, install the portaudio package (for Windows x64, the package is [this one](https://packages.msys2.org/packages/mingw-w64-x86_64-portaudio))
-  - - On Debian, install the portaudio19-dev package
+  - - On Windows in MSYS2, install the `portaudio` package (for Windows x64, the package is [this one](https://packages.msys2.org/packages/mingw-w64-x86_64-portaudio))
+  - - On Debian, install the `portaudio19-dev` package
   - - In others I didn't check, but it should be similar to the Debian one I guess
   - Go to the `ClientCode` folder and run the command `go build -tags=client .` (it will take some time the first time)
   - Move the file to the `bin` folder

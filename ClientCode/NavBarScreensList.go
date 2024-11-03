@@ -36,7 +36,6 @@ var screens_GL = map[string]string{
 	Screens.ID_MOD_SYS_CHECKER:       "System Checker",
 	Screens.ID_SMART_CHECKER:         "S.M.A.R.T. Checker",
 	Screens.ID_REGISTRY:              "Registry",
-	Screens.ID_SETTINGS:              "General settings",
 }
 
 // tree_index defines how the screens should be laid out in the index tree
@@ -53,6 +52,5 @@ var tree_index = map[string][]string{
 		Screens.ID_MOD_SYS_CHECKER,
 		Screens.ID_SMART_CHECKER,
 		Screens.ID_REGISTRY,
-		Screens.ID_SETTINGS,
 	},
 }

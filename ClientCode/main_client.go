@@ -288,8 +288,6 @@ func showScreen(uid string) {
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.ModSMARTChecker()}
 		case Screens.ID_REGISTRY:
 			content_container_GL.Objects = []fyne.CanvasObject{Screens.Registry()}
-		case Screens.ID_SETTINGS:
-			content_container_GL.Objects = []fyne.CanvasObject{Screens.Settings()}
 	}
 	content_container_GL.Refresh()
 }

@@ -24,12 +24,14 @@ package Screens
 import (
 	"SettingsSync/SettingsSync"
 	"Utils"
+	"Utils/UtilsSWA"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
+	"strings"
 	"time"
 )
 
@@ -39,7 +41,21 @@ func Home() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Main", homeCreateHomeTab()),
 		container.NewTabItem("Settings", homeCreateSettingsTab()),
+		container.NewTabItem("Local settings", homeCreateLocalSettingsTab()),
 	)
+}
+
+func homeCreateLocalSettingsTab() *container.Scroll {
+	var objects []fyne.CanvasObject = nil
+	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	for i := len(values) - 1; i >= 0; i-- {
+		var value *UtilsSWA.Value = values[i]
+		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, "General - ") {
+			objects = append(objects, createValueChooserUTILS(value))
+		}
+	}
+
+	return createMainContentScrollUTILS(objects...)
 }
 
 func homeCreateSettingsTab() *container.Scroll {
