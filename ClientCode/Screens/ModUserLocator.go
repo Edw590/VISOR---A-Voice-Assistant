@@ -39,6 +39,24 @@ func ModUserLocator() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Locations list", userLocatorCreateLocationsListTab()),
 		container.NewTabItem("Add location", userLocatorCreateAddLocationTab()),
+		container.NewTabItem("Settings", userLocatorCreateSettingsTab()),
+	)
+}
+
+func userLocatorCreateSettingsTab() *container.Scroll {
+	var entry_always_with_device *widget.Entry = widget.NewEntry()
+	entry_always_with_device.SetPlaceHolder("ID of the device always with the user (user's phone for example) or " +
+		"empty if none")
+	entry_always_with_device.SetText(Utils.User_settings_GL.UserLocator.AlwaysWith_device)
+
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		Utils.User_settings_GL.UserLocator.AlwaysWith_device = entry_always_with_device.Text
+	})
+	btn_save.Importance = widget.SuccessImportance
+
+	return createMainContentScrollUTILS(
+		entry_always_with_device,
+		btn_save,
 	)
 }
 
