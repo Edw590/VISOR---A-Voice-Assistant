@@ -1,28 +1,16 @@
 {
-	// NOTICE: Rename this file to "UserSettings_EOG.json" and fill in your values (I have examples here).
-	// Place it on the server's bin folder. The client will retrieve it from the server and keep it updated locally.
-	// The comments can stay. They're filtered by VISOR.
-
 	"General": {
-		// Pin is the numeric PIN to access the UIs
 		"Pin": "",
-		// VISOR_email_addr is VISOR's email address
 		"VISOR_email_addr": "visor@email.address",
-		// VISOR_email_pw is VISOR's email password
 		"VISOR_email_pw": "a_2fa_password",
 
-		// User_email_addr is the email address of the user, used for all email communication
 		"User_email_addr": "your@email.address",
 
-		// Website_domain is the domain of the VISOR server (or your IP address if you don't have a domain)
 		"Website_domain": "localhost",
-		// Website_pw is the password for the VISOR server
 		"Website_pw": "a_random_letters_and_numbers_strong_password",
 
-		// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
 		"WolframAlpha_AppID": "999999-9999999999",
 
-		// Picovoice_API_key is the API key for the Picovoice API
 		"Picovoice_API_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/56yHGr565RTttt=="
 	},
 	"SMARTChecker": {
@@ -30,43 +18,25 @@
 			{
 				"Id": "DISK_SERIAL_HERE",
 				"Label": "A label for the disk",
-				// True if the disk is an HDD (the ones that have a disk spinning inside)
 				"Is_HDD": true
 			}
 		]
 	},
 	"RSSFeedNotifier": {
 		"Mails_to": [
-			// List of emails to send all the notifications to.
-
 			"some@email.address",
 			"another@email.address"
 		],
 		"Feeds_info": [
-			// Format notes:
-			// - The "Feed_num" is used to be the ID of the feed and is used as file name for the feed's notified URLs.
-			//   Doesn't need to be set in order, can be any random number, just needs to be unique.
-			// - The "Feed_type" is used to identify the type of feed.
-			//   - For YouTube feeds, it's "YouTube [CH|PL] [+S]". "CH" for channel, "PL" for playlist, "+S" to include
-			//     Shorts in the notifications. For the rest, it's "General".
-			// - The "Feed_url" is the URL of the feed. For YouTube feeds, it is the channel/playlist ID.
-			// - The "Custom_msg_subject" is the custom message subject for the feed. If it is empty, the default message
-			//   subject will be used. For YouTube feeds, the default is based on the feed type.
-
-			// ---------- StackExchange ----------
-			{// Reverse Engineering Stack Exchange
+			{
 				"Feed_num": 1,
 				"Feed_enabled": true,
 				"Feed_name": "Reverse Engineering (Stack Exchange)",
 				"Feed_type": "General",
 				"Feed_url": "https://reverseengineering.stackexchange.com/feeds",
-				"Custom_msg_subject": "New post in Reverse Engineering (Stack Exchange)"},
-
-
-			// ---------- YouTube ----------
-			// ----- Channels -----
-
-			{// ElectroBOOM
+				"Custom_msg_subject": "New post in Reverse Engineering (Stack Exchange)"
+			},
+			{
 				"Feed_num": 2,
 				"Feed_enabled": true,
 				"Feed_name": "ElectroBOOM",
@@ -74,10 +44,7 @@
 				"Feed_url": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
 				"Custom_msg_subject": ""
 			},
-
-			// ----- Playlists -----
-
-			{// PROJECT: MJOLNIR --> Installation00
+			{
 				"Feed_num": 3,
 				"Feed_enabled": true,
 				"Feed_name": "PROJECT: MJOLNIR --> Installation00",
@@ -89,38 +56,25 @@
 	},
 	"OnlineInfoChk": {
 		"Temp_locs": [
-			// List of cities to get the weather from
 			"Lisbon"
 		],
 		"News_locs": [
-			// List of places to get the news from
 			"Europe",
 			"Portugal",
 			"Lisbon"
 		]
 	},
 	"GPTCommunicator": {
-		// GGUF model file location for the smart LLM, meaning the main one to be used for chat and normal conversation
-		// (supported models are Llama3.1 or 3.2)
 		"Model_smart_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
-		// GGUF model file location for the "dumb" LLM, meaning the one to be used to request to summarize sentences
-		// (supported models are Llama3.1 or 3.2)
 		"Model_dumb_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
-		// LLM system information, like the cutting knowledge date and today's date. "3234_YEAR" will be replaced by the
-		// current year.
 		"System_info": "Cutting Knowledge Date: December 2023. Today Date: 3234_WEEKDAY, 3234_DAY 3234_MONTH 3234_YEAR.",
-		// User nickname to be used by the LLM
 		"User_nickname": "Sir"
 	},
 	"WebsiteBackend": {
-		// Path to the SSL certificate cert file for the HTTPS server
 		"Crt_file": "/etc/ssl/certs/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.crt",
-		// Path to the SSL certificate key file for the HTTPS server
 		"Key_file": "/etc/ssl/private/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.key"
 	},
 	"TasksExecutor": {
-		// The available variables are all the ones in the Registry, in lower case (example: battery_level (int)).
-		// Put the booleans inside "bool()", like the examples below.
 		"Tasks": [
 			{
 				"Id": 10,
@@ -251,22 +205,14 @@
 		]
 	},
 	"UserLocator": {
-		// AlwaysWith_device_id is the ID of the device that the user always has with them, if any
 		"AlwaysWith_device_id": "MyPhone",
 		"Locs_info": [
 			{
-				// Type can be "wifi" or "bluetooth"
 				"Type": "wifi",
-				// Name is the name of the network (optional if you insert an Address)
 				"Name": "Wifi-Name",
-				// Address is the MAC address of the network (optional if you insert a Name)
 				"Address": "XX:XX:XX:XX:XX:XX",
-				// Last_detection is how long the network may not be found but the user may still be in the location
 				"Last_detection_s": 0,
-				// Max_distance is the maximum distance in meters the user can be from the network router to be
-				// considered to in the location
 				"Max_distance_m": 10,
-				// Location is the location name the network is associated with
 				"Location": "home_lisbon"
 			}
 		]

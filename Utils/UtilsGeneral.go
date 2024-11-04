@@ -22,16 +22,13 @@
 package Utils
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
 	"time"
 	"unsafe"
 
-	"github.com/dchest/jsmin"
 	"github.com/ztrue/tracerr"
 )
 
@@ -146,14 +143,9 @@ All the needed fields of the struct must be exported like with json.Marshal().
   - the JSON string, or nil if the data could not be converted
 */
 func ToJsonGENERAL(v any) *string {
-	json_data, err := json.Marshal(v)
+	json_data, err := json.MarshalIndent(v, "", "\t")
 	if nil != err {
 		return nil
-	}
-
-	var dst bytes.Buffer
-	if json.Indent(&dst, json_data, "", "\t") == nil {
-		json_data = dst.Bytes()
 	}
 
 	var json_str string = string(json_data)
@@ -166,9 +158,6 @@ FromJsonGENERAL minifies and parses the given JSON data.
 
 All the needed fields of the struct must be exported like with json.Marshal().
 
-This function supports minifying the JSON data and removing the last commas of JSON file (possibly rendering the JSON
-invalid).
-
 -----------------------------------------------------------
 
 – Params:
@@ -179,31 +168,7 @@ invalid).
   - true if the data was parsed correctly, false otherwise
 */
 func FromJsonGENERAL(json_data []byte, parsed_data any) error {
-	if json_data == nil {
-		return errors.New("the JSON data is nil")
-	}
-
-	var json_final []byte = json_data
-	for {
-		var json_min, err = jsmin.Minify(json_final)
-		if err == nil {
-			json_final = json_min
-		} else {
-			// If the minifier fails, try to parse the original JSON (probably won't work, but I'll let Unmarshal()
-			// decide).
-		}
-
-		if err = json.Unmarshal(json_final, parsed_data); err != nil {
-			// Remove the last comma after the last element of the JSON array and try again (in case the problem is
-			// a trailing comma somewhere).
-			if !DelElemSLICES(&json_final, strings.LastIndex(string(json_final), ",")) {
-				// No more commas to remove
-				return err
-			}
-		} else {
-			return nil
-		}
-	}
+	return json.Unmarshal(json_data, parsed_data)
 }
 
 /*

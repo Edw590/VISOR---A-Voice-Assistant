@@ -1,12 +1,5 @@
 {
-	// NOTICE: Rename this file to "DeviceSettings_EOG.json" and fill in your values (I have examples here).
-	// The comments can stay. They're filtered by VISOR.
-
-	// Device_ID is the device ID of the current device
 	"Device_ID": "MyComputer",
-	// Device_type is the type of the device (phone, computer, etc. - you choose the name)
 	"Device_type": "computer",
-	// Device_description is a description of the device ("personal computer", or the computer model, etc - don't
-	// include "my" or others)
 	"Device_description": "Legion Y520"
 }
