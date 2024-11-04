@@ -55,6 +55,7 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 		Utils.Password_GL = entry_password.Text
 		_ = Utils.DeletePasswordCREDENTIALS()
 	})
+	btn_save_temp.Importance = widget.SuccessImportance
 
 	var btn_save_perm *widget.Button = widget.NewButton("Save permanently", func() {
 		Utils.Password_GL = entry_password.Text
@@ -64,6 +65,7 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 			_ = Utils.SavePasswordCREDENTIALS(entry_password.Text)
 		}
 	})
+	btn_save_perm.Importance = widget.HighImportance
 
 	var entry_device_id *widget.Entry = widget.NewEntry()
 	entry_device_id.SetPlaceHolder("Unique device ID (for example \"MyComputer\")")
@@ -82,6 +84,7 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 		Utils.Gen_settings_GL.Device_settings.Type_ = entry_device_type.Text
 		Utils.Gen_settings_GL.Device_settings.Description = entry_device_description.Text
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	var objects []fyne.CanvasObject = []fyne.CanvasObject{
 		entry_password,
@@ -150,6 +153,7 @@ func homeCreateSettingsTab() *container.Scroll {
 		Utils.User_settings_GL.General.WolframAlpha_AppID = entry_wolframalpha_appid.Text
 		Utils.User_settings_GL.General.Picovoice_API_key = entry_picovoice_api_key.Text
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	return createMainContentScrollUTILS(
 		entry_pin,

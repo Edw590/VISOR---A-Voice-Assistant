@@ -66,7 +66,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 	var entry_custom_msg_subject *widget.Entry = widget.NewEntry()
 	entry_custom_msg_subject.SetPlaceHolder("Custom message subject (for YT it's automatic)")
 
-	var button_save *widget.Button = widget.NewButton("Add", func() {
+	var btn_add *widget.Button = widget.NewButton("Add", func() {
 		Utils.User_settings_GL.RSSFeedNotifier.Feeds_info = append(Utils.User_settings_GL.RSSFeedNotifier.Feeds_info,
 			ModsFileInfo.FeedInfo{
 			Feed_num:           feed_num,
@@ -87,7 +87,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 		entry_feed_type,
 		entry_feed_url,
 		entry_custom_msg_subject,
-		button_save,
+		btn_add,
 	)
 }
 
@@ -133,6 +133,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 		feed_info.Feed_url = entry_url.Text
 		feed_info.Custom_msg_subject = entry_custom_msg_subject.Text
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {

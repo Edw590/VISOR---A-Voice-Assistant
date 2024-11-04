@@ -99,7 +99,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 	}
 
 	repeat_each_min, _ := strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
-	var button_save *widget.Button = widget.NewButton("Add", func() {
+	var btn_add *widget.Button = widget.NewButton("Add", func() {
 		Utils.User_settings_GL.TasksExecutor.Tasks = append(Utils.User_settings_GL.TasksExecutor.Tasks,
 			ModsFileInfo.Task{
 				Id:                     task_id,
@@ -128,7 +128,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 		entry_repeat_each_min,
 		entry_user_location,
 		entry_programmable_condition,
-		button_save,
+		btn_add,
 	)
 }
 
@@ -209,6 +209,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		task.User_location = entry_user_location.Text
 		task.Programmable_condition = entry_programmable_condition.Text
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this task?", func(confirmed bool) {

@@ -51,7 +51,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 	var check_is_hdd *widget.Check = widget.NewCheck("Is it an HDD? (As opposed to an SSD)", nil)
 	check_is_hdd.SetChecked(true)
 
-	var button_save *widget.Button = widget.NewButton("Add", func() {
+	var btn_add *widget.Button = widget.NewButton("Add", func() {
 		for _, disk := range Utils.User_settings_GL.SMARTChecker.Disks_info {
 			if disk.Id == entry_id.Text {
 				err := errors.New("disk ID already exists")
@@ -75,7 +75,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 		entry_id,
 		entry_label,
 		check_is_hdd,
-		button_save,
+		btn_add,
 	)
 }
 
@@ -103,6 +103,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {

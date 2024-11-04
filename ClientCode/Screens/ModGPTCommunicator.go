@@ -56,6 +56,7 @@ func gptCommunicatorCreateMemoriesTab() *container.Scroll {
 	var btn_save *widget.Button = widget.NewButton("Save memories", func() {
 		GPTComm.SetMemories(memories_text.Text)
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	return createMainContentScrollUTILS(
 		label_info,
@@ -118,6 +119,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 		Utils.User_settings_GL.GPTCommunicator.System_info = entry_system_info.Text
 		Utils.User_settings_GL.GPTCommunicator.User_nickname = entry_user_nickname.Text
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	return createMainContentScrollUTILS(
 		label_supported_models,

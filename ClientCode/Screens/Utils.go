@@ -76,13 +76,16 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 		content = append(content, check)
 	}
 
-	content = append(content, widget.NewButton("Save", func() {
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		if entry != nil {
 			value.SetData(entry.Text, false)
 		} else if check != nil {
 			value.SetBool(check.Checked, false)
 		}
-	}))
+	})
+	btn_save.Importance = widget.SuccessImportance
+
+	content = append(content, btn_save)
 
 	var space *widget.Label = widget.NewLabel("")
 

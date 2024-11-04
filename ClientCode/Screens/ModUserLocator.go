@@ -75,7 +75,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 
 	last_detection_s, _ := strconv.ParseInt(entry_last_detection_s.Text, 10, 64)
 	max_distance, _ := strconv.ParseInt(entry_max_distance.Text, 10, 32)
-	var button_save *widget.Button = widget.NewButton("Add", func() {
+	var btn_add *widget.Button = widget.NewButton("Add", func() {
 		Utils.User_settings_GL.UserLocator.Locs_info = append(Utils.User_settings_GL.UserLocator.Locs_info, ModsFileInfo.LocInfo{
 			Type: entry_type.Text,
 			Name: entry_name.Text,
@@ -95,7 +95,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 		entry_last_detection_s,
 		entry_max_distance,
 		entry_location_name,
-		button_save,
+		btn_add,
 	)
 }
 
@@ -154,6 +154,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		loc_info.Max_distance_m, _ = strconv.Atoi(entry_max_distance.Text)
 		loc_info.Location = entry_location_name.Text
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this location?", func(confirmed bool) {

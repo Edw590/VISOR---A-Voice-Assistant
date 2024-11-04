@@ -110,9 +110,9 @@ func init() {realMain =
 				}
 				var test_type int = NO_TEST
 				if !no_test {
-					if time.Now().Unix()-disk_gen_info[LONG_TEST] > _LONG_TEST_EACH_S {
+					if time.Now().Unix() - disk_gen_info[LONG_TEST] >= _LONG_TEST_EACH_S && time.Now().Day() == 1 {
 						test_type = LONG_TEST
-					} else if time.Now().Unix()-disk_gen_info[SHORT_TEST] > _SHORT_TEST_EACH_S {
+					} else if time.Now().Unix() - disk_gen_info[SHORT_TEST] >= _SHORT_TEST_EACH_S {
 						test_type = SHORT_TEST
 					} else {
 						//log.Println("Time has not passed yet for the tests to be executed.")
@@ -159,7 +159,7 @@ func init() {realMain =
 						}
 						var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_INFO, things_replace)
 						email_info.Subject = test_type_str + " test could NOT be started on " + disk_user_info.Label
-						Utils.QueueEmailEMAIL(email_info)
+						_ = Utils.QueueEmailEMAIL(email_info)
 
 						//log.Println(msg_body)
 
@@ -178,14 +178,14 @@ func init() {realMain =
 						"started on " + date_time_begin + ".\n\n" +
 						"Test duration : " + strconv.Itoa(test_time) + " minutes.\n\n" +
 						"The results will be ready on or before " +
-						Utils.GetDateTimeStrTIMEDATE(millis_begin+int64(test_time)*60*1000) + "."
+						Utils.GetDateTimeStrTIMEDATE(millis_begin + int64(test_time)*60*1000) + "."
 					var things_replace = map[string]string{
 						Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrTIMEDATE(-1),
 						Utils.MODEL_INFO_MSG_BODY_EMAIL:  msg_body,
 					}
 					var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_INFO, things_replace)
 					email_info.Subject = test_type_str + " test started on " + disk_user_info.Label
-					Utils.QueueEmailEMAIL(email_info)
+					_ = Utils.QueueEmailEMAIL(email_info)
 					//log.Println("Notice email queued")
 
 					/////////////////////////////////////////////////////////
@@ -226,7 +226,7 @@ func init() {realMain =
 
 				var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_DISKS_SMART, things_replace)
 				email_info.Subject = "S.M.A.R.T. report on " + disk_user_info.Label
-				Utils.QueueEmailEMAIL(email_info)
+				_ = Utils.QueueEmailEMAIL(email_info)
 				//log.Println("Report email queued")
 			}
 

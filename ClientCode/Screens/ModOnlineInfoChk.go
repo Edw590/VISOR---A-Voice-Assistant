@@ -52,6 +52,7 @@ func onlineInfoChkCreateSettingsTab() *container.Scroll {
 		Utils.User_settings_GL.OnlineInfoChk.Temp_locs = strings.Split(entry_weather_locs.Text, "\n")
 		Utils.User_settings_GL.OnlineInfoChk.News_locs = strings.Split(entry_news_locs.Text, "\n")
 	})
+	btn_save.Importance = widget.SuccessImportance
 
 	return createMainContentScrollUTILS(
 		entry_weather_locs,
