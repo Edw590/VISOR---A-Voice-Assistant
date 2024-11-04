@@ -27,9 +27,9 @@ import (
 	"os"
 )
 
-const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
-const GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
-const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.json"
+const USER_SETTINGS_FILE string = "UserSettings_EOG.dat"
+const GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.dat"
+const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.dat"
 
 // User_settings_GL is the global variable that holds the user settings. It is saved to the USER_SETTINGS_FILE file
 // every 5 seconds.
