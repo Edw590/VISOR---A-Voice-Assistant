@@ -22,6 +22,7 @@
 package Screens
 
 import (
+	"SettingsSync/SettingsSync"
 	"TEHelper/TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
@@ -30,7 +31,6 @@ import (
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -45,7 +45,7 @@ func ModTasksExecutor() fyne.CanvasObject {
 }
 
 func tasksExecutorCreateAddTaskTab() *container.Scroll {
-	var tasks []ModsFileInfo.Task = TEHelper.GetTasks()
+	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
 	var task_id int = 1
 	for i := 0; i < len(tasks); i++ {
 		if tasks[i].Id == task_id {
@@ -100,19 +100,9 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 
 	repeat_each_min, _ := strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
-		Utils.User_settings_GL.TasksExecutor.Tasks = append(Utils.User_settings_GL.TasksExecutor.Tasks,
-			ModsFileInfo.Task{
-				Id:                     task_id,
-				Enabled:                check_enabled.Checked,
-				Device_active:          check_device_active.Checked,
-				Device_IDs:             strings.Split(entry_device_ids.Text, "\n"),
-				Message:                entry_message.Text,
-				Command:                entry_command.Text,
-				Time:                   entry_time.Text,
-				Repeat_each_min:        repeat_each_min,
-				User_location:          entry_user_location.Text,
-				Programmable_condition: entry_programmable_condition.Text,
-		})
+		SettingsSync.AddTaskTASKS(check_enabled.Checked, check_device_active.Checked, entry_device_ids.Text,
+			entry_message.Text, entry_command.Text, entry_time.Text, repeat_each_min, entry_user_location.Text,
+			entry_programmable_condition.Text)
 
 		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
@@ -135,10 +125,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 func tasksExecutorCreateTasksListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var tasks []ModsFileInfo.Task = TEHelper.GetTasks()
-	sort.Slice(tasks, func(i, j int) bool {
-		return tasks[i].Id < tasks[j].Id
-	})
+	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
 	for i := 0; i < len(tasks); i++ {
 		var task *ModsFileInfo.Task = &tasks[i]
 		var title = task.Message
