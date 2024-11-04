@@ -30,10 +30,10 @@ const _SETTINGS_PREFIX string = "MANUAL_"
 /////////////////////////////////////////////////////////////////////////////
 // Automatic values
 
+// General
+
 // Type: int64
 const K_MODULES_ACTIVE string = "MODULES_ACTIVE"
-// Type: bool
-const K_MINIMIZE_TO_TRAY string = "MINIMIZE_TO_TRAY"
 
 // Speech
 
@@ -55,6 +55,13 @@ const K_SOUND_MUTED string = "SOUND_MUTED"
 
 /////////////////////////////////////////////////////////////////////////////
 // Manual values
+
+// General
+
+// Type: bool
+const K_MINIMIZE_TO_TRAY string = _SETTINGS_PREFIX + "MINIMIZE_TO_TRAY"
+
+// Speech
 
 // Type: int
 const K_SPEECH_NORMAL_VOL string = _SETTINGS_PREFIX + "SPEECH_NORMAL_VOL"
