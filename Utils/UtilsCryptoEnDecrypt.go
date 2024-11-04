@@ -60,8 +60,7 @@ const _HMAC_KEY_SIZE int = 64              // 512 bits --> ALWAYS AT LEAST THE O
 const _INIT_LEN_ENCRYPTED_MSG int = 1 + _IV_LENGTH_BYTES + 1 + _HMAC_TAG_LENGTH_BYTES
 
 const _RAW_AAD_SEPARATOR_STR string = " \\\\\\/// "
-var _RAW_AAD_PREFIX [] byte = []byte("Scrypt-65536-8-1 + AES-256/CBC/PKCS#5 + HMAC-SHA512 + UTF-7 + randomization" +
-	_RAW_AAD_SEPARATOR_STR)
+var _RAW_AAD_PREFIX [] byte = []byte("Scrypt-65536-8-1 + AES-256/CBC/PKCS#5 + HMAC-SHA512" + _RAW_AAD_SEPARATOR_STR)
 
 // Scrypt parameters - tested a bit slow on MiTab Advance and slower on BV9500 (wtf). Good enough, I think.
 // Memory required to calculate the keys: 128 * N * r * p --> 128 * 8_192 * 8 * 1 = 8_388_608 B = 8.4 MB
@@ -99,8 +98,7 @@ const _SCRYPT_P int = 1
 
 
 /*
-EncryptBytesCRYPTOENDECRYPT encrypts the given data using the parameters defined on the file doc (encode with UTF-7
-first).
+EncryptBytesCRYPTOENDECRYPT encrypts the given data using the parameters defined on the file doc.
 
 Check if the device is running low on memory before calling this function! It needs some memory to calculate the keys!
 
@@ -112,7 +110,7 @@ the same order they were entered!
 – Params:
   - raw_password1 – the first character sequence to calculate the 2 keys from
   - raw_password2 – the second character sequence to calculate the 2 keys from
-  - raw_data – the data to encrypt encoded in UTF-7
+  - raw_data – the data to encrypt
   - raw_aad_suffix – additional not encrypted metadata suffix to include in the encrypted message, right after
     _RAW_AAD_PREFIX; nil if not to be used
 
@@ -155,8 +153,7 @@ func EncryptBytesCRYPTOENDECRYPT(raw_password1 []byte, raw_password2 []byte, raw
 }
 
 /*
-DecryptBytesCRYPTOENDECRYPT decrypts the given data using the parameters defined on the file doc (decode with UTF-7
-afterwards).
+DecryptBytesCRYPTOENDECRYPT decrypts the given data using the parameters defined on the file doc.
 
 Check if the device is running low on memory before calling this function! It needs some memory to calculate the keys!
 
@@ -168,7 +165,7 @@ the same order they were entered!
 – Params:
   - raw_password1 – the first character sequence to calculate the 2 keys from
   - raw_password2 – the second character sequence to calculate the 2 keys from
-  - raw_data – the data to encrypt encoded in UTF-7
+  - raw_data – the data to encrypt
   - raw_aad_suffix – the associated authenticated data suffix used with the encrypted message; or nil if not to be used
 
 – Returns:

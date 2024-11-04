@@ -24,8 +24,7 @@ package UtilsSWA
 import "Utils"
 
 /*
-EncryptBytesCRYPTOENDECRYPT encrypts the given data using the parameters defined on the file doc (encode with UTF-7
-first).
+EncryptBytesCRYPTOENDECRYPT encrypts the given data using the parameters defined on the file doc.
 
 Check if the device is running low on memory before calling this function! It needs some memory to calculate the keys!
 
@@ -37,7 +36,7 @@ the same order they were entered!
 – Params:
   - raw_password1 – the first character sequence to calculate the 2 keys from
   - raw_password2 – the second character sequence to calculate the 2 keys from
-  - raw_data – the data to encrypt encoded in UTF-7
+  - raw_data – the data to encrypt
   - raw_aad_suffix – additional not encrypted metadata suffix to include in the encrypted message, right after
     _RAW_AAD_PREFIX; nil if not to be used
 
@@ -50,8 +49,7 @@ func EncryptBytesCRYPTOENDECRYPT(raw_password1 []byte, raw_password2 []byte, raw
 }
 
 /*
-DecryptBytesCRYPTOENDECRYPT decrypts the given data using the parameters defined on the file doc (decode with UTF-7
-afterwards).
+DecryptBytesCRYPTOENDECRYPT decrypts the given data using the parameters defined on the file doc.
 
 Check if the device is running low on memory before calling this function! It needs some memory to calculate the keys!
 
@@ -63,7 +61,7 @@ the same order they were entered!
 – Params:
   - raw_password1 – the first character sequence to calculate the 2 keys from
   - raw_password2 – the second character sequence to calculate the 2 keys from
-  - raw_data – the data to encrypt encoded in UTF-7
+  - raw_data – the data to encrypt
   - raw_aad_suffix – the associated authenticated data suffix used with the encrypted message; or nil if not to be used
 
 – Returns:

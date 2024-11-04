@@ -32,10 +32,19 @@ const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
 const GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
 const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.json"
 
+// Device_settings_GL is the global variable that holds the device settings. Its file is read once at the start of the
+// program.
 var Device_settings_GL DeviceSettings
+// User_settings_GL is the global variable that holds the user settings. It is saved to the USER_SETTINGS_FILE file
+// every 5 seconds.
 var User_settings_GL UserSettings
+// Gen_settings_GL is the global variable that holds the general settings. It is saved to the GEN_SETTINGS_FILE_CLIENT
+// file every 5 seconds.
 var Gen_settings_GL GenSettings
+
 var VISOR_server_GL bool = false
+
+var Password_GL string = ""
 
 type DeviceSettings struct {
 	// Device_ID is the device ID of the current device
@@ -123,7 +132,12 @@ func WriteUserSettings() bool {
 		return false
 	}
 
-	if err := os.WriteFile(USER_SETTINGS_FILE, []byte(*p_string), 0777); err != nil {
+	var to_write []byte = []byte(*p_string)
+	if Password_GL != "" {
+		to_write = EncryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), to_write, nil)
+	}
+
+	if err := os.WriteFile(USER_SETTINGS_FILE, to_write, 0777); err != nil {
 		return false
 	}
 
@@ -133,7 +147,7 @@ func WriteUserSettings() bool {
 ///////////////////////////////////////////////////////////////
 
 /*
-loadGenSettings is the function that initializes the global variables of the GenSettings struct.
+readGenSettings is the function that initializes the global variables of the GenSettings struct.
 
 -----------------------------------------------------------
 
@@ -143,7 +157,7 @@ loadGenSettings is the function that initializes the global variables of the Gen
 – Returns:
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
-func loadGenSettings(server bool) error {
+func readGenSettings(server bool) error {
 	var settings_file string = GEN_SETTINGS_FILE_CLIENT
 	if server {
 		settings_file = _GEN_SETTINGS_FILE_SERVER
@@ -157,7 +171,12 @@ func loadGenSettings(server bool) error {
 		return errors.New("no " + settings_file + " file found in the current working directory: \"" + cwd + "\" - aborting")
 	}
 
-	if err := FromJsonGENERAL(bytes, &Gen_settings_GL); err != nil {
+	var to_read []byte = bytes
+	if Password_GL != "" {
+		to_read = DecryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), bytes, nil)
+	}
+
+	if err = FromJsonGENERAL(to_read, &Gen_settings_GL); err != nil {
 		return err
 	}
 
@@ -182,7 +201,12 @@ func writeGenSettings(server bool) bool {
 		return false
 	}
 
-	if err := os.WriteFile(settings_file, []byte(*p_string), 0777); err != nil {
+	var to_write []byte = []byte(*p_string)
+	if Password_GL != "" {
+		to_write = EncryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), to_write, nil)
+	}
+
+	if err := os.WriteFile(settings_file, to_write, 0777); err != nil {
 		return false
 	}
 

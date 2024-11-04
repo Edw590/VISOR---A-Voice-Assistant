@@ -254,6 +254,7 @@ GetOSVersion gets the OS version.
 – Returns:
   - the major version
   - the minor version
+  - the patch version
 */
 func GetOSVersionSYSTEM() (int, int, int) {
 	maj, min, patch := windows.RtlGetNtVersionNumbers()
