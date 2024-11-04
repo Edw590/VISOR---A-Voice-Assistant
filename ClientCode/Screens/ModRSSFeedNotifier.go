@@ -26,6 +26,7 @@ import (
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"sort"
 	"strconv"
@@ -125,7 +126,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 	entry_custom_msg_subject.SetText(feed_info.Custom_msg_subject)
 	entry_custom_msg_subject.SetPlaceHolder("Custom message subject (for YT it's automatic)")
 
-	var button_save *widget.Button = widget.NewButton("Save", func() {
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		feed_info.Feed_enabled = check_enabled.Checked
 		feed_info.Feed_name = entry_name.Text
 		feed_info.Feed_type = entry_type.Text
@@ -133,7 +134,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 		feed_info.Custom_msg_subject = entry_custom_msg_subject.Text
 	})
 
-	var button_delete *widget.Button = widget.NewButton("Delete", func() {
+	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {
 			if confirmed {
 				Utils.DelElemSLICES(&Utils.User_settings_GL.RSSFeedNotifier.Feeds_info, feed_idx)
@@ -152,8 +153,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 		entry_type,
 		entry_url,
 		entry_custom_msg_subject,
-		button_save,
-		button_delete,
+		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
 		space,
 	)
 }

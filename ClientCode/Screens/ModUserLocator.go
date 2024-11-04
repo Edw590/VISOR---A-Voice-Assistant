@@ -27,6 +27,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"strconv"
 )
@@ -145,7 +146,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 	entry_location_name.SetPlaceHolder("Location name")
 	entry_location_name.SetText(loc_info.Location)
 
-	var button_save *widget.Button = widget.NewButton("Save", func() {
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		loc_info.Type = entry_type.Text
 		loc_info.Name = entry_name.Text
 		loc_info.Address = entry_address.Text
@@ -154,7 +155,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		loc_info.Location = entry_location_name.Text
 	})
 
-	var button_delete *widget.Button = widget.NewButton("Delete", func() {
+	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this location?", func(confirmed bool) {
 			if confirmed {
 				Utils.DelElemSLICES(&Utils.User_settings_GL.UserLocator.Locs_info, loc_info_idx)
@@ -173,8 +174,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		entry_last_detection_s,
 		entry_max_distance,
 		entry_location_name,
-		button_save,
-		button_delete,
+		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
 		space,
 	)
 }

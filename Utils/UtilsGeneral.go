@@ -25,6 +25,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strings"
@@ -225,7 +226,7 @@ GetInputString reads a string from the standard input.
   - the string read from the standard input
 */
 func GetInputString(prompt string) string {
-	fmt.Print(prompt)
+	log.Print(prompt)
 	str, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		return ""

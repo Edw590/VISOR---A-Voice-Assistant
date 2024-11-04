@@ -28,6 +28,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"sort"
 	"strconv"
@@ -197,7 +198,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		return err
 	}
 
-	var button_save *widget.Button = widget.NewButton("Save", func() {
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		task.Enabled = check_enabled.Checked
 		task.Device_active = check_device_active.Checked
 		task.Device_IDs = strings.Split(entry_device_ids.Text, "\n")
@@ -209,7 +210,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		task.Programmable_condition = entry_programmable_condition.Text
 	})
 
-	var button_delete *widget.Button = widget.NewButton("Delete", func() {
+	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
 			if confirmed {
 				Utils.DelElemSLICES(&Utils.User_settings_GL.TasksExecutor.Tasks, task_idx)
@@ -232,8 +233,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		entry_repeat_each_min,
 		entry_user_location,
 		entry_programmable_condition,
-		button_save,
-		button_delete,
+		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
 		space,
 	)
 }

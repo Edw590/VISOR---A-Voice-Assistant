@@ -28,6 +28,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -98,12 +99,12 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 	var check_is_hdd *widget.Check = widget.NewCheck("Is it an HDD? (As opposed to an SSD)", nil)
 	check_is_hdd.SetChecked(disk.Is_HDD)
 
-	var button_save *widget.Button = widget.NewButton("Save", func() {
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
 	})
 
-	var button_delete *widget.Button = widget.NewButton("Delete", func() {
+	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
 			if confirmed {
 				Utils.DelElemSLICES(&Utils.User_settings_GL.SMARTChecker.Disks_info, disk_idx)
@@ -119,8 +120,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 		label_id,
 		entry_label,
 		check_is_hdd,
-		button_save,
-		button_delete,
+		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
 		space,
 	)
 }
