@@ -145,7 +145,7 @@ func formatCondition(condition string) string {
 }
 
 func checkProgrammableCondition(task ModsFileInfo.Task) bool {
-	var conds_were_true map[int]bool = modGenInfo_GL.Conds_were_true
+	var conds_were_true map[int32]bool = modGenInfo_GL.Conds_were_true
 
 	var condition bool = false
 	if task.Programmable_condition != "" {

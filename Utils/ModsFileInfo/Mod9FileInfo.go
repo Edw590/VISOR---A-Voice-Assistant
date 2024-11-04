@@ -24,9 +24,9 @@ package ModsFileInfo
 // Mod9GenInfo is the format of the custom generated information about this specific module.
 type Mod9GenInfo struct {
 	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
-	Tasks_info map[int]int64
+	Tasks_info map[int32]int64
 	// Conds_were_true maps the task ID to whether its programmable condition was true
-	Conds_were_true map[int]bool
+	Conds_were_true map[int32]bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ type Mod9UserInfo struct {
 // Task is the format of a task
 type Task struct {
 	// Id is the task ID
-	Id 		    int
+	Id 		    int32
 	// Enabled is whether the task is enabled
 	Enabled     bool
 	// Device_active is whether the device must be active to trigger the task

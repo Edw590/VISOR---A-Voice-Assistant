@@ -53,10 +53,10 @@ This function will block until a Task is due. When that happens, the Task is ret
  */
 func CheckDueTasks() *ModsFileInfo.Task {
 	if modGenInfo_GL.Tasks_info == nil {
-		modGenInfo_GL.Tasks_info = make(map[int]int64)
+		modGenInfo_GL.Tasks_info = make(map[int32]int64)
 	}
 	if modGenInfo_GL.Conds_were_true == nil {
-		modGenInfo_GL.Conds_were_true = make(map[int]bool)
+		modGenInfo_GL.Conds_were_true = make(map[int32]bool)
 	}
 
 	var task_return ModsFileInfo.Task
@@ -117,7 +117,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			}
 
 			condition_time, test_time_min := checkTime(task)
-			
+
 			var condition_loc bool = false
 			if task.User_location == "" {
 				condition_loc = true
