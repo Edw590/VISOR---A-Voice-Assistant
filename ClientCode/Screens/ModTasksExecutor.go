@@ -133,16 +133,22 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 }
 
 func tasksExecutorCreateTasksListTab() *container.Scroll {
-	var objects []fyne.CanvasObject = nil
+	var accordion *widget.Accordion = widget.NewAccordion()
+	accordion.MultiOpen = true
 	var tasks []ModsFileInfo.Task = TEHelper.GetTasks()
 	sort.Slice(tasks, func(i, j int) bool {
 		return tasks[i].Id < tasks[j].Id
 	})
 	for i := 0; i < len(tasks); i++ {
-		objects = append(objects, createTaskSetter(&tasks[i], i))
+		var task *ModsFileInfo.Task = &tasks[i]
+		var title = task.Message
+		if title == "" {
+			title = task.Command
+		}
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createTaskSetter(task, i)))
 	}
 
-	return createMainContentScrollUTILS(objects...)
+	return createMainContentScrollUTILS(accordion)
 }
 
 func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
@@ -222,8 +228,6 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 	})
 	btn_delete.Importance = widget.DangerImportance
 
-	var space *widget.Label = widget.NewLabel("")
-
 	return container.NewVBox(
 		label_id,
 		check_enabled,
@@ -236,6 +240,5 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 		entry_user_location,
 		entry_programmable_condition,
 		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
-		space,
 	)
 }

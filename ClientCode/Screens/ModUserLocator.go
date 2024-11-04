@@ -29,6 +29,7 @@ import (
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"sort"
 	"strconv"
 )
 
@@ -100,13 +101,23 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 }
 
 func userLocatorCreateLocationsListTab() *container.Scroll {
-	var objects []fyne.CanvasObject = nil
+	var accordion *widget.Accordion = widget.NewAccordion()
+	accordion.MultiOpen = true
 	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
+	sort.Slice(locs_info, func(i, j int) bool {
+		return locs_info[i].Location < locs_info[j].Location
+	})
 	for i := 0; i < len(locs_info); i++ {
-		objects = append(objects, createLocationSetter(&locs_info[i], i))
+		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
+		var title = loc_info.Name
+		if title == "" {
+			title = loc_info.Address
+		}
+		title = loc_info.Location + " - " + title
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createLocationSetter(loc_info, i)))
 	}
 
-	return createMainContentScrollUTILS(objects...)
+	return createMainContentScrollUTILS(accordion)
 }
 
 func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyne.Container {
@@ -167,8 +178,6 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 	})
 	btn_delete.Importance = widget.DangerImportance
 
-	var space *widget.Label = widget.NewLabel("")
-
 	return container.NewVBox(
 		entry_type,
 		entry_name,
@@ -177,6 +186,5 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		entry_max_distance,
 		entry_location_name,
 		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
-		space,
 	)
 }

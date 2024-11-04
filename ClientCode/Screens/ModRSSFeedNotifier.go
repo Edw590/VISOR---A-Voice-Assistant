@@ -92,16 +92,19 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 }
 
 func rssFeedNotifierCreateFeedsListTab() *container.Scroll {
-	var objects []fyne.CanvasObject = nil
+	var accordion *widget.Accordion = widget.NewAccordion()
+	accordion.MultiOpen = true
 	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
 	sort.Slice(feeds_info, func(i, j int) bool {
 		return feeds_info[i].Feed_num < feeds_info[j].Feed_num
 	})
 	for i := 0; i < len(feeds_info); i++ {
-		objects = append(objects, createFeedInfoSetter(&feeds_info[i], i))
+		var feed_info ModsFileInfo.FeedInfo = feeds_info[i]
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(feed_info.Feed_name),
+			createFeedInfoSetter(&feeds_info[i], i)))
 	}
 
-	return createMainContentScrollUTILS(objects...)
+	return createMainContentScrollUTILS(accordion)
 }
 
 func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.Container {
@@ -146,8 +149,6 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 	})
 	btn_delete.Importance = widget.DangerImportance
 
-	var space *widget.Label = widget.NewLabel("")
-
 	return container.NewVBox(
 		label_id,
 		check_enabled,
@@ -156,6 +157,5 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 		entry_url,
 		entry_custom_msg_subject,
 		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
-		space,
 	)
 }

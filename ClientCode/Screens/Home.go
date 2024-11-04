@@ -24,7 +24,6 @@ package Screens
 import (
 	"SettingsSync/SettingsSync"
 	"Utils"
-	"Utils/UtilsSWA"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -32,7 +31,6 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
-	"strings"
 	"time"
 )
 
@@ -86,23 +84,15 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 	})
 	btn_save.Importance = widget.SuccessImportance
 
-	var objects []fyne.CanvasObject = []fyne.CanvasObject{
+	return createMainContentScrollUTILS(
 		entry_password,
 		container.New(layout.NewGridLayout(2), btn_save_temp, btn_save_perm),
 		entry_device_id,
 		entry_device_type,
 		entry_device_description,
 		btn_save,
-	}
-	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
-	for i := 0; i < len(values); i++ {
-		var value *UtilsSWA.Value = values[i]
-		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, "General - ") {
-			objects = append(objects, createValueChooserUTILS(value))
-		}
-	}
-
-	return createMainContentScrollUTILS(objects...)
+		createValuesChooserAccordionUTILS("General - "),
+	)
 }
 
 func homeCreateSettingsTab() *container.Scroll {

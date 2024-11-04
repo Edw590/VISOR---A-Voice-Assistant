@@ -25,11 +25,9 @@ import (
 	"Speech"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
-	"Utils/UtilsSWA"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"strings"
 )
 
 func ModSpeech() fyne.CanvasObject {
@@ -88,16 +86,8 @@ func speechCreateSettingsTab() *container.Scroll {
 		_, _ = Utils.ExecCmdSHELL([]string{"control.exe C:\\Windows\\System32\\Speech\\SpeechUX\\sapi.cpl"})
 	})
 
-	var objects []fyne.CanvasObject = []fyne.CanvasObject{
+	return createMainContentScrollUTILS(
 		btn_config_tts,
-	}
-	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
-	for i := len(values) - 1; i >= 0; i-- {
-		var value *UtilsSWA.Value = values[i]
-		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, "Speech - ") {
-			objects = append(objects, createValueChooserUTILS(value))
-		}
-	}
-
-	return createMainContentScrollUTILS(objects...)
+		createValuesChooserAccordionUTILS("Speech - "),
+	)
 }

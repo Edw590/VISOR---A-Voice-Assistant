@@ -32,6 +32,23 @@ import (
 	"strings"
 )
 
+func createValuesChooserAccordionUTILS(prefix string) *widget.Accordion {
+	var accordion *widget.Accordion = widget.NewAccordion()
+	accordion.MultiOpen = true
+	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
+	for i := len(values) - 1; i >= 0; i-- {
+		var value *UtilsSWA.Value = values[i]
+		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, prefix) {
+			accordion.Append(widget.NewAccordionItem(
+				trimAccordionTitleUTILS(value.Pretty_name[strings.Index(value.Pretty_name, "-") + 1:]),
+				createValueChooserUTILS(value),
+			))
+		}
+	}
+
+	return accordion
+}
+
 func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 	var label *widget.Label = widget.NewLabel(
 		"Name: " + value.Pretty_name[strings.Index(value.Pretty_name, "-") + 1:] +
@@ -87,10 +104,6 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 
 	content = append(content, btn_save)
 
-	var space *widget.Label = widget.NewLabel("")
-
-	content = append(content, space)
-
 	return container.NewVBox(
 		content...
 	)
@@ -112,4 +125,12 @@ func createConfirmationUTILS(message string, callback func(bool)) *dialog.Confir
 	cnf.Show()
 
 	return cnf
+}
+
+func trimAccordionTitleUTILS(title string) string {
+	if len(title) > 60 {
+		return title[:60] + "..."
+	}
+
+	return title
 }

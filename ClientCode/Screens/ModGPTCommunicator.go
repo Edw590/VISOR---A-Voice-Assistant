@@ -45,7 +45,8 @@ func ModGPTCommunicator() fyne.CanvasObject {
 }
 
 func gptCommunicatorCreateMemoriesTab() *container.Scroll {
-	var label_info *widget.Label = widget.NewLabel("List of memories stored for the smart LLM, one per line:")
+	var label_info *widget.Label = widget.NewLabel("List of memories stored for the smart LLM, one per line " +
+		"(maximize the window):")
 
 	var memories_text *widget.Entry = widget.NewMultiLineEntry()
 	memories_text.SetPlaceHolder("Stored memories on the smart LLM")
