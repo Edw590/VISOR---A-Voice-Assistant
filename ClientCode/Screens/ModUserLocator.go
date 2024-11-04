@@ -164,6 +164,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 			}
 		})
 	})
+	btn_delete.Importance = widget.DangerImportance
 
 	var space *widget.Label = widget.NewLabel("")
 

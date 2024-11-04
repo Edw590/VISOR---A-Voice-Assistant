@@ -113,6 +113,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 			}
 		})
 	})
+	btn_delete.Importance = widget.DangerImportance
 
 	var space *widget.Label = widget.NewLabel("")
 

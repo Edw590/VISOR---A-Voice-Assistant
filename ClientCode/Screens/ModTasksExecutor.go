@@ -219,6 +219,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 			}
 		})
 	})
+	btn_delete.Importance = widget.DangerImportance
 
 	var space *widget.Label = widget.NewLabel("")
 

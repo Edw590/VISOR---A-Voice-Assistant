@@ -143,6 +143,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo, feed_idx int) *fyne.
 			}
 		})
 	})
+	btn_delete.Importance = widget.DangerImportance
 
 	var space *widget.Label = widget.NewLabel("")
 
