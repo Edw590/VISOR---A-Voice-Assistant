@@ -22,7 +22,6 @@
 package Utils
 
 import (
-	"bufio"
 	"errors"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/shirou/gopsutil/v4/process"
@@ -199,11 +198,6 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		Password_GL = GetPasswordCREDENTIALS()
 
-		if err := readDeviceSettings(); err != nil {
-			log.Println("CRITICAL ERROR: Error obtaining device settings - aborting")
-			panic(err)
-		}
-
 		readGenSettingsInternal := func() bool {
 			if err := readGenSettings(server); err != nil {
 				log.Println("warning: Error obtaining generated settings - aborting")
@@ -211,11 +205,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 				log.Println("Overwrite settings with empty file? Press ENTER to overwrite, write the password in case " +
 					"the settings have been encrypted, or press Ctrl+C to abort.")
-				password, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-				password = password[:len(password)-1]
-				if strings.HasSuffix(password, "\r") {
-					password = password[:len(password)-1]
-				}
+				var password string = GetInputString("")
 				if password != "" {
 					Password_GL = password
 
@@ -229,19 +219,8 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 		}
 
 		go func() {
-			// Keep reloading the device settings and saving the generated settings global variables in case it's MOD_0
-			// that's running.
+			// Keep saving the generated settings global variables in case it's MOD_0 that's running.
 			for {
-				// Always reload the device settings
-				err := readDeviceSettings()
-				if err != nil {
-					module.Stop = true
-
-					log.Println("warning: Error obtaining device settings - aborting")
-
-					break
-				}
-
 				if module.Stop {
 					break
 				}

@@ -161,7 +161,7 @@ func startCommunicatorInternalSERVER() {
 		for {
 			var message []byte
 			if first_message {
-				message = []byte(Device_settings_GL.Device_ID)
+				message = []byte(Gen_settings_GL.Device_settings.Id)
 				first_message = false
 			} else {
 				message = <- srvComm_gen_ch_out_GL

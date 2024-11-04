@@ -65,9 +65,31 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 		}
 	})
 
+	var entry_device_id *widget.Entry = widget.NewEntry()
+	entry_device_id.SetPlaceHolder("Unique device ID (for example \"MyComputer\")")
+	entry_device_id.SetText(Utils.Gen_settings_GL.Device_settings.Id)
+
+	var entry_device_type *widget.Entry = widget.NewEntry()
+	entry_device_type.SetPlaceHolder("Device type (for example \"computer\")")
+	entry_device_type.SetText(Utils.Gen_settings_GL.Device_settings.Type_)
+
+	var entry_device_description *widget.Entry = widget.NewEntry()
+	entry_device_description.SetPlaceHolder("Device description (for example the model, \"Legion Y520\")")
+	entry_device_description.SetText(Utils.Gen_settings_GL.Device_settings.Description)
+
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		Utils.Gen_settings_GL.Device_settings.Id = entry_device_id.Text
+		Utils.Gen_settings_GL.Device_settings.Type_ = entry_device_type.Text
+		Utils.Gen_settings_GL.Device_settings.Description = entry_device_description.Text
+	})
+
 	var objects []fyne.CanvasObject = []fyne.CanvasObject{
 		entry_password,
 		container.New(layout.NewGridLayout(2), btn_save_temp, btn_save_perm),
+		entry_device_id,
+		entry_device_type,
+		entry_device_description,
+		btn_save,
 	}
 	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
 	for i := 0; i < len(values); i++ {
@@ -88,7 +110,8 @@ func homeCreateSettingsTab() *container.Scroll {
 
 	var entry_visor_email_addr *widget.Entry = widget.NewEntry()
 	entry_visor_email_addr.SetPlaceHolder("V.I.S.O.R. email address")
-	entry_visor_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, "Invalid email address")
+	entry_visor_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`,
+		"Invalid email address")
 	entry_visor_email_addr.SetText(Utils.User_settings_GL.General.VISOR_email_addr)
 
 	var entry_visor_email_pw *widget.Entry = widget.NewPasswordEntry()
@@ -97,7 +120,8 @@ func homeCreateSettingsTab() *container.Scroll {
 
 	var entry_user_email_addr *widget.Entry = widget.NewEntry()
 	entry_user_email_addr.SetPlaceHolder("User email address (used for all email communication)")
-	entry_user_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, "Invalid email address")
+	entry_user_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`,
+		"Invalid email address")
 	entry_user_email_addr.SetText(Utils.User_settings_GL.General.User_email_addr)
 
 	var entry_server_domain *widget.Entry = widget.NewEntry()

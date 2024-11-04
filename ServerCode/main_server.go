@@ -51,6 +51,22 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
+		if Utils.Gen_settings_GL.Device_settings.Id == "" || Utils.Gen_settings_GL.Device_settings.Type_ == "" ||
+				Utils.Gen_settings_GL.Device_settings.Description == "" {
+			log.Println("Device settings incomplete. Please enter the missing one(s):")
+			if Utils.Gen_settings_GL.Device_settings.Id == "" {
+				Utils.Gen_settings_GL.Device_settings.Id = Utils.GetInputString("Unique device ID: ")
+			}
+			if Utils.Gen_settings_GL.Device_settings.Type_ == "" {
+				Utils.Gen_settings_GL.Device_settings.Type_ = Utils.GetInputString("Device type (for example " +
+					"\"computer\"): ")
+			}
+			if Utils.Gen_settings_GL.Device_settings.Description == "" {
+				Utils.Gen_settings_GL.Device_settings.Description = Utils.GetInputString("Device description (for " +
+					"example the model, \"Legion Y520\"): ")
+			}
+		}
+
 		if !readUserSettings() {
 			log.Println("Failed to load user settings. Exiting...")
 

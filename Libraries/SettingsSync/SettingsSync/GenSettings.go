@@ -57,3 +57,19 @@ func LoadGenSettings(json string) bool {
 
 	return true
 }
+
+/*
+SetDeviceSettings sets the device settings.
+
+-----------------------------------------------------------
+
+– Params:
+  - id – the device ID
+  - type_ – the device type
+  - description – the device description
+ */
+func SetDeviceSettings(id string, type_ string, description string) {
+	Utils.Gen_settings_GL.Device_settings.Id = id
+	Utils.Gen_settings_GL.Device_settings.Type_ = type_
+	Utils.Gen_settings_GL.Device_settings.Description = description
+}

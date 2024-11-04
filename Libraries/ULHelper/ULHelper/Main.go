@@ -123,7 +123,7 @@ func checkUserLocation(location string) bool {
 		return true
 	}
 
-	if modUserInfo_GL.AlwaysWith_device == Utils.Device_settings_GL.Device_ID {
+	if modUserInfo_GL.AlwaysWith_device == Utils.Gen_settings_GL.Device_settings.Id {
 		return true
 	}
 

@@ -48,7 +48,7 @@ GetNextSpeechSentence() MUST BE IN LOOP BEFORE CALLING THIS FUNCTION!!!
 func SendText(text string, use_smart bool) bool {
 	var message []byte = []byte("GPT|")
 	if text != "" {
-		message = append(message, Utils.CompressString("[" + Utils.Device_settings_GL.Device_ID + "|" +
+		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id+ "|" +
 			strconv.FormatBool(use_smart) + "]" + text)...)
 	}
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, message)

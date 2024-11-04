@@ -26,8 +26,9 @@ package Utils
 import "Utils/ModsFileInfo"
 
 type GenSettings struct {
-	MOD_9    ModsFileInfo.Mod9GenInfo
-	MOD_10   ModsFileInfo.Mod10GenInfo
-	MOD_12   ModsFileInfo.Mod12GenInfo
-	Registry []*Value
+	Device_settings DeviceSettings
+	MOD_9           ModsFileInfo.Mod9GenInfo
+	MOD_10          ModsFileInfo.Mod10GenInfo
+	MOD_12          ModsFileInfo.Mod12GenInfo
+	Registry        []*Value
 }

@@ -23,6 +23,5 @@ package UtilsSWA
 
 import "Utils"
 
-const DEVICE_SETTINGS_FILE string = Utils.DEVICE_SETTINGS_FILE
 const USER_SETTINGS_FILE string = Utils.USER_SETTINGS_FILE
 const GEN_SETTINGS_FILE_CLIENT string = Utils.GEN_SETTINGS_FILE_CLIENT

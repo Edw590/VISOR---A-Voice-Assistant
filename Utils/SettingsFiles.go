@@ -27,14 +27,10 @@ import (
 	"os"
 )
 
-const DEVICE_SETTINGS_FILE string = "DeviceSettings_EOG.json"
 const USER_SETTINGS_FILE string = "UserSettings_EOG.json"
 const GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.json"
 const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.json"
 
-// Device_settings_GL is the global variable that holds the device settings. Its file is read once at the start of the
-// program.
-var Device_settings_GL DeviceSettings
 // User_settings_GL is the global variable that holds the user settings. It is saved to the USER_SETTINGS_FILE file
 // every 5 seconds.
 var User_settings_GL UserSettings
@@ -47,12 +43,12 @@ var VISOR_server_GL bool = false
 var Password_GL string = ""
 
 type DeviceSettings struct {
-	// Device_ID is the device ID of the current device
-	Device_ID string
-	// Device_type is the type of the current device
-	Device_type string
-	// Device_description is the description of the current device
-	Device_description string
+	// Id is the device ID of the current device
+	Id string
+	// Type_ is the type of the current device
+	Type_ string
+	// Description is the description of the current device
+	Description string
 }
 
 type UserSettings struct {
@@ -90,32 +86,6 @@ type _GeneralConsts struct {
 
 	// Picovoice_API_key is the API key for the Picovoice API
 	Picovoice_API_key string
-}
-
-/*
-readDeviceSettings is the function that initializes the global variables of the DeviceSettings structs.
-
-Call this before SettingsSync.LoadUserSettings.
-
------------------------------------------------------------
-
-– Params:
-  - server – true if the version running is the server version, false if it is the client version
-
-– Returns:
-  - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
-*/
-func readDeviceSettings() error {
-	bytes, err := os.ReadFile(DEVICE_SETTINGS_FILE)
-	if err != nil {
-		cwd, err := os.Getwd()
-		if err != nil {
-			cwd = "[ERROR]"
-		}
-		return errors.New("no " + DEVICE_SETTINGS_FILE + " file found in the current working directory: \"" + cwd + "\" - aborting")
-	}
-
-	return FromJsonGENERAL(bytes, &Device_settings_GL)
 }
 
 /*

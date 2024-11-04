@@ -74,7 +74,7 @@ func checkDeviceID(task ModsFileInfo.Task) bool {
 	}
 
 	for _, device_id := range task.Device_IDs {
-		if device_id == Utils.Device_settings_GL.Device_ID {
+		if device_id == Utils.Gen_settings_GL.Device_settings.Id {
 			return true
 		}
 	}

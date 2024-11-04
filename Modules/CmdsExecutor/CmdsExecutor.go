@@ -310,7 +310,7 @@ func init() {realMain =
 func speakInternal(txt_to_speak string, speech_priority int32, mode int32, auto_gpt bool) {
 	if auto_gpt && Utils.IsCommunicatorConnectedSERVER() && GPTComm.SendText("", false) {
 		var text string = "Rephrase the following to maintain its meaning but change its wording: \"" + txt_to_speak +
-			"\". Current device: user's " + Utils.Device_settings_GL.Device_type + "."
+			"\". Current device: user's " + Utils.Gen_settings_GL.Device_settings.Type_ + "."
 		if !GPTComm.SendText(text, false) {
 			Speech.QueueSpeech("Sorry, the GPT is busy at the moment.", speech_priority,
 				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)

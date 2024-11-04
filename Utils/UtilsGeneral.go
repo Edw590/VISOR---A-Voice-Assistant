@@ -22,9 +22,11 @@
 package Utils
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 	"unsafe"
@@ -209,4 +211,30 @@ func WasArgUsedGENERAL(args []string, wanted_arg string) bool {
 	}
 
 	return false
+}
+
+/*
+GetInputString reads a string from the standard input.
+
+-----------------------------------------------------------
+
+– Params:
+  - prompt – the prompt to show to the user
+
+– Returns:
+  - the string read from the standard input
+*/
+func GetInputString(prompt string) string {
+	fmt.Print(prompt)
+	str, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		return ""
+	}
+
+	str = str[:len(str)-1]
+	if strings.HasSuffix(str, "\r") {
+		str = str[:len(str)-1]
+	}
+
+	return str
 }

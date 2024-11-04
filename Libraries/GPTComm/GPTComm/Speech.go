@@ -79,7 +79,8 @@ func GetNextSpeechSentence() string {
 		if string(response) == "start" {
 			var entry *_Entry = getEntry(-1, -1)
 			var device_id string = entry.getDeviceID()
-			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Device_settings_GL.Device_ID || device_id == ALL_DEVICES_ID) {
+			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Gen_settings_GL.Device_settings.Id ||
+					device_id == ALL_DEVICES_ID) {
 				curr_entry_time_ms_GL = entry.getTime()
 				time_begin_ms_GL = curr_entry_time_ms_GL + 1
 				last_speech_GL = ""
