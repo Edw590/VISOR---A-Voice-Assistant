@@ -29,6 +29,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
 	"strings"
@@ -46,9 +47,30 @@ func Home() fyne.CanvasObject {
 }
 
 func homeCreateLocalSettingsTab() *container.Scroll {
-	var objects []fyne.CanvasObject = nil
+	var entry_password *widget.Entry = widget.NewPasswordEntry()
+	entry_password.SetPlaceHolder("Settings protection password or empty to disable")
+	entry_password.SetText(Utils.GetPasswordCREDENTIALS())
+
+	var btn_save_temp *widget.Button = widget.NewButton("Save for this session", func() {
+		Utils.Password_GL = entry_password.Text
+		_ = Utils.DeletePasswordCREDENTIALS()
+	})
+
+	var btn_save_perm *widget.Button = widget.NewButton("Save permanently", func() {
+		Utils.Password_GL = entry_password.Text
+		if entry_password.Text == "" {
+			_ = Utils.DeletePasswordCREDENTIALS()
+		} else {
+			_ = Utils.SavePasswordCREDENTIALS(entry_password.Text)
+		}
+	})
+
+	var objects []fyne.CanvasObject = []fyne.CanvasObject{
+		entry_password,
+		container.New(layout.NewGridLayout(2), btn_save_temp, btn_save_perm),
+	}
 	var values []*UtilsSWA.Value = UtilsSWA.GetValuesREGISTRY()
-	for i := len(values) - 1; i >= 0; i-- {
+	for i := 0; i < len(values); i++ {
 		var value *UtilsSWA.Value = values[i]
 		if !value.Auto_set && strings.HasPrefix(value.Pretty_name, "General - ") {
 			objects = append(objects, createValueChooserUTILS(value))

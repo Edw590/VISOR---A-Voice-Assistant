@@ -75,12 +75,17 @@ func init() {realMain =
 		//////////////////////////////////////////
 		// Get the user settings
 
-		var user_settings_json string = ""
-		var p_user_settings_json *string = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadTextFile()
-		if p_user_settings_json != nil {
-			user_settings_json = *p_user_settings_json
+		var to_read []byte = nil
+		var user_settings_bytes []byte = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadFile()
+		if user_settings_bytes != nil {
+			to_read = user_settings_bytes
+
+			if Utils.Password_GL != "" {
+				to_read = Utils.DecryptBytesCRYPTOENDECRYPT([]byte(Utils.Password_GL), []byte(Utils.Password_GL),
+					to_read, nil)
+			}
 		}
-		if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
+		if err := SettingsSync.LoadUserSettings(string(to_read)); err != nil {
 			log.Println("Failed to load user settings. Using empty ones...")
 			log.Println(err)
 		}

@@ -197,17 +197,35 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		VISOR_server_GL = server
 
+		Password_GL = GetPasswordCREDENTIALS()
+
 		if err := readDeviceSettings(); err != nil {
 			log.Println("CRITICAL ERROR: Error obtaining device settings - aborting")
 			panic(err)
 		}
 
-		if err := loadGenSettings(server); err != nil {
-			log.Println("warning: Error obtaining generated settings - aborting")
-			log.Println(err)
+		readGenSettingsInternal := func() bool {
+			if err := readGenSettings(server); err != nil {
+				log.Println("warning: Error obtaining generated settings - aborting")
+				log.Println(err)
 
-			log.Println("Overwrite settings with empty file? Press ENTER to overwrite, or Ctrl+C to abort.")
-			_, _ = bufio.NewReader(os.Stdin).ReadString('\n')
+				log.Println("Overwrite settings with empty file? Press ENTER to overwrite, write the password in case " +
+					"the settings have been encrypted, or press Ctrl+C to abort.")
+				password, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+				password = password[:len(password)-1]
+				if strings.HasSuffix(password, "\r") {
+					password = password[:len(password)-1]
+				}
+				if password != "" {
+					Password_GL = password
+
+					return true
+				}
+			}
+
+			return false
+		}
+		for readGenSettingsInternal() {
 		}
 
 		go func() {

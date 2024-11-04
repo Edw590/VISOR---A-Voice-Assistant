@@ -49,9 +49,25 @@ GetPasswordCREDENTIALS returns the password from the keyring.
   - the password from the keyring
 
 – Returns:
-  - the password from the keyring
-  - an error if the password could not be retrieved, nil otherwise
+  - the password from the keyring or an empty string if the password could not be retrieved
  */
-func GetPasswordCREDENTIALS() (string, error) {
-	return keyring.Get("VISOR", "user")
+func GetPasswordCREDENTIALS() string {
+	password, err := keyring.Get("VISOR", "user")
+	if err != nil {
+		return ""
+	}
+
+	return password
+}
+
+/*
+DeletePasswordCREDENTIALS deletes the password from the keyring.
+
+-----------------------------------------------------------
+
+– Returns:
+  - an error if the password could not be deleted, nil otherwise
+ */
+func DeletePasswordCREDENTIALS() error {
+	return keyring.Delete("VISOR", "user")
 }

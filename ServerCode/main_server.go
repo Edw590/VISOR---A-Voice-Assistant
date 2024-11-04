@@ -51,7 +51,7 @@ func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		if !loadUserSettings() {
+		if !readUserSettings() {
 			log.Println("Failed to load user settings. Exiting...")
 
 			return
@@ -126,15 +126,18 @@ func printModulesStatus(modules []Utils.Module) {
 	}
 }
 
-func loadUserSettings() bool {
-	var user_settings_json string = ""
-	var p_user_settings_json *string = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadTextFile()
-	if p_user_settings_json == nil {
+func readUserSettings() bool {
+	var user_settings_bytes []byte = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadFile()
+	if user_settings_bytes == nil {
 		return false
 	}
 
-	user_settings_json = *p_user_settings_json
-	if err := SettingsSync.LoadUserSettings(user_settings_json); err != nil {
+	var to_read []byte = user_settings_bytes
+	if Utils.Password_GL != "" {
+		to_read = Utils.DecryptBytesCRYPTOENDECRYPT([]byte(Utils.Password_GL), []byte(Utils.Password_GL), to_read, nil)
+	}
+
+	if err := SettingsSync.LoadUserSettings(string(to_read)); err != nil {
 		log.Println("Error loading user settings:", err)
 
 		return false
