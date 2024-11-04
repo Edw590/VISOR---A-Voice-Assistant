@@ -30,6 +30,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"sort"
 )
 
 func ModSMARTChecker() fyne.CanvasObject {
@@ -80,13 +81,18 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 }
 
 func smartCheckerCreateDisksListTab() *container.Scroll {
-	var objects []fyne.CanvasObject = nil
+	var accordion *widget.Accordion = widget.NewAccordion()
+	accordion.MultiOpen = true
 	var disks []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	for i, disk := range disks {
-		objects = append(objects, createDiskSetter(&disk, i))
+	sort.Slice(disks, func(i, j int) bool {
+		return disks[i].Label < disks[j].Label
+	})
+	for i := 0; i < len(disks); i++ {
+		var disk_info *ModsFileInfo.DiskInfo = &disks[i]
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(disk_info.Label), createDiskSetter(disk_info, i)))
 	}
 
-	return createMainContentScrollUTILS(objects...)
+	return createMainContentScrollUTILS(accordion)
 }
 
 func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container {
@@ -116,13 +122,10 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 	})
 	btn_delete.Importance = widget.DangerImportance
 
-	var space *widget.Label = widget.NewLabel("")
-
 	return container.NewVBox(
 		label_id,
 		entry_label,
 		check_is_hdd,
 		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
-		space,
 	)
 }
