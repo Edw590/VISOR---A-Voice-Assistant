@@ -42,15 +42,6 @@ var VISOR_server_GL bool = false
 
 var Password_GL string = ""
 
-type DeviceSettings struct {
-	// Id is the device ID of the current device
-	Id string
-	// Type_ is the type of the current device
-	Type_ string
-	// Description is the description of the current device
-	Description string
-}
-
 type UserSettings struct {
 	General         ModsFileInfo.GeneralConsts
 	SMARTChecker    ModsFileInfo.Mod3UserInfo

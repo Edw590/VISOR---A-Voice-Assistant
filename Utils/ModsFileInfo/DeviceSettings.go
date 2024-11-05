@@ -19,16 +19,13 @@
  * under the License.
  ******************************************************************************/
 
-//go:build client
+package ModsFileInfo
 
-package Utils
-
-import "Utils/ModsFileInfo"
-
-type GenSettings struct {
-	Device_settings ModsFileInfo.DeviceSettings
-	MOD_9           ModsFileInfo.Mod9GenInfo
-	MOD_10          ModsFileInfo.Mod10GenInfo
-	MOD_12          ModsFileInfo.Mod12GenInfo
-	Registry        []*Value
+type DeviceSettings struct {
+	// Id is the device ID of the current device
+	Id string
+	// Type_ is the type of the current device
+	Type_ string
+	// Description is the description of the current device
+	Description string
 }

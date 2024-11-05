@@ -26,7 +26,7 @@ package Utils
 import "Utils/ModsFileInfo"
 
 type GenSettings struct {
-	Device_settings DeviceSettings
+	Device_settings ModsFileInfo.DeviceSettings
 	MOD_3           ModsFileInfo.Mod3GenInfo
 	MOD_4           ModsFileInfo.Mod4GenInfo
 	MOD_5           ModsFileInfo.Mod5GenInfo
