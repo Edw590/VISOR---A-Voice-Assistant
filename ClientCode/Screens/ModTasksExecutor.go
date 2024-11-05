@@ -132,6 +132,9 @@ func tasksExecutorCreateTasksListTab() *container.Scroll {
 		if title == "" {
 			title = task.Command
 		}
+		if !task.Enabled {
+			title = "[X] " + title
+		}
 		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createTaskSetter(task)))
 	}
 
@@ -201,6 +204,8 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 		task.Repeat_each_min, _ = strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 		task.User_location = entry_user_location.Text
 		task.Programmable_condition = entry_programmable_condition.Text
+
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 

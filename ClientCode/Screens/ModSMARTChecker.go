@@ -96,6 +96,8 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
+
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 

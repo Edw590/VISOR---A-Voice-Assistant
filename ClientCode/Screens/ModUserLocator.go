@@ -174,6 +174,8 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 		max_distance_m, _ := strconv.ParseInt(entry_max_distance.Text, 10, 32)
 		loc_info.Max_distance_m = int32(max_distance_m)
 		loc_info.Location = entry_location_name.Text
+
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 

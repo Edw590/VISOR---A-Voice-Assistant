@@ -79,8 +79,12 @@ func rssFeedNotifierCreateFeedsListTab() *container.Scroll {
 	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
 	for i := 0; i < len(feeds_info); i++ {
 		var feed_info ModsFileInfo.FeedInfo = feeds_info[i]
-		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(feed_info.Name),
-			createFeedInfoSetter(&feeds_info[i])))
+		var title string = ""
+		if !feed_info.Enabled {
+			title += "[X] "
+		}
+		title += feed_info.Name
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createFeedInfoSetter(&feeds_info[i])))
 	}
 
 	return createMainContentScrollUTILS(accordion)
@@ -112,6 +116,8 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 		feed_info.Type_ = entry_type.Text
 		feed_info.Url = entry_url.Text
 		feed_info.Custom_msg_subject = entry_custom_msg_subject.Text
+
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 
