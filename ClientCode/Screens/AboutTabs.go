@@ -26,7 +26,11 @@ const COMMUNICATOR_ABOUT string =
 
 You can send commands which will be processed locally or you can send anything else you want and that will be processed by the LLM (Large Language Model) on the server - if you set it up and is connected, or else VISOR will warn that the GPT model it's not available.
 
-If you send a non-command sentence, it can take a bit to start receiving the response. Depends on how slow the model is on your computer (choose one that makes it so that speaking is not interrupted to wait for more sentences).`
+If you send a non-command sentence, it can take a bit to start receiving the response. Depends on how slow the model is on your computer (choose one that makes it so that speaking is not interrupted to wait for more sentences).
+
+The memories are "infinite". You can add as many as you want and VISOR will use them all. The more you add, the more he knows about you and better the responses are. Though, the more you add, the more time he'll take to initialize.
+
+Also currently you must explicitly tell him to memorize the conversation. The command to summarize the memories must be used with caution as the LLM may remove important parts of memories because it thinks they're not important. So, use it only when you're sure you want to summarize the memories and back them up first.`
 
 const RSS_ABOUT string =
 `The feeds are checked every 2 minutes. When you add a new one, you'll receive no immediate notifications, but you'll receive the next updates.
