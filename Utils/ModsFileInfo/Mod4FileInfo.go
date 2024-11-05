@@ -24,7 +24,7 @@ package ModsFileInfo
 // Mod4GenInfo is the format of the custom generated information about this specific module.
 type Mod4GenInfo struct {
 	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
-	Notified_news map[int][]NewsInfo
+	Notified_news map[int32][]NewsInfo
 }
 
 // NewsInfo is the information about news.
@@ -43,16 +43,16 @@ type Mod4UserInfo struct {
 
 // FeedInfo is the information about a feed.
 type FeedInfo struct {
-	// Feed_num is the number of the feed, beginning in 1 (no special reason, but could be useful some time)
-	Feed_num int
-	// Feed_enabled is whether the feed is enabled
-	Feed_enabled bool
-	// Feed_name is the user-given name of the feed
-	Feed_name string
-	// Feed_url is the URL of the feed
-	Feed_url string
-	// Feed_type is the type of the feed (one of the TYPE_ constants)
-	Feed_type string
+	// Id is the number of the feed
+	Id int32
+	// Enabled is whether the feed is enabled
+	Enabled bool
+	// Name is the user-given name of the feed
+	Name string
+	// Url is the URL of the feed
+	Url string
+	// Type_ is the type of the feed
+	Type_ string
 	// Custom_msg_subject is the custom message subject
 	Custom_msg_subject string
 }

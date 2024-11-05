@@ -44,19 +44,22 @@ AddTask adds a task to the user settings.
   - repeat_each_min – the time in minutes between each repeatition
   - user_location – the location the user must be in
   - programmable_condition – an additional condition for the task, in Go
+
+– Returns:
+  - the ID of the task
  */
 func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message string, command string, time string,
-			 	  repeat_each_min int64, user_location string, programmable_condition string) {
-	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
+			 	  repeat_each_min int64, user_location string, programmable_condition string) int32 {
+	var tasks *[]ModsFileInfo.Task = &Utils.User_settings_GL.TasksExecutor.Tasks
 	var id int32 = 1
-	for i := 0; i < len(tasks); i++ {
-		if tasks[i].Id == id {
+	for i := 0; i < len(*tasks); i++ {
+		if (*tasks)[i].Id == id {
 			id++
 		}
 	}
 
 	// Add the task to the user settings
-	Utils.User_settings_GL.TasksExecutor.Tasks = append(Utils.User_settings_GL.TasksExecutor.Tasks, ModsFileInfo.Task{
+	*tasks = append(*tasks, ModsFileInfo.Task{
 		Id:                     id,
 		Enabled:                enabled,
 		Device_active:          device_active,
@@ -69,9 +72,11 @@ func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message s
 		Programmable_condition: programmable_condition,
 	})
 
-	sort.Slice(tasks, func(i, j int) bool {
-		return tasks[i].Id < tasks[j].Id
+	sort.SliceStable(*tasks, func(i, j int) bool {
+		return (*tasks)[i].Id < (*tasks)[j].Id
 	})
+
+	return id
 }
 
 /*

@@ -99,7 +99,7 @@ func homeCreateSettingsTab() *container.Scroll {
 	var entry_pin *widget.Entry = widget.NewPasswordEntry()
 	entry_pin.SetPlaceHolder("App protection PIN (any number of digits or empty to disable)")
 	entry_pin.SetText(Utils.User_settings_GL.General.Pin)
-	entry_pin.Validator = validation.NewRegexp(`^\d+$`, "PIN must be numberic")
+	entry_pin.Validator = validation.NewRegexp(`^(\d+)?$`, "PIN must be numberic")
 
 	var entry_visor_email_addr *widget.Entry = widget.NewEntry()
 	entry_visor_email_addr.SetPlaceHolder("V.I.S.O.R. email address")

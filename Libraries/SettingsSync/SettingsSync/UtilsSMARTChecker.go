@@ -41,22 +41,22 @@ AddDiskSMART adds a disk to the user settings.
   - true if the disk was added, false if the ID already exists
  */
 func AddDiskSMART(id string, label string, is_hdd bool) bool {
-	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	for _, disk_info := range disks_info {
+	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.User_settings_GL.SMARTChecker.Disks_info
+	for _, disk_info := range *disks_info {
 		if disk_info.Id == id {
 			return false
 		}
 	}
 
 	// Add the disk to the user settings
-	Utils.User_settings_GL.SMARTChecker.Disks_info = append(Utils.User_settings_GL.SMARTChecker.Disks_info, ModsFileInfo.DiskInfo{
-		Id:    id,
-		Label: label,
+	*disks_info = append(*disks_info, ModsFileInfo.DiskInfo{
+		Id:     id,
+		Label:  label,
 		Is_HDD: is_hdd,
 	})
 
-	sort.Slice(disks_info, func(i, j int) bool {
-		return disks_info[i].Label < disks_info[j].Label
+	sort.SliceStable(*disks_info, func(i, j int) bool {
+		return (*disks_info)[i].Label < (*disks_info)[j].Label
 	})
 
 	return true
@@ -100,7 +100,7 @@ func GetIdsListSMART() string {
 }
 
 /*
-DiskInfoSMART returns a disk by its ID.
+GetDiskSMART returns a disk by its ID.
 
 -----------------------------------------------------------
 
@@ -110,7 +110,7 @@ DiskInfoSMART returns a disk by its ID.
 – Returns:
   - the disk or nil if the disk was not found
  */
-func DiskInfoSMART(id string) *ModsFileInfo.DiskInfo {
+func GetDiskSMART(id string) *ModsFileInfo.DiskInfo {
 	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
 	for i := 0; i < len(disks_info); i++ {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]

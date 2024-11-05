@@ -40,19 +40,22 @@ AddLocationLOCATIONS adds a location to the user settings.
   - last_detection_s – the last time the location was detected in Unix time
   - max_distance_m – the maximum distance in meters from the location
   - location – the location of the user
+
+– Returns:
+  - the ID of the location
 */
 func AddLocationLOCATIONS(type_ string, name string, address string, last_detection_s int64, max_distance_m int32,
-						  location string) {
-	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
+						  location string) int32 {
+	var locs_info *[]ModsFileInfo.LocInfo = &Utils.User_settings_GL.UserLocator.Locs_info
 	var id int32 = 1
-	for i := 0; i < len(locs_info); i++ {
-		if locs_info[i].Id == id {
+	for i := 0; i < len(*locs_info); i++ {
+		if (*locs_info)[i].Id == id {
 			id++
 		}
 	}
 
 	// Add the location to the user settings
-	Utils.User_settings_GL.UserLocator.Locs_info = append(Utils.User_settings_GL.UserLocator.Locs_info, ModsFileInfo.LocInfo{
+	*locs_info = append(*locs_info, ModsFileInfo.LocInfo{
 		Id:               id,
 		Type:             type_,
 		Name:             name,
@@ -62,9 +65,11 @@ func AddLocationLOCATIONS(type_ string, name string, address string, last_detect
 		Location:         location,
 	})
 
-	sort.Slice(locs_info, func(i, j int) bool {
-		return locs_info[i].Location < locs_info[j].Location
+	sort.SliceStable(*locs_info, func(i, j int) bool {
+		return (*locs_info)[i].Location < (*locs_info)[j].Location
 	})
+
+	return id
 }
 
 /*

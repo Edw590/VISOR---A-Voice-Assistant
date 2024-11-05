@@ -90,22 +90,22 @@ func init() {realMain =
 		modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
 
 		if modGenInfo_GL.Notified_news == nil {
-			modGenInfo_GL.Notified_news = make(map[int][]ModsFileInfo.NewsInfo)
+			modGenInfo_GL.Notified_news = make(map[int32][]ModsFileInfo.NewsInfo)
 		}
 
 		for {
 
 			for _, feedInfo := range modUserInfo_GL.Feeds_info {
-				if !feedInfo.Feed_enabled {
+				if !feedInfo.Enabled {
 					continue
 				}
 
-				//if feedInfo.Feed_num != 8 {
+				//if feedInfo.Feed_id != 8 {
 				//	continue
 				//}
 				//log.Println("__________________________BEGINNING__________________________")
 
-				var feedType _FeedType = getFeedType(feedInfo.Feed_type)
+				var feedType _FeedType = getFeedType(feedInfo.Type_)
 
 				if !Utils.ContainsSLICES(allowed_feed_types_1_GL, feedType.type_1) {
 					//log.Println("Feed type not allowed: " + feedInfo.Feed_type)
@@ -118,13 +118,13 @@ func init() {realMain =
 					// If the feed is a YouTube feed, the feed URL is the channel or playlist ID, so we need to change it to
 					// the correct URL.
 					if feedType.type_2 == _TYPE_2_YT_CHANNEL {
-						feedInfo.Feed_url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + feedInfo.Feed_url
+						feedInfo.Url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + feedInfo.Url
 					} else if feedType.type_2 == _TYPE_2_YT_PLAYLIST {
-						feedInfo.Feed_url = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + feedInfo.Feed_url
+						feedInfo.Url = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + feedInfo.Url
 					}
 				}
 
-				//log.Println("feed_num: " + strconv.Itoa(feedInfo.Feed_num))
+				//log.Println("feed_id: " + strconv.Itoa(feedInfo.Feed_id))
 				//log.Println("feed_url: " + feedInfo.Feed_url)
 				//log.Println("feed_type: " + feedInfo.Feed_type)
 				//log.Println("feedType.type_1: " + feedType.type_1)
@@ -132,13 +132,13 @@ func init() {realMain =
 				//log.Println("feedType.type_3: " + feedType.type_3)
 
 				var new_feed bool = false
-				newsInfo_list, ok := modGenInfo_GL.Notified_news[feedInfo.Feed_num]
+				newsInfo_list, ok := modGenInfo_GL.Notified_news[feedInfo.Id]
 				if !ok {
 					new_feed = true
 				}
 
 				ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-				parsed_feed, err := gofeed.NewParser().ParseURLWithContext(feedInfo.Feed_url, ctx)
+				parsed_feed, err := gofeed.NewParser().ParseURLWithContext(feedInfo.Url, ctx)
 				cancel()
 				if nil != err {
 					//log.Println("Error parsing feed: " + err.Error())
@@ -208,7 +208,7 @@ func init() {realMain =
 					}
 				}
 
-				modGenInfo_GL.Notified_news[feedInfo.Feed_num] = newsInfo_list
+				modGenInfo_GL.Notified_news[feedInfo.Id] = newsInfo_list
 
 				//log.Println("__________________________ENDING__________________________")
 			}
