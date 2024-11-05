@@ -132,13 +132,13 @@ func tasksExecutorCreateTasksListTab() *container.Scroll {
 		if title == "" {
 			title = task.Command
 		}
-		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createTaskSetter(task, i)))
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createTaskSetter(task)))
 	}
 
 	return createMainContentScrollUTILS(accordion)
 }
 
-func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
+func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 	var label_id *widget.Label = widget.NewLabel("Task ID: " + strconv.Itoa(int(task.Id)))
 
 	var check_enabled *widget.Check = widget.NewCheck("Task enabled", nil)
@@ -207,7 +207,7 @@ func createTaskSetter(task *ModsFileInfo.Task, task_idx int) *fyne.Container {
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
 			if confirmed {
-				Utils.DelElemSLICES(&Utils.User_settings_GL.TasksExecutor.Tasks, task_idx)
+				SettingsSync.RemoveTaskTASKS(task.Id)
 
 				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 			}

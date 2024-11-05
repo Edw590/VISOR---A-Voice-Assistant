@@ -81,7 +81,7 @@ func UpdateUserLocation() {
 			}
 
 			if beacon_found != nil {
-				var distance int = UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon_found.RSSI, UtilsSWA.DEFAULT_TX_POWER)
+				var distance int32 = int32(UtilsSWA.GetRealDistanceRssiLOCRELATIVE(beacon_found.RSSI, UtilsSWA.DEFAULT_TX_POWER))
 
 				if distance <= location_info.Max_distance_m {
 					// If the device is near the beacon, then the user may be near the location.

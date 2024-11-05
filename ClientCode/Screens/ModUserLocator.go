@@ -22,6 +22,7 @@
 package Screens
 
 import (
+	"SettingsSync/SettingsSync"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"
@@ -29,7 +30,6 @@ import (
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"sort"
 	"strconv"
 )
 
@@ -95,14 +95,8 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 	last_detection_s, _ := strconv.ParseInt(entry_last_detection_s.Text, 10, 64)
 	max_distance, _ := strconv.ParseInt(entry_max_distance.Text, 10, 32)
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
-		Utils.User_settings_GL.UserLocator.Locs_info = append(Utils.User_settings_GL.UserLocator.Locs_info, ModsFileInfo.LocInfo{
-			Type: entry_type.Text,
-			Name: entry_name.Text,
-			Address: entry_address.Text,
-			Last_detection_s: last_detection_s,
-			Max_distance_m: int(max_distance),
-			Location: entry_location_name.Text,
-		})
+		SettingsSync.AddLocationLOCATIONS(entry_type.Text, entry_name.Text, entry_address.Text, last_detection_s,
+			int32(max_distance), entry_location_name.Text)
 
 		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
@@ -122,9 +116,6 @@ func userLocatorCreateLocationsListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
 	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
-	sort.Slice(locs_info, func(i, j int) bool {
-		return locs_info[i].Location < locs_info[j].Location
-	})
 	for i := 0; i < len(locs_info); i++ {
 		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
 		var title = loc_info.Name
@@ -132,13 +123,13 @@ func userLocatorCreateLocationsListTab() *container.Scroll {
 			title = loc_info.Address
 		}
 		title = loc_info.Location + " - " + title
-		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createLocationSetter(loc_info, i)))
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createLocationSetter(loc_info)))
 	}
 
 	return createMainContentScrollUTILS(accordion)
 }
 
-func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyne.Container {
+func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 	var entry_type *widget.Entry = widget.NewEntry()
 	entry_type.SetPlaceHolder("Beacon type (\"wifi\" or \"bluetooth\")")
 	entry_type.Validator = validation.NewRegexp(`^(wifi|bluetooth)$`, "The location type must be either \"wifi\" or \"bluetooth\"")
@@ -169,7 +160,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 
 		return err
 	}
-	entry_max_distance.SetText(strconv.Itoa(loc_info.Max_distance_m))
+	entry_max_distance.SetText(strconv.Itoa(int(loc_info.Max_distance_m)))
 
 	var entry_location_name *widget.Entry = widget.NewEntry()
 	entry_location_name.SetPlaceHolder("Location name")
@@ -180,7 +171,8 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 		loc_info.Name = entry_name.Text
 		loc_info.Address = entry_address.Text
 		loc_info.Last_detection_s, _ = strconv.ParseInt(entry_last_detection_s.Text, 10, 64)
-		loc_info.Max_distance_m, _ = strconv.Atoi(entry_max_distance.Text)
+		max_distance_m, _ := strconv.ParseInt(entry_max_distance.Text, 10, 32)
+		loc_info.Max_distance_m = int32(max_distance_m)
 		loc_info.Location = entry_location_name.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
@@ -188,7 +180,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo, loc_info_idx int) *fyn
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this location?", func(confirmed bool) {
 			if confirmed {
-				Utils.DelElemSLICES(&Utils.User_settings_GL.UserLocator.Locs_info, loc_info_idx)
+				SettingsSync.RemoveLocationLOCATIONS(loc_info.Id)
 
 				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 			}

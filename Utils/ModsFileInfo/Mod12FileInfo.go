@@ -53,6 +53,8 @@ type Mod12UserInfo struct {
 }
 
 type LocInfo struct {
+	// Id is the ID of the location
+	Id int32
 	// Type is the type of the location "detector" (e.g. wifi)
 	Type string
 	// Name is the name of the detection (e.g. the W-Fi SSID)
@@ -62,7 +64,7 @@ type LocInfo struct {
 	// Last_detection_s is how long the network may not be found but the user may still be in the location
 	Last_detection_s int64
 	// Max_distance_m is the maximum distance in meters in which the device is in the specified location
-	Max_distance_m int
+	Max_distance_m int32
 	// Location is where the device is (e.g. "home")
 	Location string
 }

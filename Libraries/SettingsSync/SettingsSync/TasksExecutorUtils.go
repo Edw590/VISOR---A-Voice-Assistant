@@ -46,7 +46,7 @@ AddTask adds a task to the user settings.
   - programmable_condition – an additional condition for the task, in Go
  */
 func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message string, command string, time string,
-			 repeat_each_min int64, user_location string, programmable_condition string) {
+			 	  repeat_each_min int64, user_location string, programmable_condition string) {
 	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
 	var task_id int32 = 1
 	for i := 0; i < len(tasks); i++ {
@@ -121,7 +121,7 @@ GetTaskById returns a task by its ID.
 – Returns:
   - the task or nil if the task was not found
 */
-func GetTaskByIdTASKS(id int32) *ModsFileInfo.Task {
+func GetTaskTASKS(id int32) *ModsFileInfo.Task {
 	for _, task := range Utils.User_settings_GL.TasksExecutor.Tasks {
 		if task.Id == id {
 			return &task
