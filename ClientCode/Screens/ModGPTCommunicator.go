@@ -41,7 +41,15 @@ func ModGPTCommunicator() fyne.CanvasObject {
 		container.NewTabItem("List of commands", gptCommunicatorCreateListCommandsTab()),
 		container.NewTabItem("Memories", gptCommunicatorCreateMemoriesTab()),
 		container.NewTabItem("Settings", gptCommunicatorCreateSettingsTab()),
+		container.NewTabItem("About", gptCommunicatorCreateAboutTab()),
 	)
+}
+
+func gptCommunicatorCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(COMMUNICATOR_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func gptCommunicatorCreateMemoriesTab() *container.Scroll {

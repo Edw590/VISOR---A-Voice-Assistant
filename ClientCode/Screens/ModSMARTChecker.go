@@ -39,7 +39,15 @@ func ModSMARTChecker() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Disks list", smartCheckerCreateDisksListTab()),
 		container.NewTabItem("Add disk", smartCheckerCreateAddDiskTab()),
+		container.NewTabItem("About", smartCheckerCreateAboutTab()),
 	)
+}
+
+func smartCheckerCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(SMART_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func smartCheckerCreateAddDiskTab() *container.Scroll {

@@ -40,7 +40,15 @@ func ModUserLocator() fyne.CanvasObject {
 		container.NewTabItem("Locations list", userLocatorCreateLocationsListTab()),
 		container.NewTabItem("Add location", userLocatorCreateAddLocationTab()),
 		container.NewTabItem("Settings", userLocatorCreateSettingsTab()),
+		container.NewTabItem("About", userLocatorCreateAboutTab()),
 	)
+}
+
+func userLocatorCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(LOCATOR_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func userLocatorCreateSettingsTab() *container.Scroll {

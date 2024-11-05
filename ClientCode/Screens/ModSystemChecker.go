@@ -34,7 +34,15 @@ func ModSystemChecker() fyne.CanvasObject {
 
 	return container.NewAppTabs(
 		container.NewTabItem("System state", systemCheckerCreateSystemStateTab()),
+		container.NewTabItem("About", systemCheckerCreateAboutTab()),
 	)
+}
+
+func systemCheckerCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(SYS_CHK_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func systemCheckerCreateSystemStateTab() *container.Scroll {

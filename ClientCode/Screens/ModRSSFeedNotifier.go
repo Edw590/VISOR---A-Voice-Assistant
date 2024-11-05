@@ -37,7 +37,15 @@ func ModRSSFeedNotifier() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Feeds list", rssFeedNotifierCreateFeedsListTab()),
 		container.NewTabItem("Add feed", rssFeedNotifierCreateAddFeedTab()),
+		container.NewTabItem("About", rssFeedNotifierCreateAboutTab()),
 	)
+}
+
+func rssFeedNotifierCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(RSS_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func rssFeedNotifierCreateAddFeedTab() *container.Scroll {

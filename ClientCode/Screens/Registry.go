@@ -35,7 +35,15 @@ func Registry() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Automatic values", registryCreateAutomaticValuesTab()),
 		container.NewTabItem("Manual values", registryCreateManualValuesTab()),
+		container.NewTabItem("About", registryCreateAboutTab()),
 	)
+}
+
+func registryCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(REGISTRY_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func registryCreateAutomaticValuesTab() *container.Scroll {

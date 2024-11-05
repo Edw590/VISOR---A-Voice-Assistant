@@ -34,7 +34,15 @@ func ModOnlineInfoChk() fyne.CanvasObject {
 
 	return container.NewAppTabs(
 		container.NewTabItem("Settings", onlineInfoChkCreateSettingsTab()),
+		container.NewTabItem("About", onlineInfoChkCreateAboutTab()),
 	)
+}
+
+func onlineInfoChkCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(ONLINE_INFO_CHK_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func onlineInfoChkCreateSettingsTab() *container.Scroll {

@@ -41,7 +41,15 @@ func ModTasksExecutor() fyne.CanvasObject {
 	return container.NewAppTabs(
 		container.NewTabItem("Tasks list", tasksExecutorCreateTasksListTab()),
 		container.NewTabItem("Add task", tasksExecutorCreateAddTaskTab()),
+		container.NewTabItem("About", tasksExecutorCreateAboutTab()),
 	)
+}
+
+func tasksExecutorCreateAboutTab() *container.Scroll {
+	var label_info *widget.Label = widget.NewLabel(TASKS_ABOUT)
+	label_info.Wrapping = fyne.TextWrapWord
+
+	return createMainContentScrollUTILS(label_info)
 }
 
 func tasksExecutorCreateAddTaskTab() *container.Scroll {
@@ -62,7 +70,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 	check_device_active.SetChecked(false)
 
 	var entry_device_ids *widget.Entry = widget.NewMultiLineEntry()
-	entry_device_ids.SetPlaceHolder("Device IDs (one per line)")
+	entry_device_ids.SetPlaceHolder("Device IDs where the task is triggered (one per line)")
 	entry_device_ids.SetMinRowsVisible(3)
 
 	var entry_message *widget.Entry = widget.NewEntry()
@@ -152,7 +160,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 
 	var entry_device_ids *widget.Entry = widget.NewMultiLineEntry()
 	entry_device_ids.SetText(strings.Join(task.Device_IDs, "\n"))
-	entry_device_ids.SetPlaceHolder("Device IDs (one per line)")
+	entry_device_ids.SetPlaceHolder("Device IDs where the task is triggered (one per line)")
 	entry_device_ids.SetMinRowsVisible(3)
 
 	var entry_message *widget.Entry = widget.NewEntry()
