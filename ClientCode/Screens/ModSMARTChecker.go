@@ -22,6 +22,7 @@
 package Screens
 
 import (
+	"SettingsSync/SettingsSync"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"errors"
@@ -30,7 +31,6 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"sort"
 )
 
 func ModSMARTChecker() fyne.CanvasObject {
@@ -53,21 +53,12 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 	check_is_hdd.SetChecked(true)
 
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
-		for _, disk := range Utils.User_settings_GL.SMARTChecker.Disks_info {
-			if disk.Id == entry_id.Text {
-				err := errors.New("disk ID already exists")
-				dialog.ShowError(err, Current_window_GL)
+		if !SettingsSync.AddDiskSMART(entry_id.Text, entry_label.Text, check_is_hdd.Checked) {
+			err := errors.New("disk ID already exists")
+			dialog.ShowError(err, Current_window_GL)
 
-				return
-			}
+			return
 		}
-
-		Utils.User_settings_GL.SMARTChecker.Disks_info = append(Utils.User_settings_GL.SMARTChecker.Disks_info,
-			ModsFileInfo.DiskInfo{
-				Id:     entry_id.Text,
-				Label:  entry_label.Text,
-				Is_HDD: check_is_hdd.Checked,
-		})
 
 		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
@@ -83,12 +74,9 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 func smartCheckerCreateDisksListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var disks []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	sort.Slice(disks, func(i, j int) bool {
-		return disks[i].Label < disks[j].Label
-	})
-	for i := 0; i < len(disks); i++ {
-		var disk_info *ModsFileInfo.DiskInfo = &disks[i]
+	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
+	for i := 0; i < len(disks_info); i++ {
+		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
 		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(disk_info.Label), createDiskSetter(disk_info, i)))
 	}
 
@@ -114,7 +102,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
 		createConfirmationUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
 			if confirmed {
-				Utils.DelElemSLICES(&Utils.User_settings_GL.SMARTChecker.Disks_info, disk_idx)
+				SettingsSync.RemoveDiskSMART(disk.Id)
 
 				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 			}

@@ -44,16 +44,16 @@ AddLocationLOCATIONS adds a location to the user settings.
 func AddLocationLOCATIONS(type_ string, name string, address string, last_detection_s int64, max_distance_m int32,
 						  location string) {
 	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
-	var loc_id int32 = 1
+	var id int32 = 1
 	for i := 0; i < len(locs_info); i++ {
-		if locs_info[i].Id == loc_id {
-			loc_id++
+		if locs_info[i].Id == id {
+			id++
 		}
 	}
 
 	// Add the location to the user settings
 	Utils.User_settings_GL.UserLocator.Locs_info = append(Utils.User_settings_GL.UserLocator.Locs_info, ModsFileInfo.LocInfo{
-		Id:               loc_id,
+		Id:               id,
 		Type:             type_,
 		Name:             name,
 		Address:          address,
@@ -75,11 +75,11 @@ RemoveLocationLOCATIONS removes a location from the user settings.
 – Params:
   - loc_id – the ID of the location to be removed
 */
-func RemoveLocationLOCATIONS(loc_id int32) {
-	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
-	for i := 0; i < len(locs_info); i++ {
-		if locs_info[i].Id == loc_id {
-			Utils.DelElemSLICES(&Utils.User_settings_GL.UserLocator.Locs_info, i)
+func RemoveLocationLOCATIONS(id int32) {
+	var locs_info *[]ModsFileInfo.LocInfo = &Utils.User_settings_GL.UserLocator.Locs_info
+	for i := 0; i < len(*locs_info); i++ {
+		if (*locs_info)[i].Id == id {
+			Utils.DelElemSLICES(locs_info, i)
 
 			break
 		}
@@ -95,12 +95,13 @@ GetIdsListLOCATIONS returns a list of all locations' IDs.
   - a list of all locations' IDs separated by "|"
  */
 func GetIdsListLOCATIONS() string {
-	var ids string
+	var ids_list string
 	for _, loc_info := range Utils.User_settings_GL.UserLocator.Locs_info {
-		ids += strconv.Itoa(int(loc_info.Id)) + "|"
+		ids_list += strconv.Itoa(int(loc_info.Id)) + "|"
 	}
+	ids_list = ids_list[:len(ids_list)-1]
 
-	return ids
+	return ids_list
 }
 
 /*
@@ -114,10 +115,12 @@ GetLOCATIONS returns a location by its ID.
 – Returns:
   - the location or nil if the location was not found
  */
-func GetLocationLOCATIONS(loc_id int32) *ModsFileInfo.LocInfo {
-	for _, loc_info := range Utils.User_settings_GL.UserLocator.Locs_info {
-		if loc_info.Id == loc_id {
-			return &loc_info
+func GetLocationLOCATIONS(id int32) *ModsFileInfo.LocInfo {
+	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
+	for i := 0; i < len(locs_info); i++ {
+		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
+		if loc_info.Id == id {
+			return loc_info
 		}
 	}
 
