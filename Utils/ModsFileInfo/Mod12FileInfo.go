@@ -55,6 +55,8 @@ type Mod12UserInfo struct {
 type LocInfo struct {
 	// Id is the ID of the location
 	Id int32
+	// Enabled is whether the location is enabled
+	Enabled bool
 	// Type is the type of the location "detector" (e.g. wifi)
 	Type string
 	// Name is the name of the detection (e.g. the W-Fi SSID)

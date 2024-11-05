@@ -53,6 +53,10 @@ func UpdateUserLocation() {
 		var curr_location = UNKNOWN_LOCATION
 
 		for _, location_info := range modUserInfo_GL.Locs_info {
+			if !location_info.Enabled {
+				continue
+			}
+
 			var beacons_list []ModsFileInfo.ExtBeacon
 			if location_info.Type == "wifi" {
 				beacons_list = device_info_GL.System_state.Connectivity_info.Wifi_networks

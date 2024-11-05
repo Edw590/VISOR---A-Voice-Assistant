@@ -44,8 +44,8 @@ AddLocationLOCATIONS adds a location to the user settings.
 – Returns:
   - the ID of the location
 */
-func AddLocationLOCATIONS(type_ string, name string, address string, last_detection_s int64, max_distance_m int32,
-						  location string) int32 {
+func AddLocationLOCATIONS(enabled bool, type_ string, name string, address string, last_detection_s int64,
+						  max_distance_m int32, location string) int32 {
 	var locs_info *[]ModsFileInfo.LocInfo = &Utils.User_settings_GL.UserLocator.Locs_info
 	var id int32 = 1
 	for i := 0; i < len(*locs_info); i++ {
@@ -57,6 +57,7 @@ func AddLocationLOCATIONS(type_ string, name string, address string, last_detect
 	// Add the location to the user settings
 	*locs_info = append(*locs_info, ModsFileInfo.LocInfo{
 		Id:               id,
+		Enabled:          enabled,
 		Type:             type_,
 		Name:             name,
 		Address:          address,

@@ -46,6 +46,9 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 	var entry_id *widget.Entry = widget.NewEntry()
 	entry_id.SetPlaceHolder("Disk ID")
 
+	var check_enabled *widget.Check = widget.NewCheck("Disk enabled", nil)
+	check_enabled.SetChecked(true)
+
 	var entry_label *widget.Entry = widget.NewEntry()
 	entry_label.SetPlaceHolder("Disk label")
 
@@ -53,7 +56,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 	check_is_hdd.SetChecked(true)
 
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
-		if !SettingsSync.AddDiskSMART(entry_id.Text, entry_label.Text, check_is_hdd.Checked) {
+		if !SettingsSync.AddDiskSMART(entry_id.Text, check_enabled.Checked, entry_label.Text, check_is_hdd.Checked) {
 			err := errors.New("disk ID already exists")
 			dialog.ShowError(err, Current_window_GL)
 
@@ -65,6 +68,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 
 	return createMainContentScrollUTILS(
 		entry_id,
+		check_enabled,
 		entry_label,
 		check_is_hdd,
 		btn_add,
@@ -77,14 +81,21 @@ func smartCheckerCreateDisksListTab() *container.Scroll {
 	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
 	for i := 0; i < len(disks_info); i++ {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
-		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(disk_info.Label), createDiskSetter(disk_info, i)))
+		var title string = disk_info.Label
+		if !disk_info.Enabled {
+			title = "[X] " + title
+		}
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createDiskSetter(disk_info)))
 	}
 
 	return createMainContentScrollUTILS(accordion)
 }
 
-func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container {
+func createDiskSetter(disk *ModsFileInfo.DiskInfo) *fyne.Container {
 	var label_id *widget.Label = widget.NewLabel("Disk ID: " + disk.Id)
+
+	var check_enabled *widget.Check = widget.NewCheck("Disk enabled", nil)
+	check_enabled.SetChecked(disk.Enabled)
 
 	var entry_label *widget.Entry = widget.NewEntry()
 	entry_label.SetPlaceHolder("Disk label")
@@ -94,6 +105,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 	check_is_hdd.SetChecked(disk.Is_HDD)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		disk.Enabled = check_enabled.Checked
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
 
@@ -114,6 +126,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo, disk_idx int) *fyne.Container
 
 	return container.NewVBox(
 		label_id,
+		check_enabled,
 		entry_label,
 		check_is_hdd,
 		container.New(layout.NewGridLayout(2), btn_save, btn_delete),

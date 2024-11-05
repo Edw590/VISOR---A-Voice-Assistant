@@ -30,6 +30,8 @@ type Mod3UserInfo struct {
 type DiskInfo struct {
 	// Id is the disk serial number
 	Id string
+	// Enabled is whether the disk is enabled
+	Enabled bool
 	// Label is the disk label
 	Label string
 	// Is_HDD is true if the disk is an HDD, false otherwise

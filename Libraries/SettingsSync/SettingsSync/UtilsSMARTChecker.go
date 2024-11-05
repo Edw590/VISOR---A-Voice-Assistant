@@ -40,7 +40,7 @@ AddDiskSMART adds a disk to the user settings.
 – Returns:
   - true if the disk was added, false if the ID already exists
  */
-func AddDiskSMART(id string, label string, is_hdd bool) bool {
+func AddDiskSMART(id string, enabled bool, label string, is_hdd bool) bool {
 	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.User_settings_GL.SMARTChecker.Disks_info
 	for _, disk_info := range *disks_info {
 		if disk_info.Id == id {
@@ -50,9 +50,10 @@ func AddDiskSMART(id string, label string, is_hdd bool) bool {
 
 	// Add the disk to the user settings
 	*disks_info = append(*disks_info, ModsFileInfo.DiskInfo{
-		Id:     id,
-		Label:  label,
-		Is_HDD: is_hdd,
+		Id:      id,
+		Enabled: enabled,
+		Label:   label,
+		Is_HDD:  is_hdd,
 	})
 
 	sort.SliceStable(*disks_info, func(i, j int) bool {

@@ -61,6 +61,9 @@ func userLocatorCreateSettingsTab() *container.Scroll {
 }
 
 func userLocatorCreateAddLocationTab() *container.Scroll {
+	var check_enabled *widget.Check = widget.NewCheck("Location enabled", nil)
+	check_enabled.SetChecked(true)
+
 	var entry_type *widget.Entry = widget.NewEntry()
 	entry_type.SetPlaceHolder("Beacon type (\"wifi\" or \"bluetooth\")")
 	entry_type.Validator = validation.NewRegexp(`^(wifi|bluetooth)$`, "The location type must be either \"wifi\" or \"bluetooth\"")
@@ -95,13 +98,14 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 	last_detection_s, _ := strconv.ParseInt(entry_last_detection_s.Text, 10, 64)
 	max_distance, _ := strconv.ParseInt(entry_max_distance.Text, 10, 32)
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
-		SettingsSync.AddLocationLOCATIONS(entry_type.Text, entry_name.Text, entry_address.Text, last_detection_s,
-			int32(max_distance), entry_location_name.Text)
+		SettingsSync.AddLocationLOCATIONS(check_enabled.Checked, entry_type.Text, entry_name.Text, entry_address.Text,
+			last_detection_s, int32(max_distance), entry_location_name.Text)
 
 		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
 	})
 
 	return createMainContentScrollUTILS(
+		check_enabled,
 		entry_type,
 		entry_name,
 		entry_address,
@@ -123,6 +127,9 @@ func userLocatorCreateLocationsListTab() *container.Scroll {
 			title = loc_info.Address
 		}
 		title = loc_info.Location + " - " + title
+		if !loc_info.Enabled {
+			title = "[X] " + title
+		}
 		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title), createLocationSetter(loc_info)))
 	}
 
@@ -130,6 +137,9 @@ func userLocatorCreateLocationsListTab() *container.Scroll {
 }
 
 func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
+	var check_enabled *widget.Check = widget.NewCheck("Location enabled", nil)
+	check_enabled.SetChecked(loc_info.Enabled)
+
 	var entry_type *widget.Entry = widget.NewEntry()
 	entry_type.SetPlaceHolder("Beacon type (\"wifi\" or \"bluetooth\")")
 	entry_type.Validator = validation.NewRegexp(`^(wifi|bluetooth)$`, "The location type must be either \"wifi\" or \"bluetooth\"")
@@ -167,6 +177,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 	entry_location_name.SetText(loc_info.Location)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		loc_info.Enabled = check_enabled.Checked
 		loc_info.Type = entry_type.Text
 		loc_info.Name = entry_name.Text
 		loc_info.Address = entry_address.Text
@@ -191,6 +202,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 	btn_delete.Importance = widget.DangerImportance
 
 	return container.NewVBox(
+		check_enabled,
 		entry_type,
 		entry_name,
 		entry_address,

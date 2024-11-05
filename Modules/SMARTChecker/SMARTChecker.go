@@ -85,6 +85,11 @@ func init() {realMain =
 				//log.Println("Disk serial: " + disk_serial)
 				//log.Println("Disk label: " + disk_user_info.Label)
 				//log.Println()
+				if !disk_user_info.Enabled {
+					//log.Println("Disk not enabled, skipping.")
+
+					continue
+				}
 				var partitions_list []string = getAllAvailablePartitions()
 				var disksSerialPartitions map[string]string = getDiskSerialPartitions(partitions_list)
 
