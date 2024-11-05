@@ -324,7 +324,7 @@ func speakInternal(txt_to_speak string, speech_priority int32, mode int32, auto_
 
 func sendToGPT(txt_to_send string) {
 	if !Utils.IsCommunicatorConnectedSERVER() {
-		var speak string = "GPT unavailable. not connected to the server."
+		var speak string = "GPT unavailable. Not connected to the server."
 		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 		return

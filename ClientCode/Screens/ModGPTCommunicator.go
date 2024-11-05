@@ -158,7 +158,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to the LLM (smart)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
-			var speak string = "GPT unavailable. not connected to the server."
+			var speak string = "GPT unavailable. Not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 			return
@@ -172,7 +172,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 
 	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to the LLM (dumb)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
-			var speak string = "GPT unavailable. not connected to the server."
+			var speak string = "GPT unavailable. Not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 
 			return

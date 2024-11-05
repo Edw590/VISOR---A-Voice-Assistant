@@ -52,7 +52,7 @@ type DeviceSettings struct {
 }
 
 type UserSettings struct {
-	General         _GeneralConsts
+	General         ModsFileInfo.GeneralConsts
 	SMARTChecker    ModsFileInfo.Mod3UserInfo
 	RSSFeedNotifier ModsFileInfo.Mod4UserInfo
 	OnlineInfoChk   ModsFileInfo.Mod6UserInfo
@@ -63,30 +63,6 @@ type UserSettings struct {
 }
 
 ///////////////////////////////////////////////////////////////
-
-type _GeneralConsts struct {
-	// Pin is the numeric pin to access the UIs
-	Pin string
-
-	// VISOR_email_addr is VISOR's email address
-	VISOR_email_addr string
-	// VISOR_email_pw is VISOR's email password
-	VISOR_email_pw string
-
-	// User_email_addr is the email address of the user, used for all email communication
-	User_email_addr string
-
-	// Website_domain is the domain of the VISOR website
-	Website_domain string
-	// Website_pw is the password for the VISOR website
-	Website_pw string
-
-	// WolframAlpha_AppID is the app ID for the Wolfram Alpha API
-	WolframAlpha_AppID string
-
-	// Picovoice_API_key is the API key for the Picovoice API
-	Picovoice_API_key string
-}
 
 /*
 WriteUserSettings is the function that saves the global variables of the UserSettings struct.
