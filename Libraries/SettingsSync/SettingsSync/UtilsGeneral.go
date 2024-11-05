@@ -27,8 +27,25 @@ import (
 )
 
 /*
-GetGeneralConsts returns the general constants from the user settings.
+GetGeneralSettingsGENERAL returns the general constants from the user settings.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the general constants from the user settings
  */
-func GetInfoGENERAL() *ModsFileInfo.GeneralConsts {
+func GetGeneralSettingsGENERAL() *ModsFileInfo.GeneralConsts {
 	return &Utils.User_settings_GL.General
+}
+
+/*
+GetDeviceSettingsGENERAL returns the device settings from the general settings.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the device settings from the general settings
+ */
+func GetDeviceSettingsGENERAL() *ModsFileInfo.DeviceSettings {
+	return &Utils.Gen_settings_GL.Device_settings
 }
