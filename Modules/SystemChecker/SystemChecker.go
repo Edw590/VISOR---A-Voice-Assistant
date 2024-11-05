@@ -26,6 +26,7 @@ import (
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
+	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/distatus/battery"
 	"github.com/go-vgo/robotgo"
 	"github.com/itchyny/volume-go"
@@ -74,6 +75,7 @@ func init() {realMain =
 				last_check_wifi_when_s = time.Now().Unix()
 			}
 
+
 			// Connectivity information
 			device_info_GL.System_state.Connectivity_info = ModsFileInfo.ConnectivityInfo{
 				Airplane_mode_enabled: false,
@@ -84,9 +86,10 @@ func init() {realMain =
 				Bluetooth_devices:     nil,
 			}
 
+
 			// Battery information
-			var battery_level int = getBatteryInfo().level
-			var power_connected bool = getBatteryInfo().power_connected
+			battery_level, power_connected := getBatteryInfo(device_info_GL.System_state.Battery_info.Level,
+				device_info_GL.System_state.Battery_info.Power_connected)
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetInt(int32(battery_level), false)
 			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetBool(power_connected, false)
 
@@ -94,6 +97,7 @@ func init() {realMain =
 				Level:           battery_level,
 				Power_connected: power_connected,
 			}
+
 
 			// Monitor information
 			var screen_brightness int = Utils.GetScreenBrightnessSYSTEM()
@@ -107,6 +111,7 @@ func init() {realMain =
 				Brightness: screen_brightness,
 			}
 
+
 			// Sound information
 			var sound_volume int = getSoundVolume(device_info_GL.System_state.Sound_info.Volume)
 			var sound_muted bool = getSoundMuted(device_info_GL.System_state.Sound_info.Muted)
@@ -117,6 +122,7 @@ func init() {realMain =
 				Volume: sound_volume,
 				Muted:  sound_muted,
 			}
+
 
 			// Check if the device is being used by checking if the mouse is moving
 			var x, y int = robotgo.Location()
@@ -138,18 +144,25 @@ func GetDeviceInfoText() string {
 	return *Utils.ToJsonGENERAL(device_info_GL)
 }
 
-func getBatteryInfo() _Battery {
-	batteries, err := battery.GetAll()
-	if err != nil || len(batteries) == 0 {
-		return _Battery{}
+func getBatteryInfo(prev1 int, prev2 bool) (int, bool) {
+	var batteries []*battery.Battery
+	var err error
+	var panicked bool = false
+	Tcef.Tcef{
+		Try: func() {
+			batteries, err = battery.GetAll()
+		},
+		Catch: func(e Tcef.Exception) {
+			panicked = true
+		},
+	}.Do()
+	if panicked || err != nil || len(batteries) == 0 {
+		return prev1, prev2
 	}
 
 	var b *battery.Battery = batteries[0]
 
-	return _Battery{
-		power_connected: b.State.Raw != battery.Discharging,
-		level:           int(b.Current / b.Full * 100),
-	}
+	return int(b.Current / b.Full * 100), b.State.Raw != battery.Discharging
 }
 
 func getSoundVolume(prev int) int {
