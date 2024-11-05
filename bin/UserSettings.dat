@@ -29,27 +29,27 @@
 		],
 		"Feeds_info": [
 			{
-				"Feed_num": 1,
-				"Feed_enabled": true,
-				"Feed_name": "Reverse Engineering (Stack Exchange)",
-				"Feed_type": "General",
-				"Feed_url": "https://reverseengineering.stackexchange.com/feeds",
+				"Id": 1,
+				"Enabled": true,
+				"Name": "Reverse Engineering (Stack Exchange)",
+				"Type_": "General",
+				"Url": "https://reverseengineering.stackexchange.com/feeds",
 				"Custom_msg_subject": "New post in Reverse Engineering (Stack Exchange)"
 			},
 			{
-				"Feed_num": 2,
-				"Feed_enabled": true,
-				"Feed_name": "ElectroBOOM",
-				"Feed_type": "YouTube CH +S",
-				"Feed_url": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+				"Id": 2,
+				"Enabled": true,
+				"Name": "ElectroBOOM",
+				"Type_": "YouTube CH +S",
+				"Url": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
 				"Custom_msg_subject": ""
 			},
 			{
-				"Feed_num": 3,
-				"Feed_enabled": true,
-				"Feed_name": "PROJECT: MJOLNIR --> Installation00",
-				"Feed_type": "YouTube PL",
-				"Feed_url": "PLLasqfX0uirPQeVu8erOCdLPFY_2kFL8-",
+				"Id": 3,
+				"Enabled": true,
+				"Name": "PROJECT: MJOLNIR --> Installation00",
+				"Type_": "YouTube PL",
+				"Url": "PLLasqfX0uirPQeVu8erOCdLPFY_2kFL8-",
 				"Custom_msg_subject": ""
 			}
 		]
