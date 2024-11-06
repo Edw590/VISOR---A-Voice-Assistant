@@ -140,10 +140,6 @@ func init() {realMain =
 	}
 }
 
-func GetDeviceInfoText() string {
-	return *Utils.ToJsonGENERAL(device_info_GL)
-}
-
 func getBatteryInfo(prev1 int, prev2 bool) (int, bool) {
 	var batteries []*battery.Battery
 	var err error

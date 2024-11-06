@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"SystemChecker"
+	"SettingsSync/SettingsSync"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -52,7 +52,7 @@ func systemCheckerCreateSystemStateTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_MOD_SYS_CHECKER {
-				sys_state_text.SetText(SystemChecker.GetDeviceInfoText())
+				sys_state_text.SetText(SettingsSync.GetDeviceInfoJsonSYSCHK())
 			} else {
 				break
 			}
