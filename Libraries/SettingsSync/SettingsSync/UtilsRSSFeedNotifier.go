@@ -49,6 +49,7 @@ func AddFeedRSS(enabled bool, name string, url string, type_ string, custom_msg_
 	for i := 0; i < len(*feeds_info); i++ {
 		if (*feeds_info)[i].Id == id {
 			id++
+			i = -1
 		}
 	}
 

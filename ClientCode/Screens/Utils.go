@@ -121,7 +121,7 @@ func createMainContentScrollUTILS(objects... fyne.CanvasObject) *container.Scrol
 func createConfirmationUTILS(message string, callback func(bool)) *dialog.ConfirmDialog {
 	cnf := dialog.NewConfirm("Confirmation", message, callback, Current_window_GL)
 	cnf.SetDismissText("Cancel")
-	cnf.SetConfirmText("Yes")
+	cnf.SetConfirmText("OK")
 	cnf.Show()
 
 	return cnf

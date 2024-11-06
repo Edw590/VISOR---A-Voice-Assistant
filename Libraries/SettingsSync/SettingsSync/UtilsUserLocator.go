@@ -51,6 +51,7 @@ func AddLocationLOCATIONS(enabled bool, type_ string, name string, address strin
 	for i := 0; i < len(*locs_info); i++ {
 		if (*locs_info)[i].Id == id {
 			id++
+			i = -1
 		}
 	}
 

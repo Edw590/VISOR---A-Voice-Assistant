@@ -55,6 +55,7 @@ func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message s
 	for i := 0; i < len(*tasks); i++ {
 		if (*tasks)[i].Id == id {
 			id++
+			i = -1
 		}
 	}
 
