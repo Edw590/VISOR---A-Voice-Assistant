@@ -53,7 +53,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 	check_enabled.SetChecked(true)
 
 	var entry_feed_name *widget.Entry = widget.NewEntry()
-	entry_feed_name.SetPlaceHolder("Feed name (just for identification)")
+	entry_feed_name.SetPlaceHolder("Feed name")
 
 	var entry_feed_type *widget.Entry = widget.NewEntry()
 	entry_feed_type.SetPlaceHolder("Feed type (\"General\" or \"YouTube [CH|PL] [+S]\")")
@@ -104,7 +104,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 
 	var entry_name *widget.Entry = widget.NewEntry()
 	entry_name.SetText(feed_info.Name)
-	entry_name.SetPlaceHolder("Feed name (just for identification)")
+	entry_name.SetPlaceHolder("Feed name")
 
 	var entry_type *widget.Entry = widget.NewEntry()
 	entry_type.SetText(feed_info.Type_)

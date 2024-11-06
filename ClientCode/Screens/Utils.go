@@ -51,7 +51,7 @@ func createValuesChooserAccordionUTILS(prefix string) *widget.Accordion {
 
 func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 	var label *widget.Label = widget.NewLabel(
-		"Name: " + value.Pretty_name[strings.Index(value.Pretty_name, "-") + 1:] +
+		"Name: " + value.Pretty_name[strings.Index(value.Pretty_name, "-") + 2:] +
 			"\nType: " + strings.ToLower(value.Type_[len("TYPE_"):]) +
 			"\nDescription: " + value.Description)
 	var content []fyne.CanvasObject = []fyne.CanvasObject{label}
