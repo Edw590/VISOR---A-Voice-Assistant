@@ -103,7 +103,9 @@ func GetIdsListRSS() string {
 	for _, feed_info := range *feeds_info {
 		ids_list += strconv.Itoa(int(feed_info.Id)) + "|"
 	}
-	ids_list = ids_list[:len(ids_list) - 1]
+	if len(ids_list) > 0 {
+		ids_list = ids_list[:len(ids_list)-1]
+	}
 
 	return ids_list
 }

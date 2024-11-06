@@ -106,7 +106,9 @@ func GetIdsListLOCATIONS() string {
 	for _, loc_info := range Utils.User_settings_GL.UserLocator.Locs_info {
 		ids_list += strconv.Itoa(int(loc_info.Id)) + "|"
 	}
-	ids_list = ids_list[:len(ids_list)-1]
+	if len(ids_list) > 0 {
+		ids_list = ids_list[:len(ids_list)-1]
+	}
 
 	return ids_list
 }

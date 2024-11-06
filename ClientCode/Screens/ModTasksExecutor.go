@@ -53,16 +53,6 @@ func tasksExecutorCreateAboutTab() *container.Scroll {
 }
 
 func tasksExecutorCreateAddTaskTab() *container.Scroll {
-	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
-	var task_id int32 = 1
-	for i := 0; i < len(tasks); i++ {
-		if tasks[i].Id == task_id {
-			task_id++
-		}
-	}
-
-	var label_id *widget.Label = widget.NewLabel("Task ID: " + strconv.Itoa(int(task_id)))
-
 	var check_enabled *widget.Check = widget.NewCheck("Task enabled", nil)
 	check_enabled.SetChecked(true)
 
@@ -116,7 +106,6 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 	})
 
 	return createMainContentScrollUTILS(
-		label_id,
 		check_enabled,
 		check_device_active,
 		entry_device_ids,

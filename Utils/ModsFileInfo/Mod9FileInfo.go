@@ -21,6 +21,8 @@
 
 package ModsFileInfo
 
+import "strings"
+
 // Mod9GenInfo is the format of the custom generated information about this specific module.
 type Mod9GenInfo struct {
 	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
@@ -59,4 +61,28 @@ type Task struct {
 	User_location string
 	// Programmable_condition is an additional "advanced" condition for the task in Go language
 	Programmable_condition string
+}
+
+/*
+GetDeviceIDs returns the Device_IDs separated by "\n".
+
+-----------------------------------------------------------
+
+– Returns:
+  - the Device_IDs separated by "\n"
+ */
+func (task *Task) GetDeviceIDs() string {
+	return strings.Join(task.Device_IDs, "\n")
+}
+
+/*
+SetDeviceIDs sets the Device_IDs from a string separated by "\n".
+
+-----------------------------------------------------------
+
+– Params:
+  - device_ids – the Device_IDs separated by "\n"
+ */
+func (task *Task) SetDeviceIDs(device_ids string) {
+	task.Device_IDs = strings.Split(device_ids, "\n")
 }

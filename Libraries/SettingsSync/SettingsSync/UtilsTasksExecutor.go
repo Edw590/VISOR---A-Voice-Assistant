@@ -112,7 +112,9 @@ func GetIdsListTASKS() string {
 	for _, task := range Utils.User_settings_GL.TasksExecutor.Tasks {
 		ids_list += strconv.Itoa(int(task.Id)) + "|"
 	}
-	ids_list = ids_list[:len(ids_list)-1]
+	if len(ids_list) > 0 {
+		ids_list = ids_list[:len(ids_list)-1]
+	}
 
 	return ids_list
 }
