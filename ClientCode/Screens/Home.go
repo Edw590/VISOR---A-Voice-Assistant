@@ -46,7 +46,7 @@ func Home() fyne.CanvasObject {
 
 func homeCreateLocalSettingsTab() *container.Scroll {
 	var entry_password *widget.Entry = widget.NewPasswordEntry()
-	entry_password.SetPlaceHolder("Settings protection password or empty to disable")
+	entry_password.SetPlaceHolder("Settings encryption password or empty to disable")
 	entry_password.SetText(Utils.GetPasswordCREDENTIALS())
 
 	var btn_save_temp *widget.Button = widget.NewButton("Save for this session", func() {

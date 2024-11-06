@@ -194,9 +194,9 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 		for {
 			if Current_screen_GL == ID_MOD_GPT_COMM {
 				var new_text string = GPTComm.GetLastText()
-				if old_text != new_text {
+				if new_text != old_text {
 					old_text = new_text
-					response_text.SetText(old_text)
+					response_text.SetText(new_text)
 				}
 			}
 
