@@ -61,7 +61,7 @@ const SYS_CHK_ABOUT string =
 `This module keeps checking the state of the system so that other modules can use this information (for example for the Tasks).`
 
 const SMART_ABOUT string =
-`This module starts a full S.M.A.R.T. scan of the disks you list here, every first day of the month and sends an email with the complete report after the scan is complete.`
+`This module starts a full S.M.A.R.T. scan of the disks you list here (NOTE: this is not for the client's disks - it's for the server ones), every first day of the month and sends an email with the complete report after the scan is complete.`
 
 const REGISTRY_ABOUT string =
 `The Registry is where you can see all the "public" variables VISOR is keeping track of (there's internal ones scattered across the program, but these are the important ones accessible to the user).

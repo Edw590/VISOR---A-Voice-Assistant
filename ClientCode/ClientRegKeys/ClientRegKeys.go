@@ -23,6 +23,7 @@ package ClientRegKeys
 
 import (
 	"Utils/UtilsSWA"
+	"runtime"
 )
 
 const _SETTINGS_PREFIX string = "MANUAL_"
@@ -99,8 +100,13 @@ func RegisterValues() {
 	/////////////////////////////////////////////
 	// Manual values
 
+	// Linux users may not have system tray... Default of K_MINIMIZE_TO_TRAY must be false for them.
+	var default_minimize_to_tray string = "false"
+	if runtime.GOOS == "windows" {
+		default_minimize_to_tray = "true"
+	}
 	UtilsSWA.RegisterValueREGISTRY(K_MINIMIZE_TO_TRAY, "General - Minimize to tray",
-		"Whether to minimize to the system tray", UtilsSWA.TYPE_BOOL, "false", false)
+		"Whether to minimize to the system tray", UtilsSWA.TYPE_BOOL, default_minimize_to_tray, false)
 
 	// Speech
 	UtilsSWA.RegisterValueREGISTRY(K_SPEECH_NORMAL_VOL, "Speech - Normal speech volume",
