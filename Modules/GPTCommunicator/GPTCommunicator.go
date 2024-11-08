@@ -39,8 +39,6 @@ import (
 	"time"
 )
 
-// GPT Communicator //
-
 // Directory for processing text files
 const _TO_PROCESS_REL_FOLDER string = "to_process"
 
@@ -167,6 +165,7 @@ func init() {realMain =
 			var last_answer string = ""
 			var last_word string = ""
 			var is_writing bool = false
+			var save_words bool = true
 			for {
 				var one_byte []byte = make([]byte, 1)
 				n, err := reader.Read(one_byte)
@@ -195,7 +194,21 @@ func init() {realMain =
 
 						last_word = ""
 					} else {
-						last_word += one_byte_str
+						// VISOR may start by writing the current date and time like "[date and time here]" - this
+						// below cuts that out of the answer.
+						if last_word == "" {
+							if one_byte_str == "[" {
+								save_words = false
+							} else if one_byte_str == "]" {
+								save_words = true
+
+								continue
+							}
+						}
+
+						if save_words {
+							last_word += one_byte_str
+						}
 					}
 				}
 
@@ -374,7 +387,12 @@ func init() {realMain =
 							getEndString(), true)
 					}
 				} else {
-					sendToGPT(text, use_smart)
+					if use_smart {
+						sendToGPT("[" + time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04") +
+							"] " + text, true)
+					} else {
+						sendToGPT(text, false)
+					}
 				}
 			}
 
