@@ -320,7 +320,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 		case "JSON":
 			// Get settings.
 			// Example: "[true to get file contents, false to get CRC16 checksum]|[one of the strings below]"
-			// Allowed strings: "US" (User Settings), "Weather" (Weather), "News" (News)
+			// Allowed strings: one of the ones on the switch statement
 			// Returns: the user settings in JSON format compressed
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var get_json bool = bytes_split[0] == "true"
@@ -335,6 +335,8 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
 				case "GPTMem":
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
+				case "GManTok":
+					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}
@@ -346,7 +348,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 		case "S_JSON":
 			// Set settings.
 			// Example: "[one of the strings below]|[a compressed JSON string]"
-			// Allowed strings: "US" (User Settings)
+			// Allowed strings: one of the ones on the switch statement
 			// Returns: nothing
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var json_origin string = bytes_split[0]
@@ -356,6 +358,10 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL)
 				case "GPTMem":
 					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.Gen_settings_GL.MOD_7.Memories)
+				case "GManTok":
+					Utils.Gen_settings_GL.MOD_14.Token = json
+				default:
+					log.Println("Invalid JSON destination:", json_origin)
 			}
 	}
 

@@ -6,6 +6,7 @@ use (
 	./Modules/CmdsExecutor
 	./Modules/EmailSender
 	./Modules/GPTCommunicator
+	./Modules/GoogleManager
 	./Modules/ModulesManager
 	./Modules/OnlineInfoChk
 	./Modules/RSSFeedNotifier

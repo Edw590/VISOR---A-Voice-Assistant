@@ -168,7 +168,7 @@ All the needed fields of the struct must be exported like with json.Marshal().
   - parsed_data – a pointer of where to write the parsed data to
 
 – Returns:
-  - true if the data was parsed correctly, false otherwise
+  - nil if the data was parsed correctly, an error otherwise
 */
 func FromJsonGENERAL(json_data []byte, parsed_data any) error {
 	return json.Unmarshal(json_data, parsed_data)

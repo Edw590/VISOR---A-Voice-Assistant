@@ -19,28 +19,30 @@
  * under the License.
  ******************************************************************************/
 
-//go:build server
-
-package ModulesManager
+package GoogleManager
 
 import (
-	"EmailSender"
-	"GPTCommunicator"
-	"GoogleManager"
-	"OnlineInfoChk"
-	"RSSFeedNotifier"
-	"SMARTChecker"
 	"Utils"
-	"WebsiteBackend"
+	"errors"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"log"
 )
 
-// Make sure to add the modules support check for each new module too...
-var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
-	Utils.NUM_MOD_SMARTChecker:    SMARTChecker.Start,
-	Utils.NUM_MOD_RssFeedNotifier: RSSFeedNotifier.Start,
-	Utils.NUM_MOD_EmailSender:     EmailSender.Start,
-	Utils.NUM_MOD_OnlineInfoChk:   OnlineInfoChk.Start,
-	Utils.NUM_MOD_GPTCommunicator: GPTCommunicator.Start,
-	Utils.NUM_MOD_WebsiteBackend:  WebsiteBackend.Start,
-	Utils.NUM_MOD_GoogleManager:   GoogleManager.Start,
+func ParseConfigJSON() (*oauth2.Config, error) {
+	var credentials string = Utils.User_settings_GL.GoogleManager.Credentials_JSON
+	if credentials == "" {
+		log.Println("No credentials found in the user settings file")
+
+		return nil, errors.New("no credentials found in the user settings file")
+	}
+
+	// Load the credentials from the file
+	config, err := google.ConfigFromJSON([]byte(credentials), _SCOPES...)
+	if err != nil {
+		log.Printf("Unable to parse client secret file to config: %v\n", err)
+
+		return nil, err
+	}
+	return config, err
 }

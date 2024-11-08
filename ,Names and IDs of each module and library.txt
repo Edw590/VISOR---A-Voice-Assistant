@@ -13,6 +13,7 @@ Modules:
 11 = Speech Recognition         (client)        [Windows only]
 12 = User Locator               (client)
 13 = Commands Executor          (client)
+14 = Google Manager             (server)
 
 Libraries:
 00 = Advanced Commands Detection

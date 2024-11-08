@@ -51,6 +51,7 @@ type UserSettings struct {
 	WebsiteBackend  ModsFileInfo.Mod8UserInfo
 	TasksExecutor   ModsFileInfo.Mod9UserInfo
 	UserLocator     ModsFileInfo.Mod12UserInfo
+	GoogleManager   ModsFileInfo.Mod14UserInfo
 }
 
 type GenSettings struct {
@@ -63,6 +64,7 @@ type GenSettings struct {
 	MOD_9           ModsFileInfo.Mod9GenInfo
 	MOD_10          ModsFileInfo.Mod10GenInfo
 	MOD_12          ModsFileInfo.Mod12GenInfo
+	MOD_14		    ModsFileInfo.Mod14GenInfo
 	Registry        []*Value
 }
 

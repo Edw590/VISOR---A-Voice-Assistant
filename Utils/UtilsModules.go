@@ -69,6 +69,7 @@ const (
 	NUM_MOD_SpeechRecognition
 	NUM_MOD_UserLocator
 	NUM_MOD_CmdsExecutor
+	NUM_MOD_GoogleManager
 
 	MODS_ARRAY_SIZE
 )
@@ -88,6 +89,7 @@ var MOD_NUMS_NAMES map[int]string = map[int]string{
 	NUM_MOD_SpeechRecognition: "Speech Recognition",
 	NUM_MOD_UserLocator:       "User Locator",
 	NUM_MOD_CmdsExecutor:      "Commands Executor",
+	NUM_MOD_GoogleManager:     "Google Manager",
 }
 
 const (
@@ -112,6 +114,7 @@ var MOD_NUMS_SUPPORT map[int]int = map[int]int{
 	NUM_MOD_SpeechRecognition: MOD_CLIENT,
 	NUM_MOD_UserLocator:       MOD_CLIENT,
 	NUM_MOD_CmdsExecutor:      MOD_CLIENT,
+	NUM_MOD_GoogleManager:     MOD_SERVER,
 }
 
 // _LOOP_TIME_S is the number of seconds to wait for the next timestamp to be registered by a module (must be more than
@@ -653,6 +656,8 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_UserLocator:
 			return true
 		case NUM_MOD_CmdsExecutor:
+			return true
+		case NUM_MOD_GoogleManager:
 			return true
 		default:
 			return false
