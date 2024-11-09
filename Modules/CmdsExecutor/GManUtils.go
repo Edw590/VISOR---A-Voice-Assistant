@@ -36,10 +36,10 @@ func getTasksList(tasks_ids []string, cmd_variant string) string {
 			continue
 		}
 
-		task_date, _ := time.Parse("2006-01-02", task.Date)
-
 		var add_task bool = false
-		switch cmd_variant {
+		task_date, err := time.Parse("2006-01-02", task.Date)
+		if err == nil { // Meaning, the date is empty
+			switch cmd_variant {
 			case RET_31_TODAY:
 				if task_date.Day() == time.Now().Day() {
 					add_task = true
@@ -48,6 +48,7 @@ func getTasksList(tasks_ids []string, cmd_variant string) string {
 				if task_date.Day() == time.Now().AddDate(0, 0, 1).Day() {
 					add_task = true
 				}
+			}
 		}
 		if add_task || task.Date == "" {
 			speak += task.Title + "; "

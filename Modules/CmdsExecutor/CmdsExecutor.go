@@ -221,7 +221,7 @@ func init() {realMain =
 								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 							}
 						} else {
-							speak = "No network connection available to get the weather."
+							speak = "Not connected to the server to get the weather."
 							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 
@@ -256,7 +256,7 @@ func init() {realMain =
 								speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 							}
 						} else {
-							speak = "No network connection available to get the weather."
+							speak = "Not connected to the server to get the weather."
 							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 
@@ -313,7 +313,7 @@ func init() {realMain =
 
 							speakInternal(speak, speech_priority, speech_mode2, _GPT_SMART, true)
 						} else {
-							speak = "No network connection available to get the events."
+							speak = "Not connected to the server to get the tasks and events."
 							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 				}
