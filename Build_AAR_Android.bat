@@ -15,6 +15,7 @@ gomobile bind^
  -ldflags="-v -s -w -compressdwarf=true"^
  -o="bin/MainLibraries.aar"^
  "ACD/ACD"^
+ "GMan/GMan"^
  "GPTComm/GPTComm"^
  "OICComm/OICComm"^
  "SCLink/SCLink"^

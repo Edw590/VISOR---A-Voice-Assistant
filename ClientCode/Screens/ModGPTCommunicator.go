@@ -92,9 +92,10 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 		"--> (Ask for the news)\n" +
 		"--> Turn on/off Ethernet\n" +
 		"--> Turn on/off networking\n" +
-		"--> (Ask what you have for today/tomorrow/this week/next week - Google Calendar events. After asking and if " +
-			"you asked with the server connected (meaning will be the LLM answering), you can then talk normally " +
-			"about your tasks with VISOR)\n",
+		"--> (Ask what you have for today/tomorrow/this week/next week - Google Calendar events and tasks (tasks " +
+			"are only retrieved if you ask for today or tomorrow). After asking and if you asked with the server " +
+			"connected (meaning will be the LLM answering), you can then talk normally about your events and tasks " +
+			"with VISOR)\n",
 	)
 	label_list_commands.Wrapping = fyne.TextWrapWord
 

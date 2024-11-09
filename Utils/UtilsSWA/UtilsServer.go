@@ -57,10 +57,11 @@ If no message is available, the function will wait until a message is received.
 
 – Returns:
   - the message received or nil if the communicator is stopping or stopped
-  - true if a message was received, false otherwise
 */
-func GetGeneralMessageSERVER() ([]byte, bool) {
-	return Utils.GetGeneralMessageSERVER()
+func GetGeneralMessageSERVER() []byte {
+	bytes, _ := Utils.GetGeneralMessageSERVER()
+
+	return bytes
 }
 
 /*
