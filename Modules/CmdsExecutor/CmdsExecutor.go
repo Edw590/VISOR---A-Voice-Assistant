@@ -23,6 +23,7 @@ package CmdsExecutor
 
 import (
 	"ACD/ACD"
+	"GMan/GMan"
 	"GPTComm/GPTComm"
 	"OICComm/OICComm"
 	"Speech"
@@ -160,11 +161,11 @@ func init() {realMain =
 				switch cmd_id {
 					case CMD_ASK_TIME:
 						var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
-						speakInternal(speak, speech_priority, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 
 					case CMD_ASK_DATE:
 						var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
-						speakInternal(speak, speech_priority, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 
 					case CMD_TOGGLE_WIFI:
 						if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
@@ -174,25 +175,25 @@ func init() {realMain =
 							} else {
 								speak = "Wi-Fi turned off."
 							}
-							speakInternal(speak, speech_priority, speech_mode2, false)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the Wi-Fi " + on_off + "."
-							speakInternal(speak, speech_priority, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 
 					case CMD_ASK_BATTERY_PERCENT:
 						var battery_percentage int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 							GetInt(true))
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-						speakInternal(speak, speech_priority, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 
 					case CMD_TELL_WEATHER:
 						var speak string = "Obtaining the weather..."
-						speakInternal(speak, speech_priority, speech_mode2, false)
+						speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -200,7 +201,7 @@ func init() {realMain =
 							var weather_str string = OICComm.GetWeather()
 							if weather_str == "" {
 								speak = "I'm sorry Sir, but I couldn't get the weather information."
-								speakInternal(speak, speech_priority, speech_mode2, true)
+								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 
 								break
 							}
@@ -217,16 +218,16 @@ func init() {realMain =
 									" degrees and a minimum of " + weather_data[7] + " degrees. The precipitation is of " +
 									weather_data[2] + ", humidity of " + weather_data[3] + ", and wind of " +
 									weather_data[4] + "."
-								speakInternal(speak, speech_priority, speech_mode2, true)
+								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 							}
 						} else {
 							speak = "No network connection available to get the weather."
-							speakInternal(speak, speech_priority, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 
 					case CMD_TELL_NEWS:
 						var speak string = "Obtaining the latest news..."
-						speakInternal(speak, speech_priority, speech_mode2, true)
+						speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -234,7 +235,7 @@ func init() {realMain =
 							var news_str string = OICComm.GetWeather()
 							if news_str == "" {
 								speak = "I'm sorry Sir, but I couldn't get the news information."
-								speakInternal(speak, speech_priority, speech_mode2, true)
+								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 
 								break
 							}
@@ -252,11 +253,11 @@ func init() {realMain =
 								for _, n := range news[1:] {
 									speak += n + ". "
 								}
-								speakInternal(speak, speech_priority, speech_mode2, false)
+								speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 							}
 						} else {
 							speak = "No network connection available to get the weather."
-							speakInternal(speak, speech_priority, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 
 					case CMD_TOGGLE_ETHERNET:
@@ -267,14 +268,14 @@ func init() {realMain =
 							} else {
 								speak = "Ethernet turned off."
 							}
-							speakInternal(speak, speech_priority, speech_mode2, false)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
-							speakInternal(speak, speech_priority, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 
 					case CMD_TOGGLE_NETWORKING:
@@ -285,14 +286,95 @@ func init() {realMain =
 							} else {
 								speak = "Networking turned off."
 							}
-							speakInternal(speak, speech_priority, speech_mode2, false)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
-							speakInternal(speak, speech_priority, speech_mode2, true)
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+						}
+					case CMD_ASK_EVENTS:
+						var speak string = "Obtaining the events..."
+						speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+
+						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
+
+						if UtilsSWA.WaitForNetwork(0) {
+							var events_ids []string = strings.Split(GMan.GetEventsIdsList(), "|")
+							if events_ids == nil {
+								speak = "I'm sorry Sir, but I couldn't get the events information."
+								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+
+								break
+							}
+
+							speak = ""
+
+							for _, event_id := range events_ids {
+								var event = GMan.GetEvent(event_id)
+								if event == nil {
+									continue
+								}
+
+								event_date_time, _ := time.Parse(time.RFC3339, event.Start_time)
+
+								var add_event bool = false
+								switch cmd_variant {
+									case RET_31_TODAY:
+										if event_date_time.Day() == time.Now().Day() {
+											add_event = true
+										}
+									case RET_31_TOMORROW:
+										if event_date_time.Day() == time.Now().AddDate(0, 0, 1).Day() {
+											add_event = true
+										}
+									case RET_31_THIS_WEEK:
+										if event_date_time.Weekday() >= time.Now().Weekday() {
+											add_event = true
+										}
+									case RET_31_NEXT_WEEK:
+										var days_until_next_monday int = int((8 - time.Now().Weekday()) % 7)
+										if days_until_next_monday == 0 {
+											days_until_next_monday = 7
+										}
+										next_monday := time.Now().AddDate(0, 0, days_until_next_monday)
+										if event_date_time.Day() >= next_monday.Day() &&
+												event_date_time.Day() < next_monday.AddDate(0, 0, 7).Day() {
+											add_event = true
+										}
+								}
+								if add_event {
+									var event_on string = ""
+									if cmd_variant == RET_31_THIS_WEEK || cmd_variant == RET_31_NEXT_WEEK {
+										event_on = " on " + event_date_time.Weekday().String()
+									}
+									speak += event.Summary + event_on + " at " + event_date_time.Format("15:04") +
+										" for " + getEventDuration(event.Duration_min) + "; "
+								}
+							}
+
+							var when string
+							if cmd_variant == RET_31_TODAY {
+								when = "today"
+							} else if cmd_variant == RET_31_TOMORROW {
+								when = "tomorrow"
+							} else if cmd_variant == RET_31_THIS_WEEK {
+								when = "this week"
+							} else if cmd_variant == RET_31_NEXT_WEEK {
+								when = "next week"
+							}
+							if speak == "" {
+								speak = "You have no events found for " + when + "."
+							} else {
+								speak = "Your list of events for " + when + ": " + speak + "."
+							}
+
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_SMART, true)
+						} else {
+							speak = "No network connection available to get the events."
+							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 				}
 			}
@@ -307,15 +389,22 @@ func init() {realMain =
 	}
 }
 
-func speakInternal(txt_to_speak string, speech_priority int32, mode int32, auto_gpt bool) {
-	if auto_gpt && Utils.IsCommunicatorConnectedSERVER() && GPTComm.SendText("", false) {
-		var text string = "Write ONE different sentence based the following to keep its meaning but change its " +
-			"wording: \"" + txt_to_speak + "\". Current device: user's " + Utils.Gen_settings_GL.Device_settings.Type_ +
-			"."
-		if !GPTComm.SendText(text, false) {
-			Speech.QueueSpeech("Sorry, the GPT is busy at the moment.", speech_priority,
-				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+const _GPT_NONE int = 0
+const _GPT_DUMB int = 1
+const _GPT_SMART int = 2
+func speakInternal(txt_to_speak string, speech_priority int32, mode int32, gpt_mode int, wait_for_gpt bool) {
+	if gpt_mode != _GPT_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
+			Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt || GPTComm.SendText("", false)) {
+		var text string = "Reword in English: \"" + txt_to_speak + "\". DON'T SAY YOU'RE REWORDING IT."
+		if !GPTComm.SendText(text, gpt_mode == _GPT_SMART) {
+			var speak string = "Sorry, the GPT is busy at the moment. Text on hold."
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
+
+		return
+	}
+	if gpt_mode == _GPT_SMART {
+		// Not supposed to happen
 
 		return
 	}
@@ -335,4 +424,19 @@ func sendToGPT(txt_to_send string) {
 		Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
 			SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 	}
+}
+
+func getEventDuration(min int64) string {
+	// Return in hours if more than 60 minutes, or days if more than 24 hours, etc. Else, return in minutes.
+	if min >= 60 {
+		if min >= 24*60 {
+			if min >= 7*24*60 {
+				return strconv.Itoa(int(min/(7*24*60))) + " weeks"
+			}
+			return strconv.Itoa(int(min/(24*60))) + " days"
+		}
+		return strconv.Itoa(int(min/60)) + " hours"
+	}
+
+	return strconv.Itoa(int(min)) + " minutes"
 }

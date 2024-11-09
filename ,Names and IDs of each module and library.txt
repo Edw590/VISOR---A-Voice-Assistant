@@ -24,3 +24,4 @@ Libraries:
 05 = Settings Synchronizer
 06 = User Locator Helper
 07 = System Checker Link
+08 = Google Manager

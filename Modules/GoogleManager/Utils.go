@@ -26,13 +26,12 @@ import (
 	"errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"log"
 )
 
 func ParseConfigJSON() (*oauth2.Config, error) {
 	var credentials string = Utils.User_settings_GL.GoogleManager.Credentials_JSON
 	if credentials == "" {
-		log.Println("No credentials found in the user settings file")
+		//log.Println("No credentials found in the user settings file")
 
 		return nil, errors.New("no credentials found in the user settings file")
 	}
@@ -40,9 +39,10 @@ func ParseConfigJSON() (*oauth2.Config, error) {
 	// Load the credentials from the file
 	config, err := google.ConfigFromJSON([]byte(credentials), _SCOPES...)
 	if err != nil {
-		log.Printf("Unable to parse client secret file to config: %v\n", err)
+		//log.Printf("Unable to parse client secret file to config: %v\n", err)
 
 		return nil, err
 	}
+
 	return config, err
 }

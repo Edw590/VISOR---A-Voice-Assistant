@@ -58,6 +58,7 @@ const CMD_TELL_NEWS  string = "27";
 //const CMD_GONNA_SLEEP  string = "28";
 const CMD_TOGGLE_ETHERNET string = "29";
 const CMD_TOGGLE_NETWORKING string = "30";
+const CMD_ASK_EVENTS string = "31";
 
 ///////////////////////////////////////////////////////////////////
 // Return IDs
@@ -88,6 +89,11 @@ const RET_21_PAUSE string = ".00002";
 const RET_21_STOP string = ".00003";
 const RET_21_NEXT string = ".00004";
 const RET_21_PREVIOUS string = ".00005";
+
+const RET_31_TODAY string = ".00001";
+const RET_31_TOMORROW string = ".00002";
+const RET_31_THIS_WEEK string = ".00003";
+const RET_31_NEXT_WEEK string = ".00004";
 
 ///////////////////////////////////////////////////////////////////
 // Additional command info
@@ -129,8 +135,9 @@ var cmdi_info map[string]string = map[string]string{
 	CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
 	CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
 	//CMD_GONNA_SLEEP:               CMDi_INF1_ONLY_SPEAK,       // 28
-	CMD_TOGGLE_ETHERNET:   CMDi_INF1_DO_SOMETHING, // 4
-	CMD_TOGGLE_NETWORKING: CMDi_INF1_DO_SOMETHING, // 4
+	CMD_TOGGLE_ETHERNET:           CMDi_INF1_DO_SOMETHING,     // 29
+	CMD_TOGGLE_NETWORKING:         CMDi_INF1_DO_SOMETHING,     // 30
+	CMD_ASK_EVENTS:                CMDi_INF1_ONLY_SPEAK,       // 31
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -179,6 +186,7 @@ func prepareCommandsString() string {
 		//{CMD_GONNA_SLEEP, ACD.CMDi_TYPE_WILL_GO, "", "", "sleep"},
 		{CMD_TOGGLE_ETHERNET, ACD.CMDi_TYPE_TURN_ONFF, "", "", "ethernet"},
 		{CMD_TOGGLE_NETWORKING, ACD.CMDi_TYPE_TURN_ONFF, "", "", "networking/internet"},
+		{CMD_ASK_EVENTS, ACD.CMDi_TYPE_ASK, "", "", "have today|have tomorrow|have this week|have next week"},
 	}
 
 	var commands_almost_str []string = nil

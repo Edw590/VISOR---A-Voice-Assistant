@@ -30,6 +30,7 @@ const (
 	NUM_LIB_SettingsSync
 	NUM_LIB_ULHelper
 	NUM_LIB_SCLink
+	NUM_LIB_GMan
 
 	LIBS_ARRAY_SIZE
 )
@@ -43,4 +44,5 @@ var LIB_NUMS_NAMES map[int]string = map[int]string{
 	NUM_LIB_SettingsSync: "Settings Synchronizer",
 	NUM_LIB_ULHelper:     "User Locator Helper",
 	NUM_LIB_SCLink:       "System Checker Link",
+	NUM_LIB_GMan:         "Google Manager",
 }

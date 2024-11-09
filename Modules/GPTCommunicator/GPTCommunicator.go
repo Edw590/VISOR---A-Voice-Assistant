@@ -331,75 +331,76 @@ func init() {realMain =
 
 		// Process the text to input to the LLM model
 		for {
-			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_GPTCommunicator]
-			if comms_map == nil {
-				return
-			}
-			map_value, ok := comms_map["ToProcess"]
-			if !ok {
-				continue
-			}
+			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+			var file_list []Utils.FileInfo = to_process_dir.GetFileList()
+			for len(file_list) > 0 {
+				file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
+				var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
 
-			var to_process string = map_value.(string)
-			if to_process != "" {
-				// It comes like: "[device_id|[true or false]]text"
-				var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
-				device_id = params_split[0]
-				var use_smart bool = params_split[1] == "true"
-				var text string = to_process[strings.Index(to_process, "]") + 1:]
-				text = strings.Replace(text, "\n", "\\n", -1)
+				var to_process string = *file_path.ReadTextFile()
+				if to_process != "" {
+					// It comes like: "[device_id|[true or false]]text"
+					var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
+					device_id = params_split[0]
+					var use_smart bool = params_split[1] == "true"
+					var text string = to_process[strings.Index(to_process, "]")+1:]
+					text = strings.Replace(text, "\n", "\\n", -1)
 
-				if use_smart && strings.HasPrefix(text, "/") {
-					// Control commands begin with a slash
-					if text == "/clear" {
-						// Clear the context of the LLM model by stopping the module (the Manager will restart it)
-						shut_down = true
-					} else if text == "/mem" {
-						// Memorize and clear the context
-						if user_text != "" {
-							memorizeThings(user_text, false)
+					if use_smart && strings.HasPrefix(text, "/") {
+						// Control commands begin with a slash
+						if text == "/clear" {
+							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
+							shut_down = true
+						} else if text == "/mem" {
+							// Memorize and clear the context
+							if user_text != "" {
+								memorizeThings(user_text, false)
+							}
+
+							shut_down = true
+						} else if text == "/memmem" {
+							// Summarize the list of memories (sometimes VISOR may memorize useless sentences, so this will
+							// cut them out - will cut out other things too though, so use with caution).
+							if len(modGenInfo_GL.Memories) > 0 {
+								var memories_str string = strings.Join(modGenInfo_GL.Memories, ". ")
+								memorizeThings(memories_str, true)
+							}
+						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
+							// Ask Wolfram Alpha the question
+							var question string = text[len(ASK_WOLFRAM_ALPHA):]
+							result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
+
+							if direct_result {
+								_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+"The answer is: "+result+
+									". "+getEndString(), true)
+							} else {
+								sendToGPT("Summarize in sentences the following: "+result, false)
+							}
+						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
+							// Search for the Wikipedia page title
+							var query string = text[len(SEARCH_WIKIPEDIA):]
+
+							_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+OnlineInfoChk.RetrieveWikipedia(query)+
+								getEndString(), true)
 						}
-
-						shut_down = true
-					} else if text == "/memmem" {
-						// Summarize the list of memories (sometimes VISOR may memorize useless sentences, so this will
-						// cut them out - will cut out other things too though, so use with caution).
-						if len(modGenInfo_GL.Memories) > 0 {
-							var memories_str string = strings.Join(modGenInfo_GL.Memories, ". ")
-							memorizeThings(memories_str, true)
-						}
-					} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
-						// Ask Wolfram Alpha the question
-						var question string = text[len(ASK_WOLFRAM_ALPHA):]
-						result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
-
-						if direct_result {
-							_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
-								". " + getEndString(), true)
-						} else {
-							sendToGPT("Summarize in sentences the following: " + result, false)
-						}
-					} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
-						// Search for the Wikipedia page title
-						var query string = text[len(SEARCH_WIKIPEDIA):]
-
-						_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
-							getEndString(), true)
-					}
-				} else {
-					if use_smart {
-						sendToGPT("[" + time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04") +
-							"] " + text, true)
 					} else {
-						sendToGPT(text, false)
+						if use_smart {
+							sendToGPT("["+time.Now().Weekday().String()+" "+time.Now().Format("2006-01-02 15:04")+
+								"] "+text, true)
+						} else {
+							sendToGPT(text, false)
+						}
 					}
 				}
-			}
 
-			if shut_down {
-				shutDown()
+				Utils.DelElemSLICES(&file_list, idx_to_remove)
+				_ = os.Remove(file_path.GPathToStringConversion())
 
-				return
+				if shut_down {
+					shutDown()
+
+					return
+				}
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {

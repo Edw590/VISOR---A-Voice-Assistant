@@ -46,10 +46,10 @@ func GetNews() string {
 		return ""
 	}
 
-	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+	var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var news_list []ModsFileInfo.News
-	if err := Utils.FromJsonGENERAL(file_contents, &news_list); err != nil {
+	if err := Utils.FromJsonGENERAL(json_bytes, &news_list); err != nil {
 		return ""
 	}
 
@@ -95,10 +95,10 @@ func GetWeather() string {
 		return ""
 	}
 
-	var file_contents []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+	var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
 	var weather []ModsFileInfo.Weather
-	if err := Utils.FromJsonGENERAL(file_contents, &weather); err != nil {
+	if err := Utils.FromJsonGENERAL(json_bytes, &weather); err != nil {
 		return ""
 	}
 

@@ -44,14 +44,12 @@ var (
 	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
 	modGenInfo_GL  *ModsFileInfo.Mod14GenInfo = &Utils.Gen_settings_GL.MOD_14
-	modUserInfo_GL *ModsFileInfo.Mod14UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_14
-		modUserInfo_GL = &Utils.User_settings_GL.GoogleManager
 
 		for {
 			// Parse credentials to config
@@ -63,7 +61,7 @@ func init() {realMain =
 			}
 			client := getClient(config)
 			if client == nil {
-				log.Println("No token saved")
+				//log.Println("No token saved")
 
 				return
 			}

@@ -156,22 +156,22 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var mutex sync.Mutex
 
-	sendData := func(message_type int, bytes []byte) bool {
+	sendData := func(message_type int, bytes []byte) error {
 		mutex.Lock()
 		defer mutex.Unlock()
 
 		if err = conn.WriteMessage(message_type, bytes); err != nil {
-			return false
+			return err
 		}
 
-		return true
+		return err
 	}
 
 	go func() {
 		for {
 			select {
 				case <- ticker.C:
-					if !sendData(websocket.PingMessage, nil) {
+					if sendData(websocket.PingMessage, nil) != nil {
 						log.Println("Ping error:", err)
 
 						return
@@ -189,7 +189,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 					var index_bar int = strings.Index(string(message), "|")
 					var truncated_msg []byte = message[index_bar + 1:]
 
-					if sendData(websocket.BinaryMessage, truncated_msg) {
+					if err = sendData(websocket.BinaryMessage, truncated_msg); err == nil {
 						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(truncated_msg),
 							CRC16.Result(truncated_msg, "CCIT_ZERO"), truncated_msg[:strings.Index(string(truncated_msg), "|")])
 					} else {
@@ -247,7 +247,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
 
-			if sendData(websocket.BinaryMessage, response) {
+			if err = sendData(websocket.BinaryMessage, response); err == nil {
 				log.Printf("Message sent 1. Length: %d; CRC16: %d; Content: %s", len(response),
 					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
 			} else {
@@ -312,8 +312,11 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 				ret = []byte("false")
 			}
 
-			if bytes != nil {
-				Utils.SendToModChannel(Utils.NUM_MOD_GPTCommunicator, "ToProcess", Utils.DecompressString(bytes))
+			if len(bytes) > 0 {
+				// Don't use channels for this. What if various messages are sent while one is still be processed? The
+				// module will lock - as it did now.
+				_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
+					Utils.RandStringGENERAL(10) + ".txt").WriteTextFile(Utils.DecompressString(bytes), false)
 			}
 
 			return ret
@@ -337,6 +340,8 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
 				case "GManTok":
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
+				case "GManEvents":
+					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}

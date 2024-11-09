@@ -26,16 +26,12 @@ type Mod14GenInfo struct {
 	// Token is the cached token
 	Token string
 	// Events is the list of events, with the keys being the events IDs
-	Events map[string][]*Event
-	// Tasks is the list of tasks, with the keys being the tasks IDs
-	Tasks map[string][]*Task2
-}
-
-type Task2 struct {
-
+	Events []Event
 }
 
 type Event struct {
+	// Id is the ID of the event
+	Id string
 	// Summary is the title of the event
 	Summary string
 	// Location is the location of the event
