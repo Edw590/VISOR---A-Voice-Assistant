@@ -342,6 +342,8 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
 				case "GManEvents":
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
+				case "GManTasks":
+					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}

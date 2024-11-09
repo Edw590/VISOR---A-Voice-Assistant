@@ -116,12 +116,18 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 				return
 			}
 
+			if !Utils.IsCommunicatorConnectedSERVER() {
+				dialog.ShowError(errors.New("not connected to the server"), Current_window_GL)
+
+				return
+			}
+
 			var message []byte = []byte("S_JSON|GManTok|")
 			token_bytes, _ := json.Marshal(token)
 			message = append(message, Utils.CompressString(string(token_bytes))...)
 			Utils.QueueNoResponseMessageSERVER(message)
 
-			dialog.ShowInformation("Information", "Authorization code saved", Current_window_GL)
+			dialog.ShowInformation("Information", "Authorization code saved. You're all set!", Current_window_GL)
 		}, Current_window_GL)
 
 		link, _ = url.Parse(auth_url)

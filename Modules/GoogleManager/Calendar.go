@@ -59,7 +59,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 	//log.Println("Getting all events for this week and next week")
 
 	// Reset the events map every time we update the events
-	var events_final []ModsFileInfo.Event = nil
+	var events_final []ModsFileInfo.GEvent = nil
 
 	// Iterate over each calendar and retrieve events
 	for _, calendarListEntry := range calendarList.Items {
@@ -70,7 +70,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 			SingleEvents(true).
 			TimeMin(start_of_Week.Format(time.RFC3339)).
 			TimeMax(end_of_next_week.Format(time.RFC3339)).
-			MaxResults(999).
+			MaxResults(9999).
 			OrderBy("startTime").
 			Do()
 		if err != nil {
@@ -104,7 +104,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 				var duration_min int64 = int64(end_date_parsed.Sub(start_date_parsed).Minutes())
 
 				// Store the event
-				events_final = append(events_final, ModsFileInfo.Event{
+				events_final = append(events_final, ModsFileInfo.GEvent{
 					Id:           item.Id,
 					Summary:      item.Summary,
 					Location:     item.Location,

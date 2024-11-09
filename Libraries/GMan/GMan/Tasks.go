@@ -26,10 +26,10 @@ import (
 	"Utils/ModsFileInfo"
 )
 
-var events_GL []ModsFileInfo.Event = nil
+var tasks_GL []ModsFileInfo.GTask = nil
 
-func getEvents() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, []byte("JSON|true|GManEvents"))
+func getTasks() {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, []byte("JSON|true|GManTasks"))
 	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GMan]
 	if comms_map == nil {
 		return
@@ -37,7 +37,7 @@ func getEvents() {
 
 	var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	if err := Utils.FromJsonGENERAL(json_bytes, &events_GL); err != nil {
+	if err := Utils.FromJsonGENERAL(json_bytes, &tasks_GL); err != nil {
 		return
 	}
 }
@@ -47,17 +47,19 @@ GetEventsIdsListGMAN returns a list of all events' IDs.
 
 This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
+DON'T REQUEST LISTS FROM THIS LIBRARY IN DIFFERENT THREADS!!! All in the same thread always.
+
 -----------------------------------------------------------
 
 – Returns:
   - a list of all events' IDs separated by "|"
 */
-func GetEventsIdsList() string {
-	getEvents()
+func GetTasksIdsList() string {
+	getTasks()
 
 	var ids_list string = ""
-	for _, event := range events_GL {
-		ids_list += event.Id + "|"
+	for _, task := range tasks_GL {
+		ids_list += task.Id + "|"
 	}
 	if len(ids_list) > 0 {
 		ids_list = ids_list[:len(ids_list)-1]
@@ -77,11 +79,11 @@ GetEventGMAN returns an event by its ID.
 – Returns:
   - the event or nil if the event was not found
 */
-func GetEvent(event_id string) *ModsFileInfo.Event {
-	for i := 0; i < len(events_GL); i++ {
-		var event *ModsFileInfo.Event = &events_GL[i]
-		if event.Id == event_id {
-			return event
+func GetTask(task_id string) *ModsFileInfo.GTask {
+	for i := 0; i < len(tasks_GL); i++ {
+		var task *ModsFileInfo.GTask = &tasks_GL[i]
+		if task.Id == task_id {
+			return task
 		}
 	}
 

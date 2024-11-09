@@ -25,11 +25,26 @@ package ModsFileInfo
 type Mod14GenInfo struct {
 	// Token is the cached token
 	Token string
-	// Events is the list of events, with the keys being the events IDs
-	Events []Event
+	// Events is the list of events
+	Events []GEvent
+	// Tasks is the list of tasks
+	Tasks []GTask
 }
 
-type Event struct {
+type GTask struct {
+	// Id is the ID of the task
+	Id string
+	// Title is the title of the task
+	Title string
+	// Details are the details of the task
+	Details string
+	// Date is the date of the task in "2006-01-02" format
+	Date string
+	// Completed is whether the task is completed
+	Completed bool
+}
+
+type GEvent struct {
 	// Id is the ID of the event
 	Id string
 	// Summary is the title of the event

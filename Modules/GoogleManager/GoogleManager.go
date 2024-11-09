@@ -66,8 +66,11 @@ func init() {realMain =
 				return
 			}
 
-			// Retrieve all available calendars and their events
+			// Store calendar events
 			storeCalendarsEvents(client)
+
+			// Store tasks
+			storeTasks(client)
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
 				return
