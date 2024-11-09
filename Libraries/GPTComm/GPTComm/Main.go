@@ -25,16 +25,10 @@ import (
 	"Utils"
 	"strconv"
 	"strings"
-	"time"
 )
-
-var gpt_ready_GL string
-var compressed_memories_GL []byte
 
 /*
 SendText sends the given text to the LLM model.
-
-GetNextSpeechSentence() MUST BE IN LOOP BEFORE CALLING THIS FUNCTION!!!
 
 -----------------------------------------------------------
 
@@ -51,19 +45,19 @@ func SendText(text string, use_smart bool) bool {
 		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id+ "|" +
 			strconv.FormatBool(use_smart) + "]" + text)...)
 	}
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, message)
-	time.Sleep(500 * time.Millisecond)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
+	if comms_map == nil {
+		return false
+	}
 
-	var ret = gpt_ready_GL == "true"
-	gpt_ready_GL = ""
+	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
-	return ret
+	return string(response) == "true"
 }
 
 /*
 GetMemories gets the memories from the GPT.
-
-GetNextSpeechSentence() MUST BE IN LOOP BEFORE CALLING THIS FUNCTION!!!
 
 -----------------------------------------------------------
 
@@ -71,13 +65,18 @@ GetNextSpeechSentence() MUST BE IN LOOP BEFORE CALLING THIS FUNCTION!!!
   - the memories separated by new lines
  */
 func GetMemories() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("JSON|true|GPTMem"))
-	time.Sleep(500 * time.Millisecond)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("JSON|true|GPTMem"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2)
+	if comms_map == nil {
+		return ""
+	}
 
-	var bytes []byte = []byte(Utils.DecompressString(compressed_memories_GL))
+	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+
+	var json_bytes []byte = []byte(Utils.DecompressString(response))
 
 	var memories []string
-	if err := Utils.FromJsonGENERAL(bytes, &memories); err != nil {
+	if err := Utils.FromJsonGENERAL(json_bytes, &memories); err != nil {
 		return ""
 	}
 
@@ -124,8 +123,8 @@ func getEntry(time int64, num int) *_Entry {
 		}
 	}
 
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, []byte("File|false|gpt_text.txt"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, []byte("File|false|gpt_text.txt"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
 	if comms_map == nil {
 		return &_Entry{
 			device_id: "",

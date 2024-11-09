@@ -102,7 +102,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 			entry_message.Text, entry_command.Text, entry_time.Text, repeat_each_min, entry_user_location.Text,
 			entry_programmable_condition.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 
 	return createMainContentScrollUTILS(
@@ -202,7 +202,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 		task.User_location = entry_user_location.Text
 		task.Programmable_condition = entry_programmable_condition.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -211,7 +211,7 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 			if confirmed {
 				SettingsSync.RemoveTaskTASKS(task.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 			}
 		})
 	})

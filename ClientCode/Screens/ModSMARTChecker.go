@@ -71,7 +71,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 			return
 		}
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 
 	return createMainContentScrollUTILS(
@@ -117,7 +117,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo) *fyne.Container {
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -126,7 +126,7 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo) *fyne.Container {
 			if confirmed {
 				SettingsSync.RemoveDiskSMART(disk.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 			}
 		})
 	})

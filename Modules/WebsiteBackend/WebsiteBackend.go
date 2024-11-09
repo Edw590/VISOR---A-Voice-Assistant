@@ -58,7 +58,7 @@ func init() {realMain =
 
 		go func() {
 			for {
-				var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_WebsiteBackend]
+				var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0)
 				if comms_map == nil {
 					return
 				}
@@ -243,7 +243,9 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		var bytes []byte = message[index_bar + index_2nd_bar + 2:]
 
 		var partial_resp []byte = handleMessage(device_id, type_, bytes)
-		if msg_to != "N" {
+		if msg_to == "N" {
+			log.Println("Returning no response")
+		} else {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
 
@@ -255,8 +257,6 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 				break
 			}
-		} else {
-			log.Println("Returning no response")
 		}
 	}
 

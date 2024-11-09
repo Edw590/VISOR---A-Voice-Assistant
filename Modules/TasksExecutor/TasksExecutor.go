@@ -53,7 +53,7 @@ func init() {realMain =
 				}
 
 				if task.Command != "" {
-					Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "SentenceInternal", task.Command)
+					Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, 0, "SentenceInternal", task.Command)
 				}
 			}
 		}()

@@ -67,8 +67,8 @@ func SyncUserSettings() {
 						continue
 					}
 
-					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|true|US"))
-					var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
+					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 0, []byte("JSON|true|US"))
+					var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 0)
 					if comms_map == nil {
 						return
 					}
@@ -88,8 +88,8 @@ func SyncUserSettings() {
 }
 
 func remoteSettingsChanged() bool {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, []byte("JSON|false|US"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_SettingsSync]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 1, []byte("JSON|false|US"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 1)
 	if comms_map == nil {
 		return false
 	}

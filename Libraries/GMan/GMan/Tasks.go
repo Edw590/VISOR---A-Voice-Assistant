@@ -29,8 +29,8 @@ import (
 var tasks_GL []ModsFileInfo.GTask = nil
 
 func getTasks() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, []byte("JSON|true|GManTasks"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GMan]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 1, []byte("JSON|true|GManTasks"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 1)
 	if comms_map == nil {
 		return
 	}

@@ -35,25 +35,37 @@ var last_idx_begin_GL int = 0
 var last_text_GL string = ""
 var ignore_sentence_GL bool = false
 
+var start_checking_GL []bool = nil
+
 const END_ENTRY string = "[3234_END]"
 const ALL_DEVICES_ID string = "3234_ALL"
 
 /*
-SetTimeBegin sets the time to begin searching for the next speech.
+SetPreparations sets the time to begin searching for the next speech and starts the process of getting the next speech
+beginning.
+
+Set only for the first time. The next times, the time is automatic and based on the time of the last speech.
 
 -----------------------------------------------------------
 
 – Params:
   - time_begin_ms – the time to begin searching for the next speech in milliseconds
- */
-func SetTimeBegin(time_begin_ms int64) {
+*/
+func SetPreparations(time_begin_ms int64) {
 	time_begin_ms_GL = time_begin_ms
+	go func() {
+		for {
+			// Get the start message but ignore it (we just need to know *when* to start).
+			Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 0)
+
+			// Keep waiting until the start message is received. If multiple are received, stack them up.
+			start_checking_GL = append(start_checking_GL, true)
+		}
+	}()
 }
 
 /*
 GetNextSpeechSentence gets the next sentence to be spoken of the most recent speech.
-
-THIS FUNCTION MUST BE IN LOOP BEFORE CALLING SendText()!!!
 
 Each time the function is called, a new sentence is returned, until the end of the text file is reached, in which case
 the function will return END_ENTRY.
@@ -70,26 +82,28 @@ The function will wait until the time of the next speech is reached.
  */
 func GetNextSpeechSentence() string {
 	if curr_entry_time_ms_GL == -1 {
-		var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GPTComm]
-		if comms_map == nil {
-			return END_ENTRY
+		for {
+			if len(start_checking_GL) == 0 {
+				time.Sleep(1 * time.Second)
+
+				continue
+			}
+
+			Utils.DelElemSLICES(&start_checking_GL, 0)
+
+			break
 		}
 
-		var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-		if string(response) == "start" {
-			var entry *_Entry = getEntry(-1, -1)
-			var device_id string = entry.getDeviceID()
-			if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Gen_settings_GL.Device_settings.Id ||
-					device_id == ALL_DEVICES_ID) {
-				curr_entry_time_ms_GL = entry.getTime()
+		var entry *_Entry = getEntry(-1, -1)
+		var device_id string = entry.getDeviceID()
+		if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Gen_settings_GL.Device_settings.Id ||
+				device_id == ALL_DEVICES_ID) {
+			curr_entry_time_ms_GL = entry.getTime()
+			if curr_entry_time_ms_GL != 1 {
 				time_begin_ms_GL = curr_entry_time_ms_GL + 1
-				last_speech_GL = ""
-				ignore_sentence_GL = false
 			}
-		} else if string(response) == "true" || string(response) == "false" {
-			gpt_ready_GL = string(response)
-		} else {
-			compressed_memories_GL = response
+			last_speech_GL = ""
+			ignore_sentence_GL = false
 		}
 	}
 	if curr_entry_time_ms_GL == -1 {
@@ -105,6 +119,7 @@ func GetNextSpeechSentence() string {
 	for {
 		var entry *_Entry = getEntry(curr_entry_time_ms_GL, -1)
 		if entry.getTime() == -1 {
+			//log.Println("No entry found")
 			// Maybe no Internet connection, so it returns an empty Entry. Just wait until there is connection again.
 			time.Sleep(1 * time.Second)
 
@@ -166,6 +181,7 @@ func GetNextSpeechSentence() string {
 
 			break
 		} else {
+			//fmt.Println("text[last_idx_begin_GL:]:", text[last_idx_begin_GL:])
 			time.Sleep(1 * time.Second)
 		}
 	}

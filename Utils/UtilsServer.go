@@ -25,6 +25,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -123,11 +124,12 @@ func startCommunicatorInternalSERVER() {
 				continue
 			}
 
-			//log.Printf("Received message: %s", string(message))
-
 			var msg_to string = strings.Split(string(message), "|")[0]
 			var index_bar int = strings.Index(string(message), "|")
 			var truncated_msg []byte = message[index_bar+1:]
+
+			log.Printf("Received message: %s", string(message[:index_bar]))
+
 			if msg_to == "G" {
 				if !srvComm_stopping_GL {
 					srvComm_gen_ch_in_GL <- truncated_msg
@@ -143,12 +145,18 @@ func startCommunicatorInternalSERVER() {
 
 				continue
 			}
+			ch_num, err := strconv.Atoi(msg_to_split[2])
+			if err != nil {
+				//log.Println("Error converting channel number:", err)
+
+				continue
+			}
 
 			if !srvComm_stopping_GL {
 				if to_mod {
-					SendToModChannel(num, COMMS_MAP_SRV_KEY, truncated_msg)
+					SendToModChannel(num, ch_num, COMMS_MAP_SRV_KEY, truncated_msg)
 				} else {
-					SendToLibChannel(num, COMMS_MAP_SRV_KEY, truncated_msg)
+					SendToLibChannel(num, ch_num, COMMS_MAP_SRV_KEY, truncated_msg)
 				}
 			}
 		}
@@ -259,7 +267,7 @@ QueueMessageSERVER queues a message to be sent to the server.
   - num – the number of the module or library that called this function
   - message – the message to be sent
 */
-func QueueMessageSERVER(is_mod bool, num int, message []byte) {
+func QueueMessageSERVER(is_mod bool, num int, channel_num int, message []byte) {
 	if srvComm_stopping_GL || !srvComm_started_GL {
 		return
 	}
@@ -268,7 +276,7 @@ func QueueMessageSERVER(is_mod bool, num int, message []byte) {
 	if !is_mod {
 		mod_lib = "L"
 	}
-	var message_str string = mod_lib + "_" + strconv.Itoa(num) + "|"
+	var message_str string = mod_lib + "_" + strconv.Itoa(num) + "_" + strconv.Itoa(channel_num) + "|"
 	var new_msg []byte = append([]byte(message_str), message...)
 	srvComm_gen_ch_out_GL <- new_msg
 }

@@ -58,7 +58,7 @@ func init() {realMain =
 		ACD.ReloadCmdsArray(prepareCommandsString())
 
 		for {
-			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_CmdsExecutor]
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_CmdsExecutor, 0)
 			if comms_map == nil {
 				return
 			}

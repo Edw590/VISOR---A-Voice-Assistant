@@ -71,7 +71,7 @@ func init() {realMain =
 		for {
 			keywordIndex, _ := porcupine_.Process(getNextFrameAudio())
 			if keywordIndex >= 0 {
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "ShowApp", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "ShowApp", nil)
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 0) {

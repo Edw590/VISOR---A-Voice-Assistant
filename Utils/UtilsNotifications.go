@@ -22,5 +22,5 @@
 package Utils
 
 func QueueNotificationNOTIFS(title string, text string) {
-	SendToModChannel(NUM_MOD_VISOR, "Notification", []string{title, text})
+	SendToModChannel(NUM_MOD_VISOR, 0, "Notification", []string{title, text})
 }

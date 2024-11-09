@@ -109,7 +109,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 		SettingsSync.AddLocationLOCATIONS(check_enabled.Checked, entry_type.Text, entry_name.Text, entry_address.Text,
 			last_detection_s, int32(max_distance), entry_location_name.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 
 	return createMainContentScrollUTILS(
@@ -194,7 +194,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 		loc_info.Max_distance_m = int32(max_distance_m)
 		loc_info.Location = entry_location_name.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -203,7 +203,7 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 			if confirmed {
 				SettingsSync.RemoveLocationLOCATIONS(loc_info.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 			}
 		})
 	})

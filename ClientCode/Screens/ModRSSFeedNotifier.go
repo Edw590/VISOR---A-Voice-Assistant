@@ -68,7 +68,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 		SettingsSync.AddFeedRSS(check_enabled.Checked, entry_feed_name.Text, entry_feed_url.Text, entry_feed_type.Text,
 			entry_custom_msg_subject.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 
 	return createMainContentScrollUTILS(
@@ -125,7 +125,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 		feed_info.Url = entry_url.Text
 		feed_info.Custom_msg_subject = entry_custom_msg_subject.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -134,7 +134,7 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 			if confirmed {
 				SettingsSync.RemoveFeedRSS(feed_info.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, "Redraw", nil)
+				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 			}
 		})
 	})

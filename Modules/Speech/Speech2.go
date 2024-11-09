@@ -123,7 +123,7 @@ func init() {realMain =
 		}()
 
 		go func() {
-			GPTComm.SetTimeBegin(time.Now().UnixMilli())
+			GPTComm.SetPreparations(time.Now().UnixMilli())
 			for {
 				// Keep getting the next sentence to speak from the server
 				var speak string = GPTComm.GetNextSpeechSentence()

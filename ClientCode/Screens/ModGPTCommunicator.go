@@ -157,7 +157,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	)
 
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
-		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, "Sentence", text_to_send.Text)
+		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, 0, "Sentence", text_to_send.Text)
 	})
 
 	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to the LLM (smart)", func() {

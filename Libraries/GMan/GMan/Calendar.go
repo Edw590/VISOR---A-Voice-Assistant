@@ -29,8 +29,8 @@ import (
 var events_GL []ModsFileInfo.GEvent = nil
 
 func getEvents() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, []byte("JSON|true|GManEvents"))
-	var comms_map map[string]any = <- Utils.LibsCommsChannels_GL[Utils.NUM_LIB_GMan]
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("JSON|true|GManEvents"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0)
 	if comms_map == nil {
 		return
 	}

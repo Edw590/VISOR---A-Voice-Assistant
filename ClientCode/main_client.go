@@ -305,7 +305,7 @@ processCommsChannel processes in a different thread the communications channel.
 func processCommsChannel() {
 	go func() {
 		for {
-			var comms_map map[string]any = <- Utils.ModsCommsChannels_GL[Utils.NUM_MOD_VISOR]
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_VISOR, 0)
 			if comms_map == nil {
 				return
 			}

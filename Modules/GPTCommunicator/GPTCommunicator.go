@@ -221,7 +221,7 @@ func init() {realMain =
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
 
 					// Send a message to LIB_2 saying the GPT just started writing
-					Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, "Message", []byte(device_id + "|L_2|start"))
+					Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id+"|L_2_0|start"))
 				} else if strings.Contains(last_answer, _END_TOKENS) {
 					is_writing = false
 
