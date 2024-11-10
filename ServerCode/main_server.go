@@ -99,11 +99,11 @@ func init() {realMain =
 
 		handleCtrlCGracefully(module_stop)
 
-		var no_status bool = Utils.WasArgUsedGENERAL(os.Args, "--nostatus")
+		var status bool = Utils.WasArgUsedGENERAL(os.Args, "--status")
 
 		for {
 			// Wait forever while the other modules do their work
-			if !no_status {
+			if status {
 				printModulesStatus(modules)
 			}
 
