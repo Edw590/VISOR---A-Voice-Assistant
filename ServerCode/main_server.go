@@ -23,7 +23,6 @@ package main
 
 import (
 	"ModulesManager"
-	"SettingsSync/SettingsSync"
 	"Utils"
 	"VISOR_Server/ServerRegKeys"
 	"log"
@@ -67,7 +66,7 @@ func init() {realMain =
 			}
 		}
 
-		if !readUserSettings() {
+		if err := Utils.ReadSettingsFile(true); err != nil {
 			log.Println("Failed to load user settings. Exiting...")
 
 			return
@@ -108,7 +107,7 @@ func init() {realMain =
 				printModulesStatus(modules)
 			}
 
-			Utils.WriteUserSettings()
+			Utils.WriteSettingsFile(true)
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, 5) {
 				break
@@ -140,24 +139,4 @@ func printModulesStatus(modules []Utils.Module) {
 		log.Println("- Support: " + strconv.FormatBool(Utils.IsModSupportedMODULES(module.Num)))
 		log.Println("- Running: " + strconv.FormatBool(!module.Stopped))
 	}
-}
-
-func readUserSettings() bool {
-	var user_settings_bytes []byte = Utils.GetBinDirFILESDIRS().Add2(true, Utils.USER_SETTINGS_FILE).ReadFile()
-	if user_settings_bytes == nil {
-		return false
-	}
-
-	var to_read []byte = user_settings_bytes
-	if Utils.Password_GL != "" {
-		to_read = Utils.DecryptBytesCRYPTOENDECRYPT([]byte(Utils.Password_GL), []byte(Utils.Password_GL), to_read, nil)
-	}
-
-	if err := SettingsSync.LoadUserSettings(string(to_read)); err != nil {
-		log.Println("Error loading user settings:", err)
-
-		return false
-	}
-
-	return true
 }

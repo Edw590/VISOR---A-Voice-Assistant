@@ -24,7 +24,6 @@ package Utils
 import (
 	"Utils/ModsFileInfo"
 	"errors"
-	"os"
 )
 
 const USER_SETTINGS_FILE string = "UserSettings_EOG.dat"
@@ -68,38 +67,8 @@ type GenSettings struct {
 	Registry        []*Value
 }
 
-///////////////////////////////////////////////////////////////
-
 /*
-WriteUserSettings is the function that saves the global variables of the UserSettings struct.
-
------------------------------------------------------------
-
-– Returns:
-  - true if the user settings were successfully saved, false otherwise
-*/
-func WriteUserSettings() bool {
-	var p_string *string = ToJsonGENERAL(User_settings_GL)
-	if p_string == nil {
-		return false
-	}
-
-	var to_write []byte = []byte(*p_string)
-	if Password_GL != "" {
-		to_write = EncryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), to_write, nil)
-	}
-
-	if err := os.WriteFile(USER_SETTINGS_FILE, to_write, 0777); err != nil {
-		return false
-	}
-
-	return true
-}
-
-///////////////////////////////////////////////////////////////
-
-/*
-readGenSettings is the function that initializes the global variables of the GenSettings struct.
+ReadSettingsFile is the function that reads the User and Generated settings from disk.
 
 -----------------------------------------------------------
 
@@ -109,46 +78,77 @@ readGenSettings is the function that initializes the global variables of the Gen
 – Returns:
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
 */
-func readGenSettings(server bool) error {
-	var settings_file string = GEN_SETTINGS_FILE_CLIENT
-	if server {
-		settings_file = _GEN_SETTINGS_FILE_SERVER
-	}
-	bytes, err := os.ReadFile(settings_file)
-	if err != nil {
-		cwd, err := os.Getwd()
-		if err != nil {
-			cwd = "[ERROR]"
+func ReadSettingsFile(user_settings bool) error {
+	var settings_file string = USER_SETTINGS_FILE
+	if !user_settings {
+		settings_file = GEN_SETTINGS_FILE_CLIENT
+		if VISOR_server_GL {
+			settings_file = _GEN_SETTINGS_FILE_SERVER
 		}
-		return errors.New("no " + settings_file + " file found in the current working directory: \"" + cwd + "\" - aborting")
+	}
+	var backup_file string = settings_file + ".bak"
+
+	var bin_dir GPath = GetBinDirFILESDIRS()
+	var bytes []byte = bin_dir.Add2(false, settings_file).ReadFile()
+
+	decryptToJson := func() error {
+		if Password_GL != "" {
+			bytes = DecryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), bytes, nil)
+		}
+
+		var p_settings any = &Gen_settings_GL
+		if user_settings {
+			p_settings = &User_settings_GL
+		}
+		if err := FromJsonGENERAL(bytes, p_settings); err != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	var to_read []byte = bytes
-	if Password_GL != "" {
-		to_read = DecryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), bytes, nil)
-	}
+	// Try to decrypt and parse the obtained JSON file (normal or backup)
+	if err := decryptToJson(); err != nil {
+		// If the decryption and/or parsing failed, maybe the file was empty or corrupted. So try to read the backup
+		// file.
+		bytes = bin_dir.Add2(false, backup_file).ReadFile()
+		if bytes == nil {
+			var user_generated string = "generated"
+			if user_settings {
+				user_generated = "user"
+			}
 
-	if err = FromJsonGENERAL(to_read, &Gen_settings_GL); err != nil {
-		return err
+			return errors.New("no valid " + user_generated + " settings file found in the directory: \"" +
+				bin_dir.GPathToStringConversion() + "\" - aborting")
+		}
+
+		if err = decryptToJson(); err != nil {
+			// If not even the backup file could be decrypted and/or parsed, return the error
+			return err
+		}
 	}
 
 	return nil
 }
 
 /*
-writeGenSettings is the function that saves the global variables of the GenSettings struct to the _GEN_SETTINGS_FILE file.
+WriteSettingsFile is the function that writes the User and Generated settings to disk.
 
 -----------------------------------------------------------
 
 – Params:
-  - server – true if the generated settings were successfully saved, false otherwise
-*/
-func writeGenSettings(server bool) bool {
-	var settings_file string = GEN_SETTINGS_FILE_CLIENT
-	if server {
-		settings_file = _GEN_SETTINGS_FILE_SERVER
+  - server – true if the version running is the server version, false if it is the client version
+  - user_settings – true if the user settings should be saved, false if the generated settings should be saved
+
+– Returns:
+  - true if the settings were successfully saved, false otherwise
+ */
+func WriteSettingsFile(user_settings bool) bool {
+	var settings any = Gen_settings_GL
+	if user_settings {
+		settings = User_settings_GL
 	}
-	var p_string *string = ToJsonGENERAL(Gen_settings_GL)
+	var p_string *string = ToJsonGENERAL(settings)
 	if p_string == nil {
 		return false
 	}
@@ -158,9 +158,18 @@ func writeGenSettings(server bool) bool {
 		to_write = EncryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), to_write, nil)
 	}
 
-	if err := os.WriteFile(settings_file, to_write, 0777); err != nil {
-		return false
+	var settings_file string = USER_SETTINGS_FILE
+	if !user_settings {
+		settings_file = GEN_SETTINGS_FILE_CLIENT
+		if VISOR_server_GL {
+			settings_file = _GEN_SETTINGS_FILE_SERVER
+		}
 	}
+	var backup_file string = settings_file + ".bak"
+
+	var bin_dir GPath = GetBinDirFILESDIRS()
+	_ = bin_dir.Add2(false, settings_file).WriteFile(to_write, false)
+	_ = bin_dir.Add2(false, backup_file).WriteFile(to_write, false)
 
 	return true
 }

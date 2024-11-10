@@ -202,7 +202,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 		Password_GL = GetPasswordCREDENTIALS()
 
 		readGenSettingsInternal := func() bool {
-			if err := readGenSettings(server); err != nil {
+			if err := ReadSettingsFile(false); err != nil {
 				log.Println("warning: Error obtaining generated settings - aborting")
 				log.Println(err)
 
@@ -228,7 +228,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 					break
 				}
 
-				writeGenSettings(server)
+				WriteSettingsFile(false)
 
 				time.Sleep(5 * time.Second)
 			}
@@ -296,7 +296,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 	if mod_num == NUM_MOD_VISOR {
 		// Don't run in another thread if it's the main program - it must be run on the main thread.
 
-		if isVISORRunningMODULES(server) {
+		if isVISORRunningMODULES() {
 			log.Println("Module " + strconv.Itoa(mod_num) + " is already running. Exiting...")
 
 			goto end
@@ -304,7 +304,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		InitializeCommsChannels()
 
-		moduleInfo.updateVISORRunInfo(server)
+		moduleInfo.updateVISORRunInfo()
 
 		to_do()
 	} else {
@@ -522,14 +522,14 @@ updateVISORRunInfo updates the information about the running of VISOR.
 – Returns:
   - the path to the file containing the information about the running of the module
 */
-func (moduleInfo *ModuleInfo) updateVISORRunInfo(server bool) {
+func (moduleInfo *ModuleInfo) updateVISORRunInfo() {
 	files, _ := os.ReadDir(GetUserDataDirMODULES(NUM_MOD_VISOR).GPathToStringConversion())
 
 	var curr_pid string = strconv.Itoa(os.Getpid())
 	var file_exists bool = false
 
 	var suffix = "_Client"
-	if server {
+	if VISOR_server_GL {
 		suffix = "_Server"
 	}
 
@@ -566,7 +566,7 @@ isVISORRunningMODULES checks if VISOR is already running.
 – Returns:
   - true if the module is running, false otherwise
 */
-func isVISORRunningMODULES(server bool) bool {
+func isVISORRunningMODULES() bool {
 	var curr_pid int = os.Getpid()
 	files, err := os.ReadDir(GetUserDataDirMODULES(NUM_MOD_VISOR).GPathToStringConversion())
 	if nil != err {
@@ -575,9 +575,9 @@ func isVISORRunningMODULES(server bool) bool {
 
 	for _, file := range files {
 		if strings.HasPrefix(file.Name(), "PID=") {
-			if server && !strings.HasSuffix(file.Name(), "_Server") {
+			if VISOR_server_GL && !strings.HasSuffix(file.Name(), "_Server") {
 				continue
-			} else if !server && !strings.HasSuffix(file.Name(), "_Client") {
+			} else if !VISOR_server_GL && !strings.HasSuffix(file.Name(), "_Client") {
 				continue
 			}
 
