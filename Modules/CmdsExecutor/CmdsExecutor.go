@@ -30,6 +30,7 @@ import (
 	"SpeechQueue/SpeechQueue"
 	"TEHelper/TEHelper"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"fmt"
@@ -198,26 +199,15 @@ func init() {realMain =
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
 						if UtilsSWA.WaitForNetwork(0) {
-							var weather_str string = OICComm.GetWeather()
-							if weather_str == "" {
-								speak = "I'm sorry Sir, but I couldn't get the weather information."
-								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							var weather_locs []string = strings.Split(OICComm.GetWeatherLocationsList(), "|")
 
-								break
-							}
-
-							var weather_by_loc []string = strings.Split(weather_str, "\n")
-							for _, weather := range weather_by_loc {
-								if weather == "" {
-									continue
-								}
-
-								var weather_data []string = strings.Split(weather, " ||| ")
-								speak = "The weather in " + weather_data[0] + " is " + weather_data[5] +
-									" with " + weather_data[1] + " degrees, a maximum of " + weather_data[6] +
-									" degrees and a minimum of " + weather_data[7] + " degrees. The precipitation is of " +
-									weather_data[2] + ", humidity of " + weather_data[3] + ", and wind of " +
-									weather_data[4] + "."
+							for _, weather_loc := range weather_locs {
+								var weather *ModsFileInfo.Weather = OICComm.GetWeather(weather_loc)
+								speak = "The weather in " + weather.Location + " is " + weather.Status +
+									" with a current temperature of " + weather.Temperature + " degrees, a maximum of " +
+									weather.Max_temp + " degrees and a minimum of " + weather.Min_temp +
+									" degrees. The precipitation is of " + weather.Precipitation + ", humidity of " +
+									weather.Humidity + ", and wind of " + weather.Wind + "."
 								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 							}
 						} else {
@@ -232,31 +222,20 @@ func init() {realMain =
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
 						if UtilsSWA.WaitForNetwork(0) {
-							var news_str string = OICComm.GetWeather()
-							if news_str == "" {
-								speak = "I'm sorry Sir, but I couldn't get the news information."
-								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							var news_locs []string = strings.Split(OICComm.GetNewsLocationsList(), "|")
 
-								break
-							}
+							for _, news_loc := range news_locs {
+								var news *ModsFileInfo.News = OICComm.GetNews(news_loc)
 
-							var news_by_loc []string = strings.Split(news_str, "\n")
-							for _, news_data := range news_by_loc {
-								if news_data == "" {
-									continue
-								}
+								speak = "News in " + news.Location + ". "
 
-								var news []string = strings.Split(news_data, " ||| ")
-
-								speak = "News in " + news[0] + ". "
-
-								for _, n := range news[1:] {
+								for _, n := range news.News {
 									speak += n + ". "
 								}
 								speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
 							}
 						} else {
-							speak = "Not connected to the server to get the weather."
+							speak = "Not connected to the server to get the news."
 							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
 						}
 

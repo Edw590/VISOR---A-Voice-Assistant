@@ -47,6 +47,26 @@ type Weather struct {
 	Status string
 }
 
+/*
+GetNewsList returns the news list separated by "\n".
+
+-----------------------------------------------------------
+
+– Returns:
+  - the news list separated by "\n"
+ */
+func (news *News) GetNewsList() string {
+	var news_list string = ""
+	for _, news_item := range news.News {
+		news_list += news_item + "\n"
+	}
+	if len(news_list) > 0 {
+		news_list = news_list[:len(news_list)-1]
+	}
+
+	return news_list
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // Mod6UserInfo is the format of the custom information file about this specific module.

@@ -49,8 +49,6 @@ const CMD_ASK_BATTERY_PERCENT  string = "12";
 //const CMD_TOGGLE_POWER_SAVER_MODE  string = "19";
 //const CMD_STOP_RECORD_MEDIA  string = "20";
 //const CMD_CONTROL_MEDIA  string = "21";
-//const CMD_CONFIRM  string = "22";
-//const CMD_REJECT  string = "23";
 //const CMD_STOP_LISTENING  string = "24";
 //const CMD_START_LISTENING  string = "25";
 const CMD_TELL_WEATHER  string = "26";
@@ -128,8 +126,6 @@ var cmdi_info map[string]string = map[string]string{
 	//CMD_TOGGLE_POWER_SAVER_MODE:   CMDi_INF1_DO_SOMETHING,     // 19
 	//CMD_STOP_RECORD_MEDIA:         CMDi_INF1_DO_SOMETHING,     // 20
 	//CMD_CONTROL_MEDIA:             CMDi_INF1_DO_SOMETHING,     // 21
-	//CMD_CONFIRM:                   CMDi_INF1_ASSIST_CMD,       // 22
-	//CMD_REJECT:                    CMDi_INF1_ASSIST_CMD,       // 23
 	//CMD_STOP_LISTENING:            CMDi_INF1_DO_SOMETHING,     // 24
 	//CMD_START_LISTENING:           CMDi_INF1_DO_SOMETHING,     // 25
 	CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
@@ -177,8 +173,6 @@ func prepareCommandsString() string {
 		//{CMD_TOGGLE_POWER_SAVER_MODE, ACD.CMDi_TYPE_TURN_ONFF, "", "", "power/battery saver"},
 		//{CMD_STOP_RECORD_MEDIA, ACD.CMDi_TYPE_STOP, "", "", "recording audio/sound|recording video/camera"},
 		//{CMD_CONTROL_MEDIA, ACD.CMDi_TYPE_NONE, "play continue resume pause stop next previous", "play continue resume|pause|stop|next|previous", "media/song/songs/music/audio/musics/video/videos"},
-		//{CMD_CONFIRM, ACD.CMDi_TYPE_NONE, "i", "", "do/confirm/approve/certify"},
-		//{CMD_REJECT, ACD.CMDi_TYPE_NONE, "i", "", "don't/reject/disapprove"},
 		//{CMD_STOP_LISTENING, ACD.CMDi_TYPE_STOP, "", "", "listening"},
 		//{CMD_START_LISTENING, ACD.CMDi_TYPE_START, "", "", "listening"},
 		{CMD_TELL_WEATHER, ACD.CMDi_TYPE_ASK, "", "", "weather"},

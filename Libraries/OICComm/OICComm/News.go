@@ -19,17 +19,17 @@
  * under the License.
  ******************************************************************************/
 
-package GMan
+package OICComm
 
 import (
 	"Utils"
 	"Utils/ModsFileInfo"
 )
 
-var tasks_GL []ModsFileInfo.GTask = nil
+var news_locs_GL []ModsFileInfo.News = nil
 
-func getTasks() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 1, []byte("JSON|true|GManTasks"))
+func getAllNews() {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 1, []byte("JSON|true|News"))
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 1)
 	if comms_map == nil {
 		return
@@ -37,51 +37,48 @@ func getTasks() {
 
 	var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	if err := Utils.FromJsonGENERAL(json_bytes, &tasks_GL); err != nil {
+	if err := Utils.FromJsonGENERAL(json_bytes, &news_locs_GL); err != nil {
 		return
 	}
 }
 
 /*
-GetEventsIdsListGMAN returns a list of all events' IDs.
+GetNewsLocationsList returns the news locations list separated by "|".
 
 This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 
 – Returns:
-  - a list of all events' IDs separated by "|"
-*/
-func GetTasksIdsList() string {
-	getTasks()
+  - the news locations list separated by "|"
+ */
+func GetNewsLocationsList() string {
+	getAllNews()
 
-	var ids_list string = ""
-	for _, task := range tasks_GL {
-		ids_list += task.Id + "|"
+	var locs_list string = ""
+	for _, news_loc := range news_locs_GL {
+		locs_list += news_loc.Location + "|"
 	}
-	if len(ids_list) > 0 {
-		ids_list = ids_list[:len(ids_list)-1]
+	if len(locs_list) > 0 {
+		locs_list = locs_list[:len(locs_list)-1]
 	}
 
-	return ids_list
+	return locs_list
 }
 
 /*
-GetEventGMAN returns an event by its ID.
+GetNews returns the news for the specified location.
 
 -----------------------------------------------------------
 
-– Params:
-  - event_id – the event ID
-
 – Returns:
-  - the event or nil if the event was not found
-*/
-func GetTask(task_id string) *ModsFileInfo.GTask {
-	for i := 0; i < len(tasks_GL); i++ {
-		var task *ModsFileInfo.GTask = &tasks_GL[i]
-		if task.Id == task_id {
-			return task
+  - the news or nil if the news are not found
+ */
+func GetNews(news_location string) *ModsFileInfo.News {
+	for i := 0; i < len(news_locs_GL); i++ {
+		var news_loc *ModsFileInfo.News = &news_locs_GL[i]
+		if news_loc.Location == news_location {
+			return news_loc
 		}
 	}
 

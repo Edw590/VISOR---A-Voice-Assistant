@@ -47,8 +47,6 @@ GetEventsIdsListGMAN returns a list of all events' IDs.
 
 This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
-DON'T REQUEST LISTS FROM THIS LIBRARY IN DIFFERENT THREADS!!! All in the same thread always.
-
 -----------------------------------------------------------
 
 – Returns:

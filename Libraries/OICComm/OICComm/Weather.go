@@ -19,69 +19,66 @@
  * under the License.
  ******************************************************************************/
 
-package GMan
+package OICComm
 
 import (
 	"Utils"
 	"Utils/ModsFileInfo"
 )
 
-var tasks_GL []ModsFileInfo.GTask = nil
+var weathers_GL []ModsFileInfo.Weather = nil
 
-func getTasks() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 1, []byte("JSON|true|GManTasks"))
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 1)
+func getAllWeathers() {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("JSON|true|Weather"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0)
 	if comms_map == nil {
 		return
 	}
 
 	var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	if err := Utils.FromJsonGENERAL(json_bytes, &tasks_GL); err != nil {
+	if err := Utils.FromJsonGENERAL(json_bytes, &weathers_GL); err != nil {
 		return
 	}
 }
 
 /*
-GetEventsIdsListGMAN returns a list of all events' IDs.
+GetWeatherLocationsList returns the weathers locations list separated by "|".
 
 This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 
 – Returns:
-  - a list of all events' IDs separated by "|"
+  - the weathers locations list separated by "|"
 */
-func GetTasksIdsList() string {
-	getTasks()
+func GetWeatherLocationsList() string {
+	getAllWeathers()
 
-	var ids_list string = ""
-	for _, task := range tasks_GL {
-		ids_list += task.Id + "|"
+	var locs_list string = ""
+	for _, weather := range weathers_GL {
+		locs_list += weather.Location + "|"
 	}
-	if len(ids_list) > 0 {
-		ids_list = ids_list[:len(ids_list)-1]
+	if len(locs_list) > 0 {
+		locs_list = locs_list[:len(locs_list)-1]
 	}
 
-	return ids_list
+	return locs_list
 }
 
 /*
-GetEventGMAN returns an event by its ID.
+GetWeather returns the weather for the specified location.
 
 -----------------------------------------------------------
 
-– Params:
-  - event_id – the event ID
-
 – Returns:
-  - the event or nil if the event was not found
+  - the weather or nil if the weather is not found
 */
-func GetTask(task_id string) *ModsFileInfo.GTask {
-	for i := 0; i < len(tasks_GL); i++ {
-		var task *ModsFileInfo.GTask = &tasks_GL[i]
-		if task.Id == task_id {
-			return task
+func GetWeather(weather_location string) *ModsFileInfo.Weather {
+	for i := 0; i < len(weathers_GL); i++ {
+		var weather *ModsFileInfo.Weather = &weathers_GL[i]
+		if weather.Location == weather_location {
+			return weather
 		}
 	}
 
