@@ -6,6 +6,9 @@ This project is a part of a bigger project, consisting of the following:
 -   [V.I.S.O.R. - Android Version Assistant](https://github.com/DADi590/VISOR---A-better-Android-assistant)
 -   [V.I.S.O.R. - A Voice Assistant](https://github.com/Edw590/VISOR---A-Voice-Assistant)
 
+## Video demo
+[![VISOR demo video](https://img.youtube.com/vi/GNribewvOi4/0.jpg)](https://www.youtube.com/watch?v=GNribewvOi4)
+
 ## Introduction
 These are the desktop client and server versions of my in-development assistant, V.I.S.O.R. (the Android version is just above on the link).
 
