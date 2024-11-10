@@ -31,6 +31,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
+	"net/url"
 	"time"
 )
 
@@ -125,11 +126,11 @@ func homeCreateSettingsTab() *container.Scroll {
 	entry_server_pw.SetPlaceHolder("Server password (strong letters and numbers password)")
 	entry_server_pw.SetText(Utils.User_settings_GL.General.Website_pw)
 
-	var entry_wolframalpha_appid *widget.Entry = widget.NewEntry()
+	var entry_wolframalpha_appid *widget.Entry = widget.NewPasswordEntry()
 	entry_wolframalpha_appid.SetPlaceHolder("WolframAlpha App ID")
 	entry_wolframalpha_appid.SetText(Utils.User_settings_GL.General.WolframAlpha_AppID)
 
-	var entry_picovoice_api_key *widget.Entry = widget.NewEntry()
+	var entry_picovoice_api_key *widget.Entry = widget.NewPasswordEntry()
 	entry_picovoice_api_key.SetPlaceHolder("Picovoice API key")
 	entry_picovoice_api_key.SetText(Utils.User_settings_GL.General.Picovoice_API_key)
 
@@ -145,6 +146,12 @@ func homeCreateSettingsTab() *container.Scroll {
 	})
 	btn_save.Importance = widget.SuccessImportance
 
+	link, _ := url.Parse("https://developer.wolframalpha.com/")
+	var link_wolframalpha *widget.Hyperlink = widget.NewHyperlink("Get WolframAlpha App ID from here", link)
+
+	link, _ = url.Parse("https://console.picovoice.ai/")
+	var link_picovoice *widget.Hyperlink = widget.NewHyperlink("Get Picovoice API key from here", link)
+
 	return createMainContentScrollUTILS(
 		entry_pin,
 		entry_visor_email_addr,
@@ -155,6 +162,8 @@ func homeCreateSettingsTab() *container.Scroll {
 		entry_wolframalpha_appid,
 		entry_picovoice_api_key,
 		btn_save,
+		link_wolframalpha,
+		link_picovoice,
 	)
 }
 
