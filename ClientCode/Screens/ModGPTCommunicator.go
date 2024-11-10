@@ -60,7 +60,11 @@ func gptCommunicatorCreateMemoriesTab() *container.Scroll {
 	memories_text.SetPlaceHolder("Stored memories on the smart LLM")
 	memories_text.Wrapping = fyne.TextWrapWord
 	memories_text.SetMinRowsVisible(100)
-	memories_text.SetText(GPTComm.GetMemories())
+	if Utils.IsCommunicatorConnectedSERVER() {
+		memories_text.SetText(GPTComm.GetMemories())
+	} else {
+		memories_text.SetText("[Not connected to the server to get the memories]")
+	}
 
 	var btn_save *widget.Button = widget.NewButton("Save memories", func() {
 		GPTComm.SetMemories(memories_text.Text)
