@@ -17,16 +17,13 @@
 		"Disks_info": [
 			{
 				"Id": "DISK_SERIAL_HERE",
+				"Enabled": false,
 				"Label": "A label for the disk",
 				"Is_HDD": true
 			}
 		]
 	},
 	"RSSFeedNotifier": {
-		"Mails_to": [
-			"some@email.address",
-			"another@email.address"
-		],
 		"Feeds_info": [
 			{
 				"Id": 1,
@@ -60,19 +57,18 @@
 		],
 		"News_locs": [
 			"Europe",
-			"Portugal",
-			"Lisbon"
+			"OpenAI"
 		]
 	},
 	"GPTCommunicator": {
 		"Model_smart_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
 		"Model_dumb_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
-		"System_info": "Cutting Knowledge Date: December 2023. Today Date: 3234_WEEKDAY, 3234_DAY 3234_MONTH 3234_YEAR.",
+		"System_info": "Cutting Knowledge Date: December 2023.",
 		"User_nickname": "Sir"
 	},
 	"WebsiteBackend": {
-		"Crt_file": "/etc/ssl/certs/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.crt",
-		"Key_file": "/etc/ssl/private/openmediavault-ce024921-a35b-4de3-ada8-558b56af6ca1.key"
+		"Crt_file": "/home/edw590/VISOR/bin/certificate.crt",
+		"Key_file": "/home/edw590/VISOR/bin/certificate.key"
 	},
 	"TasksExecutor": {
 		"Tasks": [
