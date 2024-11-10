@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="VISOR / Client / Linux (x64)" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="VISOR" />
+    <working_directory value="$PROJECT_DIR$/bin" />
+    <go_parameters value="-o ../bin/VISOR_Client_x64.exe -tags=client" />
+    <parameters value="--conhost" />
+    <envs>
+      <env name="GOARCH" value="amd64" />
+      <env name="GOOS" value="linux" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="VISOR_Client" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <output_directory value="$PROJECT_DIR$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>
