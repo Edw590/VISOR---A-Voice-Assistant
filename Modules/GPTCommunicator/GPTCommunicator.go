@@ -156,6 +156,11 @@ func init() {realMain =
 		var shut_down bool = false
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
+		if !gpt_text_txt.Exists() {
+			// The file must start with the start string, even if it's empty.
+			_ = gpt_text_txt.WriteTextFile("[3234_START:-1|5678iuytrrtyuj8uy|]", false)
+		}
+
 		var first_3234_end bool = true
 		var memorizing bool = false
 		var to_memorize string = ""

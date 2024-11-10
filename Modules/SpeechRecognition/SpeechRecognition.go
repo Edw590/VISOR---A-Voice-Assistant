@@ -28,8 +28,6 @@ import (
 	"log"
 )
 
-// Speech Recognition //
-
 var in_GL []int16
 var stream_GL *portaudio.Stream
 
