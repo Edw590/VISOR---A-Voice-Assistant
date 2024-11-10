@@ -126,11 +126,11 @@ func homeCreateSettingsTab() *container.Scroll {
 	entry_server_pw.SetPlaceHolder("Server password (strong letters and numbers password)")
 	entry_server_pw.SetText(Utils.User_settings_GL.General.Website_pw)
 
-	var entry_wolframalpha_appid *widget.Entry = widget.NewPasswordEntry()
+	var entry_wolframalpha_appid *widget.Entry = widget.NewEntry()
 	entry_wolframalpha_appid.SetPlaceHolder("WolframAlpha App ID")
 	entry_wolframalpha_appid.SetText(Utils.User_settings_GL.General.WolframAlpha_AppID)
 
-	var entry_picovoice_api_key *widget.Entry = widget.NewPasswordEntry()
+	var entry_picovoice_api_key *widget.Entry = widget.NewEntry()
 	entry_picovoice_api_key.SetPlaceHolder("Picovoice API key")
 	entry_picovoice_api_key.SetText(Utils.User_settings_GL.General.Picovoice_API_key)
 
