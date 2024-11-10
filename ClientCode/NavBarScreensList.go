@@ -51,7 +51,7 @@ var tree_index = map[string][]string{
 		Screens.ID_MOD_TASKS_EXECUTOR,
 		Screens.ID_MOD_USER_LOCATOR,
 		Screens.ID_ONLINE_INFO_CHK,
-		Screens.ID_MOD_SYS_CHECKER,
+		//Screens.ID_MOD_SYS_CHECKER,
 		Screens.ID_SMART_CHECKER,
 		Screens.ID_REGISTRY,
 	},
