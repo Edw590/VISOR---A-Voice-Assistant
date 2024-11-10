@@ -25,6 +25,7 @@ import (
 	"Utils"
 	porcupine "github.com/Picovoice/porcupine/binding/go/v3"
 	"github.com/gordonklaus/portaudio"
+	"log"
 )
 
 // Speech Recognition //
@@ -49,23 +50,31 @@ func init() {realMain =
 		}
 		err := porcupine_.Init()
 		if err != nil {
-			panic(err)
+			log.Println(err)
+
+			return
 		}
 		defer porcupine_.Delete()
 
 		err = portaudio.Initialize()
 		if err != nil {
-			panic(err)
+			log.Println(err)
+
+			return
 		}
 		defer closeAudio()
 		in_GL = make([]int16, porcupine.FrameLength)
 		stream_GL, err = portaudio.OpenDefaultStream(1, 0, float64(porcupine.SampleRate), porcupine.FrameLength, in_GL)
 		if err != nil {
-			panic(err)
+			log.Println(err)
+
+			return
 		}
 		err = stream_GL.Start()
 		if err != nil {
-			panic(err)
+			log.Println(err)
+
+			return
 		}
 
 		for {
@@ -84,7 +93,9 @@ func init() {realMain =
 func getNextFrameAudio() []int16 {
 	err := stream_GL.Read()
 	if err != nil {
-		panic(err)
+		log.Println(err)
+
+		return nil
 	}
 
 	return in_GL
