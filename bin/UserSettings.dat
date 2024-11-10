@@ -9,9 +9,9 @@
 		"Website_domain": "localhost",
 		"Website_pw": "a_random_letters_and_numbers_strong_password",
 
-		"WolframAlpha_AppID": "999999-9999999999",
+		"WolframAlpha_AppID": "",
 
-		"Picovoice_API_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/56yHGr565RTttt=="
+		"Picovoice_API_key": ""
 	},
 	"SMARTChecker": {
 		"Disks_info": [
