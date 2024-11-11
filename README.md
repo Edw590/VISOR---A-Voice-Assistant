@@ -45,8 +45,6 @@ Note: if you don't know how to put something on the PATH, just copy the program 
 
 **NOTE:** if you want full VISOR functionality on Windows with the server, run it in WSL (Win10+ only) and not natively on Windows. It will work just fine. If you do this, copy the GGUF file into WSL or it will load VERY slowly.
 
-To change VISOR to run on Windows or Linux, just compile to the OS you want and put the binaries in the `bin` folder. Nothing else needs to be done to change things from running on either OS.
-
 ## Modules
 | Number | Name                           | Client/Server         | Description |
 |-------|--------------------------------|-----------------------|-|
@@ -80,6 +78,8 @@ This began as a Python project (in 2020), but even using an IDE got the project 
   - Go to the `ClientCode` folder and run the command `go build -tags=client .` (it will take some time the first time)
   - Move the file to the `bin` folder
 - Check the Usage section above to know what to do next (with the User Settings DAT file, rename it to end with _EOG.dat ("Exclude Only from Git")).
+
+To change VISOR to run on Windows or Linux, just compile to the OS you want and put the binaries in the `bin` folder. Nothing else needs to be done to change things from running on either OS.
 
 ## About
 ### - License
