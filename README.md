@@ -19,9 +19,9 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 
 ## Usage
 - Download the latest Release from [here](https://github.com/Edw590/VISOR---A-Voice-Assistant/releases).
-- Next go on that `bin` folder and edit the DAT file with your values (open it with Notepad). Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him). To use the server program (very much recommended, to get all the features working), open port 3234 on your router so that the client-server communication can be made.
-- In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and use those 2 files on the "WebsiteBackend" section inside UserSettings_EOG.dat.
-- Check below the requirements for each module to work. You must have a few programs installed on your system for VISOR to work completely.
+- To use the server program (very much recommended, to get all the features working), open port 3234 on your router so that the client-server communication can be made. Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him).
+- In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and input the path to those 2 files on the "WebsiteBackend" section inside UserSettings_EOG.dat (open with Notepad).
+- Check below the requirements for each module to work. You must have a few programs installed on your computer for VISOR to work completely.
 - Start the client and the server executables and that's it. 
 
 ### - Requirements for some modules to work
