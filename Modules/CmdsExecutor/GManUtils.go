@@ -136,16 +136,59 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 }
 
 func getEventDuration(min int64) string {
-	// Return in hours if more than 60 minutes, or days if more than 24 hours, etc. Else, return in minutes.
 	if min >= 60 {
 		if min >= 24*60 {
 			if min >= 7*24*60 {
-				return strconv.Itoa(int(min/(7*24*60))) + " weeks"
+				weeks := min / (7 * 24 * 60)
+				days := (min % (7 * 24 * 60)) / (24 * 60)
+				var week_weeks string = "weeks"
+				if weeks == 1 {
+					week_weeks = "week"
+				}
+				var day_days string = "days"
+				if days == 1 {
+					day_days = "day"
+				}
+				if days > 0 {
+					return strconv.Itoa(int(weeks)) + " " + week_weeks + " and " + strconv.Itoa(int(days)) + " " + day_days
+				}
+				return strconv.Itoa(int(weeks)) + " " + week_weeks
 			}
-			return strconv.Itoa(int(min/(24*60))) + " days"
+			days := min / (24 * 60)
+			hours := (min % (24 * 60)) / 60
+			var day_days string = "days"
+			if days == 1 {
+				day_days = "day"
+			}
+			var hour_hours string = "hours"
+			if hours == 1 {
+				hour_hours = "hour"
+			}
+			if hours > 0 {
+				return strconv.Itoa(int(days)) + " " + day_days + " and " + strconv.Itoa(int(hours)) + " " + hour_hours
+			}
+			return strconv.Itoa(int(days)) + " " + day_days
 		}
-		return strconv.Itoa(int(min/60)) + " hours"
+		hours := min / 60
+		minutes := min % 60
+		var hour_hours string = "hours"
+		if hours == 1 {
+			hour_hours = "hour"
+		}
+		var minute_minutes string = "minutes"
+		if minutes == 1 {
+			minute_minutes = "minute"
+		}
+		if minutes > 0 {
+			return strconv.Itoa(int(hours)) + " " + hour_hours + " and " + strconv.Itoa(int(minutes)) + " " + minute_minutes
+		}
+		return strconv.Itoa(int(hours)) + " " + hour_hours
 	}
 
-	return strconv.Itoa(int(min)) + " minutes"
+	var minute_minutes string = "minutes"
+	if min == 1 {
+		minute_minutes = "minute"
+	}
+
+	return strconv.Itoa(int(min)) + " " + minute_minutes
 }
