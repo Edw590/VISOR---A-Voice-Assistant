@@ -292,9 +292,11 @@ func init() {realMain =
 		memorizeThings := func(input_text string, erase_mem bool) {
 			device_id = Utils.Gen_settings_GL.Device_settings.Id // To not speak in any device the memorization strings
 			memorizing = true
-			var text string = "User input: \"" + input_text + "\". Profile the USER based on their input. Write " +
-				"USEFUL but summarized user information as BULLET points (no + or - or anything. ONLY *). Format the " +
-				"output as \"* The user [detail]\". Example: \"* The user likes bags\"."
+			var text string = "User input: " + input_text + ". PROFILE the USER based on their behavior, preferences, " +
+				"personality traits, or habits revealed in their input. IGNORE specific, temporary events, schedules, " +
+				"or day-to-day plans. Summarize as KEY GENERAL user information in BULLET points (no + or - or " +
+				"anything. ONLY *). Format the output as \"* The user [detail]\". Example: \"* The user is interested " +
+				"in technology\"."
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 			_, _ = writer_dumb.WriteString(text + "\n")
 			_ = writer_dumb.Flush()
