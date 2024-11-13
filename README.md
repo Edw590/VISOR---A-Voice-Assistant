@@ -19,9 +19,10 @@ Feel free to create an Issue or a Discussion with any questions you have about t
 
 ## Usage
 - Download the latest Release from [here](https://github.com/Edw590/VISOR---A-Voice-Assistant/releases).
-- Next go on that `bin` folder and edit the DAT file with your values (open it with Notepad). Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him). To use the server program (very much recommended, to get all the features working), open port 3234 on your router so that the client-server communication can be made.
-- In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and use those 2 files on the "WebsiteBackend" section inside UserSettings_EOG.dat.
-- Check below the requirements for each module to work. You must have a few programs installed on your system for VISOR to work completely.
+- To use the server program (very much recommended, to get all the features working), open port 3234 on your router so that the client-server communication can be made. Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him).
+- In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and input the path to those 2 files on the "WebsiteBackend" section inside UserSettings_EOG.dat (open with Notepad).
+- Check below the requirements for each module to work. You must have a few programs installed on your computer for VISOR to work completely.
+- Download a GGUF LLM model, like [this one](https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/tree/main) to use on the Communicator screen settings to be VISOR's brain.
 - Start the client and the server executables and that's it. 
 
 ### - Requirements for some modules to work
@@ -43,8 +44,6 @@ Note: if you don't know how to put something on the PATH, just copy the program 
 - Windows (but I don't test the server on it, only the client)
 
 **NOTE:** if you want full VISOR functionality on Windows with the server, run it in WSL (Win10+ only) and not natively on Windows. It will work just fine. If you do this, copy the GGUF file into WSL or it will load VERY slowly.
-
-To change VISOR to run on Windows or Linux, just compile to the OS you want and put the binaries in the `bin` folder. Nothing else needs to be done to change things from running on either OS.
 
 ## Modules
 | Number | Name                           | Client/Server         | Description |
@@ -79,6 +78,8 @@ This began as a Python project (in 2020), but even using an IDE got the project 
   - Go to the `ClientCode` folder and run the command `go build -tags=client .` (it will take some time the first time)
   - Move the file to the `bin` folder
 - Check the Usage section above to know what to do next (with the User Settings DAT file, rename it to end with _EOG.dat ("Exclude Only from Git")).
+
+To change VISOR to run on Windows or Linux, just compile to the OS you want and put the binaries in the `bin` folder. Nothing else needs to be done to change things from running on either OS.
 
 ## About
 ### - License
