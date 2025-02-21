@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,6 +26,7 @@ import (
 	"context"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
+	"log"
 	"net/http"
 	"time"
 )
@@ -33,14 +34,16 @@ import (
 func storeCalendarsEvents(client *http.Client) bool {
 	service, err := calendar.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		//log.Printf("Unable to retrieve Calendar client: %v\n", err)
+		log.Printf("Unable to retrieve Calendar client: %v\n", err)
+
 		return false
 	}
 
 	// Get the list of all calendars
 	calendarList, err := service.CalendarList.List().Do()
 	if err != nil {
-		//log.Printf("Unable to retrieve calendar list: %v\n", err)
+		log.Printf("Unable to retrieve Calendar list: %v\n", err)
+
 		return false
 	}
 

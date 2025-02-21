@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,6 +26,7 @@ import (
 	"context"
 	"google.golang.org/api/option"
 	"google.golang.org/api/tasks/v1"
+	"log"
 	"net/http"
 	"time"
 )
@@ -34,7 +35,7 @@ func storeTasks(client *http.Client) bool {
 	// Create a new Tasks service.
 	srv, err := tasks.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		//log.Printf("Unable to retrieve Tasks client: %v", err)
+		log.Printf("Unable to retrieve Tasks client: %v", err)
 
 		return false
 	}
@@ -42,7 +43,7 @@ func storeTasks(client *http.Client) bool {
 	// Retrieve the user's task lists.
 	task_lists, err := srv.Tasklists.List().MaxResults(9999).Do()
 	if err != nil {
-		//log.Printf("Unable to retrieve task lists: %v", err)
+		log.Printf("Unable to retrieve Task lists: %v", err)
 
 		return false
 	}
