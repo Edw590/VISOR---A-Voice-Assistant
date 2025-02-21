@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -65,9 +65,9 @@ type _OllamaResponse struct {
 	Context []int `json:"context"`
 }
 
-/*
 
-// Directory for processing text files
+
+/*// Directory for processing text files
 const _TO_PROCESS_REL_FOLDER string = "to_process"
 
 // Command prefixes for Wolfram Alpha and Wikipedia
@@ -88,7 +88,6 @@ func init() {realMain =
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
 		modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
-		return
 
 		// Set initial module state
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING

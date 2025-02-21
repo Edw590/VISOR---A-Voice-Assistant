@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +25,7 @@ import (
 	"Utils"
 	"strconv"
 	"strings"
+	"time"
 )
 
 /*
@@ -42,8 +43,12 @@ SendText sends the given text to the LLM model.
 func SendText(text string, use_smart bool) bool {
 	var message []byte = []byte("GPT|")
 	if text != "" {
+		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
+		var date_time string = time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04")
+
+		var new_text string = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
 		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id+ "|" +
-			strconv.FormatBool(use_smart) + "]" + text)...)
+			strconv.FormatBool(use_smart) + "]" + new_text)...)
 	}
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message)
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)

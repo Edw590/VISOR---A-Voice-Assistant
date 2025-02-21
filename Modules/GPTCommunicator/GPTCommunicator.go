@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,12 +22,10 @@
 package GPTCommunicator
 
 import (
-	// Utilities for working with files and directories
 	"OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
-	// Standard library imports
 	"bufio"
 	"fmt"
 	"io"
@@ -39,18 +37,14 @@ import (
 	"time"
 )
 
-// Directory for processing text files
 const _TO_PROCESS_REL_FOLDER string = "to_process"
 
-// Command prefixes for Wolfram Alpha and Wikipedia
 const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
 const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
-// Start and end tokens for GPT output
 const _START_TOKENS string = "<|eot_id|><|start_header_id|>assistant<|end_header_id|>"
 const _END_TOKENS string = "<|start_header_id|>user<|end_header_id|>"
 
-// Sleep duration in seconds
 const _TIME_SLEEP_S int = 1
 
 // Module information and state variables
@@ -63,28 +57,24 @@ var (
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
-		// Initialize module information and state
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
 		modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
-		// Set initial module state
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
-		// Stop any running LLM instances to start fresh
 		forceStopLlama()
 
-		// Load visor introduction text
 		var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
-		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
+		//var visor_functions = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "functions.json").ReadTextFile()
+		//visor_intro = strings.Replace(visor_intro, "3234_FUNCTIONS", visor_functions, -1)
 		visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
+		visor_intro = strings.Replace(visor_intro, "\n", "\\n", -1)
+		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
 
-		// Initialize memory string
 		var memories string = strings.Join(modGenInfo_GL.Memories, ". ")
 		memories = strings.Replace(memories, "\"", "\\\"", -1)
 
-		// Declare and assign context sizes
 		var smart_ctx_size int = 12288
 		var dumb_ctx_size int = 4096
 
@@ -95,7 +85,6 @@ func init() {realMain =
 		//	smart_ctx_size, 4, 0.8, dumb_ctx_size, 4, 1.5,
 		//)
 
-		// Start LLM instance (smart and dumb)
 		writer_smart, stdout_smart, stderr_smart := startLlama("Smart", smart_ctx_size, 4, 0.8,
 			modUserInfo_GL.Model_smart_loc, memories, visor_intro)
 		if writer_smart == nil {
@@ -151,7 +140,6 @@ func init() {realMain =
 			}
 		}()
 
-		// Initialize variables for processing
 		var device_id string = ""
 		var shut_down bool = false
 		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
@@ -165,7 +153,6 @@ func init() {realMain =
 		var memorizing bool = false
 		var to_memorize string = ""
 
-		// Function to read GPT output from a reader
 		readGPT := func(reader *bufio.Reader, print bool) {
 			var last_answer string = ""
 			var last_word string = ""
@@ -201,15 +188,14 @@ func init() {realMain =
 					} else {
 						// VISOR may start by writing the current date and time like "[date and time here]" - this
 						// below cuts that out of the answer.
-						if last_word == "" {
-							if one_byte_str == "[" {
-								save_words = false
-							} else if one_byte_str == "]" {
-								save_words = true
-
-								continue
-							}
-						}
+						//if last_word == "" {
+						//	if one_byte_str == "[" {
+						//		save_words = false
+						//	} else if one_byte_str == "]" {
+						//		save_words = true
+						//		continue
+						//	}
+						//}
 
 						if save_words {
 							last_word += one_byte_str
@@ -247,7 +233,7 @@ func init() {realMain =
 
 		// Read from both GPTs --> but make them *never* work both at the same time. Only one at a time answering.
 		go func() {
-			readGPT(reader_smart, false)
+			readGPT(reader_smart, true)
 		}()
 		go func() {
 			readGPT(reader_dumb, false)
@@ -353,50 +339,47 @@ func init() {realMain =
 					var text string = to_process[strings.Index(to_process, "]")+1:]
 					text = strings.Replace(text, "\n", "\\n", -1)
 
-					if use_smart && strings.HasPrefix(text, "/") {
+					if use_smart {
 						// Control commands begin with a slash
-						if text == "/clear" {
+						if strings.HasSuffix(text, "/clear") {
 							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
 							shut_down = true
-						} else if text == "/mem" {
+						} else if strings.HasSuffix(text, "/mem") {
 							// Memorize and clear the context
 							if user_text != "" {
 								memorizeThings(user_text, false)
 							}
 
 							shut_down = true
-						} else if text == "/memmem" {
+						} else if strings.HasSuffix(text, "/memmem") {
 							// Summarize the list of memories (sometimes VISOR may memorize useless sentences, so this will
 							// cut them out - will cut out other things too though, so use with caution).
 							if len(modGenInfo_GL.Memories) > 0 {
 								var memories_str string = strings.Join(modGenInfo_GL.Memories, ". ")
 								memorizeThings(memories_str, true)
 							}
-						} else if strings.HasPrefix(text, ASK_WOLFRAM_ALPHA) {
+						} else if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
 							// Ask Wolfram Alpha the question
-							var question string = text[len(ASK_WOLFRAM_ALPHA):]
+							var question string = text[strings.Index(text, ASK_WOLFRAM_ALPHA)+len(ASK_WOLFRAM_ALPHA):]
 							result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
 
 							if direct_result {
-								_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+"The answer is: "+result+
-									". "+getEndString(), true)
+								_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
+									". " + getEndString(), true)
 							} else {
-								sendToGPT("Summarize in sentences the following: "+result, false)
+								sendToGPT("Summarize in sentences the following: " + result, false)
 							}
-						} else if strings.HasPrefix(text, SEARCH_WIKIPEDIA) {
+						} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
 							// Search for the Wikipedia page title
-							var query string = text[len(SEARCH_WIKIPEDIA):]
+							var query string = text[strings.Index(text, SEARCH_WIKIPEDIA)+len(SEARCH_WIKIPEDIA):]
 
-							_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+OnlineInfoChk.RetrieveWikipedia(query)+
+							_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
 								getEndString(), true)
+						} else {
+							sendToGPT(text, true)
 						}
 					} else {
-						if use_smart {
-							sendToGPT("["+time.Now().Weekday().String()+" "+time.Now().Format("2006-01-02 15:04")+
-								"] "+text, true)
-						} else {
-							sendToGPT(text, false)
-						}
+						sendToGPT(text, false)
 					}
 				}
 
@@ -448,8 +431,8 @@ func startLlama(instance_type string, ctx_size int, threads int, temp float32, m
 		"--temp " + strconv.FormatFloat(float64(temp), 'f', -1, 32) + " " +
 		"--keep -1 " +
 		"--mlock " +
-		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" + system_info + " | " +
-		"Memories stored about the user: " + memories + ". | About you: " + visor_intro + "<|eot_id|>\" " +
+		"--prompt \"<|begin_of_text|><|start_header_id|>system<|end_header_id|>" + system_info + "\\n\\n\\n" +
+		"Memories stored about the user: " + memories + ".\\n\\n\\nAbout you:\\n" + visor_intro + "<|eot_id|>\" " +
 		"--reverse-prompt \"<|eot_id|>\" " +
 		"--in-prefix \"" + _END_TOKENS + "\" " +
 		"--in-suffix \"" + _START_TOKENS + "\" " +

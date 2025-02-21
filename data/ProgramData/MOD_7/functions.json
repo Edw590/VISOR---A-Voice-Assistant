@@ -1,0 +1,148 @@
+[
+	{
+		"name": "toggleWifi",
+		"description": "Toggle device's the Wi-Fi adapter",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "toggleMobileData",
+		"description": "Toggle device's Mobile Data connection",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "toggleBluetooth",
+		"description": "Toggle device's Bluetooth adapter",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "answerCall",
+		"description": "Answer call"
+	},
+	{
+		"name": "endCall",
+		"description": "End call"
+	},
+	{
+		"name": "toggleAirplaneMode",
+		"description": "Toggle device's Airplane Mode",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "GetBatteryPercent",
+		"description": "Get battery percentage"
+	},
+	{
+		"name": "shutdownDevice",
+		"description": "Shut down device"
+	},
+	{
+		"name": "rebootDevice",
+		"description": "Reboot device"
+	},
+	{
+		"name": "takePicture",
+		"description": "Take a picture"
+	},
+	{
+		"name": "recordMedia",
+		"description": "Record media",
+		"parameters": {
+			"type": {
+				"description": "Type of media to record",
+				"possible_values": ["audio", "video"]
+			}
+		}
+	},
+	{
+		"name": "callContact",
+		"description": "Make a phone call to a contact",
+		"parameters": {
+			"name": {
+				"description": "Name of the contact to call",
+				"example_values": ["John", "Jane Smith"]
+			}
+		}
+	},
+	{
+		"name": "togglePowerSaverMode",
+		"description": "Toggle device's Power Saver Mode",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "stopMediaRecording",
+		"description": "Stop media recording"
+	},
+	{
+		"name": "controlMedia",
+		"description": "Control media",
+		"parameters": {
+			"action": {
+				"description": "Action to perform on media",
+				"possible_values": ["play", "pause", "stop", "next", "previous"]
+			}
+		}
+	},
+	{
+		"name": "getWeather",
+		"description": "Get the current weather"
+	},
+	{
+		"name": "getNews",
+		"description": "Get the latest news"
+	},
+	{
+		"name": "toggleEthernet",
+		"description": "Toggle device's Ethernet adapter",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "toggleNetworking",
+		"description": "Toggle device's networking",
+		"parameters": {
+			"enable": {
+				"description": "Enable or disable",
+				"possible_values": ["true", "false"]
+			}
+		}
+	},
+	{
+		"name": "getEventsTasks",
+		"description": "Get Google Calendar events and tasks",
+		"parameters": {
+			"timeframe": {
+				"description": "Timeframe for events",
+				"possible_values": ["today", "tomorrow", "this week", "next week"]
+			}
+		}
+	}
+]
