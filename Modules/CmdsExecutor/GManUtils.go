@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -101,8 +101,8 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 					days_until_next_monday = 7
 				}
 				next_monday := time.Now().AddDate(0, 0, days_until_next_monday)
-				if event_date_time.Day() >= next_monday.Day() &&
-					event_date_time.Day() < next_monday.AddDate(0, 0, 7).Day() {
+				if event_date_time.Unix() >= next_monday.Unix() &&
+					event_date_time.Unix() < next_monday.AddDate(0, 0, 7).Unix() {
 					add_event = true
 				}
 		}
