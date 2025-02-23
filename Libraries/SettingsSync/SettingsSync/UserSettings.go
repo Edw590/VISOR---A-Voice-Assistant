@@ -61,7 +61,7 @@ func SyncUserSettings() {
 					last_get_settings_when_s = time.Now().Unix()
 				}
 
-				if Utils.User_settings_GL.General.User_email_addr == "" || update_settings && remoteSettingsChanged() {
+				if update_settings && remoteSettingsChanged() {
 					if !Utils.IsCommunicatorConnectedSERVER() {
 						// Check again the communicator. Trying to prevent deadlocks.
 						continue

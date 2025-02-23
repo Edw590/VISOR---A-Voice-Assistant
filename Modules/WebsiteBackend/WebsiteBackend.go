@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -362,7 +362,16 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			var json string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
 			switch json_origin {
 				case "US":
-					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL)
+					var user_settings Utils.UserSettings
+					_ = Utils.FromJsonGENERAL([]byte(json), &user_settings)
+					if user_settings.General.Website_domain != "" &&
+							user_settings.General.Website_pw != "" &&
+							user_settings.General.User_email_addr != "" {
+						// Only accept the new settings if as a start the website information exists (or else the
+						// client will be locked out of the server surely), but also if the user email is set (that will
+						// mean the settings are not empty).
+						Utils.User_settings_GL = user_settings
+					}
 				case "GPTMem":
 					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.Gen_settings_GL.MOD_7.Memories)
 				case "GManTok":
