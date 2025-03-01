@@ -303,14 +303,9 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 		case "GPT":
 			// Send a text to be processed by the GPT model.
 			// Example: a compressed string or nil to just get the return value
-			// Returns: true if the text will be processed immediately, false if the GPT is busy for now and the text
-			// will wait
-			var ret []byte
-			if Utils.Gen_settings_GL.MOD_7.State == ModsFileInfo.MOD_7_STATE_READY {
-				ret = []byte("true")
-			} else {
-				ret = []byte("false")
-			}
+			// Returns: "true" if the text will be processed immediately, "false" if the GPT is busy for now and the
+			// text will wait
+			var ret []byte = []byte(Utils.Gen_settings_GL.MOD_7.State)
 
 			if len(bytes) > 0 {
 				// Don't use channels for this. What if various messages are sent while one is still be processed? The
@@ -320,7 +315,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 
 			return ret
-		case "JSON":
+		case "G_S":
 			// Get settings.
 			// Example: "[true to get file contents, false to get CRC16 checksum]|[one of the strings below]"
 			// Allowed strings: one of the ones on the switch statement
@@ -344,6 +339,8 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
 				case "GManTasks":
 					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
+				case "GPTSessions":
+					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Sessions)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}
@@ -352,18 +349,18 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			} else {
 				return getCRC16([]byte(json))
 			}
-		case "S_JSON":
+		case "S_S":
 			// Set settings.
 			// Example: "[one of the strings below]|[a compressed JSON string]"
 			// Allowed strings: one of the ones on the switch statement
 			// Returns: nothing
 			var bytes_split []string = strings.Split(string(bytes), "|")
-			var json_origin string = bytes_split[0]
-			var json string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
-			switch json_origin {
+			var origin string = bytes_split[0]
+			var settings string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
+			switch origin {
 				case "US":
 					var user_settings Utils.UserSettings
-					_ = Utils.FromJsonGENERAL([]byte(json), &user_settings)
+					_ = Utils.FromJsonGENERAL([]byte(settings), &user_settings)
 					if user_settings.General.Website_domain != "" &&
 							user_settings.General.Website_pw != "" &&
 							user_settings.General.User_email_addr != "" {
@@ -373,11 +370,20 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 						Utils.User_settings_GL = user_settings
 					}
 				case "GPTMem":
-					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.Gen_settings_GL.MOD_7.Memories)
+					_ = Utils.FromJsonGENERAL([]byte(settings), &Utils.Gen_settings_GL.MOD_7.Memories)
 				case "GManTok":
-					Utils.Gen_settings_GL.MOD_14.Token = json
+					Utils.Gen_settings_GL.MOD_14.Token = settings
+				case "GPTSession":
+					var instructions []string = strings.Split(settings, "\000")
+					var session_id string = instructions[0]
+					var action string = instructions[1]
+					if action == "delete" {
+						delete(Utils.Gen_settings_GL.MOD_7.Sessions, session_id)
+					} else if action == "rename" {
+						Utils.Gen_settings_GL.MOD_7.Sessions[session_id].Name = instructions[2]
+					}
 				default:
-					log.Println("Invalid JSON destination:", json_origin)
+					log.Println("Invalid JSON destination:", origin)
 			}
 	}
 

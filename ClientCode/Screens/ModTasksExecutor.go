@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -102,7 +102,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 			entry_message.Text, entry_command.Text, entry_time.Text, repeat_each_min, entry_user_location.Text,
 			entry_programmable_condition.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -202,16 +202,16 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 		task.User_location = entry_user_location.Text
 		task.Programmable_condition = entry_programmable_condition.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveTaskTASKS(task.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

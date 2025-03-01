@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,6 +22,7 @@
 package Screens
 
 import (
+	"Utils"
 	"Utils/UtilsSWA"
 	"errors"
 	"fyne.io/fyne/v2"
@@ -118,7 +119,7 @@ func createMainContentScrollUTILS(objects... fyne.CanvasObject) *container.Scrol
 	return main_scroll
 }
 
-func createConfirmationUTILS(message string, callback func(bool)) *dialog.ConfirmDialog {
+func createConfirmationDialogUTILS(message string, callback func(bool)) *dialog.ConfirmDialog {
 	cnf := dialog.NewConfirm("Confirmation", message, callback, Current_window_GL)
 	cnf.SetDismissText("Cancel")
 	cnf.SetConfirmText("OK")
@@ -133,4 +134,8 @@ func trimAccordionTitleUTILS(title string) string {
 	}
 
 	return title
+}
+
+func reloadScreen() {
+	Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 }

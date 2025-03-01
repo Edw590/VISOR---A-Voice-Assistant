@@ -40,7 +40,7 @@ SendText sends the given text to the LLM model.
 – Returns:
   - true if the text will be processed immediately, false if the GPT is busy and the text will be put on hold
 */
-func SendText(text string, use_smart bool) bool {
+func SendText(text string, use_smart bool) string {
 	var message []byte = []byte("GPT|")
 	if text != "" {
 		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
@@ -53,12 +53,12 @@ func SendText(text string, use_smart bool) bool {
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message)
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
 	if comms_map == nil {
-		return false
+		return ""
 	}
 
 	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
-	return string(response) == "true"
+	return string(response)
 }
 
 /*
@@ -70,7 +70,7 @@ GetMemories gets the memories from the GPT.
   - the memories separated by new lines
  */
 func GetMemories() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("JSON|true|GPTMem"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("G_S|true|GPTMem"))
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2)
 	if comms_map == nil {
 		return ""
@@ -99,7 +99,7 @@ SetMemories sets the memories in the GPT.
 func SetMemories(memories_str string) {
 	var memories []string = strings.Split(memories_str, "\n")
 
-	var message []byte = []byte("S_JSON|GPTMem|")
+	var message []byte = []byte("S_S|GPTMem|")
 	message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(memories))...)
 	Utils.QueueNoResponseMessageSERVER(message)
 }
@@ -230,12 +230,12 @@ func getTimeFromEntry(entry string) int64 {
 	// It comes like: "time|..."
 	var time_str string = entry[:strings.Index(entry, "|")]
 
-	time, err := strconv.ParseInt(time_str, 10, 64)
+	time_int, err := strconv.ParseInt(time_str, 10, 64)
 	if err != nil {
 		return -1
 	}
 
-	return time
+	return time_int
 }
 
 /*

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -71,7 +71,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 			return
 		}
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -117,16 +117,16 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo) *fyne.Container {
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveDiskSMART(disk.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

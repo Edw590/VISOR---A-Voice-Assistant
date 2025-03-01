@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -109,7 +109,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 		SettingsSync.AddLocationLOCATIONS(check_enabled.Checked, entry_type.Text, entry_name.Text, entry_address.Text,
 			last_detection_s, int32(max_distance), entry_location_name.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -194,16 +194,16 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 		loc_info.Max_distance_m = int32(max_distance_m)
 		loc_info.Location = entry_location_name.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this location?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this location?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveLocationLOCATIONS(loc_info.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,18 +26,31 @@ import (
 	"Speech"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
+	"Utils/ModsFileInfo"
+	"errors"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"sort"
+	"strconv"
+	"strings"
 	"time"
 )
+
+type _SessionInfo struct {
+	id string
+	session ModsFileInfo.Session
+}
 
 func ModGPTCommunicator() fyne.CanvasObject {
 	Current_screen_GL = ID_MOD_GPT_COMM
 
 	return container.NewAppTabs(
 		container.NewTabItem("Main", gptCommunicatorCreateCommunicatorTab()),
+		container.NewTabItem("Chats", gptCommunicatorCreateSessionsTab()),
 		container.NewTabItem("List of commands", gptCommunicatorCreateListCommandsTab()),
 		container.NewTabItem("Memories", gptCommunicatorCreateMemoriesTab()),
 		container.NewTabItem("Settings", gptCommunicatorCreateSettingsTab()),
@@ -148,6 +161,139 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	)
 }
 
+func gptCommunicatorCreateSessionsTab() *container.Scroll {
+	GPTComm.RetrieveSessions()
+	var session_ids_str string = GPTComm.GetSessionIdsList()
+	if session_ids_str == "" {
+		return createMainContentScrollUTILS()
+	}
+
+	var sessions_info []_SessionInfo = nil
+	var session_ids []string = strings.Split(session_ids_str, "|")
+	for _, session_id := range session_ids {
+		var session_info _SessionInfo
+		session_info.id = session_id
+		session_info.session.Name = GPTComm.GetSessionName(session_id)
+		session_info.session.Created_time_s = GPTComm.GetSessionCreatedTime(session_id)
+		sessions_info = append(sessions_info, session_info)
+	}
+
+	sort.SliceStable(sessions_info, func(i, j int) bool {
+		return sessions_info[i].session.Created_time_s < sessions_info[j].session.Created_time_s
+	})
+
+	var entries_map map[string]*widget.Entry = make(map[string]*widget.Entry)
+	var accordion *widget.Accordion = widget.NewAccordion()
+	for _, session_info := range sessions_info {
+		if session_info.id == "dumb" {
+			continue
+		}
+
+		var title string = session_info.session.Name + " - " +
+			Utils.GetDateTimeStrTIMEDATE(GPTComm.GetSessionCreatedTime(session_info.id) * 1000)
+
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title),
+			createSessionView(entries_map, session_info)))
+	}
+
+	go func() {
+		for {
+			if Current_screen_GL == ID_MOD_GPT_COMM {
+				GPTComm.RetrieveSessions()
+
+				session_ids_str = GPTComm.GetSessionIdsList()
+				if session_ids_str != "" {
+					session_ids = strings.Split(session_ids_str, "|")
+					for _, session_id := range session_ids {
+						if session_id == "dumb" {
+							continue
+						}
+
+						var session_history []string = strings.Split(GPTComm.GetSessionHistory(session_id), "\000")
+						var msg_content_str string = ""
+						for _, message := range session_history {
+							var message_parts_pipe []string = strings.Split(message, "|")
+							var message_parts_slash []string = strings.Split(message_parts_pipe[0], "/")
+
+							var msg_role = message_parts_slash[0]
+							switch msg_role {
+								case "system":
+									continue
+								case "assistant":
+									msg_role = "VISOR"
+								case "user":
+									msg_role = "YOU"
+							}
+							var msg_timestamp_s, _ = strconv.ParseInt(message_parts_slash[1], 10, 64)
+							var msg_content = message_parts_pipe[1]
+
+							msg_content_str +=
+								"-----------------------------------------------------------------------\n" +
+								"|" + strings.ToUpper(msg_role) + "| on " +
+								Utils.GetDateTimeStrTIMEDATE(msg_timestamp_s * 1000) + ":\n" + msg_content + "\n\n"
+						}
+						if len(msg_content_str) > 2 {
+							msg_content_str = msg_content_str[:len(msg_content_str)-2]
+						}
+
+						if entries_map[session_id].Text != msg_content_str {
+							entries_map[session_id].SetText(msg_content_str)
+						}
+					}
+				}
+			} else {
+				break
+			}
+
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	return createMainContentScrollUTILS(accordion)
+}
+
+func createSessionView(entries_map map[string]*widget.Entry, session_info _SessionInfo) *fyne.Container {
+
+	var entry_name *widget.Entry = widget.NewEntry()
+	entry_name.SetPlaceHolder("Chat name")
+	entry_name.SetText(session_info.session.Name)
+
+	var btn_save *widget.Button = widget.NewButton("Save name", func() {
+		if entry_name.Text == "" {
+			dialog.ShowError(errors.New("the chat name must not be empty"), Current_window_GL)
+
+			return
+		}
+
+		GPTComm.SetSessionName(session_info.id, entry_name.Text)
+
+		reloadScreen()
+	})
+	btn_save.Importance = widget.SuccessImportance
+
+	var btn_delete *widget.Button = widget.NewButton("Delete chat", func() {
+		createConfirmationDialogUTILS("Are you sure you want to delete this chat?", func(confirmed bool) {
+			if confirmed {
+				GPTComm.DeleteSession(session_info.id) // todo Not tested
+
+				reloadScreen()
+			}
+		})
+	})
+	btn_delete.Importance = widget.DangerImportance
+
+	var entry_history *widget.Entry = widget.NewMultiLineEntry()
+	entry_history.Wrapping = fyne.TextWrapWord
+	entry_history.SetMinRowsVisible(45)
+	entries_map[session_info.id] = entry_history
+
+	return container.NewVBox(
+		entry_name,
+		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
+		entry_history,
+	)
+}
+
 func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
@@ -172,9 +318,17 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 			return
 		}
 
-		if !GPTComm.SendText(text_to_send.Text, true) {
-			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
-				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+		var speak string = ""
+		switch GPTComm.SendText(text_to_send.Text, true) {
+			case ModsFileInfo.MOD_7_STATE_STARTING:
+				speak = "The GPT is starting up. Text on hold."
+			case ModsFileInfo.MOD_7_STATE_BUSY:
+				speak = "The GPT is busy. Text on hold."
+			case ModsFileInfo.MOD_7_STATE_STOPPING:
+				speak = "The GPT is stopping. Text on hold."
+		}
+		if speak != "" {
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 	})
 
@@ -186,9 +340,17 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 			return
 		}
 
-		if !GPTComm.SendText(text_to_send.Text, false) {
-			Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
-				SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+		var speak string = ""
+		switch GPTComm.SendText(text_to_send.Text, false) {
+			case ModsFileInfo.MOD_7_STATE_STARTING:
+				speak = "The GPT is starting up. Text on hold."
+			case ModsFileInfo.MOD_7_STATE_BUSY:
+				speak = "The GPT is busy. Text on hold."
+			case ModsFileInfo.MOD_7_STATE_STOPPING:
+				speak = "The GPT is stopping. Text on hold."
+		}
+		if speak != "" {
+			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 	})
 

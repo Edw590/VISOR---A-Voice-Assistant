@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -122,7 +122,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 				return
 			}
 
-			var message []byte = []byte("S_JSON|GManTok|")
+			var message []byte = []byte("S_S|GManTok|")
 			token_bytes, _ := json.Marshal(token)
 			message = append(message, Utils.CompressString(string(token_bytes))...)
 			Utils.QueueNoResponseMessageSERVER(message)

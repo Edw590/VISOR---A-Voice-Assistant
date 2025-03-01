@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -101,6 +101,7 @@ In case the module is not supported this function does nothing (to prevent deadl
 -----------------------------------------------------------
 
 – Params:
+  - mod_num – the number of the module
   - ch_num – the full channel number
   - key – the key of the data
   - data – the data to send

@@ -22,12 +22,9 @@
 package GPTCommunicator
 
 import (
-	"OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"
-	"Utils/UtilsSWA"
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -55,7 +52,7 @@ var (
 	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
+/*func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
@@ -400,7 +397,7 @@ func init() {realMain =
 			}
 		}
 	}
-}
+}*/
 
 func startLlama(instance_type string, ctx_size int, threads int, temp float32, model_loc string, memories string,
 				visor_intro string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
@@ -416,10 +413,6 @@ func startLlama(instance_type string, ctx_size int, threads int, temp float32, m
 	}
 
 	var system_info string = modUserInfo_GL.System_info
-	system_info = strings.Replace(system_info, "3234_WEEKDAY", time.Now().Weekday().String(), -1)
-	system_info = strings.Replace(system_info, "3234_DAY", strconv.Itoa(time.Now().Day()), -1)
-	system_info = strings.Replace(system_info, "3234_MONTH", time.Now().Month().String(), -1)
-	system_info = strings.Replace(system_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1)
 
 	// Configure the LLM model (Llama3/3.1/3.2's prompt)
 	writer := bufio.NewWriter(stdin)
@@ -489,7 +482,7 @@ func checkStopSpeech() bool {
 		if to_process != "" {
 			var text string = to_process[strings.Index(to_process, "]") + 1:]
 
-			if text == "/stop" {
+			if strings.HasSuffix(text, "/stop") {
 				_ = os.Remove(file_path.GPathToStringConversion())
 
 				return true

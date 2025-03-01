@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,17 +21,38 @@
 
 package ModsFileInfo
 
-const MOD_7_STATE_STARTING int = 0
-const MOD_7_STATE_READY int = 1
-const MOD_7_STATE_BUSY int = 2
-const MOD_7_STATE_STOPPING int = 3
+const MOD_7_STATE_STARTING string = "MOD_7_STATE_STARTING"
+const MOD_7_STATE_READY string = "MOD_7_STATE_READY"
+const MOD_7_STATE_BUSY string = "MOD_7_STATE_BUSY"
+const MOD_7_STATE_STOPPING string = "MOD_7_STATE_STOPPING"
 
 // Mod12GenInfo is the format of the custom generated information about this specific module.
 type Mod7GenInfo struct {
 	// State is the state of the module
-	State int
+	State string
 	// Memories is the list of memories the GPT has
 	Memories []string
+	// Sessions is the list of sessions of the user with the GPT indexed by their ID
+	Sessions map[string]*Session
+}
+
+// Session is the format of a chat session with the GPT.
+type Session struct {
+	// Name is the name of the session
+	Name string
+	// Created_time_s is the timestamp of the creation of the session
+	Created_time_s int64
+	// History is the chat history of the session
+	History []OllamaMessage
+	// Last_interaction_s is the timestamp of the last interaction with the session
+	Last_interaction_s int64
+}
+
+type OllamaMessage struct {
+	Role string `json:"role"`
+	Content string `json:"content"`
+	Images []string `json:"images"`
+	Timestamp_s int64
 }
 
 ///////////////////////////////////////////////////////////////////////////////

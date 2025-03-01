@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,7 +29,7 @@ import (
 var events_GL []ModsFileInfo.GEvent = nil
 
 func getEvents() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("JSON|true|GManEvents"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|GManEvents"))
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0)
 	if comms_map == nil {
 		return

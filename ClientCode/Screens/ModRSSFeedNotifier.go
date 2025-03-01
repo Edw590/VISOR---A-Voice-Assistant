@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -68,7 +68,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 		SettingsSync.AddFeedRSS(check_enabled.Checked, entry_feed_name.Text, entry_feed_url.Text, entry_feed_type.Text,
 			entry_custom_msg_subject.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -125,16 +125,16 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 		feed_info.Url = entry_url.Text
 		feed_info.Custom_msg_subject = entry_custom_msg_subject.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveFeedRSS(feed_info.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

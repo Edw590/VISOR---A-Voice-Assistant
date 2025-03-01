@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -313,10 +313,19 @@ const _GPT_DUMB int = 1
 const _GPT_SMART int = 2
 func speakInternal(txt_to_speak string, speech_priority int32, mode int32, gpt_mode int, wait_for_gpt bool) {
 	if gpt_mode != _GPT_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
-			Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt || GPTComm.SendText("", false)) {
+				Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt ||
+				GPTComm.SendText("", false) == ModsFileInfo.MOD_7_STATE_READY) {
 		var text string = "Reword in English: \"" + txt_to_speak + "\". DON'T SAY YOU'RE REWORDING IT."
-		if !GPTComm.SendText(text, gpt_mode == _GPT_SMART) {
-			var speak string = "Sorry, the GPT is busy at the moment. Text on hold."
+		var speak string = ""
+		switch GPTComm.SendText(text, gpt_mode == _GPT_SMART) {
+			case ModsFileInfo.MOD_7_STATE_STARTING:
+				speak = "The GPT is starting up. Text on hold."
+			case ModsFileInfo.MOD_7_STATE_BUSY:
+				speak = "The GPT is busy. Text on hold."
+			case ModsFileInfo.MOD_7_STATE_STOPPING:
+				speak = "The GPT is stopping. Text on hold."
+		}
+		if speak != "" {
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
 
@@ -339,8 +348,16 @@ func sendToGPT(txt_to_send string) {
 		return
 	}
 
-	if !GPTComm.SendText(txt_to_send, true) {
-		Speech.QueueSpeech("Sorry, the GPT is busy at the moment. Text on hold.", SpeechQueue.PRIORITY_USER_ACTION,
-			SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+	var speak string = ""
+	switch GPTComm.SendText(txt_to_send, true) {
+		case ModsFileInfo.MOD_7_STATE_STARTING:
+			speak = "The GPT is starting up. Text on hold."
+		case ModsFileInfo.MOD_7_STATE_BUSY:
+			speak = "The GPT is busy. Text on hold."
+		case ModsFileInfo.MOD_7_STATE_STOPPING:
+			speak = "The GPT is stopping. Text on hold."
+	}
+	if speak != "" {
+		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 	}
 }

@@ -50,7 +50,7 @@ func SyncUserSettings() {
 			if last_user_settings_json != new_user_settings_json {
 				last_user_settings_json = new_user_settings_json
 
-				var message []byte = []byte("S_JSON|US|")
+				var message []byte = []byte("S_S|US|")
 				message = append(message, Utils.CompressString(last_user_settings_json)...)
 				Utils.QueueNoResponseMessageSERVER(message)
 			} else {
@@ -67,7 +67,7 @@ func SyncUserSettings() {
 						continue
 					}
 
-					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 0, []byte("JSON|true|US"))
+					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 0, []byte("G_S|true|US"))
 					var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 0)
 					if comms_map == nil {
 						return
@@ -88,7 +88,7 @@ func SyncUserSettings() {
 }
 
 func remoteSettingsChanged() bool {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 1, []byte("JSON|false|US"))
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 1, []byte("G_S|false|US"))
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 1)
 	if comms_map == nil {
 		return false

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -104,7 +104,7 @@ WaitWithStopTIMEDATE waits for a certain amount of time or until a stop signal i
   - time_sleep_s – the time to wait in seconds
 
 – Returns:
-  - whether the loop was stopped (true) or it reached the end time (false)
+  - true if the loop was stopped, false if it reached the end time
 */
 func WaitWithStopTIMEDATE(stop *bool, time_wait_s int) bool {
 	if *stop {

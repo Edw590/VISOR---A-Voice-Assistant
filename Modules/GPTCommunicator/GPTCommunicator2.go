@@ -22,39 +22,39 @@
 package GPTCommunicator
 
 import (
+	"OnlineInfoChk"
 	"Utils"
-	"bufio"
-	"io"
+	"Utils/ModsFileInfo"
+	"Utils/UtilsSWA"
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
-	"os/exec"
+	"net/http"
+	"os"
+	"strings"
+	"time"
 )
 
 type _OllamaRequest struct {
 	Model string `json:"model"`
-	Prompt string `json:"prompt"`
-	Suffix string `json:"suffix"`
-	Images []string `json:"images"`
+	Messages []ModsFileInfo.OllamaMessage `json:"messages"`
 
-	Format string `json:"format"`
-	Options _ModelfileParams `json:"options"`
-	System string `json:"system"`
-	Template string `json:"template"`
-	Context []int `json:"context"`
+	Format  string `json:"format"`
+	Options _OllamaOptions `json:"options"`
 	Stream bool `json:"stream"`
-	Raw bool `json:"raw"`
 	Keep_alive string `json:"keep_alive"`
 }
 
-type _ModelfileParams struct {
+type _OllamaOptions struct {
 	Num_ctx int `json:"num_ctx"`
 	Temperature float32 `json:"temperature"`
 }
 
 type _OllamaResponse struct {
-	// Adjust field names and types based on the expected JSON structure
 	Model string `json:"model"`
 	Created_at string `json:"created_at"`
-	Response string `json:"response"`
+	Message ModsFileInfo.OllamaMessage `json:"message"`
 	Done bool `json:"done"`
 	Total_duration int `json:"total_duration"`
 	Load_duration int `json:"load_duration"`
@@ -62,149 +62,383 @@ type _OllamaResponse struct {
 	Prompt_eval_duration int `json:"prompt_eval_duration"`
 	Eval_count int `json:"eval_count"`
 	Eval_duration int `json:"eval_duration"`
-	Context []int `json:"context"`
+}
+
+// Prepared for Ollama 0.5.11
+
+var memorizing_GL bool = false
+var device_id_GL string = ""
+
+var module_stop_GL *bool = nil
+
+var visor_intro_GL string = ""
+var visor_memories_GL string = ""
+
+func readGPT(http_response *http.Response, print bool) (string, int64) {
+	var message string = ""
+	var last_word string = ""
+	var save_words bool = true
+	var curr_idx int = 0
+
+	var timestamp_s int64 = -1
+
+	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+
+	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
+
+	reduceGptTextTxt(gpt_text_txt)
+	_ = gpt_text_txt.WriteTextFile(getStartString(device_id_GL), true)
+
+	// Send a message to LIB_2 saying the GPT just started writing
+	Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id_GL + "|L_2_0|start"))
+
+	// Use a JSON decoder to handle the streamed response
+	var decoder *json.Decoder = json.NewDecoder(http_response.Body)
+
+	for {
+		if *module_stop_GL || checkStopSpeech() {
+			// Write the end string before exiting
+			_ = gpt_text_txt.WriteTextFile(getEndString(), true)
+
+			// Closing the connection makes Ollama stop generating the response
+			http_response.Body.Close()
+
+			break
+		}
+
+		if strings.Contains(message, "\000") {
+			break
+		}
+
+		if checkStopSpeech() {
+
+			break
+		}
+
+		var response _OllamaResponse
+		if err := decoder.Decode(&response); err != nil {
+			message += "\000"
+		} else {
+			message += response.Message.Content
+		}
+
+		if timestamp_s == -1 {
+			timestamp_s = time.Now().Unix()
+		}
+
+		for {
+			if curr_idx >= len(message) {
+				break
+			}
+
+			var one_byte_str string = string(message[curr_idx])
+
+			if memorizing_GL {
+				//to_memorize += one_byte_str todo
+			}
+			if print {
+				fmt.Print(one_byte_str)
+			}
+
+			if one_byte_str == " " || one_byte_str == "\n" || one_byte_str == "\000" {
+				// Meaning: new word written
+				if one_byte_str == "\000" {
+					_ = gpt_text_txt.WriteTextFile(last_word, true)
+				} else {
+					_ = gpt_text_txt.WriteTextFile(last_word+one_byte_str, true)
+				}
+
+				last_word = ""
+			} else {
+				// VISOR may start by writing the current date and time like "[date and time here]" - this
+				// below cuts that out of the answer.
+				//if last_word == "" {
+				//	if one_byte_str == "[" {
+				//		save_words = false
+				//	} else if one_byte_str == "]" {
+				//		save_words = true
+				//		continue
+				//	}
+				//}
+
+				if save_words {
+					last_word += one_byte_str
+				}
+			}
+
+			curr_idx++
+		}
+	}
+
+	_ = gpt_text_txt.WriteTextFile(getEndString(), true)
+
+	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
+
+	return message, timestamp_s
+}
+
+func chatWithGPT(user_message string, session_id string) string {
+	if session_id == "" {
+		// Get latest session ID if none is provided
+		var latest_interaction int64 = -1
+		for id, session := range modGenInfo_GL.Sessions {
+			if session.Last_interaction_s > latest_interaction {
+				session_id = id
+				latest_interaction = session.Last_interaction_s
+			}
+		}
+	}
+
+	var curr_session *ModsFileInfo.Session = &ModsFileInfo.Session{}
+	if session_id != "" {
+		curr_session = modGenInfo_GL.Sessions[session_id]
+	}
+
+	// Append user message to history
+	curr_session.History = append((*curr_session).History, ModsFileInfo.OllamaMessage{
+		Role:    "user",
+		Content: user_message,
+		Timestamp_s: time.Now().Unix(),
+	})
+
+	var temperature float32 = 1.5
+	if session_id != "dumb" {
+		temperature = 0.8
+	}
+
+	// Create payload
+	var ollama_request _OllamaRequest = _OllamaRequest{
+		Model: "llama3.2:latest",
+		Messages: curr_session.History,
+		Options: _OllamaOptions{
+			Num_ctx:     4096,
+			Temperature: temperature,
+		},
+		Stream: true,
+		Keep_alive: "99999999m",
+	}
+
+	jsonData, err := json.Marshal(ollama_request)
+	if err != nil {
+		log.Println("Error marshalling JSON: ", err)
+
+		return ""
+	}
+
+	resp, err := http.Post("http://localhost:11434/api/chat", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Println("Error posting to Ollama: ", err)
+
+		return ""
+	}
+	defer resp.Body.Close()
+
+	var response, timestamp = readGPT(resp, true)
+
+	curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
+		Role:    "assistant",
+		Content: response[:len(response)-1],
+		Timestamp_s: timestamp,
+	})
+	curr_session.Last_interaction_s = time.Now().Unix()
+
+	if session_id != "dumb" {
+		// Save the session unless it's to use the dumb LLM
+		modGenInfo_GL.Sessions[session_id] = curr_session
+	}
+
+	return session_id
+}
+
+func sendToGPT(to_send string, use_smart bool) {
+	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
+
+	var to_write string = UtilsSWA.RemoveNonGraphicCharsGENERAL(to_send)
+	if use_smart {
+		var system_prompt_smart string = modUserInfo_GL.System_info + "\n\n" + "Memories stored about the user: " +
+			visor_memories_GL + "\n\n" + "About you: " + visor_intro_GL
+
+		var session_id string = "test"
+		if !addSessionEntry(session_id, []ModsFileInfo.OllamaMessage{
+			{
+				Role:    "system",
+				Content: system_prompt_smart,
+				Images:  nil,
+				Timestamp_s: 0,
+			},
+		}, 0) {
+			// If the session already exists, update the system message
+			modGenInfo_GL.Sessions[session_id].History[0].Content = system_prompt_smart
+		}
+
+		chatWithGPT(to_write, session_id)
+	} else {
+		chatWithGPT(to_write, "dumb")
+	}
 }
 
 
-
-/*// Directory for processing text files
-const _TO_PROCESS_REL_FOLDER string = "to_process"
-
-// Command prefixes for Wolfram Alpha and Wikipedia
-const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
-const SEARCH_WIKIPEDIA string = "/searchWikipedia "
+// todo Edit each session to have an updated SYSTEM message having all user memories, each time it's reused
 
 
-var (
-	realMain       Utils.RealMain = nil
-	moduleInfo_GL  Utils.ModuleInfo
-	modGenInfo_GL  *ModsFileInfo.Mod7GenInfo
-	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
-)
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
 		modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
+		module_stop_GL = module_stop
+
 
 		// Set initial module state
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
-		// Stop any running Ollama instances to start fresh
-		restartOllama()
-
-		time.Sleep(1 * time.Second)
-
-		var system_info string = modUserInfo_GL.System_info
-		system_info = strings.Replace(system_info, "3234_WEEKDAY", time.Now().Weekday().String(), -1)
-		system_info = strings.Replace(system_info, "3234_DAY", strconv.Itoa(time.Now().Day()), -1)
-		system_info = strings.Replace(system_info, "3234_MONTH", time.Now().Month().String(), -1)
-		system_info = strings.Replace(system_info, "3234_YEAR", strconv.Itoa(time.Now().Year()), -1)
+		// Start Ollama in case it's not running
+		startOllama()
 
 		// Load visor introduction text
-		var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-		visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
-		visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
-		visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
+		visor_intro_GL = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
+		//var visor_functions = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "functions.json").ReadTextFile()
+		//visor_intro = strings.Replace(visor_intro, "3234_FUNCTIONS", visor_functions, -1)
+		visor_intro_GL = strings.Replace(visor_intro_GL, "\n", " ", -1)
+		visor_intro_GL = strings.Replace(visor_intro_GL, "\"", "\\\"", -1)
+		visor_intro_GL = strings.Replace(visor_intro_GL, "3234_NICK", modUserInfo_GL.User_nickname, -1)
 
 		// Initialize memory string
-		var memories string = strings.Join(modGenInfo_GL.Memories, ". ")
-		memories = strings.Replace(memories, "\"", "\\\"", -1)
+		visor_memories_GL = strings.Join(modGenInfo_GL.Memories, ". ")
+		visor_memories_GL = strings.Replace(visor_memories_GL, "\"", "\\\"", -1)
 
-		var system_prompt string =
-			system_info + " \n\n" +
-			"Memories stored about the user: " + memories + "\n\n" +
-			"About you:" + visor_intro
-		if system_prompt == "" {}
+		var system_prompt_dumb string = modUserInfo_GL.System_info + "\n\n" + "You're a voice assistant"
 
-		// Declare and assign context sizes
-		//var smart_ctx_size int = 12288
-		var dumb_ctx_size int = 4096
+		if modGenInfo_GL.Sessions == nil {
+			modGenInfo_GL.Sessions = make(map[string]*ModsFileInfo.Session)
+		}
 
-
-
-		var request_data _OllamaRequest = _OllamaRequest{
-			Model:      "llama3.2:latest",
-			Prompt:     "What do you remember about me?",
-			Suffix:     "",
-			Images:     nil,
-			Format:     "",
-			Options:    _ModelfileParams{
-				Num_ctx:     dumb_ctx_size,
-				Temperature: 0.8,
+		// Prepare the session for the dumb LLM
+		removeSessionEntry("dumb")
+		addSessionEntry("dumb", []ModsFileInfo.OllamaMessage{
+			{
+				Role:    "system",
+				Content: system_prompt_dumb,
+				Images:  nil,
+				Timestamp_s: 0,
 			},
-			System:     system_prompt,
-			Template:   "",
-			Context:    nil,
-			Stream:     true,
-			Raw:        false,
-			Keep_alive: "5m",
-		}
-
-		jsonData, err := json.Marshal(request_data)
-		if err != nil {
-			fmt.Printf("Error marshalling JSON: %v\n", err)
-			os.Exit(1)
-		}
-
-		// Create the POST request
-		req, err := http.NewRequest("POST", "http://127.0.0.1:11434/api/generate", bytes.NewBuffer(jsonData))
-		if err != nil {
-			fmt.Printf("Error creating request: %v\n", err)
-			os.Exit(1)
-		}
-		req.Header.Set("Content-Type", "application/json")
-
-		// Send the request
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Printf("Error making request: %v\n", err)
-			os.Exit(1)
-		}
-
-		defer resp.Body.Close()
-
-		// Use a JSON decoder to handle the streamed response
-		decoder := json.NewDecoder(resp.Body)
-		for decoder.More() {
-			var response _OllamaResponse
-			if err := decoder.Decode(&response); err != nil {
-				fmt.Printf("Error decoding JSON: %v\n", err)
-				break
-			}
-
-			// Process each JSON object as it arrives
-			fmt.Printf("Response text: %v\n", response)
-		}
+		}, -1000000) // A very low timestamp to avoid being selected as latest session
 
 
+
+		/*session_id := chatWithGPT("Who was the USA president in 2021?", Utils.RandStringGENERAL(10), true)
+
+		_ = chatWithGPT("What's 2+2?", Utils.RandStringGENERAL(10), true)
+
+		_ = chatWithGPT("And Portugal's?", session_id, true)
 
 		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+				return
+			}
+		}*/
+
+
+		var shut_down bool = false
+		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+
+		shutDown := func() {
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+		}
+
+		// Process the text to input to the LLM model
+		for {
+			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+			var file_list []Utils.FileInfo = to_process_dir.GetFileList()
+			for len(file_list) > 0 {
+				file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
+				var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
+
+				var to_process string = *file_path.ReadTextFile()
+				if to_process != "" {
+					// It comes like: "[device_id|[true or false]]text"
+					var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
+					device_id_GL = params_split[0]
+					var use_smart bool = params_split[1] == "true"
+					var text string = to_process[strings.Index(to_process, "]")+1:]
+					text = strings.Replace(text, "\n", "\\n", -1)
+
+					if use_smart {
+						// Control commands begin with a slash
+						if strings.HasSuffix(text, "/clear") {
+							// Clear the context of the LLM model by stopping the module (the Manager will restart it)
+							shut_down = true
+							// todo No need to restart the module, just remove the session
+						} else if strings.HasSuffix(text, "/restart") {
+							restartOllama()
+						} else if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
+							// Ask Wolfram Alpha the question
+							var question string = text[strings.Index(text, ASK_WOLFRAM_ALPHA)+len(ASK_WOLFRAM_ALPHA):]
+							result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
+
+							if direct_result {
+								_ = gpt_text_txt.WriteTextFile(getStartString(device_id_GL) + "The answer is: " + result +
+									". " + getEndString(), true)
+							} else {
+								sendToGPT("Summarize in sentences the following: " + result, false)
+							}
+						} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
+							// Search for the Wikipedia page title
+							var query string = text[strings.Index(text, SEARCH_WIKIPEDIA)+len(SEARCH_WIKIPEDIA):]
+
+							_ = gpt_text_txt.WriteTextFile(getStartString(device_id_GL) + OnlineInfoChk.RetrieveWikipedia(query) +
+								getEndString(), true)
+						} else {
+							sendToGPT(text, true)
+						}
+					} else {
+						sendToGPT(text, false)
+					}
+				}
+
+				Utils.DelElemSLICES(&file_list, idx_to_remove)
+				_ = os.Remove(file_path.GPathToStringConversion())
+
+				if shut_down {
+					shutDown()
+
+					return
+				}
+			}
+
+			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+				shutDown()
+
 				return
 			}
 		}
 	}
-}*/
+}
 
-func startOllama(instance_type string) (*bufio.Writer, io.ReadCloser, io.ReadCloser) {
-	cmd := exec.Command(Utils.GetShellSHELL("", ""))
-	stdin, _ := cmd.StdinPipe()
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
-	err := cmd.Start()
-	if err != nil {
-		log.Printf("Error starting %s a shell session for an LLM: %v", instance_type, err)
+func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, last_interaction_s int64) bool {
+	if _, ok := modGenInfo_GL.Sessions[session_id]; !ok {
+		// If the session doesn't exist, create it
+		modGenInfo_GL.Sessions[session_id] = &ModsFileInfo.Session{
+			Name:               session_id,
+			Created_time_s:     time.Now().Unix(),
+			History:            history,
+			Last_interaction_s: last_interaction_s,
+		}
 
-		return nil, nil, nil
+		return true
 	}
 
-	writer := bufio.NewWriter(stdin)
+	return false
+}
 
-	return writer, stdout, stderr
+func removeSessionEntry(session_id string) {
+	delete(modGenInfo_GL.Sessions, session_id)
+}
+
+func startOllama() {
+	_, _ = Utils.ExecCmdSHELL([]string{"sudo systemctl start ollama.service"})
+
 }
 
 /*
