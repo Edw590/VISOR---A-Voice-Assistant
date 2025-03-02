@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -135,7 +135,7 @@ func init() {realMain =
 
 		// Create a new application
 		my_app_GL = app.NewWithID("com.edw590.visor_c")
-		my_app_GL.SetIcon(Logo.LogoBlackGmail)
+		my_app_GL.SetIcon(Logo.LogoAdaptiveAllModded)
 		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
 		my_window_GL.Resize(fyne.NewSize(640, 480))
 		Screens.Current_window_GL = my_window_GL
@@ -207,7 +207,7 @@ func init() {realMain =
 
 		// Add system tray functionality
 		if desk, ok := my_app_GL.(desktop.App); ok {
-			var icon *fyne.StaticResource = Logo.LogoBlackGmail
+			var icon *fyne.StaticResource = Logo.LogoAdaptiveAllModded
 			var menu *fyne.Menu = fyne.NewMenu("Tray",
 				fyne.NewMenuItem("Show", func() {
 					showWindow()
