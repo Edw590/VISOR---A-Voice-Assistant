@@ -66,11 +66,10 @@ func gptCommunicatorCreateAboutTab() *container.Scroll {
 }
 
 func gptCommunicatorCreateMemoriesTab() *container.Scroll {
-	var label_info *widget.Label = widget.NewLabel("List of memories stored for the smart LLM, one per line " +
-		"(maximize the window):")
+	var label_info *widget.Label = widget.NewLabel("List of memories stored, one per line (maximize the window):")
 
 	var memories_text *widget.Entry = widget.NewMultiLineEntry()
-	memories_text.SetPlaceHolder("Stored memories on the smart LLM")
+	memories_text.SetPlaceHolder("Stored memories")
 	memories_text.Wrapping = fyne.TextWrapWord
 	memories_text.SetMinRowsVisible(100)
 	if Utils.IsCommunicatorConnectedSERVER() {
@@ -162,6 +161,10 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 }
 
 func gptCommunicatorCreateSessionsTab() *container.Scroll {
+	if !Utils.IsCommunicatorConnectedSERVER() {
+		return createMainContentScrollUTILS(widget.NewLabel("[Not connected to the server to get the chats]"))
+	}
+
 	GPTComm.RetrieveSessions()
 	var session_ids_str string = GPTComm.GetSessionIdsList()
 	if session_ids_str == "" {
@@ -179,13 +182,13 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 	}
 
 	sort.SliceStable(sessions_info, func(i, j int) bool {
-		return sessions_info[i].session.Created_time_s < sessions_info[j].session.Created_time_s
+		return sessions_info[i].session.Created_time_s > sessions_info[j].session.Created_time_s
 	})
 
 	var entries_map map[string]*widget.Entry = make(map[string]*widget.Entry)
 	var accordion *widget.Accordion = widget.NewAccordion()
 	for _, session_info := range sessions_info {
-		if session_info.id == "dumb" {
+		if session_info.id == "temp" || session_info.id == "dumb" {
 			continue
 		}
 
@@ -205,14 +208,20 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 				if session_ids_str != "" {
 					session_ids = strings.Split(session_ids_str, "|")
 					for _, session_id := range session_ids {
-						if session_id == "dumb" {
+						if session_id == "temp" || session_id == "dumb" {
 							continue
 						}
 
-						var session_history []string = strings.Split(GPTComm.GetSessionHistory(session_id), "\000")
+						var session_history_str string = GPTComm.GetSessionHistory(session_id)
+						if session_history_str == "" {
+							continue
+						}
+
+						var session_history []string = strings.Split(session_history_str, "\000")
 						var msg_content_str string = ""
 						for _, message := range session_history {
 							var message_parts_pipe []string = strings.Split(message, "|")
+							var index_first_pipe int = strings.Index(message, "|")
 							var message_parts_slash []string = strings.Split(message_parts_pipe[0], "/")
 
 							var msg_role = message_parts_slash[0]
@@ -225,7 +234,7 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 									msg_role = "YOU"
 							}
 							var msg_timestamp_s, _ = strconv.ParseInt(message_parts_slash[1], 10, 64)
-							var msg_content = message_parts_pipe[1]
+							var msg_content = message[index_first_pipe + 1:]
 
 							msg_content_str +=
 								"-----------------------------------------------------------------------\n" +
@@ -236,7 +245,7 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 							msg_content_str = msg_content_str[:len(msg_content_str)-2]
 						}
 
-						if entries_map[session_id].Text != msg_content_str {
+						if entries_map[session_id] != nil && entries_map[session_id].Text != msg_content_str {
 							entries_map[session_id].SetText(msg_content_str)
 						}
 					}
@@ -253,6 +262,8 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 }
 
 func createSessionView(entries_map map[string]*widget.Entry, session_info _SessionInfo) *fyne.Container {
+	var label_date *widget.Label = widget.NewLabel("Created on " +
+		Utils.GetDateTimeStrTIMEDATE(GPTComm.GetSessionCreatedTime(session_info.id) * 1000))
 
 	var entry_name *widget.Entry = widget.NewEntry()
 	entry_name.SetPlaceHolder("Chat name")
@@ -274,7 +285,7 @@ func createSessionView(entries_map map[string]*widget.Entry, session_info _Sessi
 	var btn_delete *widget.Button = widget.NewButton("Delete chat", func() {
 		createConfirmationDialogUTILS("Are you sure you want to delete this chat?", func(confirmed bool) {
 			if confirmed {
-				GPTComm.DeleteSession(session_info.id) // todo Not tested
+				GPTComm.DeleteSession(session_info.id)
 
 				reloadScreen()
 			}
@@ -288,6 +299,7 @@ func createSessionView(entries_map map[string]*widget.Entry, session_info _Sessi
 	entries_map[session_info.id] = entry_history
 
 	return container.NewVBox(
+		label_date,
 		entry_name,
 		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
 		entry_history,
@@ -299,18 +311,15 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
 	text_to_send.SetPlaceHolder(
-		"Text to send to VISOR (commands, or normal text to the smart LLM)\n" +
-		"- /clear to clear the context by restarting the LLMs\n" +
-		"- /stop to stop the LLM while it's generating text by restarting both\n" +
-		"- /mem to memorize the conversation\n" +
-		"- /memmem to summarize the list of memories (use with caution)\n",
+		"Text to send to VISOR\n" +
+		"- /stop to stop the LLM while it's generating text\n",
 	)
 
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, 0, "Sentence", text_to_send.Text)
 	})
 
-	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to the LLM (smart)", func() {
+	var btn_send_text_gpt_smart *widget.Button = widget.NewButton("Send text directly to the LLM (new chat)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. Not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -319,7 +328,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, true) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW) {
 			case ModsFileInfo.MOD_7_STATE_STARTING:
 				speak = "The GPT is starting up. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_BUSY:
@@ -332,7 +341,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 		}
 	})
 
-	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to the LLM (dumb)", func() {
+	var btn_send_text_gpt_dumb *widget.Button = widget.NewButton("Send text directly to the LLM (temp chat)", func() {
 		if !Utils.IsCommunicatorConnectedSERVER() {
 			var speak string = "GPT unavailable. Not connected to the server."
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -341,7 +350,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, false) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP) {
 			case ModsFileInfo.MOD_7_STATE_STARTING:
 				speak = "The GPT is starting up. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_BUSY:
@@ -355,7 +364,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	})
 
 	var response_text *widget.Entry = widget.NewMultiLineEntry()
-	response_text.SetPlaceHolder("Response from the smart LLM")
+	response_text.SetPlaceHolder("Response")
 	response_text.Wrapping = fyne.TextWrapWord
 	response_text.SetMinRowsVisible(100)
 

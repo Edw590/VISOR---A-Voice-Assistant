@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -282,6 +282,7 @@ for any other, "\r\n" and "\r" are replaced by "\n".
 
 – Params:
   - content – the contents to write
+  - append – if true, appends the content to the file, else overwrites it
 
 – Returns:
   - nil if the file was written successfully, an error otherwise (including if the path describes a directory)

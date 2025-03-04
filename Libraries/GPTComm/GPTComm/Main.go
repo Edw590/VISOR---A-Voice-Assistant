@@ -28,6 +28,9 @@ import (
 	"time"
 )
 
+const SESSION_TYPE_NEW string = "NEW"
+const SESSION_TYPE_TEMP string = "TEMP"
+const SESSION_TYPE_ACTIVE string = "ACTIVE"
 /*
 SendText sends the given text to the LLM model.
 
@@ -35,20 +38,20 @@ SendText sends the given text to the LLM model.
 
 – Params:
   - text – the text to send or an empty string to just get the return value
-  - use_smart – whether to use the smart LLM or not (ignored in case `text` is empty)
+  - session_type – one of the SESSION_TYPE_-started constants or a session ID (ignored in case `text` is empty)
 
 – Returns:
   - true if the text will be processed immediately, false if the GPT is busy and the text will be put on hold
 */
-func SendText(text string, use_smart bool) string {
+func SendText(text string, session_type string) string {
 	var message []byte = []byte("GPT|")
 	if text != "" {
 		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
 		var date_time string = time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04")
 
 		var new_text string = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
-		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id+ "|" +
-			strconv.FormatBool(use_smart) + "]" + new_text)...)
+		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id + "|" +
+			session_type+ "]" + new_text)...)
 	}
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message)
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
@@ -70,8 +73,8 @@ GetMemories gets the memories from the GPT.
   - the memories separated by new lines
  */
 func GetMemories() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("G_S|true|GPTMem"))
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 3, []byte("G_S|true|GPTMem"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 3)
 	if comms_map == nil {
 		return ""
 	}
@@ -128,8 +131,8 @@ func getEntry(time int64, num int) *_Entry {
 		}
 	}
 
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, []byte("File|false|gpt_text.txt"))
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("File|false|gpt_text.txt"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2)
 	if comms_map == nil {
 		return &_Entry{
 			device_id: "",
@@ -244,7 +247,10 @@ getTextFromEntry gets the text from the entry.
 -----------------------------------------------------------
 
 – Params:
+  - entry – the entry
 
+– Returns:
+  - the text
 */
 func getTextFromEntry(entry string) string {
 	// It comes like: "...]text[3234_END]"

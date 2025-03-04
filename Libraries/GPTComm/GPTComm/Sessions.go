@@ -30,9 +30,12 @@ import (
 
 var sessions_GL map[string]ModsFileInfo.Session = nil
 
+/*
+RetrieveSessions retrieves the list of sessions, ready to be used by the other functions.
+ */
 func RetrieveSessions() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("G_S|true|GPTSessions"))
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 4, []byte("G_S|true|GPTSessions"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 4)
 	if comms_map == nil {
 		return
 	}
@@ -41,6 +44,7 @@ func RetrieveSessions() {
 
 	var json_bytes []byte = []byte(Utils.DecompressString(response))
 
+	sessions_GL = make(map[string]ModsFileInfo.Session)
 	if err := Utils.FromJsonGENERAL(json_bytes, &sessions_GL); err != nil {
 		return
 	}
@@ -67,12 +71,12 @@ func GetSessionIdsList() string {
 }
 
 /*
-GetSessions gets the sessions from the GPT.
+GetSessionName gets the name of the session.
 
 -----------------------------------------------------------
 
 – Returns:
-  - the chats separated by null characters
+  - the name of the session
 */
 func GetSessionName(session_id string) string {
 	for id, session := range sessions_GL {
@@ -135,7 +139,9 @@ func GetSessionHistory(session_id string) string {
 			var session_history string = ""
 			for _, message := range session.History {
 				var msg_content string = message.Content
-				msg_content = msg_content[strings.Index(msg_content, "]") + 1:]
+				if message.Role == "user" {
+					msg_content = msg_content[strings.Index(msg_content, "]") + 1:]
+				}
 				session_history += message.Role + "/" + strconv.Itoa(int(message.Timestamp_s)) + "|" + msg_content +
 					"\000"
 			}

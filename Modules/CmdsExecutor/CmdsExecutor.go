@@ -136,7 +136,7 @@ func init() {realMain =
 						break
 					}
 				}
-				// If there are only WARN_-started constants (nevative numbers), send to GPT
+				// If there are only WARN_-started constants (negative numbers), send to GPT
 			}
 			if send_to_GPT {
 				sendToGPT(sentence_str)
@@ -162,11 +162,11 @@ func init() {realMain =
 				switch cmd_id {
 					case CMD_ASK_TIME:
 						var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
-						speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 
 					case CMD_ASK_DATE:
 						var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
-						speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 
 					case CMD_TOGGLE_WIFI:
 						if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
@@ -176,25 +176,25 @@ func init() {realMain =
 							} else {
 								speak = "Wi-Fi turned off."
 							}
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the Wi-Fi " + on_off + "."
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 						}
 
 					case CMD_ASK_BATTERY_PERCENT:
 						var battery_percentage int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 							GetInt(true))
 						var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-						speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 
 					case CMD_TELL_WEATHER:
 						var speak string = "Obtaining the weather..."
-						speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -208,16 +208,16 @@ func init() {realMain =
 									weather.Max_temp + " degrees and a minimum of " + weather.Min_temp +
 									" degrees. The precipitation is of " + weather.Precipitation + ", humidity of " +
 									weather.Humidity + ", and wind of " + weather.Wind + "."
-								speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 							}
 						} else {
 							speak = "Not connected to the server to get the weather."
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 						}
 
 					case CMD_TELL_NEWS:
 						var speak string = "Obtaining the latest news..."
-						speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -232,11 +232,11 @@ func init() {realMain =
 								for _, n := range news.News {
 									speak += n + ". "
 								}
-								speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+								speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
 							}
 						} else {
 							speak = "Not connected to the server to get the news."
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 						}
 
 					case CMD_TOGGLE_ETHERNET:
@@ -247,14 +247,14 @@ func init() {realMain =
 							} else {
 								speak = "Ethernet turned off."
 							}
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+							speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 						}
 
 					case CMD_TOGGLE_NETWORKING:
@@ -265,18 +265,18 @@ func init() {realMain =
 							} else {
 								speak = "Networking turned off."
 							}
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+							speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
 						} else {
 							var on_off string = "off"
 							if cmd_variant == RET_ON {
 								on_off = "on"
 							}
 							var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 						}
 					case CMD_ASK_EVENTS:
 						var speak string = "Obtaining the tasks and events..."
-						speakInternal(speak, speech_priority, speech_mode2, _GPT_NONE, false)
+						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
 
 						// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -290,10 +290,10 @@ func init() {realMain =
 								speak += " " + getTasksList(tasks_ids, cmd_variant)
 							}
 
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_SMART, true)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true)
 						} else {
 							speak = "Not connected to the server to get the tasks and events."
-							speakInternal(speak, speech_priority, speech_mode2, _GPT_DUMB, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 						}
 				}
 			}
@@ -308,16 +308,14 @@ func init() {realMain =
 	}
 }
 
-const _GPT_NONE int = 0
-const _GPT_DUMB int = 1
-const _GPT_SMART int = 2
-func speakInternal(txt_to_speak string, speech_priority int32, mode int32, gpt_mode int, wait_for_gpt bool) {
-	if gpt_mode != _GPT_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
+const _SESSION_TYPE_NONE string = "NONE"
+func speakInternal(txt_to_speak string, speech_priority int32, mode int32, session_type string, wait_for_gpt bool) {
+	if session_type != _SESSION_TYPE_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
 				Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt ||
-				GPTComm.SendText("", false) == ModsFileInfo.MOD_7_STATE_READY) {
+				GPTComm.SendText("", GPTComm.SESSION_TYPE_TEMP) == ModsFileInfo.MOD_7_STATE_READY) {
 		var text string = "Reword in English: \"" + txt_to_speak + "\". DON'T SAY YOU'RE REWORDING IT."
 		var speak string = ""
-		switch GPTComm.SendText(text, gpt_mode == _GPT_SMART) {
+		switch GPTComm.SendText(text, session_type) {
 			case ModsFileInfo.MOD_7_STATE_STARTING:
 				speak = "The GPT is starting up. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_BUSY:
@@ -328,11 +326,6 @@ func speakInternal(txt_to_speak string, speech_priority int32, mode int32, gpt_m
 		if speak != "" {
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 		}
-
-		return
-	}
-	if gpt_mode == _GPT_SMART {
-		// Not supposed to happen
 
 		return
 	}
@@ -349,7 +342,7 @@ func sendToGPT(txt_to_send string) {
 	}
 
 	var speak string = ""
-	switch GPTComm.SendText(txt_to_send, true) {
+	switch GPTComm.SendText(txt_to_send, GPTComm.SESSION_TYPE_ACTIVE) {
 		case ModsFileInfo.MOD_7_STATE_STARTING:
 			speak = "The GPT is starting up. Text on hold."
 		case ModsFileInfo.MOD_7_STATE_BUSY:

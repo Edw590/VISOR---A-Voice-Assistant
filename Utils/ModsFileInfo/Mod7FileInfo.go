@@ -46,6 +46,8 @@ type Session struct {
 	History []OllamaMessage
 	// Last_interaction_s is the timestamp of the last interaction with the session
 	Last_interaction_s int64
+	// Memorized is whether the session has been memorized since the last interaction
+	Memorized bool
 }
 
 type OllamaMessage struct {

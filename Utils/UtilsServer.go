@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -265,6 +265,7 @@ QueueMessageSERVER queues a message to be sent to the server.
 – Params:
   - is_mod – true if this function was called from a module, false if it was called from a library
   - num – the number of the module or library that called this function
+  - channel_num – the number of the channel to send the message to
   - message – the message to be sent
 */
 func QueueMessageSERVER(is_mod bool, num int, channel_num int, message []byte) {
