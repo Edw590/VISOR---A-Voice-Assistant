@@ -29,8 +29,8 @@ import (
 var news_locs_GL []ModsFileInfo.News = nil
 
 func getAllNews() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|News"))
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0)
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, 1, []byte("G_S|true|News"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_OICComm, 1)
 	if comms_map == nil {
 		return
 	}
