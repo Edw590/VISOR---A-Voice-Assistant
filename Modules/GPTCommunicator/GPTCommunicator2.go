@@ -30,9 +30,12 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
+
+// Prepared for Ollama 0.5.11
 
 type _OllamaRequest struct {
 	Model string `json:"model"`
@@ -62,14 +65,24 @@ type _OllamaResponse struct {
 	Eval_duration int `json:"eval_duration"`
 }
 
-// Prepared for Ollama 0.5.11
+const _TO_PROCESS_REL_FOLDER string = "to_process"
+
+const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
+const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
 const _INACTIVE_SESSION_TIME_S int64 = 30*60
 
+const _TIME_SLEEP_S int = 1
+
 var module_stop_GL *bool = nil
 
-
-
+var (
+	realMain       Utils.RealMain = nil
+	moduleInfo_GL  Utils.ModuleInfo
+	modGenInfo_GL  *ModsFileInfo.Mod7GenInfo
+	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
+)
+func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
 func init() {realMain =
 	func(module_stop *bool, moduleInfo_any any) {
 		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
@@ -78,8 +91,6 @@ func init() {realMain =
 
 		module_stop_GL = module_stop
 
-
-		// Set initial module state
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
 		// Start Ollama in case it's not running
@@ -90,7 +101,7 @@ func init() {realMain =
 			modGenInfo_GL.Sessions = make(map[string]*ModsFileInfo.Session)
 		}
 
-		// Prepare the session for the temp LLM
+		// Prepare the session for the temp and dumb sessions
 		addSessionEntry("temp", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
 		addSessionEntry("dumb", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
 
@@ -100,7 +111,7 @@ func init() {realMain =
 		// start and be ready.
 		chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "dumb")
 
-		go shouldMemorize()
+		autoMemorize()
 
 		// Process the text to input to the LLM model
 		for {
@@ -181,25 +192,27 @@ func sendToGPT(device_id string, user_message string, session_id string) string 
 	return chatWithGPT(device_id, user_message, session_id)
 }
 
-func shouldMemorize() {
-	for {
-		if modGenInfo_GL.State == ModsFileInfo.MOD_7_STATE_READY {
-			for session_id, session := range modGenInfo_GL.Sessions {
-				if session_id == getActiveSessionId() || session.Memorized || session_id == "temp" || session_id == "dumb" {
-					continue
-				}
+func autoMemorize() {
+	go func() {
+		for {
+			if modGenInfo_GL.State == ModsFileInfo.MOD_7_STATE_READY {
+				for session_id, session := range modGenInfo_GL.Sessions {
+					if session_id == getActiveSessionId() || session.Memorized || session_id == "temp" || session_id == "dumb" {
+						continue
+					}
 
-				// If the session is no longer the active one, memorize it
-				if memorizeSession(session_id) {
-					session.Memorized = true
+					// If the session is no longer the active one, memorize it
+					if memorizeSession(session_id) {
+						session.Memorized = true
+					}
 				}
 			}
-		}
 
-		if Utils.WaitWithStopTIMEDATE(module_stop_GL, 1*60) {
-			return
+			if Utils.WaitWithStopTIMEDATE(module_stop_GL, 1*60) {
+				return
+			}
 		}
-	}
+	}()
 }
 
 func memorizeSession(session_id string) bool {
@@ -312,6 +325,58 @@ func getActiveSessionId() string {
 	return active_session_id
 }
 
+/*
+reduceGptTextTxt reduces the GPT text file to the last 5 entries.
+
+-----------------------------------------------------------
+
+– Params:
+  - gpt_text_txt – the GPT text file
+*/
+func reduceGptTextTxt(gpt_text_txt Utils.GPath) {
+	var text string = *gpt_text_txt.ReadTextFile()
+	var entries []string = strings.Split(text, "[3234_START:")
+	if len(entries) > 5 {
+		_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[len(entries)-5], false)
+
+		for i := len(entries) - 4; i < len(entries); i++ {
+			_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[i], true)
+		}
+	}
+}
+
+/*
+checkStopSpeech checks if the text to process contains the /stop command.
+
+-----------------------------------------------------------
+
+– Returns:
+  - true if the /stop command was found, false otherwise
+*/
+func checkStopSpeech() bool {
+	var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+	var file_list []Utils.FileInfo = to_process_dir.GetFileList()
+	for len(file_list) > 0 {
+		file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
+		var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
+
+		var to_process string = *file_path.ReadTextFile()
+		if to_process != "" {
+			var text string = to_process[strings.Index(to_process, "]") + 1:]
+
+			if strings.HasSuffix(text, "/stop") {
+				_ = os.Remove(file_path.GPathToStringConversion())
+
+				return true
+			}
+		}
+
+		Utils.DelElemSLICES(&file_list, idx_to_remove)
+	}
+
+	return false
+}
+
 func startOllama() {
 	_, _ = Utils.ExecCmdSHELL([]string{"sudo systemctl start ollama.service"})
 
@@ -329,4 +394,12 @@ restartOllama restarts the Ollama service.
 */
 func restartOllama() {
 	_, _ = Utils.ExecCmdSHELL([]string{"sudo systemctl restart ollama.service"})
+}
+
+func getStartString(device_id string) string {
+	return "[3234_START:" + strconv.FormatInt(time.Now().UnixMilli(), 10) + "|" + device_id + "|]"
+}
+
+func getEndString() string {
+	return "[3234_END]\n"
 }
