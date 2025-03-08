@@ -32,8 +32,10 @@ var sessions_GL map[string]ModsFileInfo.Session = nil
 
 /*
 RetrieveSessions retrieves the list of sessions, ready to be used by the other functions.
+
+This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
  */
-func RetrieveSessions() {
+func retrieveSessions() {
 	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 4, []byte("G_S|true|GPTSessions"))
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 4)
 	if comms_map == nil {
@@ -53,12 +55,16 @@ func RetrieveSessions() {
 /*
 GetSessionIdsList gets the list of session IDs.
 
+This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
+
 -----------------------------------------------------------
 
 – Returns:
   - the list of session IDs separated by "|"
  */
 func GetSessionIdsList() string {
+	retrieveSessions()
+
 	var ids_list string = ""
 	for id := range sessions_GL {
 		ids_list += id + "|"

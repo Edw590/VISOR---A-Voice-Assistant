@@ -165,7 +165,6 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 		return createMainContentScrollUTILS(widget.NewLabel("[Not connected to the server to get the chats]"))
 	}
 
-	GPTComm.RetrieveSessions()
 	var session_ids_str string = GPTComm.GetSessionIdsList()
 	if session_ids_str == "" {
 		return createMainContentScrollUTILS()
@@ -202,51 +201,51 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_MOD_GPT_COMM {
-				GPTComm.RetrieveSessions()
+				if Utils.IsCommunicatorConnectedSERVER() {
+					session_ids_str = GPTComm.GetSessionIdsList()
+					if session_ids_str != "" {
+						session_ids = strings.Split(session_ids_str, "|")
+						for _, session_id := range session_ids {
+							if session_id == "temp" || session_id == "dumb" {
+								continue
+							}
 
-				session_ids_str = GPTComm.GetSessionIdsList()
-				if session_ids_str != "" {
-					session_ids = strings.Split(session_ids_str, "|")
-					for _, session_id := range session_ids {
-						if session_id == "temp" || session_id == "dumb" {
-							continue
-						}
+							var session_history_str string = GPTComm.GetSessionHistory(session_id)
+							if session_history_str == "" {
+								continue
+							}
 
-						var session_history_str string = GPTComm.GetSessionHistory(session_id)
-						if session_history_str == "" {
-							continue
-						}
+							var session_history []string = strings.Split(session_history_str, "\000")
+							var msg_content_str string = ""
+							for _, message := range session_history {
+								var message_parts_pipe []string = strings.Split(message, "|")
+								var index_first_pipe int = strings.Index(message, "|")
+								var message_parts_slash []string = strings.Split(message_parts_pipe[0], "/")
 
-						var session_history []string = strings.Split(session_history_str, "\000")
-						var msg_content_str string = ""
-						for _, message := range session_history {
-							var message_parts_pipe []string = strings.Split(message, "|")
-							var index_first_pipe int = strings.Index(message, "|")
-							var message_parts_slash []string = strings.Split(message_parts_pipe[0], "/")
-
-							var msg_role = message_parts_slash[0]
-							switch msg_role {
+								var msg_role = message_parts_slash[0]
+								switch msg_role {
 								case "system":
 									continue
 								case "assistant":
 									msg_role = "VISOR"
 								case "user":
 									msg_role = "YOU"
+								}
+								var msg_timestamp_s, _ = strconv.ParseInt(message_parts_slash[1], 10, 64)
+								var msg_content = message[index_first_pipe+1:]
+
+								msg_content_str +=
+									"-----------------------------------------------------------------------\n" +
+										"|" + strings.ToUpper(msg_role) + "| on " +
+										Utils.GetDateTimeStrTIMEDATE(msg_timestamp_s*1000) + ":\n" + msg_content + "\n\n"
 							}
-							var msg_timestamp_s, _ = strconv.ParseInt(message_parts_slash[1], 10, 64)
-							var msg_content = message[index_first_pipe + 1:]
+							if len(msg_content_str) > 2 {
+								msg_content_str = msg_content_str[:len(msg_content_str)-2]
+							}
 
-							msg_content_str +=
-								"-----------------------------------------------------------------------\n" +
-								"|" + strings.ToUpper(msg_role) + "| on " +
-								Utils.GetDateTimeStrTIMEDATE(msg_timestamp_s * 1000) + ":\n" + msg_content + "\n\n"
-						}
-						if len(msg_content_str) > 2 {
-							msg_content_str = msg_content_str[:len(msg_content_str)-2]
-						}
-
-						if entries_map[session_id] != nil && entries_map[session_id].Text != msg_content_str {
-							entries_map[session_id].SetText(msg_content_str)
+							if entries_map[session_id] != nil && entries_map[session_id].Text != msg_content_str {
+								entries_map[session_id].SetText(msg_content_str)
+							}
 						}
 					}
 				}

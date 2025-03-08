@@ -18,7 +18,7 @@ The server one runs 24/7 on my Raspberry Pi. This is supposed to be VISOR's "ope
 Feel free to create an Issue or a Discussion with any questions you have about this. I'm trying to make it as generic as possible for anyone to be able to use it, but I may forget to document things or something, so if you need anything, feel free to ask about it.
 
 ## Usage
-- Download the latest Release from [here](https://github.com/Edw590/VISOR---A-Voice-Assistant/releases).
+- Download the latest Release from [here](https://github.com/Edw590/VISOR---A-Voice-Assistant/releases) (if you need an executable that is not there, tell me and I'll try to compile it for you).
 - To use the server program (very much recommended, to get all the features working), open port 3234 on your router so that the client-server communication can be made. Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him).
 - In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and input the path to those 2 files on the "WebsiteBackend" section inside UserSettings_EOG.dat (open with Notepad).
 - Check below the requirements for each module to work. You must have a few programs installed on your computer for VISOR to work completely.

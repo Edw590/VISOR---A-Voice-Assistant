@@ -54,19 +54,14 @@ func SyncUserSettings() {
 				message = append(message, Utils.CompressString(last_user_settings_json)...)
 				Utils.QueueNoResponseMessageSERVER(message)
 			} else {
-				var update_settings bool = false
+				var get_settings bool = false
 				if time.Now().Unix() >= last_get_settings_when_s + _GET_SETTINGS_EACH_S && Utils.IsCommunicatorConnectedSERVER() {
-					update_settings = true
+					get_settings = true
 
 					last_get_settings_when_s = time.Now().Unix()
 				}
 
-				if update_settings && remoteSettingsChanged() {
-					if !Utils.IsCommunicatorConnectedSERVER() {
-						// Check again the communicator. Trying to prevent deadlocks.
-						continue
-					}
-
+				if get_settings && remoteSettingsChanged() {
 					Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 0, []byte("G_S|true|US"))
 					var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 0)
 					if comms_map == nil {
