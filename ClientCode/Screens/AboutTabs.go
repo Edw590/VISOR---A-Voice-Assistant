@@ -30,7 +30,7 @@ If you send a non-command sentence, it can take a bit to start receiving the res
 
 The memories are "infinite". You can add as many as you want and VISOR will use them all. The more you add, the more he knows about you and better the responses are. Though, the more you add, the more time he'll take to initialize.
 
-After the chat becomes inactive (happens after a while), VISOR will automatically memorize the conversation. When there are too many memories stored (double of last memorization time, beginning with 50), he'll summarize them.`
+After the chat becomes inactive (happens after a while), VISOR will automatically memorize the conversation. When there are too many memories stored (double of last memorization time, beginning with 50), he'll summarize them - review them once in a while to make sure they're correct, as VISOR may memorize useless things sometimes.`
 
 const RSS_ABOUT string =
 `The feeds are checked every 2 minutes. When you add a new one, you'll receive no immediate notifications, but you'll receive the next updates.

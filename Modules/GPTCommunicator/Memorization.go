@@ -117,6 +117,7 @@ func summarizeMemories() bool {
 	var lines []string = strings.Split(response, "\n")
 	for _, line := range lines {
 		if UtilsSWA.StringHasLettersGENERAL(line) && strings.Contains(line, "* ") {
+			line = strings.Replace(line, "\r", "", -1)
 			line = strings.Replace(line, "He ", "The user", -1)
 			line = strings.Replace(line, "She ", "The user", -1)
 			line = strings.Replace(line, "They ", "The user", -1)
