@@ -67,6 +67,8 @@ func SendText(text string, session_type string) string {
 /*
 GetMemories gets the memories from the GPT.
 
+This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
+
 -----------------------------------------------------------
 
 – Returns:

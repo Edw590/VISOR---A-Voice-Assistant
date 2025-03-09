@@ -140,7 +140,7 @@ func init() {realMain =
 		my_window_GL.Resize(fyne.NewSize(640, 480))
 		Screens.Current_window_GL = my_window_GL
 
-		processCommsChannel()
+		go processCommsChannel()
 
 		// Create the content area with a label to display different screens
 		content_container_GL = container.NewStack()
@@ -293,26 +293,24 @@ func showScreen(uid string) {
 processCommsChannel processes in a different thread the communications channel.
 */
 func processCommsChannel() {
-	go func() {
-		for {
-			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_VISOR, 0)
-			if comms_map == nil {
-				return
-			}
-
-			if map_value, ok := comms_map["Notification"]; ok {
-				var notif_info []string = map_value.([]string)
-				notification := fyne.NewNotification(notif_info[0], notif_info[1])
-				my_app_GL.SendNotification(notification)
-
-				time.Sleep(5 * time.Second)
-			} else if map_value, ok = comms_map["ShowApp"]; ok {
-				showWindow()
-			} else if map_value, ok = comms_map["Redraw"]; ok {
-				showScreen(Screens.Current_screen_GL)
-			}
+	for {
+		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_VISOR, 0)
+		if comms_map == nil {
+			return
 		}
-	}()
+
+		if map_value, ok := comms_map["Notification"]; ok {
+			var notif_info []string = map_value.([]string)
+			notification := fyne.NewNotification(notif_info[0], notif_info[1])
+			my_app_GL.SendNotification(notification)
+
+			time.Sleep(5 * time.Second)
+		} else if map_value, ok = comms_map["ShowApp"]; ok {
+			showWindow()
+		} else if map_value, ok = comms_map["Redraw"]; ok {
+			showScreen(Screens.Current_screen_GL)
+		}
+	}
 }
 
 func isOpenGLSupported() bool {

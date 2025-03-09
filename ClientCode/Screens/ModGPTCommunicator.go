@@ -66,17 +66,24 @@ func gptCommunicatorCreateAboutTab() *container.Scroll {
 }
 
 func gptCommunicatorCreateMemoriesTab() *container.Scroll {
-	var label_info *widget.Label = widget.NewLabel("List of memories stored, one per line (maximize the window):")
+	var memories string = "[Not connected to the server to get the memories]"
+	if Utils.IsCommunicatorConnectedSERVER() {
+		 memories = GPTComm.GetMemories()
+	}
+
+	var num_memories int = 0
+	if memories != "" {
+		num_memories = strings.Count(memories, "\n") + 1
+	}
+	var label_info *widget.Label = widget.NewLabel("List of memories stored, one per line (maximize the window). " +
+		"Number of memories: " + strconv.Itoa(num_memories) + ".")
+	label_info.Wrapping = fyne.TextWrapWord
 
 	var memories_text *widget.Entry = widget.NewMultiLineEntry()
 	memories_text.SetPlaceHolder("Stored memories")
 	memories_text.Wrapping = fyne.TextWrapWord
 	memories_text.SetMinRowsVisible(100)
-	if Utils.IsCommunicatorConnectedSERVER() {
-		memories_text.SetText(GPTComm.GetMemories())
-	} else {
-		memories_text.SetText("[Not connected to the server to get the memories]")
-	}
+	memories_text.SetText(memories)
 
 	var btn_save *widget.Button = widget.NewButton("Save memories", func() {
 		GPTComm.SetMemories(memories_text.Text)
