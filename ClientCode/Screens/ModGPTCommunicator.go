@@ -30,7 +30,6 @@ import (
 	"errors"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -129,20 +128,12 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 }
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
-	var label_supported_models *widget.Label = widget.NewLabel("Supported models: Llama3.1 and 3.2 only")
-
-	var entry_smart_model_loc *widget.Entry = widget.NewEntry()
-	entry_smart_model_loc.Validator = validation.NewRegexp(`^.*\.gguf$`, "The model location must end with .gguf")
-	entry_smart_model_loc.SetPlaceHolder("GGUF location for the smart LLM (used for normal conversation)")
-	entry_smart_model_loc.SetText(Utils.User_settings_GL.GPTCommunicator.Model_smart_loc)
-
-	var entry_dumb_model_loc *widget.Entry = widget.NewEntry()
-	entry_dumb_model_loc.Validator = validation.NewRegexp(`^.*\.gguf$`, "The model location must end with .gguf")
-	entry_dumb_model_loc.SetPlaceHolder("GGUF location for the dumb LLM (used to summarize things)")
-	entry_dumb_model_loc.SetText(Utils.User_settings_GL.GPTCommunicator.Model_dumb_loc)
+	var entry_model_name *widget.Entry = widget.NewEntry()
+	entry_model_name.SetPlaceHolder("Ollama model name. Example: llama3.2")
+	entry_model_name.SetText(Utils.User_settings_GL.GPTCommunicator.Model_name)
 
 	var entry_system_info *widget.Entry = widget.NewEntry()
-	entry_system_info.SetPlaceHolder("LLM system information")
+	entry_system_info.SetPlaceHolder("LLM system information (remove any current date/time - that's automatic)")
 	entry_system_info.SetText(Utils.User_settings_GL.GPTCommunicator.System_info)
 
 	var entry_user_nickname *widget.Entry = widget.NewEntry()
@@ -150,17 +141,14 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	entry_user_nickname.SetText(Utils.User_settings_GL.GPTCommunicator.User_nickname)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.User_settings_GL.GPTCommunicator.Model_smart_loc = entry_smart_model_loc.Text
-		Utils.User_settings_GL.GPTCommunicator.Model_dumb_loc = entry_dumb_model_loc.Text
+		Utils.User_settings_GL.GPTCommunicator.Model_name = entry_model_name.Text
 		Utils.User_settings_GL.GPTCommunicator.System_info = entry_system_info.Text
 		Utils.User_settings_GL.GPTCommunicator.User_nickname = entry_user_nickname.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	return createMainContentScrollUTILS(
-		label_supported_models,
-		entry_smart_model_loc,
-		entry_dumb_model_loc,
+		entry_model_name,
 		entry_system_info,
 		entry_user_nickname,
 		btn_save,

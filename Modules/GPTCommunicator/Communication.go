@@ -78,7 +78,7 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 
 	// Create payload
 	var ollama_request _OllamaRequest = _OllamaRequest{
-		Model:    "llama3.2:latest",
+		Model:    modUserInfo_GL.Model_name,
 		Messages: history_with_system_prompt,
 		Options: _OllamaOptions{
 			Num_ctx:     4096,
@@ -97,9 +97,12 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 
 	log.Println("Posting to Ollama: ", string(jsonData))
 
-	resp, err := http.Post("http://localhost:11434/api/chat", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post("http://localhost:11434/api/chat", "application/json; charset=utf-8", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Println("Error posting to Ollama: ", err)
+
+		// Ollama stopped running, so stop the module
+		*module_stop_GL = true
 
 		return ""
 	}

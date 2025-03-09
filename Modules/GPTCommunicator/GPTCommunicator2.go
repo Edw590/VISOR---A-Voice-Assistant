@@ -26,9 +26,6 @@ import (
 	"OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"
-	"Utils/UtilsSWA"
-	"encoding/json"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -91,7 +88,15 @@ func init() {realMain =
 
 		module_stop_GL = module_stop
 
+		if modUserInfo_GL.Model_name == "" {
+			return
+		}
+
 		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
+
+		if modGenInfo_GL.N_mems_when_last_memorized == 0 {
+			modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
+		}
 
 		// Start Ollama in case it's not running
 		startOllama()
@@ -111,7 +116,7 @@ func init() {realMain =
 		// start and be ready.
 		chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "dumb")
 
-		autoMemorize()
+		go autoMemorize()
 
 		// Process the text to input to the LLM model
 		for {
@@ -192,72 +197,6 @@ func sendToGPT(device_id string, user_message string, session_id string) string 
 	return chatWithGPT(device_id, user_message, session_id)
 }
 
-func autoMemorize() {
-	go func() {
-		for {
-			if modGenInfo_GL.State == ModsFileInfo.MOD_7_STATE_READY {
-				for session_id, session := range modGenInfo_GL.Sessions {
-					if session_id == getActiveSessionId() || session.Memorized || session_id == "temp" || session_id == "dumb" {
-						continue
-					}
-
-					// If the session is no longer the active one, memorize it
-					if memorizeSession(session_id) {
-						session.Memorized = true
-					}
-				}
-			}
-
-			if Utils.WaitWithStopTIMEDATE(module_stop_GL, 1*60) {
-				return
-			}
-		}
-	}()
-}
-
-func memorizeSession(session_id string) bool {
-	var session_history []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(modGenInfo_GL.Sessions[session_id].History)
-	for i, message := range session_history {
-		if message.Role == "user" {
-			session_history[i].Content = message.Content[strings.Index(message.Content, "]") + 1:]
-		}
-	}
-	session_history_json, err := json.Marshal(session_history)
-	if err != nil || len(session_history) == 0 {
-		log.Println("Error memorizing session " + session_id)
-
-		return false
-	}
-
-	var prompt string = "Session between user and you (in JSON): " + string(session_history_json) + ". PROFILE the USER " +
-		"based on their behavior, preferences, personality traits, or habits revealed in their input. IGNORE " +
-		"specific, temporary events, schedules, or day-to-day plans. Summarize as KEY GENERAL user information in " +
-		"BULLET points (no + or - or anything. ONLY *). Format the output as \"* The user [detail]\". Example: " +
-		"\"* The user is interested in technology\"."
-
-	var response string = sendToGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "dumb")
-
-	var lines []string = strings.Split(response, "\n")
-	for _, line := range lines {
-		if UtilsSWA.StringHasLettersGENERAL(line) && strings.Contains(line, "* ") &&
-			!strings.Contains(strings.ToLower(line), "none") {
-			line = strings.Replace(line, "*The user", "* The user", -1)
-			line = strings.Replace(line, "* The user's ", "* The user ", -1)
-			var the_user_idx int = strings.LastIndex(line, "* The user ")
-			if the_user_idx == -1 {
-				continue
-			}
-
-			modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, line[the_user_idx + len("* The user "):])
-		}
-	}
-
-	// Give time to write everything down
-	time.Sleep(6 * time.Second)
-
-	return true
-}
-
 func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, last_interaction_s int64, user_message string) bool {
 	if _, ok := modGenInfo_GL.Sessions[session_id]; !ok {
 		// If the session doesn't exist, create it
@@ -273,7 +212,14 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 			var prompt string = "Create a title for the following text and put it inside \"quotation marks\", please. " +
 				"Text: " + user_message
 			session_name = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp")
-			session_name = strings.Split(session_name, "\"")[1]
+			if strings.Contains(session_name, "\"") {
+				session_name = strings.Split(session_name, "\"")[1]
+				// Sometimes the name may come like "[name here]", so remove the brackets.
+				session_name = strings.Replace(session_name, "[", "", -1)
+				session_name = strings.Replace(session_name, "]", "", -1)
+			} else {
+				session_name = "[Error naming the session]"
+			}
 		}
 
 		modGenInfo_GL.Sessions[session_id] = &ModsFileInfo.Session{

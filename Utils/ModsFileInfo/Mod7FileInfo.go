@@ -30,6 +30,8 @@ const MOD_7_STATE_STOPPING string = "MOD_7_STATE_STOPPING"
 type Mod7GenInfo struct {
 	// State is the state of the module
 	State string
+	// N_mems_when_last_memorized is the number of memories when the last session was memorized
+	N_mems_when_last_memorized int
 	// Memories is the list of memories the GPT has
 	Memories []string
 	// Sessions is the list of sessions of the user with the GPT indexed by their ID
@@ -61,10 +63,8 @@ type OllamaMessage struct {
 
 // Mod7UserInfo is the format of the custom information file about this specific module.
 type Mod7UserInfo struct {
-	// Model_smart_loc is the location of the model file for the smart LLM
-	Model_smart_loc string
-	// Model_dumb_loc is the location of the model file for the dumb LLM
-	Model_dumb_loc string
+	// Model_name is the name of the LLM model to use
+	Model_name string
 	// System_info is the LLM's system information, like the cutting knowledge date and today's date
 	System_info string
 	// User_nickname is the user nickname to be used by the LLM

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,7 +30,7 @@ If you send a non-command sentence, it can take a bit to start receiving the res
 
 The memories are "infinite". You can add as many as you want and VISOR will use them all. The more you add, the more he knows about you and better the responses are. Though, the more you add, the more time he'll take to initialize.
 
-Also currently you must explicitly tell him to memorize the conversation. The command to summarize the memories must be used with caution as the LLM may remove important parts of memories because it thinks they're not important. So, use it only when you're sure you want to summarize the memories and back them up first.`
+After the chat becomes inactive (happens after a while), VISOR will automatically memorize the conversation. When there are too many memories stored (double of last memorization time, beginning with 50), he'll summarize them.`
 
 const RSS_ABOUT string =
 `The feeds are checked every 2 minutes. When you add a new one, you'll receive no immediate notifications, but you'll receive the next updates.
