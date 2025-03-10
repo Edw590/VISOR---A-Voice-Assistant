@@ -8,15 +8,15 @@ require (
 	github.com/Edw590/TryCatch-go v0.0.0-20240613114733-8e01c7b01734
 	github.com/andybalholm/brotli v1.1.0
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a
-	github.com/dchest/jsmin v0.0.0-20220218165748-59f39799265f
 	github.com/gorilla/websocket v1.5.3
 	github.com/itchyny/volume-go v0.2.2
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e
 	github.com/shirou/gopsutil/v4 v4.24.5
+	github.com/yusufpapurcu/wmi v1.2.4
 	github.com/zalando/go-keyring v0.2.5
 	github.com/ztrue/tracerr v0.4.0
-	golang.org/x/crypto v0.23.0
-	golang.org/x/sys v0.20.0
+	golang.org/x/crypto v0.31.0
+	golang.org/x/sys v0.28.0
 )
 
 require (
@@ -30,6 +30,5 @@ require (
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
-	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 )
