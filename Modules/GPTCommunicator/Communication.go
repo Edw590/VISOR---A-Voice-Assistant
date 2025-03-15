@@ -133,12 +133,16 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	var save_words bool = true
 	var curr_idx int = 0
 
+	var writing_to_self bool = device_id == Utils.Gen_settings_GL.Device_settings.Id
+
 	var timestamp_s int64 = -1
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
-	reduceGptTextTxt(gpt_text_txt)
-	_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
+	if !writing_to_self {
+		reduceGptTextTxt(gpt_text_txt)
+		_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
+	}
 
 	// Send a message to LIB_2 saying the GPT just started writing
 	Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id + "|L_2_0|start"))
@@ -149,7 +153,9 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	for {
 		if *module_stop_GL || checkStopSpeech() {
 			// Write the end string before exiting
-			_ = gpt_text_txt.WriteTextFile(getEndString(), true)
+			if !writing_to_self {
+				_ = gpt_text_txt.WriteTextFile(getEndString(), true)
+			}
 
 			// Closing the connection makes Ollama stop generating the response
 			http_response.Body.Close()
@@ -184,11 +190,13 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 			}
 
 			if one_byte_str == " " || one_byte_str == "\n" || one_byte_str == "\000" {
-				// Meaning: new word written
-				if one_byte_str == "\000" {
-					_ = gpt_text_txt.WriteTextFile(last_word, true)
-				} else {
-					_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
+				if !writing_to_self {
+					// Meaning: new word written
+					if one_byte_str == "\000" {
+						_ = gpt_text_txt.WriteTextFile(last_word, true)
+					} else {
+						_ = gpt_text_txt.WriteTextFile(last_word+one_byte_str, true)
+					}
 				}
 
 				last_word = ""
@@ -214,7 +222,9 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 		}
 	}
 
-	_ = gpt_text_txt.WriteTextFile("\n" + getEndString(), true)
+	if !writing_to_self {
+		_ = gpt_text_txt.WriteTextFile("\n" + getEndString(), true)
+	}
 
 	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
 
