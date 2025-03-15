@@ -42,17 +42,17 @@ func autoMemorize() {
 				// If the session is no longer the active one, memorize it
 				if memorizeSession(session_id) {
 					session.Memorized = true
-
-					if len(modGenInfo_GL.Memories) >= modGenInfo_GL.N_mems_when_last_memorized * 2 {
-						for !summarizeMemories() {
-							// VISOR may not memorize because of for example romantic stuff being on the memories, or just
-							// because they're of a user. In that case, just try again.
-						}
-
-						modGenInfo_GL.N_mems_when_last_memorized = len(modGenInfo_GL.Memories)
-					}
 				}
 			}
+
+			//if len(modGenInfo_GL.Memories) >= modGenInfo_GL.N_mems_when_last_memorized * 2 {
+			//	for !summarizeMemories() {
+			//		// VISOR may not memorize because of for example romantic stuff being on the memories, or just
+			//		// because they're of a user. In that case, just try again.
+			//	}
+			//
+			//	modGenInfo_GL.N_mems_when_last_memorized = len(modGenInfo_GL.Memories)
+			//}
 		}
 
 		if Utils.WaitWithStopTIMEDATE(module_stop_GL, 1*60) {
@@ -64,8 +64,12 @@ func autoMemorize() {
 func memorizeSession(session_id string) bool {
 	var session_history []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(modGenInfo_GL.Sessions[session_id].History)
 	for i, message := range session_history {
-		if message.Role == "user" {
+		if message.Role == "user" && !strings.Contains(message.Content, "[SYSTEM TASK - ") {
+			// Remove the first part of the user message (like time and date and location, all inside square brackets)
 			session_history[i].Content = message.Content[strings.Index(message.Content, "]") + 1:]
+		} else {
+			// Remove the system and assistant prompts, and the "system messages" from the user prompts
+			session_history = append(session_history[:i], session_history[i+1:]...)
 		}
 	}
 	session_history_json, err := json.Marshal(session_history)
@@ -75,28 +79,27 @@ func memorizeSession(session_id string) bool {
 		return false
 	}
 
-	var prompt string = "Session between user and you (in JSON): " + string(session_history_json) + ". PROFILE the USER " +
-		"based on their behavior, preferences, personality traits, or habits revealed in their input. IGNORE " +
-		"specific, temporary events, schedules, or day-to-day plans. Summarize as KEY GENERAL user information in " +
-		"BULLET points (no + or - or anything. ONLY *). Format the output as \"* The user [detail]\". Example: " +
-		"\"* The user is interested in technology\"."
+	var prompt string = "User messages (in JSON): " + string(session_history_json) + ". Write NEW things you've " +
+		"learned from this specific conversation (EXCLUDING YOUR MEMORIES) in BULLET points (no + or - or anything. " +
+		"ONLY *). Format the output as \"* [detail]\". IGNORE specific, temporary events, scheedules, or day-to-day " +
+		"plans. Summarize as KEY GENERAL information. If there is nothing, write \"* 3234_NONE\"."
 
-	var response string = sendToGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "dumb")
+	var response string = sendToGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp")
 
 	var lines []string = strings.Split(response, "\n")
 	for _, line := range lines {
-		if UtilsSWA.StringHasLettersGENERAL(line) && strings.Contains(line, "* ") {
-			line = strings.Replace(line, "He ", "The user", -1)
-			line = strings.Replace(line, "She ", "The user", -1)
-			line = strings.Replace(line, "They ", "The user", -1)
-			line = strings.Replace(line, "*The user", "* The user", -1)
-			line = strings.Replace(line, "* The user's ", "* The user ", -1)
-			var the_user_idx int = strings.LastIndex(line, "* The user ")
+		if UtilsSWA.StringHasLettersGENERAL(line) && strings.Contains(line, "* ") && !strings.Contains(line, "3234_NONE") {
+			line = strings.Replace(line, "\r ", "", -1)
+			line = strings.Replace(line, "You ", "The user ", -1)
+			line = strings.Replace(line, "He ", "The user ", -1)
+			line = strings.Replace(line, "She ", "The user ", -1)
+			line = strings.Replace(line, "They ", "The user ", -1)
+			var the_user_idx int = strings.LastIndex(line, "* ")
 			if the_user_idx == -1 {
 				continue
 			}
 
-			modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, line[the_user_idx + len("* The user "):])
+			modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, line[the_user_idx + len("* "):])
 		}
 	}
 
@@ -108,8 +111,8 @@ func memorizeSession(session_id string) bool {
 
 func summarizeMemories() bool {
 	var prompt string = "Summarize your memories about the user in BULLET points (no + or - or anything. ONLY *). " +
-		"Format the output as \"* The user [detail]\". Example: \"* The user is interested in technology\". Write as " +
-		"much as you need. ALL MEMORIES ARE IMPORTANT, EVEN MINOR ONES."
+		"Format the output as \"* [detail]\". Write as much as you need. If newer memories contradict old " +
+		"ones, update them. ALL MEMORIES ARE IMPORTANT, EVEN MINOR ONES!!! But again, SUMMARIZE them."
 
 	var response string = sendToGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp")
 
@@ -118,17 +121,16 @@ func summarizeMemories() bool {
 	for _, line := range lines {
 		if UtilsSWA.StringHasLettersGENERAL(line) && strings.Contains(line, "* ") {
 			line = strings.Replace(line, "\r", "", -1)
+			line = strings.Replace(line, "You ", "The user", -1)
 			line = strings.Replace(line, "He ", "The user", -1)
 			line = strings.Replace(line, "She ", "The user", -1)
 			line = strings.Replace(line, "They ", "The user", -1)
-			line = strings.Replace(line, "*The user", "* The user", -1)
-			line = strings.Replace(line, "* The user's ", "* The user ", -1)
-			var the_user_idx int = strings.LastIndex(line, "* The user ")
+			var the_user_idx int = strings.LastIndex(line, "* ")
 			if the_user_idx == -1 {
 				continue
 			}
 
-			new_memories = append(new_memories, line[the_user_idx + len("* The user "):])
+			new_memories = append(new_memories, line[the_user_idx + len("* "):])
 		}
 	}
 
