@@ -313,7 +313,8 @@ func speakInternal(txt_to_speak string, speech_priority int32, mode int32, sessi
 	if session_type != _SESSION_TYPE_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
 				Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt ||
 				GPTComm.SendText("", GPTComm.SESSION_TYPE_TEMP) == ModsFileInfo.MOD_7_STATE_READY) {
-		var text string = "Reword in English: \"" + txt_to_speak + "\". DON'T SAY YOU'RE REWORDING IT."
+		var text string = "[SYSTEM TASK - Inform the user of the following: \"" + txt_to_speak +
+			"\". NO SAYING YOU'RE REWORDING IT]"
 		var speak string = ""
 		switch GPTComm.SendText(text, session_type) {
 			case ModsFileInfo.MOD_7_STATE_STARTING:
