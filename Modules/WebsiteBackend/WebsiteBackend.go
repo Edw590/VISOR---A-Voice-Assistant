@@ -370,6 +370,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 						Utils.User_settings_GL = user_settings
 					}
 				case "GPTMem":
+					settings = strings.Replace(settings, "\\r", "", -1)
 					_ = Utils.FromJsonGENERAL([]byte(settings), &Utils.Gen_settings_GL.MOD_7.Memories)
 				case "GManTok":
 					Utils.Gen_settings_GL.MOD_14.Token = settings

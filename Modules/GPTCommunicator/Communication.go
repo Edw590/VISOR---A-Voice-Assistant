@@ -110,7 +110,9 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 	defer resp.Body.Close()
 
 	var response, timestamp = readGPT(device_id, resp, true)
-	response = response[:len(response)-1] // Remove the last character, which is a null character
+	if response != "" {
+		response = response[:len(response)-1] // Remove the last character, which is a null character
+	}
 
 	if session_id != "temp" && session_id != "dumb" {
 		curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
