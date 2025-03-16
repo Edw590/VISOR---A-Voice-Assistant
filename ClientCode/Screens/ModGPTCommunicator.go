@@ -66,14 +66,14 @@ func gptCommunicatorCreateAboutTab() *container.Scroll {
 
 func gptCommunicatorCreateMemoriesTab() *container.Scroll {
 	var memories string = "[Not connected to the server to get the memories]"
+	var num_memories int = 0
 	if Utils.IsCommunicatorConnectedSERVER() {
 		 memories = GPTComm.GetMemories()
+		if memories != "" {
+			num_memories = strings.Count(memories, "\n") + 1
+		}
 	}
 
-	var num_memories int = 0
-	if memories != "" {
-		num_memories = strings.Count(memories, "\n") + 1
-	}
 	var label_info *widget.Label = widget.NewLabel("List of memories stored, one per line (maximize the window). " +
 		"Number of memories: " + strconv.Itoa(num_memories) + ".")
 	label_info.Wrapping = fyne.TextWrapWord
