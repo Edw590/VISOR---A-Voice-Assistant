@@ -306,7 +306,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			// Example: a compressed string or nil to just get the return value
 			// Returns: "true" if the text will be processed immediately, "false" if the GPT is busy for now and the
 			// text will wait
-			var ret []byte = []byte(strconv.Itoa(Utils.Gen_settings_GL.MOD_7.State))
+			var ret []byte = []byte(strconv.Itoa(int(Utils.Gen_settings_GL.MOD_7.State)))
 
 			if len(bytes) > 0 {
 				// Don't use channels for this. What if various messages are sent while one is still be processed? The

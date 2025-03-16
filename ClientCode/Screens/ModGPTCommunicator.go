@@ -129,7 +129,7 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var entry_model_name *widget.Entry = widget.NewEntry()
-	entry_model_name.SetPlaceHolder("GPT model name. Example: llama3.2")
+	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
 	entry_model_name.SetText(Utils.User_settings_GL.GPTCommunicator.Model_name)
 
 	var entry_system_info *widget.Entry = widget.NewEntry()
@@ -376,7 +376,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
 				if Utils.IsCommunicatorConnectedSERVER() {
-					gpt_state = "invalid state"
+					gpt_state = "invalid"
 					switch GPTComm.GetModuleState() {
 						case ModsFileInfo.MOD_7_STATE_STARTING:
 							gpt_state = "starting"

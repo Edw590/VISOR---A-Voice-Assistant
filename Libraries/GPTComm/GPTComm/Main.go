@@ -43,7 +43,7 @@ SendText sends the given text to the LLM model.
 – Returns:
   - the state of the GPT Communicator module
 */
-func SendText(text string, session_type string) int {
+func SendText(text string, session_type string) int32 {
 	var message []byte = []byte("GPT|")
 	if text != "" {
 		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
@@ -65,13 +65,13 @@ func SendText(text string, session_type string) int {
 
 	ret, _ := strconv.Atoi(string(response))
 
-	return ret
+	return int32(ret)
 }
 
 /*
 GetModuleState gets the state of the GPT Communicator module.
  */
-func GetModuleState() int {
+func GetModuleState() int32 {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|")) {
 		return -1
 	}
@@ -84,7 +84,7 @@ func GetModuleState() int {
 
 	ret, _ := strconv.Atoi(string(response))
 
-	return ret
+	return int32(ret)
 }
 
 /*

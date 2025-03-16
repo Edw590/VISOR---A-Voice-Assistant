@@ -53,7 +53,7 @@ func retrieveSessions() {
 }
 
 /*
-GetSessionIdsList gets the list of session IDs.
+GetSessionIdsList updates and gets the list of session IDs.
 
 -----------------------------------------------------------
 

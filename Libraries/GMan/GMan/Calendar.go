@@ -45,7 +45,7 @@ func getEvents() {
 }
 
 /*
-GetEventsIdsListGMAN returns a list of all events' IDs.
+GetEventsIdsListGMAN updates and gets a list of all events' IDs.
 
 -----------------------------------------------------------
 
