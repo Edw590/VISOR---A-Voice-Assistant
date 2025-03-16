@@ -32,7 +32,7 @@ import (
 	"time"
 )
 
-// Prepared for Ollama 0.5.11
+// ----- Prepared for Ollama 0.5.11 -----
 
 type _OllamaRequest struct {
 	Model string `json:"model"`
