@@ -63,18 +63,27 @@ func autoMemorize() {
 
 func memorizeSession(session_id string) bool {
 	var session_history []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(modGenInfo_GL.Sessions[session_id].History)
-	for i, message := range session_history {
+	for i := 0; i < len(session_history); i++ {
+		var message ModsFileInfo.OllamaMessage = session_history[i]
 		if message.Role == "user" && !strings.Contains(message.Content, "[SYSTEM TASK - ") {
 			// Remove the first part of the user message (like time and date and location, all inside square brackets)
 			session_history[i].Content = message.Content[strings.Index(message.Content, "]") + 1:]
 		} else {
 			// Remove the system and assistant prompts, and the "system messages" from the user prompts
-			session_history = append(session_history[:i], session_history[i+1:]...)
+			Utils.DelElemSLICES(&session_history, i)
+			i--
 		}
 	}
+	if len(session_history) == 0 {
+		// Nothing to memorize
+
+		return true
+	}
+
 	session_history_json, err := json.Marshal(session_history)
-	if err != nil || len(session_history) == 0 {
+	if err != nil {
 		log.Println("Error memorizing session " + session_id)
+		log.Println(err)
 
 		return false
 	}
