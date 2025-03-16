@@ -102,6 +102,10 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 	if err != nil {
 		log.Println("Error posting to Ollama: ", err)
 
+		// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the STOPPING
+		// one (they check every second).
+		time.Sleep(2 * time.Second)
+
 		// Ollama stopped running, so stop the module
 		*module_stop_GL = true
 

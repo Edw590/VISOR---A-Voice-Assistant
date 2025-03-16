@@ -323,31 +323,33 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var get_json bool = bytes_split[0] == "true"
 			var json_origin string = bytes_split[1]
-			var json string = ""
+			var settings string = ""
 			switch json_origin {
 				case "US":
-					json = *Utils.ToJsonGENERAL(Utils.User_settings_GL)
+					settings = *Utils.ToJsonGENERAL(Utils.User_settings_GL)
 				case "Weather":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.Weather)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.Weather)
 				case "News":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
 				case "GPTMem":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
+				case "GPTState":
+					settings = Utils.Gen_settings_GL.MOD_7.State
 				case "GManTok":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
 				case "GManEvents":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
 				case "GManTasks":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
 				case "GPTSessions":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Sessions)
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Sessions)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}
 			if get_json {
-				return Utils.CompressString(json)
+				return Utils.CompressString(settings)
 			} else {
-				return getCRC16([]byte(json))
+				return getCRC16([]byte(settings))
 			}
 		case "S_S":
 			// Set settings.

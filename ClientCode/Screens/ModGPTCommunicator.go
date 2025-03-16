@@ -129,7 +129,7 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var entry_model_name *widget.Entry = widget.NewEntry()
-	entry_model_name.SetPlaceHolder("Ollama model name. Example: llama3.2")
+	entry_model_name.SetPlaceHolder("GPT model name. Example: llama3.2")
 	entry_model_name.SetText(Utils.User_settings_GL.GPTCommunicator.Model_name)
 
 	var entry_system_info *widget.Entry = widget.NewEntry()
@@ -301,6 +301,8 @@ func createSessionView(entries_map map[string]*widget.Entry, session_info _Sessi
 }
 
 func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
+	var label_ollama_state *widget.Label = widget.NewLabel("GPT state: error")
+
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
@@ -371,6 +373,22 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 					old_text = new_text
 					response_text.SetText(new_text)
 				}
+
+				var gpt_state string = "[Not connected to the server to get the GPT state]"
+				if Utils.IsCommunicatorConnectedSERVER() {
+					gpt_state = "invalid state"
+					switch GPTComm.GetModuleState() {
+						case ModsFileInfo.MOD_7_STATE_STARTING:
+							gpt_state = "starting"
+						case ModsFileInfo.MOD_7_STATE_READY:
+							gpt_state = "ready"
+						case ModsFileInfo.MOD_7_STATE_BUSY:
+							gpt_state = "busy"
+						case ModsFileInfo.MOD_7_STATE_STOPPING:
+							gpt_state = "stopping"
+					}
+				}
+				label_ollama_state.SetText("GPT state: " + gpt_state)
 			}
 
 			time.Sleep(1 * time.Second)
@@ -378,6 +396,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	}()
 
 	return createMainContentScrollUTILS(
+		label_ollama_state,
 		text_to_send,
 		btn_send_text,
 		btn_send_text_gpt_smart,

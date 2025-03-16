@@ -110,6 +110,28 @@ func SetMemories(memories_str string) {
 }
 
 /*
+GetModuleState gets the state of the GPT Communicator module.
+
+This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
+
+-----------------------------------------------------------
+
+– Returns:
+  - the state
+ */
+func GetModuleState() string {
+	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("G_S|true|GPTState"))
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5)
+	if comms_map == nil {
+		return ""
+	}
+
+	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+
+	return Utils.DecompressString(response)
+}
+
+/*
 getEntry gets the entry at the given number or time.
 
 If -1 is provided on both parameters, it will return the last entry. The time parameter is prioritized over the number
