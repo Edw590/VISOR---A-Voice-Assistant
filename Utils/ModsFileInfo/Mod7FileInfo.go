@@ -21,15 +21,15 @@
 
 package ModsFileInfo
 
-const MOD_7_STATE_STARTING string = "MOD_7_STATE_STARTING"
-const MOD_7_STATE_READY string = "MOD_7_STATE_READY"
-const MOD_7_STATE_BUSY string = "MOD_7_STATE_BUSY"
-const MOD_7_STATE_STOPPING string = "MOD_7_STATE_STOPPING"
+const MOD_7_STATE_STARTING int = 0
+const MOD_7_STATE_READY int = 1
+const MOD_7_STATE_BUSY int = 2
+const MOD_7_STATE_STOPPING int = 3
 
 // Mod12GenInfo is the format of the custom generated information about this specific module.
 type Mod7GenInfo struct {
 	// State is the state of the module
-	State string
+	State int
 	// N_mems_when_last_memorized is the number of memories when the last session was memorized
 	N_mems_when_last_memorized int
 	// Memories is the list of memories the GPT has

@@ -33,6 +33,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"log"
 	"sort"
 	"strconv"
 	"strings"
@@ -375,9 +376,12 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				}
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
+				log.Println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+				log.Println(Utils.IsCommunicatorConnectedSERVER())
 				if Utils.IsCommunicatorConnectedSERVER() {
+					log.Println("EEEEEEEEEEEEEEEEEEEEEEEEEEE")
 					gpt_state = "invalid state"
-					switch GPTComm.GetModuleState() {
+					switch GPTComm.SendText("", "") {
 						case ModsFileInfo.MOD_7_STATE_STARTING:
 							gpt_state = "starting"
 						case ModsFileInfo.MOD_7_STATE_READY:
@@ -387,6 +391,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 						case ModsFileInfo.MOD_7_STATE_STOPPING:
 							gpt_state = "stopping"
 					}
+					log.Println("YYYYYYYYYYYYYYYYYYYYYYYYYY")
 				}
 				label_ollama_state.SetText("GPT state: " + gpt_state)
 			}

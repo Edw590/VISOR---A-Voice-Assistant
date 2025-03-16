@@ -29,7 +29,9 @@ import (
 var events_GL []ModsFileInfo.GEvent = nil
 
 func getEvents() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|GManEvents"))
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|GManEvents")) {
+		return
+	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0)
 	if comms_map == nil {
 		return
@@ -44,8 +46,6 @@ func getEvents() {
 
 /*
 GetEventsIdsListGMAN returns a list of all events' IDs.
-
-This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 

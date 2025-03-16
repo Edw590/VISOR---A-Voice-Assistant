@@ -43,7 +43,7 @@ SendText sends the given text to the LLM model.
 – Returns:
   - true if the text will be processed immediately, false if the GPT is busy and the text will be put on hold
 */
-func SendText(text string, session_type string) string {
+func SendText(text string, session_type string) int {
 	var message []byte = []byte("GPT|")
 	if text != "" {
 		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
@@ -53,21 +53,23 @@ func SendText(text string, session_type string) string {
 		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id + "|" +
 			session_type+ "]" + new_text)...)
 	}
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message)
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message) {
+		return -1
+	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
 	if comms_map == nil {
-		return ""
+		return -1
 	}
 
 	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
-	return string(response)
+	ret, _ := strconv.Atoi(string(response))
+
+	return ret
 }
 
 /*
 GetMemories gets the memories from the GPT.
-
-This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 
@@ -75,7 +77,9 @@ This function will BLOCK FOREVER if there's no Internet connection! Check first 
   - the memories separated by new lines
  */
 func GetMemories() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 3, []byte("G_S|true|GPTMem"))
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 3, []byte("G_S|true|GPTMem")) {
+		return ""
+	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 3)
 	if comms_map == nil {
 		return ""
@@ -110,28 +114,6 @@ func SetMemories(memories_str string) {
 }
 
 /*
-GetModuleState gets the state of the GPT Communicator module.
-
-This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
-
------------------------------------------------------------
-
-– Returns:
-  - the state
- */
-func GetModuleState() string {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("G_S|true|GPTState"))
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5)
-	if comms_map == nil {
-		return ""
-	}
-
-	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-
-	return Utils.DecompressString(response)
-}
-
-/*
 getEntry gets the entry at the given number or time.
 
 If -1 is provided on both parameters, it will return the last entry. The time parameter is prioritized over the number
@@ -155,7 +137,13 @@ func getEntry(time int64, num int) *_Entry {
 		}
 	}
 
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("File|false|gpt_text.txt"))
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 2, []byte("File|false|gpt_text.txt")) {
+		return &_Entry{
+			device_id: "",
+			text:      "",
+			time_ms:   -1,
+		}
+	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2)
 	if comms_map == nil {
 		return &_Entry{

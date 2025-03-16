@@ -29,7 +29,9 @@ import (
 var weathers_GL []ModsFileInfo.Weather = nil
 
 func getAllWeathers() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, 0, []byte("G_S|true|Weather"))
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, 0, []byte("G_S|true|Weather")) {
+		return
+	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_OICComm, 0)
 	if comms_map == nil {
 		return
@@ -44,8 +46,6 @@ func getAllWeathers() {
 
 /*
 GetWeatherLocationsList returns the weathers locations list separated by "|".
-
-This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 

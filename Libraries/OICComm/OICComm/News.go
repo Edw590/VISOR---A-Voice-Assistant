@@ -29,7 +29,9 @@ import (
 var news_locs_GL []ModsFileInfo.News = nil
 
 func getAllNews() {
-	Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, 1, []byte("G_S|true|News"))
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, 1, []byte("G_S|true|News")) {
+		return
+	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_OICComm, 1)
 	if comms_map == nil {
 		return
@@ -44,8 +46,6 @@ func getAllNews() {
 
 /*
 GetNewsLocationsList returns the news locations list separated by "|".
-
-This function will BLOCK FOREVER if there's no Internet connection! Check first with Utils.IsCommunicatorConnectedSERVER().
 
 -----------------------------------------------------------
 

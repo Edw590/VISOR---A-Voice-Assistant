@@ -312,7 +312,7 @@ const _SESSION_TYPE_NONE string = "NONE"
 func speakInternal(txt_to_speak string, speech_priority int32, mode int32, session_type string, wait_for_gpt bool) {
 	if session_type != _SESSION_TYPE_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
 				Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt ||
-				GPTComm.SendText("", GPTComm.SESSION_TYPE_TEMP) == ModsFileInfo.MOD_7_STATE_READY) {
+				GPTComm.SendText("", "") == ModsFileInfo.MOD_7_STATE_READY) {
 		var text string = "[SYSTEM TASK - Inform the user of the following: \"" + txt_to_speak +
 			"\". NO SAYING YOU'RE REWORDING IT]" // Keep this last part here. He'll say less stuff this way.
 		var speak string = ""
