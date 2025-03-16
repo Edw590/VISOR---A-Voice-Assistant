@@ -33,7 +33,6 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"log"
 	"sort"
 	"strconv"
 	"strings"
@@ -302,7 +301,7 @@ func createSessionView(entries_map map[string]*widget.Entry, session_info _Sessi
 }
 
 func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
-	var label_ollama_state *widget.Label = widget.NewLabel("GPT state: error")
+	var label_gpt_comm_state *widget.Label = widget.NewLabel("GPT state: error")
 
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
@@ -376,10 +375,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				}
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
-				log.Println("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
-				log.Println(Utils.IsCommunicatorConnectedSERVER())
 				if Utils.IsCommunicatorConnectedSERVER() {
-					log.Println("EEEEEEEEEEEEEEEEEEEEEEEEEEE")
 					gpt_state = "invalid state"
 					switch GPTComm.GetModuleState() {
 						case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -391,9 +387,8 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 						case ModsFileInfo.MOD_7_STATE_STOPPING:
 							gpt_state = "stopping"
 					}
-					log.Println("YYYYYYYYYYYYYYYYYYYYYYYYYY")
 				}
-				label_ollama_state.SetText("GPT state: " + gpt_state)
+				label_gpt_comm_state.SetText("GPT state: " + gpt_state)
 			}
 
 			time.Sleep(1 * time.Second)
@@ -401,7 +396,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 	}()
 
 	return createMainContentScrollUTILS(
-		label_ollama_state,
+		label_gpt_comm_state,
 		text_to_send,
 		btn_send_text,
 		btn_send_text_gpt_smart,

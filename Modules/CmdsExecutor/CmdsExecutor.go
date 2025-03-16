@@ -351,7 +351,7 @@ func sendToGPT(txt_to_send string) {
 		case ModsFileInfo.MOD_7_STATE_STOPPING:
 			speak = "The GPT is stopping. Text on hold."
 	}
-	if speak != "" {
+	if speak != "" && txt_to_send != "/stop" {
 		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 	}
 }
