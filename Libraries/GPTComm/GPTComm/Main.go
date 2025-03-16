@@ -41,7 +41,7 @@ SendText sends the given text to the LLM model.
   - session_type – one of the SESSION_TYPE_-started constants or a session ID (ignored in case `text` is empty)
 
 – Returns:
-  - true if the text will be processed immediately, false if the GPT is busy and the text will be put on hold
+  - the state of the GPT Communicator module
 */
 func SendText(text string, session_type string) int {
 	var message []byte = []byte("GPT|")
@@ -57,6 +57,25 @@ func SendText(text string, session_type string) int {
 		return -1
 	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1)
+	if comms_map == nil {
+		return -1
+	}
+
+	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+
+	ret, _ := strconv.Atoi(string(response))
+
+	return ret
+}
+
+/*
+GetModuleState gets the state of the GPT Communicator module.
+ */
+func GetModuleState() int {
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|")) {
+		return -1
+	}
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5)
 	if comms_map == nil {
 		return -1
 	}

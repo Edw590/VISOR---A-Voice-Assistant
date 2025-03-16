@@ -381,7 +381,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				if Utils.IsCommunicatorConnectedSERVER() {
 					log.Println("EEEEEEEEEEEEEEEEEEEEEEEEEEE")
 					gpt_state = "invalid state"
-					switch GPTComm.SendText("", "") {
+					switch GPTComm.GetModuleState() {
 						case ModsFileInfo.MOD_7_STATE_STARTING:
 							gpt_state = "starting"
 						case ModsFileInfo.MOD_7_STATE_READY:
