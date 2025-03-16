@@ -99,10 +99,6 @@ func init() {realMain =
 			modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
 		}
 
-		// Start Ollama in case it's not running
-		startOllama()
-		time.Sleep(2 * time.Second)
-
 		if modGenInfo_GL.Sessions == nil {
 			modGenInfo_GL.Sessions = make(map[string]*ModsFileInfo.Session)
 		}
@@ -152,11 +148,7 @@ func init() {realMain =
 					}
 
 					// Control commands begin with a slash
-					if strings.HasSuffix(text, "/restartGPT") {
-						restartOllama()
-						time.Sleep(2 * time.Second)
-						chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "dumb")
-					} else if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
+					if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
 						// Ask Wolfram Alpha the question
 						var question string = text[strings.Index(text, ASK_WOLFRAM_ALPHA)+len(ASK_WOLFRAM_ALPHA):]
 						result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
@@ -322,25 +314,6 @@ func checkStopSpeech() bool {
 	}
 
 	return false
-}
-
-func startOllama() {
-	_, _ = Utils.ExecCmdSHELL([]string{"sudo systemctl start ollama.service"})
-
-}
-
-/*
-stopOllama stop the Ollama service.
-*/
-func stopOllama() {
-	_, _ = Utils.ExecCmdSHELL([]string{"sudo systemctl stop ollama.service"})
-}
-
-/*
-restartOllama restarts the Ollama service.
-*/
-func restartOllama() {
-	_, _ = Utils.ExecCmdSHELL([]string{"sudo systemctl restart ollama.service"})
 }
 
 func getStartString(device_id string) string {
