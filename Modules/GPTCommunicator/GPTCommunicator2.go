@@ -46,7 +46,7 @@ type _OllamaRequest struct {
 
 type _OllamaOptions struct {
 	Num_keep int `json:"num_keep"`
-	Num_ctx int `json:"num_ctx"`
+	Num_ctx int32 `json:"num_ctx"`
 	Temperature float32 `json:"temperature"`
 }
 
@@ -89,11 +89,15 @@ func init() {realMain =
 
 		module_stop_GL = module_stop
 
-		if modUserInfo_GL.Model_name == "" {
+		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
+
+		if modUserInfo_GL.Model_name == "" || modUserInfo_GL.Context_size == 0 {
+			time.Sleep(2 * time.Second)
+
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+
 			return
 		}
-
-		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
 		if modGenInfo_GL.N_mems_when_last_memorized == 0 {
 			modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
@@ -202,8 +206,8 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 		} else {
 			// I've titled the text for you, Sir: "App Notification Settings on OnePlus Watch".
 			// Get the text inside the quotation marks.
-			var prompt string = "Create a title for the following text and put it inside \"quotation marks\", please. " +
-				"Don't include the date and time. Text: " + user_message
+			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
+				"inside \"double quotation marks\", please. Don't include the date and time. Text: " + user_message
 			session_name = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp")
 			if strings.Contains(session_name, "\"") {
 				session_name = strings.Split(session_name, "\"")[1]

@@ -65,6 +65,10 @@ type OllamaMessage struct {
 type Mod7UserInfo struct {
 	// Model_name is the name of the LLM model to use
 	Model_name string
+	// Context_size is the context size to use
+	Context_size int32
+	// Temperature is the temperature to use
+	Temperature float32
 	// System_info is the LLM's system information, like the cutting knowledge date and today's date
 	System_info string
 	// User_nickname is the user nickname to be used by the LLM

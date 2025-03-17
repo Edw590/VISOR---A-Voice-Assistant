@@ -60,38 +60,38 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 	var entry *widget.Entry = nil
 	var check *widget.Check = nil
 	switch value.Type_ {
-	case UtilsSWA.TYPE_INT: fallthrough
-	case UtilsSWA.TYPE_LONG: fallthrough
-	case UtilsSWA.TYPE_STRING: fallthrough
-	case UtilsSWA.TYPE_FLOAT: fallthrough
-	case UtilsSWA.TYPE_DOUBLE:
-		entry = widget.NewEntry()
-		entry.SetText(value.Curr_data)
-		entry.Validator = func(s string) error {
-			if value.Type_ == UtilsSWA.TYPE_INT {
-				if _, err := strconv.Atoi(s); err != nil {
-					return errors.New("not an int")
+		case UtilsSWA.TYPE_INT: fallthrough
+		case UtilsSWA.TYPE_LONG: fallthrough
+		case UtilsSWA.TYPE_STRING: fallthrough
+		case UtilsSWA.TYPE_FLOAT: fallthrough
+		case UtilsSWA.TYPE_DOUBLE:
+			entry = widget.NewEntry()
+			entry.SetText(value.Curr_data)
+			entry.Validator = func(s string) error {
+				if value.Type_ == UtilsSWA.TYPE_INT {
+					if _, err := strconv.Atoi(s); err != nil {
+						return errors.New("not an int")
+					}
+				} else if value.Type_ == UtilsSWA.TYPE_LONG {
+					if _, err := strconv.ParseInt(s, 10, 64); err != nil {
+						return errors.New("not a long")
+					}
+				} else if value.Type_ == UtilsSWA.TYPE_FLOAT {
+					if _, err := strconv.ParseFloat(s, 32); err != nil {
+						return errors.New("not a float")
+					}
+				} else if value.Type_ == UtilsSWA.TYPE_DOUBLE {
+					if _, err := strconv.ParseFloat(s, 64); err != nil {
+						return errors.New("not a double")
+					}
 				}
-			} else if value.Type_ == UtilsSWA.TYPE_LONG {
-				if _, err := strconv.ParseInt(s, 10, 64); err != nil {
-					return errors.New("not a long")
-				}
-			} else if value.Type_ == UtilsSWA.TYPE_FLOAT {
-				if _, err := strconv.ParseFloat(s, 32); err != nil {
-					return errors.New("not a float")
-				}
-			} else if value.Type_ == UtilsSWA.TYPE_DOUBLE {
-				if _, err := strconv.ParseFloat(s, 64); err != nil {
-					return errors.New("not a double")
-				}
+				return nil
 			}
-			return nil
-		}
-		content = append(content, entry)
-	case UtilsSWA.TYPE_BOOL:
-		check = widget.NewCheck("Check", nil)
-		check.SetChecked(value.GetBool(true))
-		content = append(content, check)
+			content = append(content, entry)
+		case UtilsSWA.TYPE_BOOL:
+			check = widget.NewCheck("Check", nil)
+			check.SetChecked(value.GetBool(true))
+			content = append(content, check)
 	}
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {

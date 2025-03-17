@@ -30,6 +30,7 @@ import (
 	"errors"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -132,16 +133,40 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
 	entry_model_name.SetText(Utils.User_settings_GL.GPTCommunicator.Model_name)
 
+	var entry_ctx_size *widget.Entry = widget.NewEntry()
+	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
+	entry_ctx_size.SetText(strconv.Itoa(int(Utils.User_settings_GL.GPTCommunicator.Context_size)))
+	entry_ctx_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numberic")
+
+	var entry_temperature *widget.Entry = widget.NewEntry()
+	entry_temperature.SetPlaceHolder("GPT temperature (example: 0.8)")
+	entry_temperature.SetText(strconv.FormatFloat(float64(Utils.User_settings_GL.GPTCommunicator.Temperature), 'f', -1, 32))
+	entry_temperature.Validator = func(s string) error {
+		value, err := strconv.ParseFloat(s, 32)
+		if err != nil {
+			return errors.New("temperature must be a decimal number")
+		}
+		if value < 0 || value > 1 {
+			return errors.New("temperature must be between 0 and 1")
+		}
+
+		return nil
+	}
+
 	var entry_system_info *widget.Entry = widget.NewEntry()
 	entry_system_info.SetPlaceHolder("LLM system information (remove any current date/time - that's automatic)")
 	entry_system_info.SetText(Utils.User_settings_GL.GPTCommunicator.System_info)
 
 	var entry_user_nickname *widget.Entry = widget.NewEntry()
-	entry_user_nickname.SetPlaceHolder("User nickname")
+	entry_user_nickname.SetPlaceHolder("User nickname (Sir, for example)")
 	entry_user_nickname.SetText(Utils.User_settings_GL.GPTCommunicator.User_nickname)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		Utils.User_settings_GL.GPTCommunicator.Model_name = entry_model_name.Text
+		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
+		Utils.User_settings_GL.GPTCommunicator.Context_size = int32(value1)
+		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
+		Utils.User_settings_GL.GPTCommunicator.Temperature = float32(value2)
 		Utils.User_settings_GL.GPTCommunicator.System_info = entry_system_info.Text
 		Utils.User_settings_GL.GPTCommunicator.User_nickname = entry_user_nickname.Text
 	})
@@ -149,6 +174,8 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 
 	return createMainContentScrollUTILS(
 		entry_model_name,
+		entry_ctx_size,
+		entry_temperature,
 		entry_system_info,
 		entry_user_nickname,
 		btn_save,
