@@ -81,7 +81,7 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 		Model:    modUserInfo_GL.Model_name,
 		Messages: history_with_system_prompt,
 		Options: _OllamaOptions{
-			Num_keep:    9999999,
+			Num_keep:    99999999,
 			Num_ctx:     modUserInfo_GL.Context_size,
 			Temperature: modUserInfo_GL.Temperature,
 		},

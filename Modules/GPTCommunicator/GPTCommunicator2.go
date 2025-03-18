@@ -206,8 +206,9 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 		} else {
 			// I've titled the text for you, Sir: "App Notification Settings on OnePlus Watch".
 			// Get the text inside the quotation marks.
-			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
-				"inside \"double quotation marks\", please. Don't include the date and time. Text: " + user_message
+			var prompt string = "Create a title for the following text (beginning of a conversation between you and " +
+				"me) and put it inside \"double quotation marks\", please. Don't include the date and time. Text: " +
+				user_message
 			session_name = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp")
 			if strings.Contains(session_name, "\"") {
 				session_name = strings.Split(session_name, "\"")[1]
