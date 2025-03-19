@@ -408,7 +408,12 @@ func registerChannel() int {
 
 func unregisterChannel(channel_num int) {
 	if channel_num >= 0 && channel_num < MAX_CHANNELS {
-		close(channels_GL[channel_num])
+		// Ignore the panic of writing to closed channels (sometimes happens when the app is shutting down).
+		Tcef.Tcef{
+			Try: func() {
+				close(channels_GL[channel_num])
+			},
+		}.Do()
 		channels_GL[channel_num] = nil
 		used_channels_GL[channel_num] = false
 	}
