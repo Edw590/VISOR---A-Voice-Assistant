@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +25,8 @@ package ModsFileInfo
 type Mod14GenInfo struct {
 	// Token is the cached token
 	Token string
+	// Token_invalid is whether the token is invalid
+	Token_invalid bool
 	// Events is the list of events
 	Events []GEvent
 	// Tasks is the list of tasks
