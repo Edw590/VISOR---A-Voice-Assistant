@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -661,8 +661,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 }
 
 /*
-SignalModulesStopMODULES signals all the modules to stop and waits for them to stop, also closing all communication
-channels.
+SignalModulesStopMODULES signals all the modules to stop and waits for them to stop.
 
 -----------------------------------------------------------
 
