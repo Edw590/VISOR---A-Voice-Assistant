@@ -94,7 +94,7 @@ func init() {realMain =
 		if modUserInfo_GL.Model_name == "" || modUserInfo_GL.Context_size == 0 {
 			time.Sleep(2 * time.Second)
 
-			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 			return
 		}
@@ -180,7 +180,7 @@ func init() {realMain =
 			}
 
 			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPING
+				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 				return
 			}

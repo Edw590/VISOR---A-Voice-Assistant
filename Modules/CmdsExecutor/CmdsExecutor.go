@@ -317,12 +317,12 @@ func speakInternal(txt_to_speak string, speech_priority int32, mode int32, sessi
 			"\". NO SAYING YOU'RE REWORDING IT]" // Keep this last part here. He'll say less stuff this way.
 		var speak string = ""
 		switch GPTComm.SendText(text, session_type) {
+			case ModsFileInfo.MOD_7_STATE_STOPPED:
+				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
 				speak = "The GPT is starting up. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_BUSY:
 				speak = "The GPT is busy. Text on hold."
-			case ModsFileInfo.MOD_7_STATE_STOPPING:
-				speak = "The GPT is stopping. Text on hold."
 		}
 		if speak != "" {
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -344,12 +344,12 @@ func sendToGPT(txt_to_send string) {
 
 	var speak string = ""
 	switch GPTComm.SendText(txt_to_send, GPTComm.SESSION_TYPE_ACTIVE) {
+		case ModsFileInfo.MOD_7_STATE_STOPPED:
+			speak = "The GPT is stopped. Text on hold."
 		case ModsFileInfo.MOD_7_STATE_STARTING:
 			speak = "The GPT is starting up. Text on hold."
 		case ModsFileInfo.MOD_7_STATE_BUSY:
 			speak = "The GPT is busy. Text on hold."
-		case ModsFileInfo.MOD_7_STATE_STOPPING:
-			speak = "The GPT is stopping. Text on hold."
 	}
 	if speak != "" && txt_to_send != "/stop" {
 		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)

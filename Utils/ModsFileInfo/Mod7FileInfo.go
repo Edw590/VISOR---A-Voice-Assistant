@@ -21,10 +21,10 @@
 
 package ModsFileInfo
 
-const MOD_7_STATE_STARTING int32 = 0
-const MOD_7_STATE_READY int32 = 1
-const MOD_7_STATE_BUSY int32 = 2
-const MOD_7_STATE_STOPPING int32 = 3
+const MOD_7_STATE_STOPPED int32 = 0
+const MOD_7_STATE_STARTING int32 = 1
+const MOD_7_STATE_READY int32 = 2
+const MOD_7_STATE_BUSY int32 = 3
 
 // Mod12GenInfo is the format of the custom generated information about this specific module.
 type Mod7GenInfo struct {

@@ -352,12 +352,12 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 
 		var speak string = ""
 		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW) {
+			case ModsFileInfo.MOD_7_STATE_STOPPED:
+				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
 				speak = "The GPT is starting up. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_BUSY:
 				speak = "The GPT is busy. Text on hold."
-			case ModsFileInfo.MOD_7_STATE_STOPPING:
-				speak = "The GPT is stopping. Text on hold."
 		}
 		if speak != "" {
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -374,12 +374,12 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 
 		var speak string = ""
 		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP) {
+			case ModsFileInfo.MOD_7_STATE_STOPPED:
+				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
 				speak = "The GPT is starting up. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_BUSY:
 				speak = "The GPT is busy. Text on hold."
-			case ModsFileInfo.MOD_7_STATE_STOPPING:
-				speak = "The GPT is stopping. Text on hold."
 		}
 		if speak != "" {
 			Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
@@ -405,14 +405,14 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				if Utils.IsCommunicatorConnectedSERVER() {
 					gpt_state = "invalid"
 					switch GPTComm.GetModuleState() {
+						case ModsFileInfo.MOD_7_STATE_STOPPED:
+							gpt_state = "stopped"
 						case ModsFileInfo.MOD_7_STATE_STARTING:
 							gpt_state = "starting"
 						case ModsFileInfo.MOD_7_STATE_READY:
 							gpt_state = "ready"
 						case ModsFileInfo.MOD_7_STATE_BUSY:
 							gpt_state = "busy"
-						case ModsFileInfo.MOD_7_STATE_STOPPING:
-							gpt_state = "stopping"
 					}
 				}
 				label_gpt_comm_state.SetText("GPT state: " + gpt_state)
