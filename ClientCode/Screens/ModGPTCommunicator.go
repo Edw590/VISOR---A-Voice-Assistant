@@ -402,20 +402,19 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				}
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
-				if Utils.IsCommunicatorConnectedSERVER() {
-					gpt_state = "invalid"
-					switch GPTComm.GetModuleState() {
-						case ModsFileInfo.MOD_7_STATE_STOPPED:
-							gpt_state = "stopped"
-						case ModsFileInfo.MOD_7_STATE_STARTING:
-							gpt_state = "starting"
-						case ModsFileInfo.MOD_7_STATE_READY:
-							gpt_state = "ready"
-						case ModsFileInfo.MOD_7_STATE_BUSY:
-							gpt_state = "busy"
-					}
+				switch GPTComm.GetModuleState() {
+					case ModsFileInfo.MOD_7_STATE_STOPPED:
+						gpt_state = "stopped"
+					case ModsFileInfo.MOD_7_STATE_STARTING:
+						gpt_state = "starting"
+					case ModsFileInfo.MOD_7_STATE_READY:
+						gpt_state = "ready"
+					case ModsFileInfo.MOD_7_STATE_BUSY:
+						gpt_state = "busy"
 				}
 				label_gpt_comm_state.SetText("GPT state: " + gpt_state)
+			} else {
+				break
 			}
 
 			time.Sleep(1 * time.Second)

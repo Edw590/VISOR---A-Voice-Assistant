@@ -624,11 +624,9 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_SMARTChecker:
 			return CheckTerminalProgramAvailable("smartctl")
 		case NUM_MOD_Speech:
-			if runtime.GOOS == "windows" {
-				return true
-			}
-
-			return CheckTerminalProgramAvailable("festival")
+			// Must always run, just like with the Android version - else there's no communication from him to us.
+			// The Speech module doesn't only take care of speaking with audio - also with notifications!
+			return true
 		case NUM_MOD_RssFeedNotifier:
 			return true
 		case NUM_MOD_EmailSender:
