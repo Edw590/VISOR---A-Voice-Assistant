@@ -37,6 +37,7 @@ import (
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"log"
 	"os"
@@ -350,7 +351,12 @@ func quitApp(modules []Utils.Module) {
 	Utils.CloseCommsChannels()
 	Utils.SignalModulesStopMODULES(modules)
 
-	my_app_GL.Quit()
+	// Ignore a "runtime error: invalid memory address or nil pointer dereference" that happens who knows why.
+	Tcef.Tcef{
+		Try: func() {
+			my_app_GL.Quit()
+		},
+	}.Do()
 }
 
 func lockApp() {
