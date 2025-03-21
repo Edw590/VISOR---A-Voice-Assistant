@@ -334,14 +334,16 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
 				case "GPTMem":
 					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
+				case "GPTSessions":
+					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Sessions)
 				case "GManTok":
 					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
 				case "GManEvents":
 					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
 				case "GManTasks":
 					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
-				case "GPTSessions":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Sessions)
+				case "GManTokVal":
+					settings = strconv.FormatBool(!Utils.Gen_settings_GL.MOD_14.Token_invalid)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}

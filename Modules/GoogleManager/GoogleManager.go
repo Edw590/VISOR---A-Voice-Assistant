@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -52,6 +52,8 @@ func init() {realMain =
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_14
 
 		for {
+			modGenInfo_GL.Token_invalid = true
+
 			// Parse credentials to config
 			config, err := ParseConfigJSON()
 			if err != nil {

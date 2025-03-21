@@ -22,10 +22,10 @@
 package Screens
 
 import (
+	"GMan/GMan"
 	"GoogleManager"
 	"Utils"
 	"context"
-	"encoding/json"
 	"errors"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -57,7 +57,7 @@ func ModGoogleManager() fyne.CanvasObject {
 
 func googleManagerCreateSettingsTab() *container.Scroll {
 	link, _ := url.Parse("https://console.cloud.google.com/projectcreate")
-	var link_google *widget.Hyperlink = widget.NewHyperlink("Click here and watch the video below", link)
+	var link_google *widget.Hyperlink = widget.NewHyperlink("Click here and watch the video on the link below", link)
 
 	link, _ = url.Parse("https://youtu.be/B2E82UPUnOY?si=TIHV5U1kxY5mCKsD&t=95")
 	var link_video *widget.Hyperlink = widget.NewHyperlink("How to obtain the Google credentials JSON", link)
@@ -122,10 +122,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 				return
 			}
 
-			var message []byte = []byte("S_S|GManTok|")
-			token_bytes, _ := json.Marshal(token)
-			message = append(message, Utils.CompressString(string(token_bytes))...)
-			Utils.QueueNoResponseMessageSERVER(message)
+			GMan.SetToken(token)
 
 			dialog.ShowInformation("Information", "Authorization code saved. You're all set!", Current_window_GL)
 		}, Current_window_GL)
@@ -136,6 +133,21 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	})
 	btn_authorize.Importance = widget.HighImportance
 
+	var label_token_valid *widget.Label = widget.NewLabel("Token valid: error")
+	label_token_valid.Wrapping = fyne.TextWrapWord
+
+	go func() {
+		for {
+			if Current_screen_GL == ID_GOOGLE_MANAGER {
+				label_token_valid.SetText("Token is valid (refreshes at most every 60 seconds): " + GMan.IsTokenValid())
+			} else {
+				break
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
 	return createMainContentScrollUTILS(
 		link_google,
 		link_video,
@@ -144,5 +156,6 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 		btn_save,
 		label_additional_info2,
 		btn_authorize,
+		label_token_valid,
 	)
 }

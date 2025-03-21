@@ -47,6 +47,8 @@ func storeCalendarsEvents(client *http.Client) bool {
 		return false
 	}
 
+	modGenInfo_GL.Token_invalid = false
+
 	// Calculate the start of the current week (Monday)
 	now := time.Now()
 	weekday := int(now.Weekday())

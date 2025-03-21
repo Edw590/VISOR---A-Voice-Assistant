@@ -636,7 +636,7 @@ func IsModSupportedMODULES(mod_num int) bool {
 		case NUM_MOD_OnlineInfoChk:
 			return CheckTerminalProgramAvailable("chromedriver")
 		case NUM_MOD_GPTCommunicator:
-			return CheckTerminalProgramAvailable("ollama")
+			return true
 		case NUM_MOD_WebsiteBackend:
 			return true
 		case NUM_MOD_TasksExecutor:
