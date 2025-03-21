@@ -278,8 +278,13 @@ reduceGptTextTxt reduces the GPT text file to the last 5 entries.
   - gpt_text_txt – the GPT text file
 */
 func reduceGptTextTxt(gpt_text_txt Utils.GPath) {
-	var text string = *gpt_text_txt.ReadTextFile()
-	var entries []string = strings.Split(text, "[3234_START:")
+	var p_text *string = gpt_text_txt.ReadTextFile()
+	if p_text == nil {
+		// The file doesn't yet exist
+		return
+	}
+
+	var entries []string = strings.Split(*p_text, "[3234_START:")
 	if len(entries) > 5 {
 		_ = gpt_text_txt.WriteTextFile("[3234_START:" + entries[len(entries)-5], false)
 
