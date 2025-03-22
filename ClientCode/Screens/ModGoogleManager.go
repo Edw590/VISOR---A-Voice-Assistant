@@ -139,7 +139,15 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_GOOGLE_MANAGER {
-				label_token_valid.SetText("Token is valid (refreshes at most every 60 seconds): " + GMan.IsTokenValid())
+				var validity = "[Not connected to the server to get the token validity]"
+				if Utils.IsCommunicatorConnectedSERVER() {
+					if GMan.IsTokenValid() {
+						validity = "valid"
+					} else {
+						validity = "INVALID"
+					}
+				}
+				label_token_valid.SetText("Token is: " + validity + " (refreshes at most every 60 seconds)")
 			} else {
 				break
 			}

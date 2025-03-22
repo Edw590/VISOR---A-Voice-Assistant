@@ -25,6 +25,7 @@ import (
 	"Utils"
 	"encoding/json"
 	"golang.org/x/oauth2"
+	"strconv"
 )
 
 /*
@@ -48,18 +49,23 @@ IsTokenValid checks if the token is valid.
 -----------------------------------------------------------
 
 – Returns:
-  - a string containing the token validity ready to print to the user
+  - true if the token is valid, false otherwise
  */
-func IsTokenValid() string {
+func IsTokenValid() bool {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 2, []byte("G_S|true|GManTokVal")) {
-		return "[not connected to the server to get the token validity]"
+		return false
 	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 2)
 	if comms_map == nil {
-		return "error"
+		return false
 	}
 
 	var response []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-	return string(response)
+	ret, err := strconv.ParseBool(string(response))
+	if err != nil {
+		ret = false
+	}
+
+	return ret
 }
