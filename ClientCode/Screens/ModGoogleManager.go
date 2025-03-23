@@ -81,6 +81,11 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 		"= sign until just before the next & sign.")
 	label_additional_info2.Wrapping = fyne.TextWrapWord
 
+	var label_additional_info3 *widget.Label = widget.NewLabel("NOTICE: if you've set the app as a test app on the " +
+		"link above, the token will EXPIRE every 7 days. Just click on Authorize below and do the same steps and " +
+		"you're ready to go for another week.")
+	label_additional_info3.Wrapping = fyne.TextWrapWord
+
 	var btn_authorize *widget.Button = widget.NewButton("Authorize", func() {
 		if Utils.User_settings_GL.GoogleManager.Credentials_JSON == "" {
 			dialog.ShowError(errors.New("no credentials JSON saved"), Current_window_GL)
@@ -163,6 +168,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 		entry_credentials_json,
 		btn_save,
 		label_additional_info2,
+		label_additional_info3,
 		btn_authorize,
 		label_token_valid,
 	)
