@@ -402,7 +402,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 				}
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
-				switch GPTComm.SendText("", "") {
+				switch GPTComm.GetModuleState() {
 					case ModsFileInfo.MOD_7_STATE_STOPPED:
 						gpt_state = "stopped"
 					case ModsFileInfo.MOD_7_STATE_STARTING:

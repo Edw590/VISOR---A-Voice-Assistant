@@ -69,6 +69,27 @@ func SendText(text string, session_type string) int32 {
 }
 
 /*
+GetModuleState gets the state of the GPT Communicator module.
+
+DON'T delete the function. It's useful for use in a thread other than the one used to send commands.
+*/
+func GetModuleState() int32 {
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|")) {
+		return -1
+	}
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5)
+	if comms_map == nil {
+		return -1
+	}
+
+	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+
+	ret, _ := strconv.Atoi(string(response))
+
+	return int32(ret)
+}
+
+/*
 GetMemories gets the memories from the GPT.
 
 -----------------------------------------------------------
