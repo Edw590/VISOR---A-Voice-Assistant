@@ -32,37 +32,6 @@ import (
 	"time"
 )
 
-// ----- Prepared for Ollama 0.5.11 -----
-
-type _OllamaRequest struct {
-	Model string `json:"model"`
-	Messages []ModsFileInfo.OllamaMessage `json:"messages"`
-
-	Format  string `json:"format"`
-	Options _OllamaOptions `json:"options"`
-	Stream bool `json:"stream"`
-	Keep_alive string `json:"keep_alive"`
-}
-
-type _OllamaOptions struct {
-	Num_keep int `json:"num_keep"`
-	Num_ctx int32 `json:"num_ctx"`
-	Temperature float32 `json:"temperature"`
-}
-
-type _OllamaResponse struct {
-	Model string `json:"model"`
-	Created_at string `json:"created_at"`
-	Message ModsFileInfo.OllamaMessage `json:"message"`
-	Done bool `json:"done"`
-	Total_duration int `json:"total_duration"`
-	Load_duration int `json:"load_duration"`
-	Prompt_eval_count int `json:"prompt_eval_count"`
-	Prompt_eval_duration int `json:"prompt_eval_duration"`
-	Eval_count int `json:"eval_count"`
-	Eval_duration int `json:"eval_duration"`
-}
-
 const _TO_PROCESS_REL_FOLDER string = "to_process"
 
 const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
@@ -232,26 +201,6 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 	}
 
 	return false
-}
-
-func getVisorIntroAndMemories() (string, string) {
-	// Load visor introduction text
-	var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-	//var visor_functions = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "functions.json").ReadTextFile()
-	//visor_intro = strings.Replace(visor_intro, "3234_FUNCTIONS", visor_functions, -1)
-	visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
-	visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
-	visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
-
-	// Initialize memory string
-	var visor_memories string = strings.Join(modGenInfo_GL.Memories, ". ")
-	visor_memories = strings.Replace(visor_memories, "\"", "\\\"", -1)
-
-	return visor_intro, visor_memories
-}
-
-func removeSessionEntry(session_id string) {
-	delete(modGenInfo_GL.Sessions, session_id)
 }
 
 func getActiveSessionId() string {

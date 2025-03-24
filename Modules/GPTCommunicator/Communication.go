@@ -77,10 +77,10 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 	}, 0)
 
 	// Create payload
-	var ollama_request _OllamaRequest = _OllamaRequest{
-		Model:    modUserInfo_GL.Model_name,
+	var ollama_request ModsFileInfo.OllamaChatRequest = ModsFileInfo.OllamaChatRequest{
+		Model: modUserInfo_GL.Model_name,
 		Messages: history_with_system_prompt,
-		Options: _OllamaOptions{
+		Options: ModsFileInfo.OllamaOptions{
 			Num_keep:    99999999,
 			Num_ctx:     modUserInfo_GL.Context_size,
 			Temperature: modUserInfo_GL.Temperature,
@@ -120,8 +120,8 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 
 	if session_id != "temp" && session_id != "dumb" {
 		curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
-			Role:    "assistant",
-			Content: response,
+			Role:        "assistant",
+			Content:     response,
 			Timestamp_s: timestamp,
 		})
 		curr_session.Last_interaction_s = time.Now().Unix()
@@ -173,7 +173,7 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 			break
 		}
 
-		var response _OllamaResponse
+		var response ModsFileInfo.OllamaChatResponse
 		if err := decoder.Decode(&response); err != nil {
 			message += "\000"
 		} else {
@@ -235,4 +235,20 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
 
 	return message, timestamp_s
+}
+
+func getVisorIntroAndMemories() (string, string) {
+	// Load visor introduction text
+	var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
+	//var visor_functions = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "functions.json").ReadTextFile()
+	//visor_intro = strings.Replace(visor_intro, "3234_FUNCTIONS", visor_functions, -1)
+	visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
+	visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
+	visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
+
+	// Initialize memory string
+	var visor_memories string = strings.Join(modGenInfo_GL.Memories, ". ")
+	visor_memories = strings.Replace(visor_memories, "\"", "\\\"", -1)
+
+	return visor_intro, visor_memories
 }

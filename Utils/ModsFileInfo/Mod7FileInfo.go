@@ -52,13 +52,6 @@ type Session struct {
 	Memorized bool
 }
 
-type OllamaMessage struct {
-	Role string `json:"role"`
-	Content string `json:"content"`
-	Images []string `json:"images"`
-	Timestamp_s int64
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 // Mod7UserInfo is the format of the custom information file about this specific module.
