@@ -71,7 +71,7 @@ func SendText(text string, session_type string) int32 {
 /*
 GetModuleState gets the state of the GPT Communicator module.
 
-DON'T delete the function. It's useful for use in a thread other than the one used to send commands.
+DON'T delete the function. It's useful for use in a thread other than the one used to send text.
 */
 func GetModuleState() int32 {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|")) {
