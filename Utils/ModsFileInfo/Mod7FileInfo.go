@@ -35,11 +35,13 @@ type Mod7GenInfo struct {
 	// Memories is the list of memories the GPT has
 	Memories []string
 	// Sessions is the list of sessions of the user with the GPT indexed by their ID
-	Sessions map[string]*Session
+	Sessions []Session
 }
 
 // Session is the format of a chat session with the GPT.
 type Session struct {
+	// Id is the ID of the session
+	Id string
 	// Name is the name of the session
 	Name string
 	// Created_time_s is the timestamp of the creation of the session

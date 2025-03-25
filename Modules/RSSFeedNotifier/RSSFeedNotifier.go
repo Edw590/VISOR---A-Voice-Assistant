@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -89,12 +89,7 @@ func init() {realMain =
 		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_4
 		modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
 
-		if modGenInfo_GL.Notified_news == nil {
-			modGenInfo_GL.Notified_news = make(map[int32][]ModsFileInfo.NewsInfo)
-		}
-
 		for {
-
 			for _, feedInfo := range modUserInfo_GL.Feeds_info {
 				if !feedInfo.Enabled {
 					continue
@@ -131,10 +126,15 @@ func init() {realMain =
 				//log.Println("feedType.type_2: " + feedType.type_2)
 				//log.Println("feedType.type_3: " + feedType.type_3)
 
-				var new_feed bool = false
-				newsInfo_list, ok := modGenInfo_GL.Notified_news[feedInfo.Id]
-				if !ok {
-					new_feed = true
+				var new_feed bool = true
+				var newsInfo_list []ModsFileInfo.NewsInfo2 = nil
+				for _, newsInfo := range modGenInfo_GL.Notified_news {
+					if newsInfo.Id == feedInfo.Id {
+						new_feed = false
+						newsInfo_list = newsInfo.News_info
+
+						break
+					}
 				}
 
 				ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
@@ -161,8 +161,8 @@ func init() {realMain =
 						}
 					}
 
-					var email_info Utils.EmailInfo = Utils.EmailInfo{}
-					var newsInfo ModsFileInfo.NewsInfo
+					var email_info Utils.EmailInfo
+					var newsInfo ModsFileInfo.NewsInfo2
 
 					switch feedType.type_1 {
 						case _TYPE_1_YOUTUBE: {
@@ -208,7 +208,21 @@ func init() {realMain =
 					}
 				}
 
-				modGenInfo_GL.Notified_news[feedInfo.Id] = newsInfo_list
+				var found bool = false
+				for i, news_info := range modGenInfo_GL.Notified_news {
+					if news_info.Id == feedInfo.Id {
+						modGenInfo_GL.Notified_news[i].News_info = newsInfo_list
+						found = true
+
+						break
+					}
+				}
+				if !found {
+					modGenInfo_GL.Notified_news = append(modGenInfo_GL.Notified_news, ModsFileInfo.NewsInfo{
+						Id: feedInfo.Id,
+						News_info: newsInfo_list,
+					})
+				}
 
 				//log.Println("__________________________ENDING__________________________")
 			}
@@ -261,7 +275,7 @@ isNewNews checks if the news is new.
 – Returns:
   - true if the news is new, false otherwise
  */
-func isNewNews(newsInfo_list []ModsFileInfo.NewsInfo, title string, url string) bool {
+func isNewNews(newsInfo_list []ModsFileInfo.NewsInfo2, title string, url string) bool {
 	//log.Println("Checking if news is new: " + title)
 	for _, newsInfo := range newsInfo_list {
 		if  newsInfo.Url == url && newsInfo.Title == title {

@@ -382,9 +382,21 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 					var session_id string = instructions[0]
 					var action string = instructions[1]
 					if action == "delete" {
-						delete(Utils.Gen_settings_GL.MOD_7.Sessions, session_id)
+						for i, session := range Utils.Gen_settings_GL.MOD_7.Sessions {
+							if session.Id == session_id {
+								Utils.DelElemSLICES(&Utils.Gen_settings_GL.MOD_7.Sessions, i)
+
+								break
+							}
+						}
 					} else if action == "rename" {
-						Utils.Gen_settings_GL.MOD_7.Sessions[session_id].Name = instructions[2]
+						for i, session := range Utils.Gen_settings_GL.MOD_7.Sessions {
+							if session.Id == session_id {
+								Utils.Gen_settings_GL.MOD_7.Sessions[i].Name = instructions[2]
+
+								break
+							}
+						}
 					}
 				default:
 					log.Println("Invalid JSON destination:", origin)

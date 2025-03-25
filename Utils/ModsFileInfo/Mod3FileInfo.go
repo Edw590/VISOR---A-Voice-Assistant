@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,7 +23,7 @@ package ModsFileInfo
 
 // Mod3UserInfo is the format of the custom information file about this specific module.
 type Mod3UserInfo struct {
-	// Disks_info is the information about the disks. It maps the disk serial number to the disk information struct.
+	// Disks_info is the information about the disks
 	Disks_info []DiskInfo
 }
 
@@ -40,8 +40,15 @@ type DiskInfo struct {
 
 // Mod3GenInfo is the format of the custom generated information about this specific module.
 type Mod3GenInfo struct {
-	// Disks_info is the information about the disks. It maps the disk serial number to an array with the first element
-	// being the last short test timestamp and the second element being the last long test timestamp. The timestamps are
-	// in seconds.
-	Disks_info map[string][]int64
+	// Disks_info is the information about the disks
+	Disks_info []DiskInfo2
+}
+
+type DiskInfo2 struct {
+	// Id is the disk serial number
+	Id string
+	// Last_short_test_s is the timestamp of the last short test in seconds
+	Last_short_test_s int64
+	// Last_long_test_s is the timestamp of the last long test in seconds
+	Last_long_test_s int64
 }

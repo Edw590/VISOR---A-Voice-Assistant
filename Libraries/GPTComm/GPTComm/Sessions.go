@@ -28,7 +28,7 @@ import (
 	"strings"
 )
 
-var sessions_GL map[string]ModsFileInfo.Session = nil
+var sessions_GL []ModsFileInfo.Session = nil
 
 /*
 RetrieveSessions retrieves the list of sessions, ready to be used by the other functions.
@@ -46,7 +46,6 @@ func retrieveSessions() {
 
 	var json_bytes []byte = []byte(Utils.DecompressString(response))
 
-	sessions_GL = make(map[string]ModsFileInfo.Session)
 	if err := Utils.FromJsonGENERAL(json_bytes, &sessions_GL); err != nil {
 		return
 	}
@@ -64,8 +63,8 @@ func GetSessionIdsList() string {
 	retrieveSessions()
 
 	var ids_list string = ""
-	for id := range sessions_GL {
-		ids_list += id + "|"
+	for _, session := range sessions_GL {
+		ids_list += session.Id + "|"
 	}
 	if len(ids_list) > 0 {
 		ids_list = ids_list[:len(ids_list)-1]
@@ -83,8 +82,8 @@ GetSessionName gets the name of the session.
   - the name of the session
 */
 func GetSessionName(session_id string) string {
-	for id, session := range sessions_GL {
-		if session_id == id {
+	for _, session := range sessions_GL {
+		if session_id == session.Id {
 			return session.Name
 		}
 	}
@@ -101,8 +100,8 @@ GetSessionCreatedTime gets the creation timestamp of the session.
   - the creation timestamp
  */
 func GetSessionCreatedTime(session_id string) int64 {
-	for id, session := range sessions_GL {
-		if session_id == id {
+	for _, session := range sessions_GL {
+		if session_id == session.Id {
 			return session.Created_time_s
 		}
 	}
@@ -119,8 +118,8 @@ GetSessionLastInteraction gets the last interaction timestamp of the session.
   - the last interaction timestamp
  */
 func GetSessionLastInteraction(session_id string) int64 {
-	for id, session := range sessions_GL {
-		if session_id == id {
+	for _, session := range sessions_GL {
+		if session_id == session.Id {
 			return session.Last_interaction_s
 		}
 	}
@@ -138,8 +137,8 @@ GetSessionHistory gets the history of the session.
     separated by "\0"
  */
 func GetSessionHistory(session_id string) string {
-	for id, session := range sessions_GL {
-		if session_id == id {
+	for _, session := range sessions_GL {
+		if session_id == session.Id {
 			var session_history string = ""
 			for _, message := range session.History {
 				var msg_content string = message.Content

@@ -72,10 +72,6 @@ func init() {realMain =
 			modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
 		}
 
-		if modGenInfo_GL.Sessions == nil {
-			modGenInfo_GL.Sessions = make(map[string]*ModsFileInfo.Session)
-		}
-
 		// Prepare the session for the temp and dumb sessions
 		addSessionEntry("temp", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
 		addSessionEntry("dumb", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
@@ -164,7 +160,15 @@ func sendToGPT(device_id string, user_message string, session_id string) string 
 }
 
 func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, last_interaction_s int64, user_message string) bool {
-	if _, ok := modGenInfo_GL.Sessions[session_id]; !ok {
+	var session_exists bool = false
+	for _, session := range modGenInfo_GL.Sessions {
+		if session.Id == session_id {
+			session_exists = true
+
+			break
+		}
+	}
+	if !session_exists {
 		// If the session doesn't exist, create it
 
 		var session_name = ""
@@ -189,13 +193,14 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 			}
 		}
 
-		modGenInfo_GL.Sessions[session_id] = &ModsFileInfo.Session{
+		modGenInfo_GL.Sessions = append(modGenInfo_GL.Sessions, ModsFileInfo.Session{
+			Id:                 session_id,
 			Name:               session_name,
 			Created_time_s:     time.Now().Unix(),
 			History:            history,
 			Last_interaction_s: last_interaction_s,
 			Memorized:          false,
-		}
+		})
 
 		return true
 	}
@@ -207,10 +212,10 @@ func getActiveSessionId() string {
 	// The latest session with less than 30 minutes of inactivity is considered the active one
 	var latest_interaction int64 = 0
 	var active_session_id string = ""
-	for id, session := range modGenInfo_GL.Sessions {
+	for _, session := range modGenInfo_GL.Sessions {
 		if session.Last_interaction_s > latest_interaction &&
 				time.Now().Unix() - session.Last_interaction_s < _INACTIVE_SESSION_TIME_S {
-			active_session_id = id
+			active_session_id = session.Id
 			latest_interaction = session.Last_interaction_s
 		}
 	}

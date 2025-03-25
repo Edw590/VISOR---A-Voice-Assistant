@@ -78,7 +78,7 @@ GetEventGMAN returns an event by its ID.
   - the event or nil if the event was not found
 */
 func GetTask(task_id string) *ModsFileInfo.GTask {
-	for i := 0; i < len(tasks_GL); i++ {
+	for i := range tasks_GL {
 		var task *ModsFileInfo.GTask = &tasks_GL[i]
 		if task.Id == task_id {
 			return task

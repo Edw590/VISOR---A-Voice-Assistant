@@ -87,7 +87,7 @@ func smartCheckerCreateDisksListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
 	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	for i := 0; i < len(disks_info); i++ {
+	for i := range disks_info {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
 		var title string = disk_info.Label
 		if !disk_info.Enabled {

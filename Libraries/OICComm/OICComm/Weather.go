@@ -75,7 +75,7 @@ GetWeather returns the weather for the specified location.
   - the weather or nil if the weather is not found
 */
 func GetWeather(weather_location string) *ModsFileInfo.Weather {
-	for i := 0; i < len(weathers_GL); i++ {
+	for i := range weathers_GL {
 		var weather *ModsFileInfo.Weather = &weathers_GL[i]
 		if weather.Location == weather_location {
 			return weather

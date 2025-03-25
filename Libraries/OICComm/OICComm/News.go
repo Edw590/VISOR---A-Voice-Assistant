@@ -75,7 +75,7 @@ GetNews returns the news for the specified location.
   - the news or nil if the news are not found
  */
 func GetNews(news_location string) *ModsFileInfo.News {
-	for i := 0; i < len(news_locs_GL); i++ {
+	for i := range news_locs_GL {
 		var news_loc *ModsFileInfo.News = &news_locs_GL[i]
 		if news_loc.Location == news_location {
 			return news_loc

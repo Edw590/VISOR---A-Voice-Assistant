@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -84,7 +84,7 @@ RemoveLocationLOCATIONS removes a location from the user settings.
 */
 func RemoveLocationLOCATIONS(id int32) {
 	var locs_info *[]ModsFileInfo.LocInfo = &Utils.User_settings_GL.UserLocator.Locs_info
-	for i := 0; i < len(*locs_info); i++ {
+	for i := range *locs_info {
 		if (*locs_info)[i].Id == id {
 			Utils.DelElemSLICES(locs_info, i)
 
@@ -126,7 +126,7 @@ GetLOCATIONS returns a location by its ID.
  */
 func GetLocationLOCATIONS(id int32) *ModsFileInfo.LocInfo {
 	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
-	for i := 0; i < len(locs_info); i++ {
+	for i := range locs_info {
 		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
 		if loc_info.Id == id {
 			return loc_info

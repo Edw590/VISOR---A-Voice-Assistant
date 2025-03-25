@@ -78,7 +78,7 @@ GetEventGMAN returns an event by its ID.
   - the event or nil if the event was not found
 */
 func GetEvent(event_id string) *ModsFileInfo.GEvent {
-	for i := 0; i < len(events_GL); i++ {
+	for i := range events_GL {
 		var event *ModsFileInfo.GEvent = &events_GL[i]
 		if event.Id == event_id {
 			return event

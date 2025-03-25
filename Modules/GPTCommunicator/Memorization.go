@@ -34,13 +34,13 @@ import (
 func autoMemorize() {
 	for {
 		if modGenInfo_GL.State == ModsFileInfo.MOD_7_STATE_READY {
-			for session_id, session := range modGenInfo_GL.Sessions {
-				if session_id == getActiveSessionId() || session.Memorized || session_id == "temp" || session_id == "dumb" {
+			for _, session := range modGenInfo_GL.Sessions {
+				if session.Id == getActiveSessionId() || session.Memorized || session.Id == "temp" || session.Id == "dumb" {
 					continue
 				}
 
 				// If the session is no longer the active one, memorize it
-				if memorizeSession(session_id) {
+				if memorizeSession(session.Id) {
 					session.Memorized = true
 				}
 			}
@@ -62,7 +62,14 @@ func autoMemorize() {
 }
 
 func memorizeSession(session_id string) bool {
-	var session_history []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(modGenInfo_GL.Sessions[session_id].History)
+	var session_history []ModsFileInfo.OllamaMessage = nil
+	for _, session := range modGenInfo_GL.Sessions {
+		if session.Id == session_id {
+			session_history = Utils.CopyOuterSLICES(session.History)
+
+			break
+		}
+	}
 	for i := 0; i < len(session_history); i++ {
 		var message ModsFileInfo.OllamaMessage = session_history[i]
 		if message.Role == "user" && !strings.Contains(message.Content, "[SYSTEM TASK - ") {

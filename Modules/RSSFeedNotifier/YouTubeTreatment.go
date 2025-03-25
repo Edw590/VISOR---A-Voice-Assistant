@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -60,7 +60,7 @@ still filled with the video info. To check for errors, check if the video URL is
 have a value).
 */
 func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int, title_url_only bool) (Utils.EmailInfo,
-					  ModsFileInfo.NewsInfo) {
+					  ModsFileInfo.NewsInfo2) {
 	const (
 		VIDEO_COLOR string = "#212121" // Default video color (sort of black)
 		LIVE_COLOR  string = "#E62117" // Default live color (sort of red)
@@ -99,7 +99,7 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 		// playlist page.
 		var video_info _VideoInfo = ytPlaylistScraping(things_replace[Utils.MODEL_YT_VIDEO_PLAYLIST_CODE_EMAIL], item_num, len(parsed_feed.Items))
 		if video_info.id == _GEN_ERROR {
-			return Utils.EmailInfo{}, ModsFileInfo.NewsInfo{}
+			return Utils.EmailInfo{}, ModsFileInfo.NewsInfo2{}
 		}
 
 		things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TITLE_EMAIL] = video_info.title
@@ -132,7 +132,7 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 	// If it's not to include Shorts and the video is a Short, return only the news info (to ignore the notification but
 	// memorize that the video is to be ignored).
 	if (feedType.type_3 != _TYPE_3_YT_INC_SHORTS && is_short) || title_url_only {
-		return Utils.EmailInfo{}, ModsFileInfo.NewsInfo{
+		return Utils.EmailInfo{}, ModsFileInfo.NewsInfo2{
 			Title: things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TITLE_EMAIL],
 			Url:   "https://www.youtube.com/watch?v=" + things_replace[Utils.MODEL_YT_VIDEO_VIDEO_CODE_EMAIL],
 		}
@@ -181,7 +181,7 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 	email_info.Subject = msg_subject
 
 	return email_info,
-	ModsFileInfo.NewsInfo{
+	ModsFileInfo.NewsInfo2{
 		Title: vid_title_original,
 		Url:   "https://www.youtube.com/watch?v=" + things_replace[Utils.MODEL_YT_VIDEO_VIDEO_CODE_EMAIL],
 	}

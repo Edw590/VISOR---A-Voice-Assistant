@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -56,7 +56,14 @@ func checkTime(task ModsFileInfo.Task) (bool, int64) {
 			}
 		}
 
-		return curr_time >= test_time_min && modGenInfo_GL.Tasks_info[task.Id] < test_time_min, test_time_min
+		var task_info ModsFileInfo.TaskInfo
+		for _, task_info = range modGenInfo_GL.Tasks_info {
+			if task_info.Id == task.Id {
+				break
+			}
+		}
+
+		return curr_time >= test_time_min && task_info.Last_time_reminded < test_time_min, test_time_min
 	}
 }
 
@@ -145,23 +152,31 @@ func formatCondition(condition string) string {
 }
 
 func checkProgrammableCondition(task ModsFileInfo.Task) bool {
-	var conds_were_true map[int32]bool = modGenInfo_GL.Conds_were_true
-
 	var condition bool = false
 	if task.Programmable_condition != "" {
-		if ok := conds_were_true[task.Id]; !ok {
-			conds_were_true[task.Id] = false
+		var cond_was_true ModsFileInfo.CondWasTrue
+		for _, cond_was_true = range modGenInfo_GL.Conds_were_true {
+			if cond_was_true.Id == task.Id {
+				break
+			}
+		}
+		if cond_was_true.Id == 0 {
+			cond_was_true = ModsFileInfo.CondWasTrue{
+				Id:       task.Id,
+				Was_true: false,
+			}
+			modGenInfo_GL.Conds_were_true = append(modGenInfo_GL.Conds_were_true, cond_was_true)
 		}
 
 		cond_result, _ := ComputeCondition(task.Programmable_condition)
 		if cond_result {
-			if !conds_were_true[task.Id] {
-				conds_were_true[task.Id] = true
+			if !cond_was_true.Was_true {
+				cond_was_true.Was_true = true
 
 				condition = true
 			}
 		} else {
-			conds_were_true[task.Id] = false
+			cond_was_true.Was_true = false
 		}
 	} else {
 		condition = true

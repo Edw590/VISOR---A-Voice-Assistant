@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -100,24 +100,13 @@ func init() {realMain =
 					continue
 				}
 
-				// Fill the map with spots for the 2 elements that must be in them
-				if modGenInfo_GL.Disks_info == nil {
-					modGenInfo_GL.Disks_info = make(map[string][]int64, 2)
-				}
-
 				// Check which test to execute, or execute none if the time hasn't passed yet.
-				var disk_gen_info []int64 = modGenInfo_GL.Disks_info[disk_user_info.Id]
-				if disk_gen_info == nil {
-					disk_gen_info = make([]int64, 2)
-					disk_gen_info[SHORT_TEST] = 0
-					disk_gen_info[LONG_TEST] = 0
-					modGenInfo_GL.Disks_info[disk_user_info.Id] = disk_gen_info
-				}
+				var disk_gen_info *ModsFileInfo.DiskInfo2 = getDiskInfo2(disk_user_info.Id)
 				var test_type int = NO_TEST
 				if !no_test {
-					if time.Now().Unix() - disk_gen_info[LONG_TEST] >= _LONG_TEST_EACH_S && time.Now().Day() == 1 {
+					if time.Now().Unix() - disk_gen_info.Last_long_test_s >= _LONG_TEST_EACH_S && time.Now().Day() == 1 {
 						test_type = LONG_TEST
-					} else if time.Now().Unix() - disk_gen_info[SHORT_TEST] >= _SHORT_TEST_EACH_S {
+					} else if time.Now().Unix() - disk_gen_info.Last_short_test_s >= _SHORT_TEST_EACH_S {
 						test_type = SHORT_TEST
 					} else {
 						//log.Println("Time has not passed yet for the tests to be executed.")
@@ -214,9 +203,9 @@ func init() {realMain =
 
 					// Update the timestamp
 					if test_type == SHORT_TEST {
-						disk_gen_info[SHORT_TEST] = time.Now().Unix()
+						disk_gen_info.Last_short_test_s = time.Now().Unix()
 					} else {
-						disk_gen_info[LONG_TEST] = time.Now().Unix()
+						disk_gen_info.Last_long_test_s = time.Now().Unix()
 					}
 				}
 
@@ -247,4 +236,18 @@ func init() {realMain =
 			}
 		}
 	}
+}
+
+func getDiskInfo2(disk_serial string) *ModsFileInfo.DiskInfo2 {
+	for i, disk_gen_info := range modGenInfo_GL.Disks_info {
+		if disk_gen_info.Id == disk_serial {
+			return &modGenInfo_GL.Disks_info[i]
+		}
+	}
+
+	modGenInfo_GL.Disks_info = append(modGenInfo_GL.Disks_info, ModsFileInfo.DiskInfo2{
+		Id: disk_serial,
+	})
+
+	return &modGenInfo_GL.Disks_info[len(modGenInfo_GL.Disks_info)-1]
 }

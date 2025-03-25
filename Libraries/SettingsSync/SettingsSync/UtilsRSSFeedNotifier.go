@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -80,7 +80,7 @@ RemoveFeedRSS removes a feed from the user settings.
  */
 func RemoveFeedRSS(feed_id int32) {
 	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
-	for i := 0; i < len(*feeds_info); i++ {
+	for i := range *feeds_info {
 		if (*feeds_info)[i].Id == feed_id {
 			Utils.DelElemSLICES(feeds_info, i)
 
@@ -123,7 +123,7 @@ GetFeedRSS returns a feed by its ID.
  */
 func GetFeedRSS(feed_id int32) *ModsFileInfo.FeedInfo {
 	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
-	for i := 0; i < len(feeds_info); i++ {
+	for i := range feeds_info {
 		var feed_info *ModsFileInfo.FeedInfo = &feeds_info[i]
 		if feed_info.Id == feed_id {
 			return feed_info

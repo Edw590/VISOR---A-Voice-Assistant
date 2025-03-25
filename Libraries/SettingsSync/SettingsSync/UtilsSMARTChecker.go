@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -73,7 +73,7 @@ RemoveDiskSMART removes a disk from the user settings.
  */
 func RemoveDiskSMART(id string) {
 	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.User_settings_GL.SMARTChecker.Disks_info
-	for i := 0; i < len(*disks_info); i++ {
+	for i := range *disks_info {
 		if (*disks_info)[i].Id == id {
 			Utils.DelElemSLICES(disks_info, i)
 
@@ -113,7 +113,7 @@ GetDiskSMART returns a disk by its ID.
  */
 func GetDiskSMART(id string) *ModsFileInfo.DiskInfo {
 	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	for i := 0; i < len(disks_info); i++ {
+	for i := range disks_info {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
 		if disk_info.Id == id {
 			return disk_info

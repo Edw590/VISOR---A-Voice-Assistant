@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -52,13 +52,6 @@ This function will block until a Task is due. When that happens, the Task is ret
   - the Task that is due or nil if the checker was stopped
  */
 func CheckDueTasks() *ModsFileInfo.Task {
-	if modGenInfo_GL.Tasks_info == nil {
-		modGenInfo_GL.Tasks_info = make(map[int32]int64)
-	}
-	if modGenInfo_GL.Conds_were_true == nil {
-		modGenInfo_GL.Conds_were_true = make(map[int32]bool)
-	}
-
 	var task_return ModsFileInfo.Task
 	stop_GL = false
 	for {
@@ -95,17 +88,18 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 				var condition_device_active bool = checkDeviceActive(task)
 
+				var task_info *ModsFileInfo.TaskInfo = getTaskInfo(task.Id)
 				if condition_loc && programmable_condition && device_id_matches && condition_device_active {
-					if modGenInfo_GL.Tasks_info[task.Id] == 0 {
+					if task_info.Last_time_reminded == 0 {
 						if task_return.Id == 0 {
 							// Only set the last reminded time if no other task was triggered
-							modGenInfo_GL.Tasks_info[task.Id] = time.Now().Unix() / 60
+							task_info.Last_time_reminded = time.Now().Unix() / 60
 
 							task_return = task
 						}
 					}
 				} else {
-					modGenInfo_GL.Tasks_info[task.Id] = 0
+					task_info.Last_time_reminded = 0
 				}
 			}
 		}
@@ -138,7 +132,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			if condition_time && condition_loc && programmable_condition && device_id_matches && condition_device_active {
 				if task_return.Id == 0 {
 					// Only set the last reminded time if no other task was triggered
-					modGenInfo_GL.Tasks_info[task.Id] = test_time_min
+					getTaskInfo(task.Id).Last_time_reminded = test_time_min
 
 					task_return = task
 				}
@@ -153,6 +147,21 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			return nil
 		}
 	}
+}
+
+func getTaskInfo(task_id int32) *ModsFileInfo.TaskInfo {
+	for i, task_info := range modGenInfo_GL.Tasks_info {
+		if task_info.Id == task_id {
+			return &modGenInfo_GL.Tasks_info[i]
+		}
+	}
+
+	modGenInfo_GL.Tasks_info = append(modGenInfo_GL.Tasks_info, ModsFileInfo.TaskInfo{
+		Id: task_id,
+		Last_time_reminded: 0,
+	})
+
+	return &modGenInfo_GL.Tasks_info[len(modGenInfo_GL.Tasks_info) - 1]
 }
 
 /*

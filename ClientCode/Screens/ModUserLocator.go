@@ -128,7 +128,7 @@ func userLocatorCreateLocationsListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
 	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
-	for i := 0; i < len(locs_info); i++ {
+	for i := range locs_info {
 		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
 		var title = loc_info.Name
 		if title == "" {

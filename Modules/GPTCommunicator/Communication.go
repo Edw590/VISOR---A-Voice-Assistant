@@ -38,9 +38,9 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 	if session_id == "" {
 		// Get latest session ID if none is provided
 		var latest_interaction int64 = -1
-		for id, session := range modGenInfo_GL.Sessions {
+		for _, session := range modGenInfo_GL.Sessions {
 			if session.Last_interaction_s > latest_interaction {
-				session_id = id
+				session_id = session.Id
 				latest_interaction = session.Last_interaction_s
 			}
 		}
@@ -48,7 +48,7 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 
 	addSessionEntry(session_id, nil, 0, user_message)
 
-	var curr_session ModsFileInfo.Session = *modGenInfo_GL.Sessions[session_id]
+	var curr_session ModsFileInfo.Session = *getSession(session_id)
 	curr_session.Memorized = false
 
 	// Append user message to history
@@ -127,7 +127,13 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 		curr_session.Last_interaction_s = time.Now().Unix()
 
 		// Save the session unless it's to use the temp or dumb sessions
-		modGenInfo_GL.Sessions[session_id] = &curr_session
+		for i, session := range modGenInfo_GL.Sessions {
+			if session.Id == session_id {
+				modGenInfo_GL.Sessions[i] = curr_session
+
+				break
+			}
+		}
 	}
 
 	return response
@@ -251,4 +257,18 @@ func getVisorIntroAndMemories() (string, string) {
 	visor_memories = strings.Replace(visor_memories, "\"", "\\\"", -1)
 
 	return visor_intro, visor_memories
+}
+
+func getSession(session_id string) *ModsFileInfo.Session {
+	for i, session := range modGenInfo_GL.Sessions {
+		if session.Id == session_id {
+			return &modGenInfo_GL.Sessions[i]
+		}
+	}
+
+	modGenInfo_GL.Sessions = append(modGenInfo_GL.Sessions, ModsFileInfo.Session{
+		Id: session_id,
+	})
+
+	return &modGenInfo_GL.Sessions[len(modGenInfo_GL.Sessions)-1]
 }
