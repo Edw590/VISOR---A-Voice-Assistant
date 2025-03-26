@@ -158,7 +158,6 @@ func getTaskInfo(task_id int32) *ModsFileInfo.TaskInfo {
 
 	modGenInfo_GL.Tasks_info = append(modGenInfo_GL.Tasks_info, ModsFileInfo.TaskInfo{
 		Id: task_id,
-		Last_time_reminded: 0,
 	})
 
 	return &modGenInfo_GL.Tasks_info[len(modGenInfo_GL.Tasks_info) - 1]

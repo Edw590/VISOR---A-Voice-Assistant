@@ -84,7 +84,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Programmable_condition": "bool(battery_level < 20) && bool(!power_connected)"
+				"Programmable_condition": "bool(battery_level >= 0) && bool(battery_level < 20) && bool(!power_connected)"
 			},
 			{
 				"Id": 9,
@@ -98,7 +98,7 @@
 				"Time": "",
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Programmable_condition": "bool(battery_level <= 5) && bool(!power_connected)"
+				"Programmable_condition": "bool(battery_level >= 0) && bool(battery_level <= 5) && bool(!power_connected)"
 			},
 			{
 				"Id": 7,

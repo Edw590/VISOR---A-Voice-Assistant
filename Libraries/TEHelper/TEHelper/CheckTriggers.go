@@ -56,14 +56,7 @@ func checkTime(task ModsFileInfo.Task) (bool, int64) {
 			}
 		}
 
-		var task_info ModsFileInfo.TaskInfo
-		for _, task_info = range modGenInfo_GL.Tasks_info {
-			if task_info.Id == task.Id {
-				break
-			}
-		}
-
-		return curr_time >= test_time_min && task_info.Last_time_reminded < test_time_min, test_time_min
+		return curr_time >= test_time_min && getTaskInfo(task.Id).Last_time_reminded < test_time_min, test_time_min
 	}
 }
 
@@ -154,19 +147,7 @@ func formatCondition(condition string) string {
 func checkProgrammableCondition(task ModsFileInfo.Task) bool {
 	var condition bool = false
 	if task.Programmable_condition != "" {
-		var cond_was_true ModsFileInfo.CondWasTrue
-		for _, cond_was_true = range modGenInfo_GL.Conds_were_true {
-			if cond_was_true.Id == task.Id {
-				break
-			}
-		}
-		if cond_was_true.Id == 0 {
-			cond_was_true = ModsFileInfo.CondWasTrue{
-				Id:       task.Id,
-				Was_true: false,
-			}
-			modGenInfo_GL.Conds_were_true = append(modGenInfo_GL.Conds_were_true, cond_was_true)
-		}
+		var cond_was_true *ModsFileInfo.CondWasTrue = getCondWasTrue(task.Id)
 
 		cond_result, _ := ComputeCondition(task.Programmable_condition)
 		if cond_result {
@@ -183,4 +164,18 @@ func checkProgrammableCondition(task ModsFileInfo.Task) bool {
 	}
 
 	return condition
+}
+
+func getCondWasTrue(task_id int32) *ModsFileInfo.CondWasTrue {
+	for i, cond_was_true := range modGenInfo_GL.Conds_were_true {
+		if cond_was_true.Id == task_id {
+			return &modGenInfo_GL.Conds_were_true[i]
+		}
+	}
+
+	modGenInfo_GL.Conds_were_true = append(modGenInfo_GL.Conds_were_true, ModsFileInfo.CondWasTrue{
+		Id:       task_id,
+	})
+
+	return &modGenInfo_GL.Conds_were_true[len(modGenInfo_GL.Conds_were_true) - 1]
 }
