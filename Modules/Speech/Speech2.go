@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -70,84 +70,81 @@ var curr_speech_GL *SpeechQueue.Speech = nil
 var mutex sync.Mutex
 
 var (
-	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		initTts()
+	initTts()
 
-		processVolumeChanges()
+	processVolumeChanges()
 
-		//log.Println("Waiting for speeches to speak...")
+	//log.Println("Waiting for speeches to speak...")
 
-		go func() {
-			for {
-				if curr_speech_GL != nil {
-					var curr_speech *SpeechQueue.Speech = curr_speech_GL
-					//log.Println("Speaking speech with priority " + strconv.Itoa(int(curr_speech.GetPriority())) + " and ID " +
-					//	curr_speech.GetID()[:10] + "(...)...")
-
-					var notified bool = rightBeforeSpeaking(curr_speech.GetID())
-					log.Println("Notified:", notified)
-
-					if err := speak(curr_speech.GetText()); err != nil {
-						log.Println("Error speaking speech:", err)
-						if !notified {
-							Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
-						}
-					}
-
-					UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
-
-					var speech_id string = curr_speech.GetID()
-					if higher_priority_came_GL {
-						higher_priority_came_GL = false
-
-						curr_speech.RephraseInterrSpeech()
-						speech_id = ""
-					}
-
-					curr_speech_GL = nil
-
-					speechTreatment(speech_id)
-				}
-
-				if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
-					return
-				}
-			}
-		}()
-
-		go func() {
-			GPTComm.SetPreparations(time.Now().UnixMilli())
-			for {
-				// Keep getting the next sentence to speak from the server
-				var speak string = GPTComm.GetNextSpeechSentence()
-				if speak == "" || speak == GPTComm.END_ENTRY {
-					time.Sleep(1 * time.Second)
-
-					continue
-				}
-
-				if *module_stop {
-					break
-				}
-
-				QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE_DEFAULT, "", 0)
-			}
-		}()
-
+	go func() {
 		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
-				stop_volume_processing_GL = true
-				SpeechQueue.ClearQueue()
+			if curr_speech_GL != nil {
+				var curr_speech *SpeechQueue.Speech = curr_speech_GL
+				//log.Println("Speaking speech with priority " + strconv.Itoa(int(curr_speech.GetPriority())) + " and ID " +
+				//	curr_speech.GetID()[:10] + "(...)...")
 
+				var notified bool = rightBeforeSpeaking(curr_speech.GetID())
+				log.Println("Notified:", notified)
+
+				if err := speak(curr_speech.GetText()); err != nil {
+					log.Println("Error speaking speech:", err)
+					if !notified {
+						Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
+					}
+				}
+
+				UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_LAST_SPEECH).SetString(curr_speech.GetText(), true)
+
+				var speech_id string = curr_speech.GetID()
+				if higher_priority_came_GL {
+					higher_priority_came_GL = false
+
+					curr_speech.RephraseInterrSpeech()
+					speech_id = ""
+				}
+
+				curr_speech_GL = nil
+
+				speechTreatment(speech_id)
+			}
+
+			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
 				return
 			}
+		}
+	}()
+
+	go func() {
+		GPTComm.SetPreparations(time.Now().UnixMilli())
+		for {
+			// Keep getting the next sentence to speak from the server
+			var speak string = GPTComm.GetNextSpeechSentence()
+			if speak == "" || speak == GPTComm.END_ENTRY {
+				time.Sleep(1 * time.Second)
+
+				continue
+			}
+
+			if *module_stop {
+				break
+			}
+
+			QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE_DEFAULT, "", 0)
+		}
+	}()
+
+	for {
+		if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+			stop_volume_processing_GL = true
+			SpeechQueue.ClearQueue()
+
+			return
 		}
 	}
 }

@@ -153,9 +153,7 @@ type Module struct {
 }
 
 /*
-RealMain is the type of the realMain() function of a module.
-
-realMain is the function that does the actual work of a module (it's equivalent to what main() would normally be).
+Main is the type of the main() function of a module.
 
 -----------------------------------------------------------
 
@@ -163,10 +161,10 @@ realMain is the function that does the actual work of a module (it's equivalent 
   - module_stop – a pointer to a boolean that is set to true if the module should stop
   - moduleInfo_any – the ModuleInfo struct of the module
 */
-type RealMain func(module_stop *bool, moduleInfo_any any)
+type Main func(module_stop *bool, moduleInfo_any any)
 
 /*
-ModStartup does the startup routine for a module and executes its realMain() function, catching any fatal errors and
+ModStartup does the startup routine for a module and executes its main() function, catching any fatal errors and
 sending an email with them.
 
 Call this as the ONLY thing in the Start() function of a module.
@@ -174,11 +172,11 @@ Call this as the ONLY thing in the Start() function of a module.
 -----------------------------------------------------------
 
 – Params:
-  - realMain – a pointer to the realMain() function of the module
+  - main – a pointer to the main() function of the module
   - module – a pointer to the Module struct of the module
 */
-func ModStartup(realMain RealMain, module *Module) {
-	ModStartup2(realMain, module, false)
+func ModStartup(main Main, module *Module) {
+	ModStartup2(main, module, false)
 }
 /*
 ModStartup2 is the main function for ModStartup. Read everything there, except one different parameter.
@@ -188,7 +186,7 @@ ModStartup2 is the main function for ModStartup. Read everything there, except o
 – Params:
   - server – true if the version running is the server version, false if it's the client version
  */
-func ModStartup2(realMain RealMain, module *Module, server bool) {
+func ModStartup2(main Main, module *Module, server bool) {
 	// Module startup routine //
 
 	var mod_num = module.Num
@@ -274,8 +272,8 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		Tcef.Tcef{
 			Try: func() {
-				// Execute realMain()
-				realMain(&module.Stop, moduleInfo)
+				// Execute main()
+				main(&module.Stop, moduleInfo)
 			},
 			Catch: func(e Tcef.Exception) {
 				errs = true

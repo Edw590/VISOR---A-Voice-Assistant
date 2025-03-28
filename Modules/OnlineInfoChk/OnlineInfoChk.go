@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -103,62 +103,59 @@ const _TIME_SLEEP_S int = 15*60
 // Chrome: log.Sprintf("http://127.0.0.1:%d/wd/hub", port) - default
 
 var (
-	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
 	modGenInfo_GL  *ModsFileInfo.Mod6GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod6UserInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_6
-		modUserInfo_GL = &Utils.User_settings_GL.OnlineInfoChk
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_6
+	modUserInfo_GL = &Utils.User_settings_GL.OnlineInfoChk
 
-		for {
-			////////////////////////////////
-			// Prepare the browser
-			service, err := selenium.NewChromeDriverService("chromedriver", 4444)
-			if err != nil {
-				return
-			}
+	for {
+		////////////////////////////////
+		// Prepare the browser
+		service, err := selenium.NewChromeDriverService("chromedriver", 4444)
+		if err != nil {
+			return
+		}
 
-			caps := selenium.Capabilities{}
-			caps.AddChrome(chrome.Capabilities{Args: []string{
-				// Keep all of these here. They ensure that the driver works properly.
-				"start-maximized",
-				"enable-automation",
-				"--headless",
-				"--disable-browser-side-navigation",
-				"--disable-dev-shm-usage",
-				"--disable-extensions",
-				"--disable-gpu",
-				"--disable-infobars",
-				"--dns-prefetch-disable",
-				"--incognito",
-				"--no-sandbox",
-				"--remote-debugging-port=9222",
-				"--window-size=1920,1080",
-			}})
+		caps := selenium.Capabilities{}
+		caps.AddChrome(chrome.Capabilities{Args: []string{
+			// Keep all of these here. They ensure that the driver works properly.
+			"start-maximized",
+			"enable-automation",
+			"--headless",
+			"--disable-browser-side-navigation",
+			"--disable-dev-shm-usage",
+			"--disable-extensions",
+			"--disable-gpu",
+			"--disable-infobars",
+			"--dns-prefetch-disable",
+			"--incognito",
+			"--no-sandbox",
+			"--remote-debugging-port=9222",
+			"--window-size=1920,1080",
+		}})
 
-			driver, err := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d/wd/hub", 4444))
-			if err != nil {
-				return
-			}
-			////////////////////////////////
+		driver, err := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d/wd/hub", 4444))
+		if err != nil {
+			return
+		}
+		////////////////////////////////
 
-			_ = bypassGoogleCookies(driver)
+		_ = bypassGoogleCookies(driver)
 
-			modGenInfo_GL.Weather = OICWeather.UpdateWeather(driver, modUserInfo_GL.Temp_locs)
-			modGenInfo_GL.News = OICNews.UpdateNews(driver, modUserInfo_GL.News_locs)
+		modGenInfo_GL.Weather = OICWeather.UpdateWeather(driver, modUserInfo_GL.Temp_locs)
+		modGenInfo_GL.News = OICNews.UpdateNews(driver, modUserInfo_GL.News_locs)
 
-			_ = driver.Quit()
-			_ = service.Stop()
+		_ = driver.Quit()
+		_ = service.Stop()
 
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-				return
-			}
+		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+			return
 		}
 	}
 }

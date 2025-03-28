@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -34,110 +34,107 @@ const _TIME_SLEEP_S int = 5
 var modules_GL []Utils.Module
 
 var (
-	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
 )
 func Start(modules []Utils.Module) {
 	modules_GL = modules
-	Utils.ModStartup(realMain, &modules_GL[Utils.NUM_MOD_ModManager])
+	Utils.ModStartup(main, &modules_GL[Utils.NUM_MOD_ModManager])
 }
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+func main(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE).SetLong(0, false)
+	UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE).SetLong(0, false)
 
-		// Check all modules' support and put on a list to later warn if there were changes of support or not.
-		var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
+	// Check all modules' support and put on a list to later warn if there were changes of support or not.
+	var mod_support_list [Utils.MODS_ARRAY_SIZE]bool
+	for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
+		mod_support_list[mod_num] = Utils.IsModSupportedMODULES(mod_num)
+	}
+
+	for {
+		var modules_to_start [Utils.MODS_ARRAY_SIZE]bool
+		var modules_to_stop [Utils.MODS_ARRAY_SIZE]bool
+
 		for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
-			mod_support_list[mod_num] = Utils.IsModSupportedMODULES(mod_num)
+			if mod_num == Utils.NUM_MOD_VISOR || mod_num == Utils.NUM_MOD_ModManager {
+				continue
+			}
+
+			// Only start the modules supported by the server or client depending on the VISOR_SERVER constant.
+			if Utils.VISOR_server_GL && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_SERVER == 0) {
+				continue
+			} else if !Utils.VISOR_server_GL && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_CLIENT == 0) {
+				continue
+			}
+
+			var module_supported bool = Utils.IsModSupportedMODULES(mod_num)
+
+			if module_supported {
+				if !mod_support_list[mod_num] {
+					// Module was not supported and now it is.
+					//log.Println("The following module is now supported on this machine: " + mod_name)
+
+					mod_support_list[mod_num] = true
+				}
+			} else {
+				if mod_support_list[mod_num] {
+					// Module was not supported and now it is.
+					//log.Println("The following module stopped being supported on this machine: " + mod_name)
+
+					mod_support_list[mod_num] = false
+				}
+			}
+
+			//log.Println("-----------------------")
+			//log.Println("Module " + mod_name + " is supported: " + strconv.FormatBool(module_supported))
+			//log.Println("Module " + mod_name + " is running: " + strconv.FormatBool(isModRunning(mod_num)))
+			//log.Println("Module " + mod_name + " is enabled: " + strconv.FormatBool(modules_GL[mod_num].Enabled))
+
+			if module_supported {
+				if !isModRunning(mod_num) && modules_GL[mod_num].Enabled {
+					//log.Println("Starting module: " + mod_name)
+
+					modules_to_start[mod_num] = true
+				} else if isModRunning(mod_num) && !modules_GL[mod_num].Enabled {
+					//log.Println("Stopping module: " + mod_name)
+
+					modules_to_stop[mod_num] = true
+				}
+			} else {
+				if isModRunning(mod_num) {
+					//log.Println("Stopping module: " + mod_name)
+
+					modules_to_stop[mod_num] = true
+				}
+			}
 		}
 
-		for {
-			var modules_to_start [Utils.MODS_ARRAY_SIZE]bool
-			var modules_to_stop [Utils.MODS_ARRAY_SIZE]bool
-
-			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
-				if mod_num == Utils.NUM_MOD_VISOR || mod_num == Utils.NUM_MOD_ModManager {
-					continue
-				}
-
-				// Only start the modules supported by the server or client depending on the VISOR_SERVER constant.
-				if Utils.VISOR_server_GL && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_SERVER == 0) {
-					continue
-				} else if !Utils.VISOR_server_GL && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_CLIENT == 0) {
-					continue
-				}
-
-				var module_supported bool = Utils.IsModSupportedMODULES(mod_num)
-
-				if module_supported {
-					if !mod_support_list[mod_num] {
-						// Module was not supported and now it is.
-						//log.Println("The following module is now supported on this machine: " + mod_name)
-
-						mod_support_list[mod_num] = true
-					}
-				} else {
-					if mod_support_list[mod_num] {
-						// Module was not supported and now it is.
-						//log.Println("The following module stopped being supported on this machine: " + mod_name)
-
-						mod_support_list[mod_num] = false
-					}
-				}
-
-				//log.Println("-----------------------")
-				//log.Println("Module " + mod_name + " is supported: " + strconv.FormatBool(module_supported))
-				//log.Println("Module " + mod_name + " is running: " + strconv.FormatBool(isModRunning(mod_num)))
-				//log.Println("Module " + mod_name + " is enabled: " + strconv.FormatBool(modules_GL[mod_num].Enabled))
-
-				if module_supported {
-					if !isModRunning(mod_num) && modules_GL[mod_num].Enabled {
-						//log.Println("Starting module: " + mod_name)
-
-						modules_to_start[mod_num] = true
-					} else if isModRunning(mod_num) && !modules_GL[mod_num].Enabled {
-						//log.Println("Stopping module: " + mod_name)
-
-						modules_to_stop[mod_num] = true
-					}
-				} else {
-					if isModRunning(mod_num) {
-						//log.Println("Stopping module: " + mod_name)
-
-						modules_to_stop[mod_num] = true
-					}
+		// Start the modules
+		for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
+			if modules_to_start[mod_num] && modules_GL[mod_num].Enabled {
+				var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE)
+				value.SetLong(value.GetLong(true) | (1 << mod_num), false)
+				modules_GL[mod_num].Stop = false
+				var start_func = _MAP_MOD_NUM_START[mod_num]
+				if start_func != nil {
+					start_func(&modules_GL[mod_num])
 				}
 			}
+		}
 
-			// Start the modules
-			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
-				if modules_to_start[mod_num] && modules_GL[mod_num].Enabled {
-					var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE)
-					value.SetLong(value.GetLong(true) | (1 << mod_num), false)
-					modules_GL[mod_num].Stop = false
-					var start_func = _MAP_MOD_NUM_START[mod_num]
-					if start_func != nil {
-						start_func(&modules_GL[mod_num])
-					}
-				}
+		// Stop the modules
+		for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
+			if modules_to_stop[mod_num] {
+				var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE)
+				value.SetLong(value.GetLong(true) & ^(1 << mod_num), false)
+				modules_GL[mod_num].Stop = true
 			}
+		}
 
-			// Stop the modules
-			for mod_num := 0; mod_num < Utils.MODS_ARRAY_SIZE; mod_num++ {
-				if modules_to_stop[mod_num] {
-					var value *UtilsSWA.Value = UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE)
-					value.SetLong(value.GetLong(true) & ^(1 << mod_num), false)
-					modules_GL[mod_num].Stop = true
-				}
-			}
+		//////////////////////////////////////////////////////////////////
 
-			//////////////////////////////////////////////////////////////////
-
-			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-				return
-			}
+		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+			return
 		}
 	}
 }

@@ -56,7 +56,6 @@ var modules_GL []Utils.Module = nil
 var content_container_GL *fyne.Container = nil
 
 var (
-	realMain      Utils.RealMain = nil
 	moduleInfo_GL Utils.ModuleInfo
 )
 func main() {
@@ -69,193 +68,191 @@ func main() {
 	}
 	Utils.ModStartup2(realMain, &module, false)
 }
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+func realMain(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		//////////////////////////////////////////
-		// Get the user settings
+	//////////////////////////////////////////
+	// Get the user settings
 
-		if err := Utils.ReadSettingsFile(true); err != nil {
-			log.Println("Failed to load user settings. Using empty ones...")
-			log.Println(err)
+	if err := Utils.ReadSettingsFile(true); err != nil {
+		log.Println("Failed to load user settings. Using empty ones...")
+		log.Println(err)
+	}
+
+	//////////////////////////////////////////
+	// Prepare to hide the window
+
+	if !isOpenGLSupported() {
+		log.Println("Required OpenGL version not supported. Exiting...")
+
+		return
+	}
+
+	if !Utils.WasArgUsedGENERAL(os.Args, "--nohide") {
+		// All mainly alright, let's hide the terminal window
+		if runtime.GOOS == "windows" {
+			maj, min, patch := Utils.GetOSVersionSYSTEM()
+			if maj >= 10 && min >= 0 && patch >= 19041 {
+				// Restart the process with conhost.exe on Windows to be able to actually hide the window if we're
+				// on Windows 10 Build 2004 or newer (because of the new Windows Terminal).
+				if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
+					if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])),
+							"--conhost") {
+						return
+					}
+				}
+			}
 		}
+		Utils.HideConsoleWindowPROCESSES()
+	}
 
-		//////////////////////////////////////////
-		// Prepare to hide the window
+	//////////////////////////////////////////
+	// No terminal window from here on
 
-		if !isOpenGLSupported() {
-			log.Println("Required OpenGL version not supported. Exiting...")
+	Utils.StartCommunicatorSERVER()
+
+	// Keep syncing the user settings with the server.
+	SettingsSync.SyncUserSettings()
+
+	ClientRegKeys.RegisterValues()
+
+	for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
+		modules_GL = append(modules_GL, Utils.Module{
+			Num:     i,
+			Name:    Utils.GetModNameMODULES(i),
+			Stop:    true,
+			Stopped: true,
+			Enabled: true,
+		})
+	}
+	modules_GL[Utils.NUM_MOD_VISOR].Stop = false
+	modules_GL[Utils.NUM_MOD_VISOR].Stopped = false
+	// The Manager needs to be started first. It'll handle the others.
+	modules_GL[Utils.NUM_MOD_ModManager].Stop = false
+
+	ModulesManager.Start(modules_GL)
+
+	// Create a new application
+	my_app_GL = app.NewWithID("com.edw590.visor_c")
+	my_app_GL.SetIcon(Logo.LogoAdaptiveAllModded)
+	my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
+	my_window_GL.Resize(fyne.NewSize(640, 480))
+	Screens.Current_window_GL = my_window_GL
+
+	go processCommsChannel()
+
+	// Create the content area with a label to display different screens
+	content_container_GL = container.NewStack()
+
+	// Set the initial screen and lock the app right when it starts.
+	Screens.Current_screen_GL = Screens.ID_MOD_GPT_COMM
+	lockApp()
+
+	var nav_bar *widget.Tree = &widget.Tree{
+		ChildUIDs: func(uid string) []string {
+			return tree_index[uid]
+		},
+		IsBranch: func(uid string) bool {
+			children, ok := tree_index[uid]
+
+			return ok && len(children) > 0
+		},
+		CreateNode: func(branch bool) fyne.CanvasObject {
+			return widget.NewLabel("Collection Widgets")
+		},
+		UpdateNode: func(uid string, branch bool, obj fyne.CanvasObject) {
+			t, ok := screens_GL[uid]
+			if !ok {
+				fyne.LogError("Missing tutorial panel: " + uid, nil)
+				return
+			}
+			obj.(*widget.Label).SetText(t)
+		},
+		OnSelected: func(uid string) {
+			showScreen(uid)
+		},
+	}
+
+	var themes *fyne.Container = container.NewGridWithColumns(2,
+		widget.NewButton("Dark", func() {
+			my_app_GL.Settings().SetTheme(theme.DarkTheme())
+		}),
+		widget.NewButton("Light", func() {
+			my_app_GL.Settings().SetTheme(theme.LightTheme())
+		}),
+		widget.NewButton("Auto", func() {
+			my_app_GL.Settings().SetTheme(theme.DefaultTheme())
+		}),
+		widget.NewButton("Lock", func() {
+			if Utils.User_settings_GL.General.Pin == "" {
+				dialog.ShowInformation("No PIN set", "You need to set a PIN in the settings to lock the app.",
+					my_window_GL)
+
+				return
+			}
+
+			lockApp()
+		}),
+	)
+
+	var sidebar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
+
+	// Create a split container to hold the sidebar and the content
+	var split *container.Split = container.NewHSplit(sidebar, content_container_GL)
+	split.SetOffset(0.2) // Set the split ratio (20% for sidebar, 80% for content)
+
+	// Set the content of the window
+	my_window_GL.SetContent(split)
+
+	// Add system tray functionality
+	if desk, ok := my_app_GL.(desktop.App); ok {
+		var icon *fyne.StaticResource = Logo.LogoAdaptiveAllModded
+		var menu *fyne.Menu = fyne.NewMenu("Tray",
+			fyne.NewMenuItem("Show", func() {
+				showWindow()
+			}),
+			fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
+				quitApp(modules_GL)
+			}),
+		)
+		desk.SetSystemTrayMenu(menu)
+		desk.SetSystemTrayIcon(icon)
+	}
+
+	// Minimize to tray on close
+	my_window_GL.SetCloseIntercept(func() {
+		if !UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MINIMIZE_TO_TRAY).GetBool(true) {
+			quitApp(modules_GL)
 
 			return
 		}
 
-		if !Utils.WasArgUsedGENERAL(os.Args, "--nohide") {
-			// All mainly alright, let's hide the terminal window
-			if runtime.GOOS == "windows" {
-				maj, min, patch := Utils.GetOSVersionSYSTEM()
-				if maj >= 10 && min >= 0 && patch >= 19041 {
-					// Restart the process with conhost.exe on Windows to be able to actually hide the window if we're
-					// on Windows 10 Build 2004 or newer (because of the new Windows Terminal).
-					if !Utils.WasArgUsedGENERAL(os.Args, "--conhost") {
-						if Utils.StartConAppPROCESSES(Utils.GetBinDirFILESDIRS().Add2(true, filepath.Base(os.Args[0])),
-								"--conhost") {
-							return
-						}
-					}
-				}
-			}
-			Utils.HideConsoleWindowPROCESSES()
-		}
+		my_window_GL.Hide()
 
-		//////////////////////////////////////////
-		// No terminal window from here on
+		// Create and send one-time notification
+		var notification_title string = "V.I.S.O.R. minimized"
+		var notification_text string = "I'm still running in the background. To quit, use the system tray menu."
+		notification := fyne.NewNotification(notification_title, notification_text)
+		my_app_GL.SendNotification(notification)
+	})
 
-		Utils.StartCommunicatorSERVER()
-
-		// Keep syncing the user settings with the server.
-		SettingsSync.SyncUserSettings()
-
-		ClientRegKeys.RegisterValues()
-
-		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
-			modules_GL = append(modules_GL, Utils.Module{
-				Num:     i,
-				Name:    Utils.GetModNameMODULES(i),
-				Stop:    true,
-				Stopped: true,
-				Enabled: true,
-			})
-		}
-		modules_GL[Utils.NUM_MOD_VISOR].Stop = false
-		modules_GL[Utils.NUM_MOD_VISOR].Stopped = false
-		// The Manager needs to be started first. It'll handle the others.
-		modules_GL[Utils.NUM_MOD_ModManager].Stop = false
-
-		ModulesManager.Start(modules_GL)
-
-		// Create a new application
-		my_app_GL = app.NewWithID("com.edw590.visor_c")
-		my_app_GL.SetIcon(Logo.LogoAdaptiveAllModded)
-		my_window_GL = my_app_GL.NewWindow("V.I.S.O.R.")
-		my_window_GL.Resize(fyne.NewSize(640, 480))
-		Screens.Current_window_GL = my_window_GL
-
-		go processCommsChannel()
-
-		// Create the content area with a label to display different screens
-		content_container_GL = container.NewStack()
-
-		// Set the initial screen and lock the app right when it starts.
-		Screens.Current_screen_GL = Screens.ID_MOD_GPT_COMM
-		lockApp()
-
-		var nav_bar *widget.Tree = &widget.Tree{
-			ChildUIDs: func(uid string) []string {
-				return tree_index[uid]
-			},
-			IsBranch: func(uid string) bool {
-				children, ok := tree_index[uid]
-
-				return ok && len(children) > 0
-			},
-			CreateNode: func(branch bool) fyne.CanvasObject {
-				return widget.NewLabel("Collection Widgets")
-			},
-			UpdateNode: func(uid string, branch bool, obj fyne.CanvasObject) {
-				t, ok := screens_GL[uid]
-				if !ok {
-					fyne.LogError("Missing tutorial panel: " + uid, nil)
-					return
-				}
-				obj.(*widget.Label).SetText(t)
-			},
-			OnSelected: func(uid string) {
-				showScreen(uid)
-			},
-		}
-
-		var themes *fyne.Container = container.NewGridWithColumns(2,
-			widget.NewButton("Dark", func() {
-				my_app_GL.Settings().SetTheme(theme.DarkTheme())
-			}),
-			widget.NewButton("Light", func() {
-				my_app_GL.Settings().SetTheme(theme.LightTheme())
-			}),
-			widget.NewButton("Auto", func() {
-				my_app_GL.Settings().SetTheme(theme.DefaultTheme())
-			}),
-			widget.NewButton("Lock", func() {
-				if Utils.User_settings_GL.General.Pin == "" {
-					dialog.ShowInformation("No PIN set", "You need to set a PIN in the settings to lock the app.",
-						my_window_GL)
-
-					return
-				}
-
-				lockApp()
-			}),
-		)
-
-		var sidebar *fyne.Container = container.NewBorder(nil, themes, nil, nil, nav_bar)
-
-		// Create a split container to hold the sidebar and the content
-		var split *container.Split = container.NewHSplit(sidebar, content_container_GL)
-		split.SetOffset(0.2) // Set the split ratio (20% for sidebar, 80% for content)
-
-		// Set the content of the window
-		my_window_GL.SetContent(split)
-
-		// Add system tray functionality
-		if desk, ok := my_app_GL.(desktop.App); ok {
-			var icon *fyne.StaticResource = Logo.LogoAdaptiveAllModded
-			var menu *fyne.Menu = fyne.NewMenu("Tray",
-				fyne.NewMenuItem("Show", func() {
-					showWindow()
-				}),
-				fyne.NewMenuItem("Quit (USE THIS ONE)", func() {
-					quitApp(modules_GL)
-				}),
-			)
-			desk.SetSystemTrayMenu(menu)
-			desk.SetSystemTrayIcon(icon)
-		}
-
-		// Minimize to tray on close
-		my_window_GL.SetCloseIntercept(func() {
-			if !UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MINIMIZE_TO_TRAY).GetBool(true) {
+	go func() {
+		for {
+			if *module_stop {
+				SettingsSync.StopUserSettingsSyncer()
 				quitApp(modules_GL)
 
 				return
 			}
 
-			my_window_GL.Hide()
+			Utils.WriteSettingsFile(true)
 
-			// Create and send one-time notification
-			var notification_title string = "V.I.S.O.R. minimized"
-			var notification_text string = "I'm still running in the background. To quit, use the system tray menu."
-			notification := fyne.NewNotification(notification_title, notification_text)
-			my_app_GL.SendNotification(notification)
-		})
+			time.Sleep(5 * time.Second)
+		}
+	}()
 
-		go func() {
-			for {
-				if *module_stop {
-					SettingsSync.StopUserSettingsSyncer()
-					quitApp(modules_GL)
-
-					return
-				}
-
-				Utils.WriteSettingsFile(true)
-
-				time.Sleep(5 * time.Second)
-			}
-		}()
-
-		// Show and run the application
-		my_window_GL.ShowAndRun()
-	}
+	// Show and run the application
+	my_window_GL.ShowAndRun()
 }
 
 func showScreen(uid string) {

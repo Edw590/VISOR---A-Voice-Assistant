@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -33,7 +33,6 @@ import (
 )
 
 var (
-	realMain        Utils.RealMain = nil
 	moduleInfo_GL   Utils.ModuleInfo
 )
 func main() {
@@ -46,77 +45,75 @@ func main() {
 	}
 	Utils.ModStartup2(realMain, &module, true)
 }
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+func realMain(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
 
-		if Utils.Gen_settings_GL.Device_settings.Id == "" || Utils.Gen_settings_GL.Device_settings.Type_ == "" ||
-				Utils.Gen_settings_GL.Device_settings.Description == "" {
-			log.Println("Device settings incomplete. Please enter the missing one(s):")
-			if Utils.Gen_settings_GL.Device_settings.Id == "" {
-				Utils.Gen_settings_GL.Device_settings.Id = Utils.GetInputString("Unique device ID: ")
-			}
-			if Utils.Gen_settings_GL.Device_settings.Type_ == "" {
-				Utils.Gen_settings_GL.Device_settings.Type_ = Utils.GetInputString("Device type (for example " +
-					"\"computer\"): ")
-			}
-			if Utils.Gen_settings_GL.Device_settings.Description == "" {
-				Utils.Gen_settings_GL.Device_settings.Description = Utils.GetInputString("Device description (for " +
-					"example the model, \"Legion Y520\"): ")
-			}
+	if Utils.Gen_settings_GL.Device_settings.Id == "" || Utils.Gen_settings_GL.Device_settings.Type_ == "" ||
+			Utils.Gen_settings_GL.Device_settings.Description == "" {
+		log.Println("Device settings incomplete. Please enter the missing one(s):")
+		if Utils.Gen_settings_GL.Device_settings.Id == "" {
+			Utils.Gen_settings_GL.Device_settings.Id = Utils.GetInputString("Unique device ID: ")
 		}
-
-		if err := Utils.ReadSettingsFile(true); err != nil {
-			log.Println("Failed to load user settings. Exiting...")
-
-			return
+		if Utils.Gen_settings_GL.Device_settings.Type_ == "" {
+			Utils.Gen_settings_GL.Device_settings.Type_ = Utils.GetInputString("Device type (for example " +
+				"\"computer\"): ")
 		}
-
-		if !Utils.RunningAsAdminPROCESSES() {
-			log.Println("Not running as administrator/root. Exiting...")
-
-			return
+		if Utils.Gen_settings_GL.Device_settings.Description == "" {
+			Utils.Gen_settings_GL.Device_settings.Description = Utils.GetInputString("Device description (for " +
+				"example the model, \"Legion Y520\"): ")
 		}
-
-		ServerRegKeys.RegisterValues()
-
-		var modules []Utils.Module
-		for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
-			modules = append(modules, Utils.Module{
-				Num:     i,
-				Name:    Utils.GetModNameMODULES(i),
-				Stop:    true,
-				Stopped: true,
-				Enabled: true,
-			})
-		}
-		modules[Utils.NUM_MOD_VISOR].Stop = false
-		modules[Utils.NUM_MOD_VISOR].Stopped = false
-		// The Manager needs to be started first. It'll handle the others.
-		modules[Utils.NUM_MOD_ModManager].Stop = false
-
-		ModulesManager.Start(modules)
-
-		handleCtrlCGracefully(module_stop)
-
-		var status bool = Utils.WasArgUsedGENERAL(os.Args, "--status")
-
-		for {
-			// Wait forever while the other modules do their work
-			if status {
-				printModulesStatus(modules)
-			}
-
-			Utils.WriteSettingsFile(true)
-
-			if Utils.WaitWithStopTIMEDATE(module_stop, 5) {
-				break
-			}
-		}
-
-		Utils.CloseCommsChannels()
-		Utils.SignalModulesStopMODULES(modules)
 	}
+
+	if err := Utils.ReadSettingsFile(true); err != nil {
+		log.Println("Failed to load user settings. Exiting...")
+
+		return
+	}
+
+	if !Utils.RunningAsAdminPROCESSES() {
+		log.Println("Not running as administrator/root. Exiting...")
+
+		return
+	}
+
+	ServerRegKeys.RegisterValues()
+
+	var modules []Utils.Module
+	for i := 0; i < Utils.MODS_ARRAY_SIZE; i++ {
+		modules = append(modules, Utils.Module{
+			Num:     i,
+			Name:    Utils.GetModNameMODULES(i),
+			Stop:    true,
+			Stopped: true,
+			Enabled: true,
+		})
+	}
+	modules[Utils.NUM_MOD_VISOR].Stop = false
+	modules[Utils.NUM_MOD_VISOR].Stopped = false
+	// The Manager needs to be started first. It'll handle the others.
+	modules[Utils.NUM_MOD_ModManager].Stop = false
+
+	ModulesManager.Start(modules)
+
+	handleCtrlCGracefully(module_stop)
+
+	var status bool = Utils.WasArgUsedGENERAL(os.Args, "--status")
+
+	for {
+		// Wait forever while the other modules do their work
+		if status {
+			printModulesStatus(modules)
+		}
+
+		Utils.WriteSettingsFile(true)
+
+		if Utils.WaitWithStopTIMEDATE(module_stop, 5) {
+			break
+		}
+	}
+
+	Utils.CloseCommsChannels()
+	Utils.SignalModulesStopMODULES(modules)
 }
 
 func handleCtrlCGracefully(module_stop *bool) {

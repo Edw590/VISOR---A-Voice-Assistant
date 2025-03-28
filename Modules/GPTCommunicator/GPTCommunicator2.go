@@ -44,111 +44,108 @@ const _TIME_SLEEP_S int = 1
 var module_stop_GL *bool = nil
 
 var (
-	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
 	modGenInfo_GL  *ModsFileInfo.Mod7GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
-		modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
+	modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
-		module_stop_GL = module_stop
+	module_stop_GL = module_stop
 
-		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
+	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
 
-		if modUserInfo_GL.Model_name == "" || modUserInfo_GL.Context_size == 0 {
-			time.Sleep(2 * time.Second)
+	if modUserInfo_GL.Model_name == "" || modUserInfo_GL.Context_size == 0 {
+		time.Sleep(2 * time.Second)
 
+		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
+
+		return
+	}
+
+	if modGenInfo_GL.N_mems_when_last_memorized == 0 {
+		modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
+	}
+
+	// Prepare the session for the temp and dumb sessions
+	addSessionEntry("temp", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
+	addSessionEntry("dumb", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
+
+	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+
+	// In case Ollama was started (as opposed to already being running), send a test message for it to actually
+	// start and be ready.
+	chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "temp")
+
+	go autoMemorize()
+
+	// Process the text to input to the LLM model
+	for {
+		var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+		var file_list []Utils.FileInfo = to_process_dir.GetFileList()
+		for len(file_list) > 0 {
+			file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
+			var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
+
+			var to_process string = *file_path.ReadTextFile()
+			if to_process != "" {
+				// It comes like: "[device ID|session type]text"
+				var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
+				var device_id = params_split[0]
+				var session_type = params_split[1]
+
+				var text string = to_process[strings.Index(to_process, "]") + 1:]
+
+				var session_id string = ""
+				switch session_type {
+					case GPTComm.SESSION_TYPE_NEW:
+						session_id = Utils.RandStringGENERAL(10)
+					case GPTComm.SESSION_TYPE_TEMP:
+						session_id = "temp"
+					case GPTComm.SESSION_TYPE_ACTIVE:
+						session_id = getActiveSessionId()
+						if session_id == "" {
+							session_id = Utils.RandStringGENERAL(10)
+						}
+					default:
+						session_id = session_type
+				}
+
+				// Control commands begin with a slash
+				if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
+					// Ask Wolfram Alpha the question
+					var question string = text[strings.Index(text, ASK_WOLFRAM_ALPHA)+len(ASK_WOLFRAM_ALPHA):]
+					result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
+
+					if direct_result {
+						_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
+							". " + getEndString(), true)
+					} else {
+						sendToGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
+							session_id)
+					}
+				} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
+					// Search for the Wikipedia page title
+					var query string = text[strings.Index(text, SEARCH_WIKIPEDIA)+len(SEARCH_WIKIPEDIA):]
+
+					_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
+						getEndString(), true)
+				} else {
+					sendToGPT(device_id, text, session_id)
+				}
+			}
+
+			Utils.DelElemSLICES(&file_list, idx_to_remove)
+			_ = os.Remove(file_path.GPathToStringConversion())
+		}
+
+		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
 			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 			return
-		}
-
-		if modGenInfo_GL.N_mems_when_last_memorized == 0 {
-			modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
-		}
-
-		// Prepare the session for the temp and dumb sessions
-		addSessionEntry("temp", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
-		addSessionEntry("dumb", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
-
-		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
-
-		// In case Ollama was started (as opposed to already being running), send a test message for it to actually
-		// start and be ready.
-		chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "temp")
-
-		go autoMemorize()
-
-		// Process the text to input to the LLM model
-		for {
-			var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
-			var file_list []Utils.FileInfo = to_process_dir.GetFileList()
-			for len(file_list) > 0 {
-				file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
-				var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
-
-				var to_process string = *file_path.ReadTextFile()
-				if to_process != "" {
-					// It comes like: "[device ID|session type]text"
-					var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
-					var device_id = params_split[0]
-					var session_type = params_split[1]
-
-					var text string = to_process[strings.Index(to_process, "]") + 1:]
-
-					var session_id string = ""
-					switch session_type {
-						case GPTComm.SESSION_TYPE_NEW:
-							session_id = Utils.RandStringGENERAL(10)
-						case GPTComm.SESSION_TYPE_TEMP:
-							session_id = "temp"
-						case GPTComm.SESSION_TYPE_ACTIVE:
-							session_id = getActiveSessionId()
-							if session_id == "" {
-								session_id = Utils.RandStringGENERAL(10)
-							}
-						default:
-							session_id = session_type
-					}
-
-					// Control commands begin with a slash
-					if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
-						// Ask Wolfram Alpha the question
-						var question string = text[strings.Index(text, ASK_WOLFRAM_ALPHA)+len(ASK_WOLFRAM_ALPHA):]
-						result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
-
-						if direct_result {
-							_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
-								". " + getEndString(), true)
-						} else {
-							sendToGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
-								session_id)
-						}
-					} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
-						// Search for the Wikipedia page title
-						var query string = text[strings.Index(text, SEARCH_WIKIPEDIA)+len(SEARCH_WIKIPEDIA):]
-
-						_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
-							getEndString(), true)
-					} else {
-						sendToGPT(device_id, text, session_id)
-					}
-				}
-
-				Utils.DelElemSLICES(&file_list, idx_to_remove)
-				_ = os.Remove(file_path.GPathToStringConversion())
-			}
-
-			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-				modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
-
-				return
-			}
 		}
 	}
 }

@@ -47,73 +47,70 @@ var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
 var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
 
 var (
-	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
 	modUserInfo_GL *ModsFileInfo.Mod8UserInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modUserInfo_GL = &Utils.User_settings_GL.WebsiteBackend
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modUserInfo_GL = &Utils.User_settings_GL.WebsiteBackend
 
-		go func() {
-			for {
-				var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0)
-				if comms_map == nil {
-					return
-				}
-				map_value, ok := comms_map["Message"]
-				if !ok {
-					continue
-				}
-
-				var message []byte = map_value.([]byte)
-				for i := 0; i < MAX_CHANNELS; i++ {
-					if used_channels_GL[i] {
-						channels_GL[i] <- message
-					}
-				}
-			}
-		}()
-
-		var srv *http.Server = nil
-		go func() {
-			Tcef.Tcef{
-				Try: func() {
-					// Try to register. If it's already registered, ignore the panic.
-					http.HandleFunc("/ws", basicAuth(webSocketsHandler))
-				},
-			}.Do()
-
-			//log.Println("Server running on port 3234")
-			srv = &http.Server{Addr: ":3234"}
-			err := srv.ListenAndServeTLS(modUserInfo_GL.Crt_file, modUserInfo_GL.Key_file)
-			if err != nil {
-				log.Println("ListenAndServeTLS error:", err)
-			}
-		}()
-
-		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-		defer cancel()
-
+	go func() {
 		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
-				_ = srv.Shutdown(ctx)
-
-				for i := 0; i < MAX_CHANNELS; i++ {
-					if used_channels_GL[i] {
-						// Ignore the panic in case the channel is already closed (happened).
-						Tcef.Tcef{
-							Try: func() {
-								close(channels_GL[i])
-							},
-						}.Do()
-					}
-				}
-
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0)
+			if comms_map == nil {
 				return
 			}
+			map_value, ok := comms_map["Message"]
+			if !ok {
+				continue
+			}
+
+			var message []byte = map_value.([]byte)
+			for i := 0; i < MAX_CHANNELS; i++ {
+				if used_channels_GL[i] {
+					channels_GL[i] <- message
+				}
+			}
+		}
+	}()
+
+	var srv *http.Server = nil
+	go func() {
+		Tcef.Tcef{
+			Try: func() {
+				// Try to register. If it's already registered, ignore the panic.
+				http.HandleFunc("/ws", basicAuth(webSocketsHandler))
+			},
+		}.Do()
+
+		//log.Println("Server running on port 3234")
+		srv = &http.Server{Addr: ":3234"}
+		err := srv.ListenAndServeTLS(modUserInfo_GL.Crt_file, modUserInfo_GL.Key_file)
+		if err != nil {
+			log.Println("ListenAndServeTLS error:", err)
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
+	for {
+		if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
+			_ = srv.Shutdown(ctx)
+
+			for i := 0; i < MAX_CHANNELS; i++ {
+				if used_channels_GL[i] {
+					// Ignore the panic in case the channel is already closed (happened).
+					Tcef.Tcef{
+						Try: func() {
+							close(channels_GL[i])
+						},
+					}.Do()
+				}
+			}
+
+			return
 		}
 	}
 }

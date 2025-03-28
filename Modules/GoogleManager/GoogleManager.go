@@ -41,42 +41,39 @@ var _SCOPES = []string{
 }
 
 var (
-	realMain       Utils.RealMain = nil
 	moduleInfo_GL  Utils.ModuleInfo
 	modGenInfo_GL  *ModsFileInfo.Mod14GenInfo = &Utils.Gen_settings_GL.MOD_14
 )
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_14
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_14
 
-		for {
-			modGenInfo_GL.Token_invalid = true
+	for {
+		modGenInfo_GL.Token_invalid = true
 
-			// Parse credentials to config
-			config, err := ParseConfigJSON()
-			if err != nil {
-				log.Printf("Unable to parse client secret file to config: %v\n", err)
+		// Parse credentials to config
+		config, err := ParseConfigJSON()
+		if err != nil {
+			log.Printf("Unable to parse client secret file to config: %v\n", err)
 
-				return
-			}
-			client := getClient(config)
-			if client == nil {
-				//log.Println("No token saved")
+			return
+		}
+		client := getClient(config)
+		if client == nil {
+			//log.Println("No token saved")
 
-				return
-			}
+			return
+		}
 
-			// Store calendar events
-			storeCalendarsEvents(client)
+		// Store calendar events
+		storeCalendarsEvents(client)
 
-			// Store tasks
-			storeTasks(client)
+		// Store tasks
+		storeTasks(client)
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
-				return
-			}
+		if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
+			return
 		}
 	}
 }
