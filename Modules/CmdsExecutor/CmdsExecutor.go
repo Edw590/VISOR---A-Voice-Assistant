@@ -48,11 +48,11 @@ var last_and string = ""
 var last_and_when int64 = 0
 
 var (
-	moduleInfo_GL  Utils.ModuleInfo
+	modDirsInfo_GL  Utils.ModDirsInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	ACD.ReloadCmdsArray(prepareCommandsString())
 

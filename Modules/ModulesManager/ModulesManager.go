@@ -34,14 +34,14 @@ const _TIME_SLEEP_S int = 5
 var modules_GL []Utils.Module
 
 var (
-	moduleInfo_GL Utils.ModuleInfo
+	modDirsInfo_GL Utils.ModDirsInfo
 )
 func Start(modules []Utils.Module) {
 	modules_GL = modules
 	Utils.ModStartup(main, &modules_GL[Utils.NUM_MOD_ModManager])
 }
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_MODULES_ACTIVE).SetLong(0, false)
 
@@ -61,9 +61,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 			}
 
 			// Only start the modules supported by the server or client depending on the VISOR_SERVER constant.
-			if Utils.VISOR_server_GL && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_SERVER == 0) {
+			if Utils.VISOR_server_GL && (Utils.MOD_NUMS_INFO[mod_num].C_S_support & Utils.MOD_SERVER == 0) {
 				continue
-			} else if !Utils.VISOR_server_GL && (Utils.MOD_NUMS_SUPPORT[mod_num] & Utils.MOD_CLIENT == 0) {
+			} else if !Utils.VISOR_server_GL && (Utils.MOD_NUMS_INFO[mod_num].C_S_support & Utils.MOD_CLIENT == 0) {
 				continue
 			}
 

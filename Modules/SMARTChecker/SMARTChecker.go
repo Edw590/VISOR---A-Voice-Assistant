@@ -40,13 +40,13 @@ const _SHORT_TEST_EACH_S int64 = 5*60*60*99999999999 // oo hours (test disabled)
 const _TIME_SLEEP_S int = 60
 
 var (
-	moduleInfo_GL   Utils.ModuleInfo
+	modDirsInfo_GL   Utils.ModDirsInfo
 	modGenInfo_GL   *ModsFileInfo.Mod3GenInfo
 	modUserInfo_GL  *ModsFileInfo.Mod3UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_3
 	modUserInfo_GL = &Utils.User_settings_GL.SMARTChecker
 

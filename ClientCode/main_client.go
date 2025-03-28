@@ -56,7 +56,7 @@ var modules_GL []Utils.Module = nil
 var content_container_GL *fyne.Container = nil
 
 var (
-	moduleInfo_GL Utils.ModuleInfo
+	modDirsInfo_GL Utils.ModDirsInfo
 )
 func main() {
 	var module Utils.Module = Utils.Module{
@@ -69,7 +69,7 @@ func main() {
 	Utils.ModStartup2(realMain, &module, false)
 }
 func realMain(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	//////////////////////////////////////////
 	// Get the user settings

@@ -245,8 +245,8 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 
 func getVisorIntroAndMemories() (string, string) {
 	// Load visor introduction text
-	var visor_intro string = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-	//var visor_functions = *moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "functions.json").ReadTextFile()
+	var visor_intro string = *modDirsInfo_GL.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
+	//var visor_functions = *modDirsInfo_GL.ProgramData.Add2(false, "functions.json").ReadTextFile()
 	//visor_intro = strings.Replace(visor_intro, "3234_FUNCTIONS", visor_functions, -1)
 	visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
 	visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)

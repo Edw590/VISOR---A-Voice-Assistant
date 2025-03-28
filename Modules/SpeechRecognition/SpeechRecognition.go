@@ -32,16 +32,16 @@ var in_GL []int16
 var stream_GL *portaudio.Stream
 
 var (
-	moduleInfo_GL Utils.ModuleInfo
+	modDirsInfo_GL Utils.ModDirsInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	porcupine_ := porcupine.Porcupine{
 		AccessKey: Utils.User_settings_GL.General.Picovoice_API_key, // from Picovoice Console (https://console.picovoice.ai/)
 		KeywordPaths: []string{
-			moduleInfo_GL.ModDirsInfo.ProgramData.Add2(false, "Hey-Visor_en_windows_v3_0_0.ppn").GPathToStringConversion(),
+			modDirsInfo_GL.ProgramData.Add2(false, "Hey-Visor_en_windows_v3_0_0.ppn").GPathToStringConversion(),
 		},
 	}
 	err := porcupine_.Init()

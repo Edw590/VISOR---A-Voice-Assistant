@@ -44,13 +44,13 @@ const _TIME_SLEEP_S int = 1
 var module_stop_GL *bool = nil
 
 var (
-	moduleInfo_GL  Utils.ModuleInfo
+	modDirsInfo_GL  Utils.ModDirsInfo
 	modGenInfo_GL  *ModsFileInfo.Mod7GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
 	modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
@@ -84,7 +84,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 	// Process the text to input to the LLM model
 	for {
-		var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+		var to_process_dir Utils.GPath = modDirsInfo_GL.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
 		var file_list []Utils.FileInfo = to_process_dir.GetFileList()
 		for len(file_list) > 0 {
 			file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
@@ -254,7 +254,7 @@ checkStopSpeech checks if the text to process contains the /stop command.
   - true if the /stop command was found, false otherwise
 */
 func checkStopSpeech() bool {
-	var to_process_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
+	var to_process_dir Utils.GPath = modDirsInfo_GL.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
 	var file_list []Utils.FileInfo = to_process_dir.GetFileList()
 	for len(file_list) > 0 {
 		file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)

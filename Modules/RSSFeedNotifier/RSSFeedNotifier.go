@@ -77,13 +77,13 @@ const _MAX_URLS_STORED int = 100
 const _TIME_SLEEP_S int = 2*60
 
 var (
-	moduleInfo_GL  Utils.ModuleInfo
+	modDirsInfo_GL  Utils.ModDirsInfo
 	modGenInfo_GL  *ModsFileInfo.Mod4GenInfo
 	modUserInfo_GL *ModsFileInfo.Mod4UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_4
 	modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
 
@@ -326,7 +326,7 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 	//}
 
 	// Write the HTML to a file in case debugging is needed.
-	_ = moduleInfo_GL.ModDirsInfo.Temp.Add2(false, "last_html_queued.html").WriteTextFile(html, false)
+	_ = modDirsInfo_GL.Temp.Add2(false, "last_html_queued.html").WriteTextFile(html, false)
 
 	err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
 		Sender:  sender_name,

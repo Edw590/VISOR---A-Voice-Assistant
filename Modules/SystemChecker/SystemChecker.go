@@ -47,12 +47,12 @@ type _MousePosition struct {
 }
 
 var (
-	moduleInfo_GL Utils.ModuleInfo
+	modDirsInfo_GL Utils.ModDirsInfo
 	modGenInfo_GL *ModsFileInfo.Mod10GenInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_10
 
 	var curr_mouse_position _MousePosition

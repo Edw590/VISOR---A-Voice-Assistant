@@ -47,12 +47,12 @@ var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
 var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
 
 var (
-	moduleInfo_GL  Utils.ModuleInfo
+	modDirsInfo_GL  Utils.ModDirsInfo
 	modUserInfo_GL *ModsFileInfo.Mod8UserInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 	modUserInfo_GL = &Utils.User_settings_GL.WebsiteBackend
 
 	go func() {

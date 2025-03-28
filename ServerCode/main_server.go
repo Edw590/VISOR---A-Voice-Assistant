@@ -33,7 +33,7 @@ import (
 )
 
 var (
-	moduleInfo_GL   Utils.ModuleInfo
+	modDirsInfo_GL   Utils.ModDirsInfo
 )
 func main() {
 	var module Utils.Module = Utils.Module{
@@ -46,7 +46,7 @@ func main() {
 	Utils.ModStartup2(realMain, &module, true)
 }
 func realMain(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	if Utils.Gen_settings_GL.Device_settings.Id == "" || Utils.Gen_settings_GL.Device_settings.Type_ == "" ||
 			Utils.Gen_settings_GL.Device_settings.Description == "" {

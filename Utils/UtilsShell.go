@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -178,7 +178,7 @@ func GetShellSHELL(windows_shell string, linux_shell string) string {
 }
 
 /*
-CheckTerminalProgramAvailable checks if a terminal program is available in the system.
+CheckIfProgramIsAvailable checks if a program is available in the system through the PATH.
 
 -----------------------------------------------------------
 
@@ -187,8 +187,8 @@ CheckTerminalProgramAvailable checks if a terminal program is available in the s
 
 – Returns:
   - true if the program is available, false otherwise
- */
-func CheckTerminalProgramAvailable(program_name string) bool {
+*/
+func CheckIfProgramIsAvailable(program_name string) bool {
 	var cmd_output CmdOutput
 	var err error
 	if runtime.GOOS == "windows" {

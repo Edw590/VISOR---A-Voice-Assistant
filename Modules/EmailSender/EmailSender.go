@@ -45,15 +45,15 @@ type emailSent struct {
 }
 
 var (
-	moduleInfo_GL  Utils.ModuleInfo
+	modDirsInfo_GL  Utils.ModDirsInfo
 	modGenInfo_GL  *ModsFileInfo.Mod5GenInfo
 )
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
-	moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_5
 
-	var to_send_dir Utils.GPath = moduleInfo_GL.ModDirsInfo.UserData.Add2(true, Utils.TO_SEND_REL_FOLDER)
+	var to_send_dir Utils.GPath = modDirsInfo_GL.UserData.Add2(true, Utils.TO_SEND_REL_FOLDER)
 	if !to_send_dir.Exists() {
 		_ = to_send_dir.Create(false)
 	}
