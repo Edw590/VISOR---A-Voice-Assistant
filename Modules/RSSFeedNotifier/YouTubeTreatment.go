@@ -295,7 +295,7 @@ func isShort(video_texts []string, video_len string) bool {
 	// If any of the video texts has the #short or #shorts tag, mark as Short.
 	for _, video_text := range video_texts {
 		video_text_words := strings.Split(strings.ToLower(video_text), " ")
-		if slices.Contains(video_text_words, "#short") || slices.Contains(video_text_words, "#shorts") {
+		if slices.Contains(video_text_words, "#short") { // #short or #shorts
 			return true
 		}
 	}
@@ -305,7 +305,7 @@ func isShort(video_texts []string, video_len string) bool {
 		return false
 	}
 
-	// Lastly, if none of the others worked (a video can be a Short and not have the tags), if the video is 1 minute or
+	// Lastly, if none of the others worked (a video can be a Short and not have the tags), if the video is 3 minutes or
 	// less long, mark it as Short.
 	var length_seconds = 0
 	if len(Utils.FindAllIndexesGENERAL(video_len, ":")) == 1 {
@@ -316,5 +316,5 @@ func isShort(video_texts []string, video_len string) bool {
 		length_seconds = length_parsed.Hour()*60*60 + length_parsed.Minute()*60 + length_parsed.Second()
 	}
 
-	return length_seconds <= 60
+	return length_seconds <= 3*60
 }
