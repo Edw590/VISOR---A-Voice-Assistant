@@ -28,6 +28,8 @@ import (
 	"time"
 )
 
+const ROLE_USER string = "USER"
+const ROLE_TOOL string = "TOOL"
 const SESSION_TYPE_NEW string = "NEW"
 const SESSION_TYPE_TEMP string = "TEMP"
 const SESSION_TYPE_ACTIVE string = "ACTIVE"
@@ -39,19 +41,24 @@ SendText sends the given text to the LLM model.
 – Params:
   - text – the text to send or an empty string to just get the return value
   - session_type – one of the SESSION_TYPE_-started constants or a session ID (ignored in case `text` is empty)
+  - role – the role of the message (one of the ROLE_-started constants)
+  - more_coming – whether more messages are coming or not and the LLM should wait for them before replying
 
 – Returns:
   - the state of the GPT Communicator module
 */
-func SendText(text string, session_type string) int32 {
+func SendText(text string, session_type string, role string, more_coming bool) int32 {
 	var message []byte = []byte("GPT|")
 	if text != "" {
 		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
 		var date_time string = time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04")
 
-		var new_text string = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
+		var new_text string = text
+		if role == ROLE_USER {
+			new_text = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
+		}
 		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id + "|" +
-			session_type+ "]" + new_text)...)
+			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "]" + new_text)...)
 	}
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message) {
 		return -1

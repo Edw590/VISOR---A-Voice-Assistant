@@ -61,12 +61,12 @@ type OllamaToolCall struct {
 }
 
 type OllamaToolCallFunction struct {
-	Index     int                       `json:"index,omitempty"`
-	Name      string                    `json:"name"`
-	Arguments ToolCallFunctionArguments `json:"arguments"`
+	Index     int                             `json:"index,omitempty"`
+	Name      string                          `json:"name"`
+	Arguments OllamaToolCallFunctionArguments `json:"arguments"`
 }
 
-type ToolCallFunctionArguments map[string]any
+type OllamaToolCallFunctionArguments map[string]any
 
 type OllamaTool struct {
 	Type     string       `json:"type"`

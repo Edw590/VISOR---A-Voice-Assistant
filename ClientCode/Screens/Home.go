@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -178,8 +178,7 @@ func homeCreateHomeTab() *container.Scroll {
 	text.Alignment = fyne.TextAlignCenter
 	text.TextStyle.Bold = true
 
-	var communicator_checkbox *widget.Check = widget.NewCheck("Connected to the server", func(checked bool) {
-	})
+	var communicator_checkbox *widget.Check = widget.NewCheck("Connected to the server", nil)
 
 	var no_website_info_label *widget.Label = widget.NewLabel("")
 

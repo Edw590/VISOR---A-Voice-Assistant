@@ -22,6 +22,7 @@
 package GPTCommunicator
 
 import (
+	"GPTComm/GPTComm"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
@@ -34,7 +35,7 @@ import (
 	"time"
 )
 
-func chatWithGPT(device_id string, user_message string, session_id string) string {
+func chatWithGPT(device_id string, user_message string, session_id string, role string, more_coming bool) string {
 	if session_id == "" {
 		// Get latest session ID if none is provided
 		var latest_interaction int64 = -1
@@ -46,86 +47,124 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 		}
 	}
 
-	addSessionEntry(session_id, nil, 0, user_message)
+	addSessionEntry(session_id, time.Now().Unix(), user_message)
 
 	var curr_session ModsFileInfo.Session = *getSession(session_id)
 	curr_session.Memorized = false
 
+	var actual_role string = ""
+	switch role {
+		case GPTComm.ROLE_USER:
+			actual_role = "user"
+		case GPTComm.ROLE_TOOL:
+			user_message = "Inform the user that: \"" + user_message + "\"."
+			if modUserInfo_GL.Model_has_tool_role {
+				actual_role = "tool"
+			} else {
+				actual_role = "user"
+
+				// Keep the last part. He'll say less random stuff this way.
+				user_message = "[SYSTEM TASK - " + user_message + " NO SAYING YOU'RE REWORDING IT]"
+			}
+		default:
+			actual_role = role
+	}
+
 	// Append user message to history
 	curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
-		Role:    "user",
-		Content: UtilsSWA.RemoveNonGraphicCharsGENERAL(user_message),
+		Role:        actual_role,
+		Content:     UtilsSWA.RemoveNonGraphicCharsGENERAL(user_message),
 		Timestamp_s: time.Now().Unix(),
 	})
 
-	var history_with_system_prompt []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(curr_session.History)
-	var system_prompt string = ""
-	// Add the system prompt every time *temporarily*, so that if it's updated, it's updated in all sessions when
-	// they're used - because it's not stored in any session.
-	if session_id == "dumb" {
-		system_prompt = modUserInfo_GL.System_info + "\n\n" + "You're a voice assistant"
-	} else {
-		var visor_intro, visor_memories string = getVisorIntroAndMemories()
-		system_prompt = modUserInfo_GL.System_info + "\n\n" + "Long-term memories stored about the user: " +
-			visor_memories + "\n\n" + "About you: " + visor_intro
-	}
-	Utils.AddElemSLICES(&history_with_system_prompt, ModsFileInfo.OllamaMessage{
-		Role:        "system",
-		Content:     system_prompt,
-		Images:      nil,
-		Timestamp_s: 0,
-	}, 0)
+	if !more_coming {
+		var history_with_system_prompt []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(curr_session.History)
+		var system_prompt string = ""
+		// Add the system prompt every time *temporarily*, so that if it's updated, it's updated in all sessions when
+		// they're used - because it's not stored in any session.
+		if session_id == "dumb" {
+			system_prompt = modUserInfo_GL.System_info + "\n\n" + "You're a voice assistant"
+		} else {
+			var visor_intro, visor_memories string = getVisorIntroAndMemories()
+			system_prompt = modUserInfo_GL.System_info + "\n\n" + "Long-term memories stored about the user: " +
+				visor_memories + "\n\n" + "About you: " + visor_intro
+		}
+		Utils.AddElemSLICES(&history_with_system_prompt, ModsFileInfo.OllamaMessage{
+			Role:        "system",
+			Content:     system_prompt,
+			Images:      nil,
+			Timestamp_s: 0,
+		}, 0)
 
-	// Create payload
-	var ollama_request ModsFileInfo.OllamaChatRequest = ModsFileInfo.OllamaChatRequest{
-		Model: modUserInfo_GL.Model_name,
-		Messages: history_with_system_prompt,
-		Options: ModsFileInfo.OllamaOptions{
-			Num_keep:    99999999,
-			Num_ctx:     modUserInfo_GL.Context_size,
-			Temperature: modUserInfo_GL.Temperature,
-		},
-		Stream: true,
-		Keep_alive: "99999999m",
-	}
+		// Ready to function, but when creating a title for "What's the battery percentage", he called the function to
+		// get the battery percentage - not too useful. So the code is disabled (for now?).
+		//var tools_json []byte = modDirsInfo_GL.ProgramData.Add2(false, "tools.json").ReadFile()
+		//var tools ModsFileInfo.OllamaTools = nil
+		//if tools_json != nil {
+		//	err := Utils.FromJsonGENERAL(tools_json, &tools)
+		//	if err != nil {
+		//		log.Println("Error unmarshalling tools JSON: ", err)
+		//
+		//		return ""
+		//	}
+		//}
 
-	jsonData, err := json.Marshal(ollama_request)
-	if err != nil {
-		log.Println("Error marshalling JSON: ", err)
+		// Create payload
+		var ollama_request ModsFileInfo.OllamaChatRequest = ModsFileInfo.OllamaChatRequest{
+			Model:    modUserInfo_GL.Model_name,
+			Messages: history_with_system_prompt,
+			Options: ModsFileInfo.OllamaOptions{
+				Num_keep:    99999999,
+				Num_ctx:     modUserInfo_GL.Context_size,
+				Temperature: modUserInfo_GL.Temperature,
+			},
+			Stream:     true,
+			Keep_alive: "9999m",
+			//Tools: tools,
+		}
 
-		return ""
-	}
+		jsonData, err := json.Marshal(ollama_request)
+		if err != nil {
+			log.Println("Error marshalling JSON: ", err)
 
-	log.Println("Posting to Ollama: ", string(jsonData))
+			return ""
+		}
 
-	resp, err := http.Post("http://localhost:11434/api/chat", "application/json; charset=utf-8", bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Println("Error posting to Ollama: ", err)
+		log.Println("Posting to Ollama: ", string(jsonData))
 
-		// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the STOPPING
-		// one (they check every second).
-		time.Sleep(2 * time.Second)
+		resp, err := http.Post("http://localhost:11434/api/chat", "application/json; charset=utf-8", bytes.NewBuffer(jsonData))
+		if err != nil {
+			log.Println("Error posting to Ollama: ", err)
 
-		// Ollama stopped running, so stop the module
-		*module_stop_GL = true
+			// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the STOPPING
+			// one (they check every second).
+			time.Sleep(2 * time.Second)
 
-		return ""
-	}
-	defer resp.Body.Close()
+			// Ollama stopped running, so stop the module
+			*module_stop_GL = true
 
-	var response, timestamp = readGPT(device_id, resp, true)
-	if response != "" {
-		response = response[:len(response)-1] // Remove the last character, which is a null character
+			return ""
+		}
+		defer resp.Body.Close()
+
+		var response, timestamp = readGPT(device_id, resp, true)
+		if response != "" {
+			response = response[:len(response)-1] // Remove the last character, which is a null character
+		}
+
+		if session_id != "temp" && session_id != "dumb" {
+			curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
+				Role:        "assistant",
+				Content:     response,
+				Timestamp_s: timestamp,
+			})
+			curr_session.Last_interaction_s = time.Now().Unix()
+		}
+
+		return response
 	}
 
 	if session_id != "temp" && session_id != "dumb" {
-		curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
-			Role:        "assistant",
-			Content:     response,
-			Timestamp_s: timestamp,
-		})
-		curr_session.Last_interaction_s = time.Now().Unix()
-
 		// Save the session unless it's to use the temp or dumb sessions
 		for i, session := range modGenInfo_GL.Sessions {
 			if session.Id == session_id {
@@ -136,7 +175,7 @@ func chatWithGPT(device_id string, user_message string, session_id string) strin
 		}
 	}
 
-	return response
+	return ""
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
@@ -180,10 +219,10 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 		}
 
 		var response ModsFileInfo.OllamaChatResponse
-		if err := decoder.Decode(&response); err != nil {
-			message += "\000"
-		} else {
+		if err := decoder.Decode(&response); err == nil {
 			message += response.Message.Content
+		} else {
+			message += "\000"
 		}
 
 		if timestamp_s == -1 {
@@ -246,15 +285,18 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 func getVisorIntroAndMemories() (string, string) {
 	// Load visor introduction text
 	var visor_intro string = *modDirsInfo_GL.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-	//var visor_functions = *modDirsInfo_GL.ProgramData.Add2(false, "functions.json").ReadTextFile()
-	//visor_intro = strings.Replace(visor_intro, "3234_FUNCTIONS", visor_functions, -1)
-	visor_intro = strings.Replace(visor_intro, "\n", " ", -1)
-	visor_intro = strings.Replace(visor_intro, "\"", "\\\"", -1)
 	visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
+	if !modUserInfo_GL.Model_has_tool_role {
+		// If the model tool role is not set, the user one will be used instead - but in that case VISOR has to
+		// differentiate from the actual user input. So "SYSTEM TASK"s are used.
+		visor_intro = strings.Replace(visor_intro, "3234_SYS_TASKS", "Sometimes there will be \"SYSTEM TASK\"s. "+
+			"These are tasks that the system has set for you to do. You must do as written.", -1)
+	} else {
+		visor_intro = strings.Replace(visor_intro, "3234_SYS_TASKS\n", "", -1)
+	}
 
 	// Initialize memory string
-	var visor_memories string = strings.Join(modGenInfo_GL.Memories, ". ")
-	visor_memories = strings.Replace(visor_memories, "\"", "\\\"", -1)
+	var visor_memories string = strings.Join(modGenInfo_GL.Memories, "\n")
 
 	return visor_intro, visor_memories
 }

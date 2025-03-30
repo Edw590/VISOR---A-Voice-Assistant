@@ -49,7 +49,7 @@ func ModGPTCommunicator() fyne.CanvasObject {
 	Current_screen_GL = ID_MOD_GPT_COMM
 
 	return container.NewAppTabs(
-		container.NewTabItem("Main", gptCommunicatorCreateCommunicatorTab()),
+		container.NewTabItem("Main", gptCommunicatorCreateMainTab()),
 		container.NewTabItem("Chats", gptCommunicatorCreateSessionsTab()),
 		container.NewTabItem("List of commands", gptCommunicatorCreateListCommandsTab()),
 		container.NewTabItem("Memories", gptCommunicatorCreateMemoriesTab()),
@@ -133,6 +133,8 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
 	entry_model_name.SetText(Utils.User_settings_GL.GPTCommunicator.Model_name)
 
+	//var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
+
 	var entry_ctx_size *widget.Entry = widget.NewEntry()
 	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
 	entry_ctx_size.SetText(strconv.Itoa(int(Utils.User_settings_GL.GPTCommunicator.Context_size)))
@@ -153,8 +155,9 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 		return nil
 	}
 
-	var entry_system_info *widget.Entry = widget.NewEntry()
+	var entry_system_info *widget.Entry = widget.NewMultiLineEntry()
 	entry_system_info.SetPlaceHolder("LLM system information (remove any current date/time - that's automatic)")
+	entry_system_info.SetMinRowsVisible(3)
 	entry_system_info.SetText(Utils.User_settings_GL.GPTCommunicator.System_info)
 
 	var entry_user_nickname *widget.Entry = widget.NewEntry()
@@ -163,6 +166,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		Utils.User_settings_GL.GPTCommunicator.Model_name = entry_model_name.Text
+		//Utils.User_settings_GL.GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
 		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
 		Utils.User_settings_GL.GPTCommunicator.Context_size = int32(value1)
 		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
@@ -174,6 +178,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 
 	return createMainContentScrollUTILS(
 		entry_model_name,
+		//checkbox_model_has_tool_role,
 		entry_ctx_size,
 		entry_temperature,
 		entry_system_info,
@@ -327,16 +332,14 @@ func createSessionView(entries_map map[string]*widget.Entry, session_info _Sessi
 	)
 }
 
-func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
+func gptCommunicatorCreateMainTab() *container.Scroll {
 	var label_gpt_comm_state *widget.Label = widget.NewLabel("GPT state: error")
 
 	var text_to_send *widget.Entry = widget.NewMultiLineEntry()
 	text_to_send.Wrapping = fyne.TextWrapWord
 	text_to_send.SetMinRowsVisible(6) // 6 lines, like ChatGPT has
-	text_to_send.SetPlaceHolder(
-		"Text to send to VISOR\n" +
-		"- /stop to stop the LLM while it's generating text\n",
-	)
+	text_to_send.SetPlaceHolder("Text to send to VISOR (without punctuation for command detection)\n" +
+		"- /stop to stop the LLM while it's generating text")
 
 	var btn_send_text *widget.Button = widget.NewButton("Send text", func() {
 		Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, 0, "Sentence", text_to_send.Text)
@@ -351,7 +354,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW, GPTComm.ROLE_USER, false) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -373,7 +376,7 @@ func gptCommunicatorCreateCommunicatorTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP, GPTComm.ROLE_USER, false) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:

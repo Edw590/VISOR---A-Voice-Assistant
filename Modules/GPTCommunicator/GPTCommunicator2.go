@@ -37,6 +37,8 @@ const _TO_PROCESS_REL_FOLDER string = "to_process"
 const ASK_WOLFRAM_ALPHA string = "/askWolframAlpha "
 const SEARCH_WIKIPEDIA string = "/searchWikipedia "
 
+const STOP_CMD string = "/stop"
+
 const _INACTIVE_SESSION_TIME_S int64 = 30*60
 
 const _TIME_SLEEP_S int = 1
@@ -71,14 +73,15 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}
 
 	// Prepare the session for the temp and dumb sessions
-	addSessionEntry("temp", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
-	addSessionEntry("dumb", nil, -1000000, "") // A very low timestamp to avoid being selected as latest session
+	// Very low timestamp to avoid being selected as latest sessions
+	addSessionEntry("temp", -1000000, "")
+	addSessionEntry("dumb", -1000000, "")
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
 	// In case Ollama was started (as opposed to already being running), send a test message for it to actually
 	// start and be ready.
-	chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "temp")
+	chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
 
 	go autoMemorize()
 
@@ -92,10 +95,16 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 			var to_process string = *file_path.ReadTextFile()
 			if to_process != "" {
-				// It comes like: "[device ID|session type]text"
+				// It comes like: "[device ID|session type|role|true/false]text"
 				var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
-				var device_id = params_split[0]
-				var session_type = params_split[1]
+				// ID of the device sending the text
+				var device_id string = params_split[0]
+				// Session type to use
+				var session_type string = params_split[1]
+				// Role to use
+				var role string = params_split[2]
+				// If more text is coming and VISOR should wait before calling the LLM
+				var more_coming bool = params_split[3] == "true"
 
 				var text string = to_process[strings.Index(to_process, "]") + 1:]
 
@@ -125,7 +134,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 							". " + getEndString(), true)
 					} else {
 						sendToGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
-							session_id)
+							session_id, role, more_coming)
 					}
 				} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
 					// Search for the Wikipedia page title
@@ -133,8 +142,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
 						getEndString(), true)
-				} else {
-					sendToGPT(device_id, text, session_id)
+				} else if !strings.Contains(text, STOP_CMD) {
+					sendToGPT(device_id, text, session_id, role, more_coming)
 				}
 			}
 
@@ -150,13 +159,13 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}
 }
 
-func sendToGPT(device_id string, user_message string, session_id string) string {
+func sendToGPT(device_id string, user_message string, session_id string, role string, more_coming bool) string {
 	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 
-	return chatWithGPT(device_id, user_message, session_id)
+	return chatWithGPT(device_id, user_message, session_id, role, more_coming)
 }
 
-func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, last_interaction_s int64, user_message string) bool {
+func addSessionEntry(session_id string, last_interaction_s int64, user_message string) bool {
 	var session_exists bool = false
 	for _, session := range modGenInfo_GL.Sessions {
 		if session.Id == session_id {
@@ -174,12 +183,13 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 		} else if session_id == "dumb" {
 			session_name = "Dumb session"
 		} else {
+			var message_without_add_info string = user_message[strings.Index(user_message, "]") + 1:]
 			// I've titled the text for you, Sir: "App Notification Settings on OnePlus Watch".
 			// Get the text inside the quotation marks.
-			var prompt string = "Create a title for the following text (beginning of a conversation between you and " +
-				"me) and put it inside \"double quotation marks\", please. Don't include the date and time. Text: " +
-				user_message
-			session_name = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp")
+			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
+				"inside \"double quotation marks\", please. Don't include the date and time. Text: " +
+				message_without_add_info
+			session_name = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
 			if strings.Contains(session_name, "\"") {
 				session_name = strings.Split(session_name, "\"")[1]
 				// Sometimes the name may come like "[name here]", so remove the brackets.
@@ -194,7 +204,7 @@ func addSessionEntry(session_id string, history []ModsFileInfo.OllamaMessage, la
 			Id:                 session_id,
 			Name:               session_name,
 			Created_time_s:     time.Now().Unix(),
-			History:            history,
+			History:            nil,
 			Last_interaction_s: last_interaction_s,
 			Memorized:          false,
 		})
@@ -264,7 +274,7 @@ func checkStopSpeech() bool {
 		if to_process != "" {
 			var text string = to_process[strings.Index(to_process, "]") + 1:]
 
-			if strings.HasSuffix(text, "/stop") {
+			if strings.HasSuffix(text, STOP_CMD) {
 				_ = os.Remove(file_path.GPathToStringConversion())
 
 				return true

@@ -1,0 +1,317 @@
+[
+	{
+		"type": "function",
+		"function": {
+			"name": "toggleWifi",
+			"description": "Toggle device's the Wi-Fi adapter",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "toggleMobileData",
+			"description": "Toggle device's Mobile Data connection",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "toggleBluetooth",
+			"description": "Toggle device's Bluetooth adapter",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "answerCall",
+			"description": "Answer call",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "endCall",
+			"description": "End call",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "toggleAirplaneMode",
+			"description": "Toggle device's Airplane Mode",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "getBatteryPercentage",
+			"description": "Get battery percentage",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "shutdownDevice",
+			"description": "Shut down device",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "rebootDevice",
+			"description": "Reboot device",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "takePicture",
+			"description": "Take a picture",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "recordMedia",
+			"description": "Record media",
+			"parameters": {
+				"type": "object",
+				"required": ["type"],
+				"properties": {
+					"type": {
+						"type": "string",
+						"description": "Type of media to record",
+						"enum": ["audio", "video"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "callContact",
+			"description": "Make a phone call to a contact",
+			"parameters": {
+				"type": "object",
+				"required": ["name"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "Name of the contact to call"
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "togglePowerSaverMode",
+			"description": "Toggle device's Power Saver Mode",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "stopMediaRecording",
+			"description": "Stop media recording",
+			"parameters": {
+				"type": "object",
+				"required": [],
+				"properties": {}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "controlMedia",
+			"description": "Control media playback",
+			"parameters": {
+				"type": "object",
+				"required": ["action"],
+				"properties": {
+					"action": {
+						"type": "string",
+						"description": "Action to perform on media",
+						"enum": ["play", "pause", "stop", "next", "previous"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "getWeather",
+			"description": "Get the current weather",
+			"parameters": {
+				"type": "object",
+				"required": ["location"],
+				"properties": {
+					"location": {
+						"type": "string",
+						"description": "Location to get weather for"
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "getNews",
+			"description": "Get the latest news",
+			"parameters": {
+				"type": "object",
+				"required": ["topic"],
+				"properties": {
+					"topic": {
+						"type": "string",
+						"description": "Topic to get news for"
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "toggleEthernet",
+			"description": "Toggle device's Ethernet adapter",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "toggleNetworking",
+			"description": "Toggle device's networking",
+			"parameters": {
+				"type": "object",
+				"required": ["enable"],
+				"properties": {
+					"enable": {
+						"type": "string",
+						"description": "Enable or disable",
+						"enum": ["true", "false"]
+					}
+				}
+			}
+		}
+	},
+	{
+		"type": "function",
+		"function": {
+			"name": "getEventsTasks",
+			"description": "Get Google Calendar events and tasks",
+			"parameters": {
+				"type": "object",
+				"required": ["timeframe"],
+				"properties": {
+					"timeframe": {
+						"type": "string",
+						"description": "Timeframe for events",
+						"enum": ["today", "tomorrow", "this week", "next week"]
+					}
+				}
+			}
+		}
+	}
+]

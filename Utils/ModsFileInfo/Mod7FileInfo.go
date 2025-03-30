@@ -60,6 +60,8 @@ type Session struct {
 type Mod7UserInfo struct {
 	// Model_name is the name of the LLM model to use
 	Model_name string
+	// Model_has_tool_role indicates if the tool role of the LLM model exists or not
+	Model_has_tool_role bool
 	// Context_size is the context size to use
 	Context_size int32
 	// Temperature is the temperature to use
