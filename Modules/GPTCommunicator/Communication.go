@@ -179,10 +179,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
-	var message string = ""
-	var last_word string = ""
-	var save_words bool = true
-	var curr_idx int = 0
+	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
 
 	var writing_to_self bool = device_id == Utils.Gen_settings_GL.Device_settings.Id
 
@@ -201,6 +198,10 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	// Use a JSON decoder to handle the streamed response
 	var decoder *json.Decoder = json.NewDecoder(http_response.Body)
 
+	var message string = ""
+	var last_word string = ""
+	var save_words bool = true
+	var curr_idx int = 0
 	for {
 		if *module_stop_GL || checkStopSpeech() {
 			// Write the end string before exiting

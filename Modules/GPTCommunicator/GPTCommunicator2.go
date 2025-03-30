@@ -133,7 +133,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
 							". " + getEndString(), true)
 					} else {
-						sendToGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
+						chatWithGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
 							session_id, role, more_coming)
 					}
 				} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
@@ -143,7 +143,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
 						getEndString(), true)
 				} else if !strings.Contains(text, STOP_CMD) {
-					sendToGPT(device_id, text, session_id, role, more_coming)
+					chatWithGPT(device_id, text, session_id, role, more_coming)
 				}
 			}
 
@@ -157,12 +157,6 @@ func main(module_stop *bool, moduleInfo_any any) {
 			return
 		}
 	}
-}
-
-func sendToGPT(device_id string, user_message string, session_id string, role string, more_coming bool) string {
-	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
-
-	return chatWithGPT(device_id, user_message, session_id, role, more_coming)
 }
 
 func addSessionEntry(session_id string, last_interaction_s int64, user_message string) bool {
