@@ -39,7 +39,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 	if session_id == "" {
 		// Get latest session ID if none is provided
 		var latest_interaction int64 = -1
-		for _, session := range modGenInfo_GL.Sessions {
+		for _, session := range getModGenSettings().Sessions {
 			if session.Last_interaction_s > latest_interaction {
 				session_id = session.Id
 				latest_interaction = session.Last_interaction_s
@@ -58,7 +58,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 			actual_role = "user"
 		case GPTComm.ROLE_TOOL:
 			user_message = "Inform the user that: \"" + user_message + "\"."
-			if modUserInfo_GL.Model_has_tool_role {
+			if getModUserInfo().Model_has_tool_role {
 				actual_role = "tool"
 			} else {
 				actual_role = "user"
@@ -83,10 +83,10 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		// Add the system prompt every time *temporarily*, so that if it's updated, it's updated in all sessions when
 		// they're used - because it's not stored in any session.
 		if session_id == "dumb" {
-			system_prompt = modUserInfo_GL.System_info + "\n\n" + "You're a voice assistant"
+			system_prompt = getModUserInfo().System_info + "\n\n" + "You're a voice assistant"
 		} else {
 			var visor_intro, visor_memories string = getVisorIntroAndMemories()
-			system_prompt = modUserInfo_GL.System_info + "\n\n" + "Long-term memories stored about the user: " +
+			system_prompt = getModUserInfo().System_info + "\n\n" + "Long-term memories stored about the user: " +
 				visor_memories + "\n\n" + "About you: " + visor_intro
 		}
 		Utils.AddElemSLICES(&history_with_system_prompt, ModsFileInfo.OllamaMessage{
@@ -111,12 +111,12 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 
 		// Create payload
 		var ollama_request ModsFileInfo.OllamaChatRequest = ModsFileInfo.OllamaChatRequest{
-			Model:    modUserInfo_GL.Model_name,
+			Model:    getModUserInfo().Model_name,
 			Messages: history_with_system_prompt,
 			Options: ModsFileInfo.OllamaOptions{
 				Num_keep:    99999999,
-				Num_ctx:     modUserInfo_GL.Context_size,
-				Temperature: modUserInfo_GL.Temperature,
+				Num_ctx:     getModUserInfo().Context_size,
+				Temperature: getModUserInfo().Temperature,
 			},
 			Stream:     true,
 			Keep_alive: "9999m",
@@ -166,9 +166,9 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 
 	if session_id != "temp" && session_id != "dumb" {
 		// Save the session unless it's to use the temp or dumb sessions
-		for i, session := range modGenInfo_GL.Sessions {
+		for i, session := range getModGenSettings().Sessions {
 			if session.Id == session_id {
-				modGenInfo_GL.Sessions[i] = curr_session
+				getModGenSettings().Sessions[i] = curr_session
 
 				break
 			}
@@ -179,9 +179,9 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
-	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_BUSY
+	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_BUSY
 
-	var writing_to_self bool = device_id == Utils.Gen_settings_GL.Device_settings.Id
+	var writing_to_self bool = device_id == Utils.GetGenSettings().Device_settings.Id
 
 	var timestamp_s int64 = -1
 
@@ -278,7 +278,7 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 		_ = gpt_text_txt.WriteTextFile("\n" + getEndString(), true)
 	}
 
-	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_READY
+	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_READY
 
 	return message, timestamp_s
 }
@@ -286,8 +286,8 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 func getVisorIntroAndMemories() (string, string) {
 	// Load visor introduction text
 	var visor_intro string = *modDirsInfo_GL.ProgramData.Add2(false, "visor_intro.txt").ReadTextFile()
-	visor_intro = strings.Replace(visor_intro, "3234_NICK", modUserInfo_GL.User_nickname, -1)
-	if !modUserInfo_GL.Model_has_tool_role {
+	visor_intro = strings.Replace(visor_intro, "3234_NICK", getModUserInfo().User_nickname, -1)
+	if !getModUserInfo().Model_has_tool_role {
 		// If the model tool role is not set, the user one will be used instead - but in that case VISOR has to
 		// differentiate from the actual user input. So "SYSTEM TASK"s are used.
 		visor_intro = strings.Replace(visor_intro, "3234_SYS_TASKS", "Sometimes there will be \"SYSTEM TASK\"s. "+
@@ -297,21 +297,21 @@ func getVisorIntroAndMemories() (string, string) {
 	}
 
 	// Initialize memory string
-	var visor_memories string = strings.Join(modGenInfo_GL.Memories, "\n")
+	var visor_memories string = strings.Join(getModGenSettings().Memories, "\n")
 
 	return visor_intro, visor_memories
 }
 
 func getSession(session_id string) *ModsFileInfo.Session {
-	for i, session := range modGenInfo_GL.Sessions {
+	for i, session := range getModGenSettings().Sessions {
 		if session.Id == session_id {
-			return &modGenInfo_GL.Sessions[i]
+			return &getModGenSettings().Sessions[i]
 		}
 	}
 
-	modGenInfo_GL.Sessions = append(modGenInfo_GL.Sessions, ModsFileInfo.Session{
+	getModGenSettings().Sessions = append(getModGenSettings().Sessions, ModsFileInfo.Session{
 		Id: session_id,
 	})
 
-	return &modGenInfo_GL.Sessions[len(modGenInfo_GL.Sessions)-1]
+	return &getModGenSettings().Sessions[len(getModGenSettings().Sessions)-1]
 }

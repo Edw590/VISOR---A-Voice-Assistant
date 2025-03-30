@@ -50,7 +50,7 @@ AddTask adds a task to the user settings.
  */
 func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message string, command string, time string,
 			 	  repeat_each_min int64, user_location string, programmable_condition string) int32 {
-	var tasks *[]ModsFileInfo.Task = &Utils.User_settings_GL.TasksExecutor.Tasks
+	var tasks *[]ModsFileInfo.Task = &Utils.GetUserSettings().TasksExecutor.Tasks
 	var id int32 = 1 // 0 is reserved
 	for i := 0; i < len(*tasks); i++ {
 		if (*tasks)[i].Id == id {
@@ -89,7 +89,7 @@ RemoveTask removes a task from the user settings.
   - id – the task ID
  */
 func RemoveTaskTASKS(id int32) {
-	var tasks *[]ModsFileInfo.Task = &Utils.User_settings_GL.TasksExecutor.Tasks
+	var tasks *[]ModsFileInfo.Task = &Utils.GetUserSettings().TasksExecutor.Tasks
 	for i := range *tasks {
 		if (*tasks)[i].Id == id {
 			Utils.DelElemSLICES(tasks, i)
@@ -109,7 +109,7 @@ GetIdsList returns a list of all tasks' IDs.
 */
 func GetIdsListTASKS() string {
 	var ids_list string
-	for _, task := range Utils.User_settings_GL.TasksExecutor.Tasks {
+	for _, task := range Utils.GetUserSettings().TasksExecutor.Tasks {
 		ids_list += strconv.Itoa(int(task.Id)) + "|"
 	}
 	if len(ids_list) > 0 {
@@ -131,7 +131,7 @@ GetTaskById returns a task by its ID.
   - the task or nil if the task was not found
 */
 func GetTaskTASKS(id int32) *ModsFileInfo.Task {
-	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
+	var tasks []ModsFileInfo.Task = Utils.GetUserSettings().TasksExecutor.Tasks
 	for i := range tasks {
 		var task *ModsFileInfo.Task = &tasks[i]
 		if task.Id == id {

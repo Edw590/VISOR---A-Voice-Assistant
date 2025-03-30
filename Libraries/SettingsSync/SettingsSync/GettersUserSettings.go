@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,7 +35,7 @@ GetMod7InfoUSERSETS returns the MOD_7 user information from the user settings.
   - the MOD_7 user information from the user settings
 */
 func GetMod7InfoUSERSETS() *ModsFileInfo.Mod7UserInfo {
-	return &Utils.User_settings_GL.GPTCommunicator
+	return &Utils.GetUserSettings().GPTCommunicator
 }
 
 /*
@@ -47,5 +47,5 @@ GetMod12InfoUSERSETS returns the MOD_12 user information from the user settings.
   - the MOD_12 user information from the user settings
 */
 func GetMod12InfoUSERSETS() *ModsFileInfo.Mod12UserInfo {
-	return &Utils.User_settings_GL.UserLocator
+	return &Utils.GetUserSettings().UserLocator
 }

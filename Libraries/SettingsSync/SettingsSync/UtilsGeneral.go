@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,7 +35,7 @@ GetGeneralSettingsGENERAL returns the general constants from the user settings.
   - the general constants from the user settings
  */
 func GetGeneralSettingsGENERAL() *ModsFileInfo.GeneralConsts {
-	return &Utils.User_settings_GL.General
+	return &Utils.GetUserSettings().General
 }
 
 /*
@@ -47,5 +47,5 @@ GetDeviceSettingsGENERAL returns the device settings from the general settings.
   - the device settings from the general settings
  */
 func GetDeviceSettingsGENERAL() *ModsFileInfo.DeviceSettings {
-	return &Utils.Gen_settings_GL.Device_settings
+	return &Utils.GetGenSettings().Device_settings
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,7 +35,7 @@ GetTempLocsOIC returns the locations to get the weather from, from the user sett
   - the locations separated by "\n"
  */
 func GetTempLocsOIC() string {
-	return strings.Join(Utils.User_settings_GL.OnlineInfoChk.Temp_locs, "\n")
+	return strings.Join(Utils.GetUserSettings().OnlineInfoChk.Temp_locs, "\n")
 }
 
 /*
@@ -47,7 +47,7 @@ SetTempLocsOIC sets the locations to get the weather from, in the user settings.
   - locs – the locations separated by "\n"
  */
 func SetTempLocsOIC(locs string) {
-	Utils.User_settings_GL.OnlineInfoChk.Temp_locs = strings.Split(locs, "\n")
+	Utils.GetUserSettings().OnlineInfoChk.Temp_locs = strings.Split(locs, "\n")
 }
 
 /*
@@ -59,7 +59,7 @@ GetNewsLocsOIC returns the locations to get the news from, from the user setting
   - the locations separated by "\n"
  */
 func GetNewsLocsOIC() string {
-	return strings.Join(Utils.User_settings_GL.OnlineInfoChk.News_locs, "\n")
+	return strings.Join(Utils.GetUserSettings().OnlineInfoChk.News_locs, "\n")
 }
 
 /*
@@ -71,5 +71,5 @@ SetNewsLocsOIC sets the locations to get the news from, in the user settings.
   - locs – the locations separated by "\n"
  */
 func SetNewsLocsOIC(locs string) {
-	Utils.User_settings_GL.OnlineInfoChk.News_locs = strings.Split(locs, "\n")
+	Utils.GetUserSettings().OnlineInfoChk.News_locs = strings.Split(locs, "\n")
 }

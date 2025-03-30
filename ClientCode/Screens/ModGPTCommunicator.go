@@ -131,18 +131,18 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var entry_model_name *widget.Entry = widget.NewEntry()
 	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
-	entry_model_name.SetText(Utils.User_settings_GL.GPTCommunicator.Model_name)
+	entry_model_name.SetText(Utils.GetUserSettings().GPTCommunicator.Model_name)
 
 	//var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
 
 	var entry_ctx_size *widget.Entry = widget.NewEntry()
 	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
-	entry_ctx_size.SetText(strconv.Itoa(int(Utils.User_settings_GL.GPTCommunicator.Context_size)))
+	entry_ctx_size.SetText(strconv.Itoa(int(Utils.GetUserSettings().GPTCommunicator.Context_size)))
 	entry_ctx_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numberic")
 
 	var entry_temperature *widget.Entry = widget.NewEntry()
 	entry_temperature.SetPlaceHolder("GPT temperature (example: 0.8)")
-	entry_temperature.SetText(strconv.FormatFloat(float64(Utils.User_settings_GL.GPTCommunicator.Temperature), 'f', -1, 32))
+	entry_temperature.SetText(strconv.FormatFloat(float64(Utils.GetUserSettings().GPTCommunicator.Temperature), 'f', -1, 32))
 	entry_temperature.Validator = func(s string) error {
 		value, err := strconv.ParseFloat(s, 32)
 		if err != nil {
@@ -158,21 +158,21 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var entry_system_info *widget.Entry = widget.NewMultiLineEntry()
 	entry_system_info.SetPlaceHolder("LLM system information (remove any current date/time - that's automatic)")
 	entry_system_info.SetMinRowsVisible(3)
-	entry_system_info.SetText(Utils.User_settings_GL.GPTCommunicator.System_info)
+	entry_system_info.SetText(Utils.GetUserSettings().GPTCommunicator.System_info)
 
 	var entry_user_nickname *widget.Entry = widget.NewEntry()
 	entry_user_nickname.SetPlaceHolder("User nickname (Sir, for example)")
-	entry_user_nickname.SetText(Utils.User_settings_GL.GPTCommunicator.User_nickname)
+	entry_user_nickname.SetText(Utils.GetUserSettings().GPTCommunicator.User_nickname)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.User_settings_GL.GPTCommunicator.Model_name = entry_model_name.Text
-		//Utils.User_settings_GL.GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
+		Utils.GetUserSettings().GPTCommunicator.Model_name = entry_model_name.Text
+		//Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
 		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
-		Utils.User_settings_GL.GPTCommunicator.Context_size = int32(value1)
+		Utils.GetUserSettings().GPTCommunicator.Context_size = int32(value1)
 		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
-		Utils.User_settings_GL.GPTCommunicator.Temperature = float32(value2)
-		Utils.User_settings_GL.GPTCommunicator.System_info = entry_system_info.Text
-		Utils.User_settings_GL.GPTCommunicator.User_nickname = entry_user_nickname.Text
+		Utils.GetUserSettings().GPTCommunicator.Temperature = float32(value2)
+		Utils.GetUserSettings().GPTCommunicator.System_info = entry_system_info.Text
+		Utils.GetUserSettings().GPTCommunicator.User_nickname = entry_user_nickname.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 

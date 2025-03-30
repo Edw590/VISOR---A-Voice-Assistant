@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,10 +26,6 @@ import (
 	"Utils/ModsFileInfo"
 	"strconv"
 	"strings"
-)
-
-var (
-	modGenInfo_GL  *ModsFileInfo.Mod10GenInfo = &Utils.Gen_settings_GL.MOD_10
 )
 
 /*
@@ -66,7 +62,7 @@ func UpdateDeviceInfo(last_time_used_s int64, airplane_mode_enabled bool, wifi_e
 		bluetooth_device.RSSI = rssi
 		bluetooth_devices_ret = append(bluetooth_devices_ret, bluetooth_device)
 	}
-	modGenInfo_GL.Device_info = ModsFileInfo.DeviceInfo{
+	Utils.GetGenSettings().MOD_10.Device_info = ModsFileInfo.DeviceInfo{
 		Last_time_used_s: last_time_used_s,
 		System_state: ModsFileInfo.SystemState{
 			Connectivity_info: ModsFileInfo.ConnectivityInfo{
@@ -101,5 +97,5 @@ GetLastTimeUsed returns the last time the device was used from the internal devi
   - the last time the device was used
  */
 func GetLastTimeUsed() int64 {
-	return modGenInfo_GL.Device_info.Last_time_used_s
+	return Utils.GetGenSettings().MOD_10.Device_info.Last_time_used_s
 }

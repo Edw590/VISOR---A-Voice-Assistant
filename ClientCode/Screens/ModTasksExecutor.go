@@ -122,7 +122,7 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 func tasksExecutorCreateTasksListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
+	var tasks []ModsFileInfo.Task = Utils.GetUserSettings().TasksExecutor.Tasks
 	for i := range tasks {
 		var task *ModsFileInfo.Task = &tasks[i]
 		var title = task.Message

@@ -48,18 +48,18 @@ func main() {
 func realMain(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
-	if Utils.Gen_settings_GL.Device_settings.Id == "" || Utils.Gen_settings_GL.Device_settings.Type_ == "" ||
-			Utils.Gen_settings_GL.Device_settings.Description == "" {
+	if Utils.GetGenSettings().Device_settings.Id == "" || Utils.GetGenSettings().Device_settings.Type_ == "" ||
+			Utils.GetGenSettings().Device_settings.Description == "" {
 		log.Println("Device settings incomplete. Please enter the missing one(s):")
-		if Utils.Gen_settings_GL.Device_settings.Id == "" {
-			Utils.Gen_settings_GL.Device_settings.Id = Utils.GetInputString("Unique device ID: ")
+		if Utils.GetGenSettings().Device_settings.Id == "" {
+			Utils.GetGenSettings().Device_settings.Id = Utils.GetInputString("Unique device ID: ")
 		}
-		if Utils.Gen_settings_GL.Device_settings.Type_ == "" {
-			Utils.Gen_settings_GL.Device_settings.Type_ = Utils.GetInputString("Device type (for example " +
+		if Utils.GetGenSettings().Device_settings.Type_ == "" {
+			Utils.GetGenSettings().Device_settings.Type_ = Utils.GetInputString("Device type (for example " +
 				"\"computer\"): ")
 		}
-		if Utils.Gen_settings_GL.Device_settings.Description == "" {
-			Utils.Gen_settings_GL.Device_settings.Description = Utils.GetInputString("Device description (for " +
+		if Utils.GetGenSettings().Device_settings.Description == "" {
+			Utils.GetGenSettings().Device_settings.Description = Utils.GetInputString("Device description (for " +
 				"example the model, \"Legion Y520\"): ")
 		}
 	}

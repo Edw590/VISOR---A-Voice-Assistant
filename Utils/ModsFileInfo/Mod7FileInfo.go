@@ -34,7 +34,7 @@ type Mod7GenInfo struct {
 	N_mems_when_last_memorized int
 	// Memories is the list of memories the GPT has
 	Memories []string
-	// Sessions is the list of sessions of the user with the GPT indexed by their ID
+	// Sessions is the list of sessions of the user with the GPT
 	Sessions []Session
 }
 

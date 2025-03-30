@@ -40,17 +40,13 @@ var _SCOPES = []string{
 	gmail.GmailModifyScope,
 }
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-	modGenInfo_GL  *ModsFileInfo.Mod14GenInfo = &Utils.Gen_settings_GL.MOD_14
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_14
 
 	for {
-		modGenInfo_GL.Token_invalid = true
+		getModGenSettings().Token_invalid = true
 
 		// Parse credentials to config
 		config, err := ParseConfigJSON()
@@ -91,7 +87,11 @@ func getClient(config *oauth2.Config) *http.Client {
 // getToken retrieves a token from a local file
 func getToken() (*oauth2.Token, error) {
 	var token oauth2.Token
-	err := Utils.FromJsonGENERAL([]byte(modGenInfo_GL.Token), &token)
+	err := Utils.FromJsonGENERAL([]byte(getModGenSettings().Token), &token)
 
 	return &token, err
+}
+
+func getModGenSettings() *ModsFileInfo.Mod14GenInfo {
+	return &Utils.GetGenSettings().MOD_14
 }

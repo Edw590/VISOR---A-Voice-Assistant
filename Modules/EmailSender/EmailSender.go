@@ -31,8 +31,6 @@ import (
 	"Utils"
 )
 
-// Email Sender //
-
 // _MAX_EMAILS_HOUR is the maximum number of emails that can be sent per hour according to Google, which are 20. But
 // we'll go with 15 to be safe about emails sent without this module's help (error emails).
 const _MAX_EMAILS_HOUR = 15
@@ -44,14 +42,10 @@ type emailSent struct {
 	time_s int64
 }
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-	modGenInfo_GL  *ModsFileInfo.Mod5GenInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_5
 
 	var to_send_dir Utils.GPath = modDirsInfo_GL.UserData.Add2(true, Utils.TO_SEND_REL_FOLDER)
 	if !to_send_dir.Exists() {
@@ -85,11 +79,11 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 			if !reachedMaxEmailsHour() {
 				if err := Utils.SendEmailEMAIL(*file_to_send.GPath.ReadTextFile(), mail_to, false); err == nil {
-					if time.Now().Hour() != modGenInfo_GL.Hour {
-						modGenInfo_GL.Hour = time.Now().Hour()
-						modGenInfo_GL.Num_emails_hour = 0
+					if time.Now().Hour() != getModGenSettings().Hour {
+						getModGenSettings().Hour = time.Now().Hour()
+						getModGenSettings().Num_emails_hour = 0
 					}
-					modGenInfo_GL.Num_emails_hour++
+					getModGenSettings().Num_emails_hour++
 					//log.Println("Email sent successfully.")
 
 					last_file_sent.email = *file_to_send.GPath.ReadTextFile()
@@ -137,6 +131,10 @@ reachedMaxEmailsHour returns true if the maximum number of emails per hour has b
   - true if the maximum number of emails per hour has been reached, false otherwise.
  */
 func reachedMaxEmailsHour() bool {
-	return modGenInfo_GL.Num_emails_hour >= _MAX_EMAILS_HOUR &&
-		time.Now().Hour() == modGenInfo_GL.Hour
+	return getModGenSettings().Num_emails_hour >= _MAX_EMAILS_HOUR &&
+		time.Now().Hour() == getModGenSettings().Hour
+}
+
+func getModGenSettings() *ModsFileInfo.Mod5GenInfo {
+	return &Utils.GetGenSettings().MOD_5
 }

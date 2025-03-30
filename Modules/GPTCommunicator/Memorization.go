@@ -34,8 +34,8 @@ import (
 
 func autoMemorize() {
 	for {
-		if modGenInfo_GL.State == ModsFileInfo.MOD_7_STATE_READY {
-			for _, session := range modGenInfo_GL.Sessions {
+		if getModGenSettings().State == ModsFileInfo.MOD_7_STATE_READY {
+			for _, session := range getModGenSettings().Sessions {
 				if session.Id == getActiveSessionId() || session.Memorized || session.Id == "temp" || session.Id == "dumb" {
 					continue
 				}
@@ -46,13 +46,13 @@ func autoMemorize() {
 				}
 			}
 
-			//if len(modGenInfo_GL.Memories) >= modGenInfo_GL.N_mems_when_last_memorized * 2 {
+			//if len(getModGenSettings().Memories) >= getModGenSettings().N_mems_when_last_memorized * 2 {
 			//	for !summarizeMemories() {
 			//		// VISOR may not memorize because of for example romantic stuff being on the memories, or just
 			//		// because they're of a user. In that case, just try again.
 			//	}
 			//
-			//	modGenInfo_GL.N_mems_when_last_memorized = len(modGenInfo_GL.Memories)
+			//	getModGenSettings().N_mems_when_last_memorized = len(getModGenSettings().Memories)
 			//}
 		}
 
@@ -64,7 +64,7 @@ func autoMemorize() {
 
 func memorizeSession(session_id string) bool {
 	var session_history []ModsFileInfo.OllamaMessage = nil
-	for _, session := range modGenInfo_GL.Sessions {
+	for _, session := range getModGenSettings().Sessions {
 		if session.Id == session_id {
 			session_history = Utils.CopyOuterSLICES(session.History)
 
@@ -98,10 +98,10 @@ func memorizeSession(session_id string) bool {
 
 	var prompt string = "User messages (in JSON): " + string(session_history_json) + ". Write NEW things you've " +
 		"learned from this specific conversation (EXCLUDING YOUR MEMORIES) in BULLET points (no + or - or anything. " +
-		"ONLY *). Format the output as \"* [detail]\". IGNORE specific, temporary events, scheedules, or day-to-day " +
+		"ONLY *). Format the output as \"* [detail]\". IGNORE specific, temporary events, schedules, or day-to-day " +
 		"plans. Summarize as KEY GENERAL information. If there is nothing, write \"* 3234_NONE\"."
 
-	var response string = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
+	var response string = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
 
 	var lines []string = strings.Split(response, "\n")
 	for _, line := range lines {
@@ -116,7 +116,7 @@ func memorizeSession(session_id string) bool {
 				continue
 			}
 
-			modGenInfo_GL.Memories = append(modGenInfo_GL.Memories, line[the_user_idx + len("* "):])
+			getModGenSettings().Memories = append(getModGenSettings().Memories, line[the_user_idx + len("* "):])
 		}
 	}
 
@@ -131,7 +131,7 @@ func summarizeMemories() bool {
 		"Format the output as \"* [detail]\". Write as much as you need. If newer memories contradict old " +
 		"ones, update them. ALL MEMORIES ARE IMPORTANT, EVEN MINOR ONES!!! But again, SUMMARIZE them."
 
-	var response string = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
+	var response string = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
 
 	var new_memories []string = nil
 	var lines []string = strings.Split(response, "\n")
@@ -155,7 +155,7 @@ func summarizeMemories() bool {
 		return false
 	}
 
-	modGenInfo_GL.Memories = new_memories
+	getModGenSettings().Memories = new_memories
 
 	// Give time to write everything down
 	time.Sleep(6 * time.Second)

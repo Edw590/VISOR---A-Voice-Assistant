@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -36,6 +36,6 @@ the User Settings file.
   - website_pw – the password of VISOR's website
  */
 func InitWebsiteConsts(website_domain string, website_pw string) {
-	Utils.User_settings_GL.General.Website_domain = website_domain
-	Utils.User_settings_GL.General.Website_pw = website_pw
+	Utils.GetUserSettings().General.Website_domain = website_domain
+	Utils.GetUserSettings().General.Website_pw = website_pw
 }

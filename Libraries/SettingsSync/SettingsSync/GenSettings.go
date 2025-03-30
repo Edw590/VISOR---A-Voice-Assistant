@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -32,7 +32,7 @@ GetJsonGenSettings returns the generated settings in JSON format.
   - the generated settings in JSON format
  */
 func GetJsonGenSettings() string {
-	return *Utils.ToJsonGENERAL(Utils.Gen_settings_GL)
+	return *Utils.ToJsonGENERAL(*Utils.GetGenSettings())
 }
 
 /*
@@ -51,7 +51,7 @@ func LoadGenSettings(json string) bool {
 		return false
 	}
 
-	if err := Utils.FromJsonGENERAL([]byte(json), &Utils.Gen_settings_GL); err != nil {
+	if err := Utils.FromJsonGENERAL([]byte(json), Utils.GetGenSettings()); err != nil {
 		return false
 	}
 
@@ -69,7 +69,7 @@ SetDeviceSettings sets the device settings.
   - description – the device description
  */
 func SetDeviceSettings(id string, type_ string, description string) {
-	Utils.Gen_settings_GL.Device_settings.Id = id
-	Utils.Gen_settings_GL.Device_settings.Type_ = type_
-	Utils.Gen_settings_GL.Device_settings.Description = description
+	Utils.GetGenSettings().Device_settings.Id = id
+	Utils.GetGenSettings().Device_settings.Type_ = type_
+	Utils.GetGenSettings().Device_settings.Description = description
 }

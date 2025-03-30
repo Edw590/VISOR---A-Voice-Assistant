@@ -46,7 +46,7 @@ AddLocationLOCATIONS adds a location to the user settings.
 */
 func AddLocationLOCATIONS(enabled bool, type_ string, name string, address string, last_detection_s int64,
 						  max_distance_m int32, location string) int32 {
-	var locs_info *[]ModsFileInfo.LocInfo = &Utils.User_settings_GL.UserLocator.Locs_info
+	var locs_info *[]ModsFileInfo.LocInfo = &Utils.GetUserSettings().UserLocator.Locs_info
 	var id int32 = 1
 	for i := 0; i < len(*locs_info); i++ {
 		if (*locs_info)[i].Id == id {
@@ -83,7 +83,7 @@ RemoveLocationLOCATIONS removes a location from the user settings.
   - loc_id – the ID of the location to be removed
 */
 func RemoveLocationLOCATIONS(id int32) {
-	var locs_info *[]ModsFileInfo.LocInfo = &Utils.User_settings_GL.UserLocator.Locs_info
+	var locs_info *[]ModsFileInfo.LocInfo = &Utils.GetUserSettings().UserLocator.Locs_info
 	for i := range *locs_info {
 		if (*locs_info)[i].Id == id {
 			Utils.DelElemSLICES(locs_info, i)
@@ -103,7 +103,7 @@ GetIdsListLOCATIONS returns a list of all locations' IDs.
  */
 func GetIdsListLOCATIONS() string {
 	var ids_list string
-	for _, loc_info := range Utils.User_settings_GL.UserLocator.Locs_info {
+	for _, loc_info := range Utils.GetUserSettings().UserLocator.Locs_info {
 		ids_list += strconv.Itoa(int(loc_info.Id)) + "|"
 	}
 	if len(ids_list) > 0 {
@@ -125,7 +125,7 @@ GetLOCATIONS returns a location by its ID.
   - the location or nil if the location was not found
  */
 func GetLocationLOCATIONS(id int32) *ModsFileInfo.LocInfo {
-	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
+	var locs_info []ModsFileInfo.LocInfo = Utils.GetUserSettings().UserLocator.Locs_info
 	for i := range locs_info {
 		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
 		if loc_info.Id == id {

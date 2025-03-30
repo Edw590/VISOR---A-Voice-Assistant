@@ -84,7 +84,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 func rssFeedNotifierCreateFeedsListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
+	var feeds_info []ModsFileInfo.FeedInfo = Utils.GetUserSettings().RSSFeedNotifier.Feeds_info
 	for i := range feeds_info {
 		var feed_info ModsFileInfo.FeedInfo = feeds_info[i]
 		var title string = ""

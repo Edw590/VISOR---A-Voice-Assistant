@@ -45,31 +45,25 @@ const _TIME_SLEEP_S int = 1
 
 var module_stop_GL *bool = nil
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-	modGenInfo_GL  *ModsFileInfo.Mod7GenInfo
-	modUserInfo_GL *ModsFileInfo.Mod7UserInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_7
-	modUserInfo_GL = &Utils.User_settings_GL.GPTCommunicator
 
 	module_stop_GL = module_stop
 
-	modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STARTING
+	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STARTING
 
-	if modUserInfo_GL.Model_name == "" || modUserInfo_GL.Context_size == 0 {
+	if getModUserInfo().Model_name == "" || getModUserInfo().Context_size == 0 {
 		time.Sleep(2 * time.Second)
 
-		modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
+		getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 		return
 	}
 
-	if modGenInfo_GL.N_mems_when_last_memorized == 0 {
-		modGenInfo_GL.N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
+	if getModGenSettings().N_mems_when_last_memorized == 0 {
+		getModGenSettings().N_mems_when_last_memorized = 25 // So that the double is 50 for the first time
 	}
 
 	// Prepare the session for the temp and dumb sessions
@@ -81,7 +75,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 	// In case Ollama was started (as opposed to already being running), send a test message for it to actually
 	// start and be ready.
-	chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
+	chatWithGPT(Utils.GetGenSettings().Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
 
 	go autoMemorize()
 
@@ -152,7 +146,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 		}
 
 		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-			modGenInfo_GL.State = ModsFileInfo.MOD_7_STATE_STOPPED
+			getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 			return
 		}
@@ -161,7 +155,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 func addSessionEntry(session_id string, last_interaction_s int64, user_message string) bool {
 	var session_exists bool = false
-	for _, session := range modGenInfo_GL.Sessions {
+	for _, session := range getModGenSettings().Sessions {
 		if session.Id == session_id {
 			session_exists = true
 
@@ -183,7 +177,7 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
 				"inside \"double quotation marks\", please. Don't include the date and time. Text: " +
 				message_without_add_info
-			session_name = chatWithGPT(Utils.Gen_settings_GL.Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
+			session_name = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
 			if strings.Contains(session_name, "\"") {
 				session_name = strings.Split(session_name, "\"")[1]
 				// Sometimes the name may come like "[name here]", so remove the brackets.
@@ -194,7 +188,7 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 			}
 		}
 
-		modGenInfo_GL.Sessions = append(modGenInfo_GL.Sessions, ModsFileInfo.Session{
+		getModGenSettings().Sessions = append(getModGenSettings().Sessions, ModsFileInfo.Session{
 			Id:                 session_id,
 			Name:               session_name,
 			Created_time_s:     time.Now().Unix(),
@@ -213,7 +207,7 @@ func getActiveSessionId() string {
 	// The latest session with less than 30 minutes of inactivity is considered the active one
 	var latest_interaction int64 = 0
 	var active_session_id string = ""
-	for _, session := range modGenInfo_GL.Sessions {
+	for _, session := range getModGenSettings().Sessions {
 		if session.Last_interaction_s > latest_interaction &&
 				time.Now().Unix() - session.Last_interaction_s < _INACTIVE_SESSION_TIME_S {
 			active_session_id = session.Id
@@ -287,4 +281,12 @@ func getStartString(device_id string) string {
 
 func getEndString() string {
 	return "[3234_END]\n"
+}
+
+func getModGenSettings() *ModsFileInfo.Mod7GenInfo {
+	return &Utils.GetGenSettings().MOD_7
+}
+
+func getModUserInfo() *ModsFileInfo.Mod7UserInfo {
+	return &Utils.GetUserSettings().GPTCommunicator
 }

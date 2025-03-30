@@ -102,16 +102,10 @@ const _TIME_SLEEP_S int = 15*60
 // Firefox: log.Sprintf("http://localhost:%d", port)
 // Chrome: log.Sprintf("http://127.0.0.1:%d/wd/hub", port) - default
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-	modGenInfo_GL  *ModsFileInfo.Mod6GenInfo
-	modUserInfo_GL *ModsFileInfo.Mod6UserInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_6
-	modUserInfo_GL = &Utils.User_settings_GL.OnlineInfoChk
 
 	for {
 		////////////////////////////////
@@ -147,8 +141,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 		_ = bypassGoogleCookies(driver)
 
-		modGenInfo_GL.Weather = OICWeather.UpdateWeather(driver, modUserInfo_GL.Temp_locs)
-		modGenInfo_GL.News = OICNews.UpdateNews(driver, modUserInfo_GL.News_locs)
+		getModGenSettings().Weather = OICWeather.UpdateWeather(driver, getModUserInfo().Temp_locs)
+		getModGenSettings().News = OICNews.UpdateNews(driver, getModUserInfo().News_locs)
 
 		_ = driver.Quit()
 		_ = service.Stop()
@@ -176,7 +170,7 @@ RetrieveWolframAlpha retrieves the information from the given query using Wolfra
 func RetrieveWolframAlpha(query string) (string, bool) {
 	//Initialize a new client
 	c := &wolfram.Client{
-		AppID: Utils.User_settings_GL.General.WolframAlpha_AppID,
+		AppID: Utils.GetUserSettings().General.WolframAlpha_AppID,
 	}
 
 	//Get a result without additional parameters
@@ -242,4 +236,12 @@ func RetrieveWikipedia(query string) string {
 	}
 
 	return content
+}
+
+func getModGenSettings() *ModsFileInfo.Mod6GenInfo {
+	return &Utils.GetGenSettings().MOD_6
+}
+
+func getModUserInfo() *ModsFileInfo.Mod6UserInfo {
+	return &Utils.GetUserSettings().OnlineInfoChk
 }

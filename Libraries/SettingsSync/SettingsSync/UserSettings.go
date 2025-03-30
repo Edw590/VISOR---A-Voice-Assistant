@@ -72,7 +72,7 @@ func SyncUserSettings() {
 
 					var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-					_ = Utils.FromJsonGENERAL(json, &Utils.User_settings_GL)
+					_ = Utils.FromJsonGENERAL(json, Utils.GetUserSettings())
 					last_user_settings_json = GetJsonUserSettings()
 				}
 			}
@@ -123,7 +123,7 @@ GetUserSettings returns the user settings in JSON format.
   - the user settings in JSON format
  */
 func GetJsonUserSettings() string {
-	return *Utils.ToJsonGENERAL(Utils.User_settings_GL)
+	return *Utils.ToJsonGENERAL(*Utils.GetUserSettings())
 }
 
 /*
@@ -142,7 +142,7 @@ func LoadUserSettings(json string) error {
 		return errors.New("empty JSON string")
 	}
 
-	if err := Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL); err != nil {
+	if err := Utils.FromJsonGENERAL([]byte(json), Utils.GetUserSettings()); err != nil {
 		return err
 	}
 
@@ -158,7 +158,7 @@ IsWebsiteInfoEmpty returns true if the website domain and password are empty, fa
   - true if the website domain and password are empty, false otherwise
  */
 func IsWebsiteInfoEmpty() bool {
-	return Utils.User_settings_GL.General.Website_domain == "" && Utils.User_settings_GL.General.Website_pw == ""
+	return Utils.GetUserSettings().General.Website_domain == "" && Utils.GetUserSettings().General.Website_pw == ""
 }
 
 /*
@@ -171,6 +171,6 @@ SetWebsiteInfo sets the website domain and password.
   - website_password – the password for the VISOR website
  */
 func SetWebsiteInfo(website_domain string, website_password string) {
-	Utils.User_settings_GL.General.Website_domain = website_domain
-	Utils.User_settings_GL.General.Website_pw = website_password
+	Utils.GetUserSettings().General.Website_domain = website_domain
+	Utils.GetUserSettings().General.Website_pw = website_password
 }

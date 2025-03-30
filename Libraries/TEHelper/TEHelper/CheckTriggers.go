@@ -65,7 +65,7 @@ func checkDeviceActive(task ModsFileInfo.Task) bool {
 		return true
 	}
 
-	return Utils.Gen_settings_GL.MOD_10.Device_info.Last_time_used_s + 5 >= time.Now().Unix()
+	return Utils.GetGenSettings().MOD_10.Device_info.Last_time_used_s + 5 >= time.Now().Unix()
 }
 
 func checkDeviceID(task ModsFileInfo.Task) bool {
@@ -74,7 +74,7 @@ func checkDeviceID(task ModsFileInfo.Task) bool {
 	}
 
 	for _, device_id := range task.Device_IDs {
-		if device_id == Utils.Gen_settings_GL.Device_settings.Id {
+		if device_id == Utils.GetGenSettings().Device_settings.Id {
 			return true
 		}
 	}
@@ -167,15 +167,15 @@ func checkProgrammableCondition(task ModsFileInfo.Task) bool {
 }
 
 func getCondWasTrue(task_id int32) *ModsFileInfo.CondWasTrue {
-	for i, cond_was_true := range modGenInfo_GL.Conds_were_true {
+	for i, cond_was_true := range getModGenSettings().Conds_were_true {
 		if cond_was_true.Id == task_id {
-			return &modGenInfo_GL.Conds_were_true[i]
+			return &getModGenSettings().Conds_were_true[i]
 		}
 	}
 
-	modGenInfo_GL.Conds_were_true = append(modGenInfo_GL.Conds_were_true, ModsFileInfo.CondWasTrue{
+	getModGenSettings().Conds_were_true = append(getModGenSettings().Conds_were_true, ModsFileInfo.CondWasTrue{
 		Id:       task_id,
 	})
 
-	return &modGenInfo_GL.Conds_were_true[len(modGenInfo_GL.Conds_were_true) - 1]
+	return &getModGenSettings().Conds_were_true[len(getModGenSettings().Conds_were_true) - 1]
 }

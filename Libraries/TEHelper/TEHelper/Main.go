@@ -29,17 +29,10 @@ import (
 	"time"
 )
 
-var user_location_GL *ModsFileInfo.UserLocation = &Utils.Gen_settings_GL.MOD_12.User_location
-
-var prev_curr_last_known_user_loc_GL string = user_location_GL.Curr_location
-var prev_prev_last_known_user_loc_GL string = user_location_GL.Prev_location
+var prev_curr_last_known_user_loc_GL string = getUserLocation().Curr_location
+var prev_prev_last_known_user_loc_GL string = getUserLocation().Prev_location
 
 var stop_GL bool = false
-
-var (
-	modGenInfo_GL  *ModsFileInfo.Mod9GenInfo = &Utils.Gen_settings_GL.MOD_9
-	modUserInfo_GL *ModsFileInfo.Mod9UserInfo = &Utils.User_settings_GL.TasksExecutor
-)
 
 /*
 CheckDueTasks checks if any Task is due.
@@ -56,13 +49,13 @@ func CheckDueTasks() *ModsFileInfo.Task {
 	stop_GL = false
 	for {
 		// Location trigger - if the user location changed, check if any task is triggered
-		var curr_last_known_user_loc string = user_location_GL.Curr_location
-		var prev_last_known_user_loc string = user_location_GL.Prev_location
+		var curr_last_known_user_loc string = getUserLocation().Curr_location
+		var prev_last_known_user_loc string = getUserLocation().Prev_location
 		if curr_last_known_user_loc != prev_curr_last_known_user_loc_GL || prev_last_known_user_loc != prev_prev_last_known_user_loc_GL {
 			prev_curr_last_known_user_loc_GL = curr_last_known_user_loc
 			prev_prev_last_known_user_loc_GL = prev_last_known_user_loc
 
-			for _, task := range modUserInfo_GL.Tasks {
+			for _, task := range getModUserSettings().Tasks {
 				// If the task has a time set or has no location, skip it
 				if !task.Enabled || task.Time != "" || task.User_location == "" {
 					continue
@@ -105,7 +98,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 		}
 
 		// Time/condition trigger - if the time changed (it always does), check if any task is triggered
-		for _, task := range modUserInfo_GL.Tasks {
+		for _, task := range getModUserSettings().Tasks {
 			if !task.Enabled {
 				continue
 			}
@@ -117,7 +110,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 				condition_loc = true
 			} else {
 				// Check if the task has a location and the user is at that location.
-				var curr_user_loc string = user_location_GL.Curr_location
+				var curr_user_loc string = getUserLocation().Curr_location
 				if curr_user_loc != ULHelper.UNKNOWN_LOCATION {
 					condition_loc = checkLocation(task.User_location, curr_user_loc)
 				}
@@ -150,17 +143,17 @@ func CheckDueTasks() *ModsFileInfo.Task {
 }
 
 func getTaskInfo(task_id int32) *ModsFileInfo.TaskInfo {
-	for i, task_info := range modGenInfo_GL.Tasks_info {
+	for i, task_info := range getModGenSettings().Tasks_info {
 		if task_info.Id == task_id {
-			return &modGenInfo_GL.Tasks_info[i]
+			return &getModGenSettings().Tasks_info[i]
 		}
 	}
 
-	modGenInfo_GL.Tasks_info = append(modGenInfo_GL.Tasks_info, ModsFileInfo.TaskInfo{
+	getModGenSettings().Tasks_info = append(getModGenSettings().Tasks_info, ModsFileInfo.TaskInfo{
 		Id: task_id,
 	})
 
-	return &modGenInfo_GL.Tasks_info[len(modGenInfo_GL.Tasks_info) - 1]
+	return &getModGenSettings().Tasks_info[len(getModGenSettings().Tasks_info) - 1]
 }
 
 /*
@@ -168,4 +161,16 @@ StopChecker stops the CheckDueTasks function.
  */
 func StopChecker() {
 	stop_GL = true
+}
+
+func getUserLocation() *ModsFileInfo.UserLocation {
+	return &Utils.GetGenSettings().MOD_12.User_location
+}
+
+func getModGenSettings() *ModsFileInfo.Mod9GenInfo {
+	return &Utils.GetGenSettings().MOD_9
+}
+
+func getModUserSettings() *ModsFileInfo.Mod9UserInfo {
+	return &Utils.GetUserSettings().TasksExecutor
 }

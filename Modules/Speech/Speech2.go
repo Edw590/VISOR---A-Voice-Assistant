@@ -25,6 +25,7 @@ import (
 	"GPTComm/GPTComm"
 	"SpeechQueue/SpeechQueue"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
 	"log"
@@ -69,9 +70,7 @@ var curr_speech_GL *SpeechQueue.Speech = nil
 
 var mutex sync.Mutex
 
-var (
-	modDirsInfo_GL Utils.ModDirsInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
@@ -208,4 +207,8 @@ SkipCurrentSpeech skips the current speech.
  */
 func SkipCurrentSpeech() bool {
 	return stopTts()
+}
+
+func getMod10GenSettings() *ModsFileInfo.Mod10GenInfo {
+	return &Utils.GetGenSettings().MOD_10
 }

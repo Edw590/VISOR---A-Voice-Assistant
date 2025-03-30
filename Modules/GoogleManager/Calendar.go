@@ -47,7 +47,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 		return false
 	}
 
-	modGenInfo_GL.Token_invalid = false
+	getModGenSettings().Token_invalid = false
 
 	// Calculate the start of the current week (Monday)
 	now := time.Now()
@@ -120,7 +120,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 			}
 		}
 
-		modGenInfo_GL.Events = events_final
+		getModGenSettings().Events = events_final
 	}
 
 	return true

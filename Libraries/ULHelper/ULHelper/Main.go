@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,14 +35,6 @@ const LAST_UNUSED_MAX_S int64 = 5 * 60
 
 var stop_GL bool = false
 
-var device_info_GL *ModsFileInfo.DeviceInfo = &Utils.Gen_settings_GL.MOD_10.Device_info
-var user_location_GL *ModsFileInfo.UserLocation = &modGenInfo_GL.User_location
-
-var (
-	modGenInfo_GL  *ModsFileInfo.Mod12GenInfo = &Utils.Gen_settings_GL.MOD_12
-	modUserInfo_GL *ModsFileInfo.Mod12UserInfo = &Utils.User_settings_GL.UserLocator
-)
-
 /*
 UpdateUserLocation updates the internal user location based on the internal device information.
 */
@@ -52,16 +44,16 @@ func UpdateUserLocation() {
 	for {
 		var curr_location = UNKNOWN_LOCATION
 
-		for _, location_info := range modUserInfo_GL.Locs_info {
+		for _, location_info := range getModUserInfo().Locs_info {
 			if !location_info.Enabled {
 				continue
 			}
 
 			var beacons_list []ModsFileInfo.ExtBeacon
 			if location_info.Type == "wifi" {
-				beacons_list = device_info_GL.System_state.Connectivity_info.Wifi_networks
+				beacons_list = getDeviceInfo().System_state.Connectivity_info.Wifi_networks
 			} else if location_info.Type == "bluetooth" {
-				beacons_list = device_info_GL.System_state.Connectivity_info.Bluetooth_devices
+				beacons_list = getDeviceInfo().System_state.Connectivity_info.Bluetooth_devices
 			} else {
 				continue
 			}
@@ -91,7 +83,7 @@ func UpdateUserLocation() {
 					// If the device is near the beacon, then the user may be near the location.
 					curr_location = location_info.Location
 					if checkUserLocation(curr_location) {
-						user_location_GL.Last_detection_when_s = time.Now().Unix()
+						getUserLocation().Last_detection_when_s = time.Now().Unix()
 					}
 
 					break
@@ -102,9 +94,9 @@ func UpdateUserLocation() {
 		// If no beacon was found, check if the user may still be in the location based on the time the location was
 		// last detected.
 		if curr_location == UNKNOWN_LOCATION {
-			for _, location_info := range modUserInfo_GL.Locs_info {
-				if user_location_GL.Curr_location == location_info.Location &&
-					user_location_GL.Last_detection_when_s + location_info.Last_detection_s >= time.Now().Unix() {
+			for _, location_info := range getModUserInfo().Locs_info {
+				if getUserLocation().Curr_location == location_info.Location &&
+					getUserLocation().Last_detection_when_s + location_info.Last_detection_s >= time.Now().Unix() {
 					curr_location = location_info.Location
 
 					break
@@ -127,12 +119,12 @@ func checkUserLocation(location string) bool {
 		return true
 	}
 
-	if modUserInfo_GL.AlwaysWith_device == Utils.Gen_settings_GL.Device_settings.Id {
+	if getModUserInfo().AlwaysWith_device == Utils.GetGenSettings().Device_settings.Id {
 		return true
 	}
 
 	var approved bool = false
-	if device_info_GL.Last_time_used_s + LAST_UNUSED_MAX_S >= time.Now().Unix() {
+	if getDeviceInfo().Last_time_used_s + LAST_UNUSED_MAX_S >= time.Now().Unix() {
 		approved = true
 	}
 
@@ -141,16 +133,16 @@ func checkUserLocation(location string) bool {
 
 func updateUserLocation(new_location string) {
 	if new_location != UNKNOWN_LOCATION {
-		user_location_GL.Last_known_location = user_location_GL.Curr_location
+		getUserLocation().Last_known_location = getUserLocation().Curr_location
 	}
 
-	if new_location != user_location_GL.Curr_location {
-		user_location_GL.Prev_location = user_location_GL.Curr_location
-		user_location_GL.Prev_last_time_checked_s = user_location_GL.Last_time_checked_s
+	if new_location != getUserLocation().Curr_location {
+		getUserLocation().Prev_location = getUserLocation().Curr_location
+		getUserLocation().Prev_last_time_checked_s = getUserLocation().Last_time_checked_s
 
-		user_location_GL.Curr_location = new_location
+		getUserLocation().Curr_location = new_location
 	}
-	user_location_GL.Last_time_checked_s = time.Now().Unix()
+	getUserLocation().Last_time_checked_s = time.Now().Unix()
 }
 
 /*
@@ -158,4 +150,20 @@ StopChecker stops the user location checker.
  */
 func StopChecker() {
 	stop_GL = true
+}
+
+func getUserLocation() *ModsFileInfo.UserLocation {
+	return &getModGenSettings().User_location
+}
+
+func getDeviceInfo() *ModsFileInfo.DeviceInfo {
+	return &Utils.GetGenSettings().MOD_10.Device_info
+}
+
+func getModGenSettings() *ModsFileInfo.Mod12GenInfo {
+	return &Utils.GetGenSettings().MOD_12
+}
+
+func getModUserInfo() *ModsFileInfo.Mod12UserInfo {
+	return &Utils.GetUserSettings().UserLocator
 }

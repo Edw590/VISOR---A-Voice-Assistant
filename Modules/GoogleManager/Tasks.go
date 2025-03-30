@@ -48,7 +48,7 @@ func storeTasks(client *http.Client) bool {
 		return false
 	}
 
-	modGenInfo_GL.Token_invalid = false
+	getModGenSettings().Token_invalid = false
 
 	if len(task_lists.Items) == 0 {
 		//log.Println("No task lists found.")
@@ -94,7 +94,7 @@ func storeTasks(client *http.Client) bool {
 		}
 	}
 
-	modGenInfo_GL.Tasks = tasks_final
+	getModGenSettings().Tasks = tasks_final
 
 	return true
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,6 +24,7 @@ package Utils
 import (
 	"Utils/ModsFileInfo"
 	"errors"
+	"sync"
 )
 
 const USER_SETTINGS_FILE string = "UserSettings_EOG.dat"
@@ -32,14 +33,17 @@ const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.dat"
 
 // User_settings_GL is the global variable that holds the user settings. It is saved to the USER_SETTINGS_FILE file
 // every 5 seconds.
-var User_settings_GL UserSettings
+var user_settings_GL UserSettings
 // Gen_settings_GL is the global variable that holds the general settings. It is saved to the GEN_SETTINGS_FILE_CLIENT
-// file every 5 seconds.
-var Gen_settings_GL GenSettings
+// or _GEN_SETTINGS_FILE_SERVER file every 5 seconds.
+var gen_settings_GL GenSettings
 
 var VISOR_server_GL bool = false
 
 var Password_GL string = ""
+
+var mutex_US sync.Mutex
+var mutex_GS sync.Mutex
 
 type UserSettings struct {
 	General         ModsFileInfo.GeneralConsts
@@ -68,12 +72,52 @@ type GenSettings struct {
 }
 
 /*
+GetUserSettings is the function that returns the User settings.
+
+This function is thread-safe. It uses a mutex to lock and unlock the access to the global variable.
+
+DO NOT SET THIS POINTER ON VARIABLES!!! Each time you want to use the settings, call this function and use its pointer
+directly - not indirectly! It's like if it was a temporary pointer that only lasts for one usage.
+
+-----------------------------------------------------------
+
+– Returns:
+  - a pointer to the user_settings_GL variable
+ */
+func GetUserSettings() *UserSettings {
+	mutex_US.Lock()
+	defer mutex_US.Unlock()
+
+	return &user_settings_GL
+}
+
+/*
+GetGenSettings is the function that returns the Generated settings.
+
+This function is thread-safe. It uses a mutex to lock and unlock the access to the global variable.
+
+DO NOT SET THIS POINTER ON VARIABLES!!! Each time you want to use the settings, call this function and use its pointer
+directly - not indirectly! It's like if it was a temporary pointer that only lasts for one usage.
+
+-----------------------------------------------------------
+
+– Returns:
+  - a pointer to the gen_settings_GL variable
+ */
+func GetGenSettings() *GenSettings {
+	mutex_GS.Lock()
+	defer mutex_GS.Unlock()
+
+	return &gen_settings_GL
+}
+
+/*
 ReadSettingsFile is the function that reads the User and Generated settings from disk.
 
 -----------------------------------------------------------
 
 – Params:
-  - server – true if the version running is the server version, false if it is the client version
+  - user_settings – true if the user settings should be read, false if the generated settings should be read
 
 – Returns:
   - an error if the settings file was not found or if the JSON file could not be parsed, nil otherwise
@@ -96,9 +140,9 @@ func ReadSettingsFile(user_settings bool) error {
 			bytes = DecryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), bytes, nil)
 		}
 
-		var p_settings any = &Gen_settings_GL
+		var p_settings any = GetGenSettings()
 		if user_settings {
-			p_settings = &User_settings_GL
+			p_settings = GetUserSettings()
 		}
 		if err := FromJsonGENERAL(bytes, p_settings); err != nil {
 			return err
@@ -137,16 +181,15 @@ WriteSettingsFile is the function that writes the User and Generated settings to
 -----------------------------------------------------------
 
 – Params:
-  - server – true if the version running is the server version, false if it is the client version
   - user_settings – true if the user settings should be saved, false if the generated settings should be saved
 
 – Returns:
   - true if the settings were successfully saved, false otherwise
  */
 func WriteSettingsFile(user_settings bool) bool {
-	var settings any = Gen_settings_GL
+	var settings any = *GetGenSettings()
 	if user_settings {
-		settings = User_settings_GL
+		settings = *GetUserSettings()
 	}
 	var p_string *string = ToJsonGENERAL(settings)
 	if p_string == nil {

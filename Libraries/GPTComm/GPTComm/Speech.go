@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -96,7 +96,7 @@ func GetNextSpeechSentence() string {
 
 		var entry *_Entry = getEntry(-1, -1)
 		var device_id string = entry.getDeviceID()
-		if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.Gen_settings_GL.Device_settings.Id ||
+		if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.GetGenSettings().Device_settings.Id ||
 				device_id == ALL_DEVICES_ID) {
 			curr_entry_time_ms_GL = entry.getTime()
 			if curr_entry_time_ms_GL != 1 {

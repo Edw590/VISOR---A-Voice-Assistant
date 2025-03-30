@@ -39,7 +39,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	porcupine_ := porcupine.Porcupine{
-		AccessKey: Utils.User_settings_GL.General.Picovoice_API_key, // from Picovoice Console (https://console.picovoice.ai/)
+		AccessKey: Utils.GetUserSettings().General.Picovoice_API_key, // from Picovoice Console (https://console.picovoice.ai/)
 		KeywordPaths: []string{
 			modDirsInfo_GL.ProgramData.Add2(false, "Hey-Visor_en_windows_v3_0_0.ppn").GPathToStringConversion(),
 		},

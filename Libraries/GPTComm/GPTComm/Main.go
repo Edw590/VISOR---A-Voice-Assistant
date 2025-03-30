@@ -50,14 +50,14 @@ SendText sends the given text to the LLM model.
 func SendText(text string, session_type string, role string, more_coming bool) int32 {
 	var message []byte = []byte("GPT|")
 	if text != "" {
-		var curr_location string = Utils.Gen_settings_GL.MOD_12.User_location.Curr_location
+		var curr_location string = Utils.GetGenSettings().MOD_12.User_location.Curr_location
 		var date_time string = time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04")
 
 		var new_text string = text
 		if role == ROLE_USER {
 			new_text = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
 		}
-		message = append(message, Utils.CompressString("[" + Utils.Gen_settings_GL.Device_settings.Id + "|" +
+		message = append(message, Utils.CompressString("[" + Utils.GetGenSettings().Device_settings.Id + "|" +
 			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "]" + new_text)...)
 	}
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message) {

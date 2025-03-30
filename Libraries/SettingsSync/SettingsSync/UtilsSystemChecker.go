@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -32,5 +32,5 @@ GetDeviceInfoJsonSYSCHK returns the device info in JSON format.
   - the device info in JSON format
  */
 func GetDeviceInfoJsonSYSCHK() string {
-	return *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_10.Device_info)
+	return *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_10.Device_info)
 }

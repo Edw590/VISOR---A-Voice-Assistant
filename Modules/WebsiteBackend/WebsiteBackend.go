@@ -46,14 +46,10 @@ const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT. -->
 var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
 var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-	modUserInfo_GL *ModsFileInfo.Mod8UserInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modUserInfo_GL = &Utils.User_settings_GL.WebsiteBackend
 
 	go func() {
 		for {
@@ -86,7 +82,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 		//log.Println("Server running on port 3234")
 		srv = &http.Server{Addr: ":3234"}
-		err := srv.ListenAndServeTLS(modUserInfo_GL.Crt_file, modUserInfo_GL.Key_file)
+		err := srv.ListenAndServeTLS(getModUserInfo().Crt_file, getModUserInfo().Key_file)
 		if err != nil {
 			log.Println("ListenAndServeTLS error:", err)
 		}
@@ -303,7 +299,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			// Example: a compressed string or nil to just get the return value
 			// Returns: "true" if the text will be processed immediately, "false" if the GPT is busy for now and the
 			// text will wait
-			var ret []byte = []byte(strconv.Itoa(int(Utils.Gen_settings_GL.MOD_7.State)))
+			var ret []byte = []byte(strconv.Itoa(int(Utils.GetGenSettings().MOD_7.State)))
 
 			if len(bytes) > 0 {
 				// Don't use channels for this. What if various messages are sent while one is still be processed? The
@@ -324,23 +320,23 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			var settings string = ""
 			switch json_origin {
 				case "US":
-					settings = *Utils.ToJsonGENERAL(Utils.User_settings_GL)
+					settings = *Utils.ToJsonGENERAL(*Utils.GetUserSettings())
 				case "Weather":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.Weather)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_6.Weather)
 				case "News":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_6.News)
 				case "GPTMem":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_7.Memories)
 				case "GPTSessions":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Sessions)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_7.Sessions)
 				case "GManTok":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_14.Token)
 				case "GManEvents":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_14.Events)
 				case "GManTasks":
-					settings = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_14.Tasks)
 				case "GManTokVal":
-					settings = strconv.FormatBool(!Utils.Gen_settings_GL.MOD_14.Token_invalid)
+					settings = strconv.FormatBool(!Utils.GetGenSettings().MOD_14.Token_invalid)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}
@@ -367,29 +363,29 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 						// Only accept the new settings if as a start the website information exists (or else the
 						// client will be locked out of the server surely), but also if the user email is set (that will
 						// mean the settings are not empty).
-						Utils.User_settings_GL = user_settings
+						*Utils.GetUserSettings() = user_settings
 					}
 				case "GPTMem":
 					settings = strings.Replace(settings, "\\r", "", -1)
-					_ = Utils.FromJsonGENERAL([]byte(settings), &Utils.Gen_settings_GL.MOD_7.Memories)
+					_ = Utils.FromJsonGENERAL([]byte(settings), &Utils.GetGenSettings().MOD_7.Memories)
 				case "GManTok":
-					Utils.Gen_settings_GL.MOD_14.Token = settings
+					Utils.GetGenSettings().MOD_14.Token = settings
 				case "GPTSession":
 					var instructions []string = strings.Split(settings, "\000")
 					var session_id string = instructions[0]
 					var action string = instructions[1]
 					if action == "delete" {
-						for i, session := range Utils.Gen_settings_GL.MOD_7.Sessions {
+						for i, session := range Utils.GetGenSettings().MOD_7.Sessions {
 							if session.Id == session_id {
-								Utils.DelElemSLICES(&Utils.Gen_settings_GL.MOD_7.Sessions, i)
+								Utils.DelElemSLICES(&Utils.GetGenSettings().MOD_7.Sessions, i)
 
 								break
 							}
 						}
 					} else if action == "rename" {
-						for i, session := range Utils.Gen_settings_GL.MOD_7.Sessions {
+						for i, session := range Utils.GetGenSettings().MOD_7.Sessions {
 							if session.Id == session_id {
-								Utils.Gen_settings_GL.MOD_7.Sessions[i].Name = instructions[2]
+								Utils.GetGenSettings().MOD_7.Sessions[i].Name = instructions[2]
 
 								break
 							}
@@ -437,4 +433,8 @@ func getCRC16(bytes []byte) []byte {
 	crc16_bytes[1] = byte(crc16)
 
 	return crc16_bytes
+}
+
+func getModUserInfo() *ModsFileInfo.Mod8UserInfo {
+	return &Utils.GetUserSettings().WebsiteBackend
 }

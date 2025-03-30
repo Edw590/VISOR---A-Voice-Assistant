@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -36,7 +36,7 @@ func rightBeforeSpeaking(speech_id string) bool {
 	var notified bool = false
 
 	var skip_speaking bool = false
-	if Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Muted {
+	if getMod10GenSettings().Device_info.System_state.Sound_info.Muted {
 		skip_speaking = curr_speech.GetPriority() != SpeechQueue.PRIORITY_CRITICAL &&
 			(curr_speech.GetMode() & SpeechQueue.MODE2_BYPASS_NO_SND) == 0
 	}
@@ -75,7 +75,7 @@ func setToSpeakChanges(speech_id string) bool {
 
 	if curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
 		// Set the muted state
-		if Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Muted {
+		if getMod10GenSettings().Device_info.System_state.Sound_info.Muted {
 			volumeMutedState_GL.was_muted = 1
 		} else {
 			volumeMutedState_GL.was_muted = 0
@@ -83,7 +83,7 @@ func setToSpeakChanges(speech_id string) bool {
 		Utils.SetMutedVOLUME(false)
 
 		// Set the volume
-		var curr_volume int = Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume
+		var curr_volume int = getMod10GenSettings().Device_info.System_state.Sound_info.Volume
 		volumeMutedState_GL.old_volume = curr_volume
 		var new_volume int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_CRITICAL_VOL).GetInt(true))
 
@@ -94,7 +94,7 @@ func setToSpeakChanges(speech_id string) bool {
 		}
 	} else {
 		if curr_speech.GetMode() & SpeechQueue.MODE2_BYPASS_NO_SND != 0 {
-			if Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Muted {
+			if getMod10GenSettings().Device_info.System_state.Sound_info.Muted {
 				volumeMutedState_GL.was_muted = 1
 			} else {
 				volumeMutedState_GL.was_muted = 0
@@ -104,9 +104,9 @@ func setToSpeakChanges(speech_id string) bool {
 			}
 		}
 
-		if !Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Muted {
+		if !getMod10GenSettings().Device_info.System_state.Sound_info.Muted {
 			// Set the volume
-			var curr_volume int = Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume
+			var curr_volume int = getMod10GenSettings().Device_info.System_state.Sound_info.Volume
 			volumeMutedState_GL.old_volume = curr_volume
 
 			log.Println("GGGGGGGGGGGGGGGGGGGGGGGGG")

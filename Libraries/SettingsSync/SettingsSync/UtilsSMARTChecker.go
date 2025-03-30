@@ -41,7 +41,7 @@ AddDiskSMART adds a disk to the user settings.
   - true if the disk was added, false if the ID already exists
  */
 func AddDiskSMART(id string, enabled bool, label string, is_hdd bool) bool {
-	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.User_settings_GL.SMARTChecker.Disks_info
+	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.GetUserSettings().SMARTChecker.Disks_info
 	for _, disk_info := range *disks_info {
 		if disk_info.Id == id {
 			return false
@@ -72,7 +72,7 @@ RemoveDiskSMART removes a disk from the user settings.
   - id – the disk serial number
  */
 func RemoveDiskSMART(id string) {
-	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.User_settings_GL.SMARTChecker.Disks_info
+	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.GetUserSettings().SMARTChecker.Disks_info
 	for i := range *disks_info {
 		if (*disks_info)[i].Id == id {
 			Utils.DelElemSLICES(disks_info, i)
@@ -92,7 +92,7 @@ GetIdsListSMART returns a list of all disks' IDs.
  */
 func GetIdsListSMART() string {
 	var ids_list string = ""
-	for _, disk_info := range Utils.User_settings_GL.SMARTChecker.Disks_info {
+	for _, disk_info := range Utils.GetUserSettings().SMARTChecker.Disks_info {
 		ids_list += disk_info.Id + "|"
 	}
 	ids_list = ids_list[:len(ids_list)-1]
@@ -112,7 +112,7 @@ GetDiskSMART returns a disk by its ID.
   - the disk or nil if the disk was not found
  */
 func GetDiskSMART(id string) *ModsFileInfo.DiskInfo {
-	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
+	var disks_info []ModsFileInfo.DiskInfo = Utils.GetUserSettings().SMARTChecker.Disks_info
 	for i := range disks_info {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
 		if disk_info.Id == id {

@@ -76,19 +76,13 @@ const _MAX_URLS_STORED int = 100
 
 const _TIME_SLEEP_S int = 2*60
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-	modGenInfo_GL  *ModsFileInfo.Mod4GenInfo
-	modUserInfo_GL *ModsFileInfo.Mod4UserInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_4
-	modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
 
 	for {
-		for _, feedInfo := range modUserInfo_GL.Feeds_info {
+		for _, feedInfo := range Utils.GetUserSettings().RSSFeedNotifier.Feeds_info {
 			if !feedInfo.Enabled {
 				continue
 			}
@@ -126,7 +120,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 			var new_feed bool = true
 			var newsInfo_list []ModsFileInfo.NewsInfo2 = nil
-			for _, newsInfo := range modGenInfo_GL.Notified_news {
+			for _, newsInfo := range getModGenSettings().Notified_news {
 				if newsInfo.Id == feedInfo.Id {
 					new_feed = false
 					newsInfo_list = newsInfo.News_info
@@ -207,16 +201,16 @@ func main(module_stop *bool, moduleInfo_any any) {
 			}
 
 			var found bool = false
-			for i, news_info := range modGenInfo_GL.Notified_news {
+			for i, news_info := range getModGenSettings().Notified_news {
 				if news_info.Id == feedInfo.Id {
-					modGenInfo_GL.Notified_news[i].News_info = newsInfo_list
+					getModGenSettings().Notified_news[i].News_info = newsInfo_list
 					found = true
 
 					break
 				}
 			}
 			if !found {
-				modGenInfo_GL.Notified_news = append(modGenInfo_GL.Notified_news, ModsFileInfo.NewsInfo{
+				getModGenSettings().Notified_news = append(getModGenSettings().Notified_news, ModsFileInfo.NewsInfo{
 					Id: feedInfo.Id,
 					News_info: newsInfo_list,
 				})
@@ -330,7 +324,7 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 
 	err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
 		Sender:  sender_name,
-		Mail_to: Utils.User_settings_GL.General.User_email_addr,
+		Mail_to: Utils.GetUserSettings().General.User_email_addr,
 		Subject: subject,
 		Html:    html,
 		Multiparts: nil,
@@ -340,4 +334,8 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 	}
 
 	return true
+}
+
+func getModGenSettings() *ModsFileInfo.Mod4GenInfo {
+	return &Utils.GetGenSettings().MOD_4
 }

@@ -44,7 +44,7 @@ AddFeedRSS adds a feed to the user settings.
   - the ID of the feed
  */
 func AddFeedRSS(enabled bool, name string, url string, type_ string, custom_msg_subject string) int32 {
-	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
+	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.GetUserSettings().RSSFeedNotifier.Feeds_info
 	var id int32 = 1
 	for i := 0; i < len(*feeds_info); i++ {
 		if (*feeds_info)[i].Id == id {
@@ -79,7 +79,7 @@ RemoveFeedRSS removes a feed from the user settings.
   - feed_id – the feed ID
  */
 func RemoveFeedRSS(feed_id int32) {
-	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
+	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.GetUserSettings().RSSFeedNotifier.Feeds_info
 	for i := range *feeds_info {
 		if (*feeds_info)[i].Id == feed_id {
 			Utils.DelElemSLICES(feeds_info, i)
@@ -98,7 +98,7 @@ GetIdsListRSS returns a list of all feeds' IDs.
   - a list of all feeds' IDs separated by "|"
  */
 func GetIdsListRSS() string {
-	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
+	var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.GetUserSettings().RSSFeedNotifier.Feeds_info
 	var ids_list string = ""
 	for _, feed_info := range *feeds_info {
 		ids_list += strconv.Itoa(int(feed_info.Id)) + "|"
@@ -122,7 +122,7 @@ GetFeedRSS returns a feed by its ID.
   - the feed or nil if the feed was not found
  */
 func GetFeedRSS(feed_id int32) *ModsFileInfo.FeedInfo {
-	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
+	var feeds_info []ModsFileInfo.FeedInfo = Utils.GetUserSettings().RSSFeedNotifier.Feeds_info
 	for i := range feeds_info {
 		var feed_info *ModsFileInfo.FeedInfo = &feeds_info[i]
 		if feed_info.Id == feed_id {

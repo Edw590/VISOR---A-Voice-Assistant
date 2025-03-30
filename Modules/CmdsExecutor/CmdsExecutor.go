@@ -40,16 +40,12 @@ import (
 	"time"
 )
 
-// Commands Executor //
-
 var last_it string = ""
 var last_it_when int64 = 0
 var last_and string = ""
 var last_and_when int64 = 0
 
-var (
-	modDirsInfo_GL  Utils.ModDirsInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)

@@ -77,12 +77,12 @@ func startCommunicatorInternalSERVER() {
 	var stop bool = false
 
 	// Define the WebSocket server address
-	u := url.URL{Scheme: "wss", Host: User_settings_GL.General.Website_domain + ":3234", Path: "/ws"}
+	u := url.URL{Scheme: "wss", Host: GetUserSettings().General.Website_domain + ":3234", Path: "/ws"}
 	//log.Printf("Connecting to %s", u.String())
 
 	// Create Basic Auth credentials (username:password)
 	username := "VISOR"
-	password := User_settings_GL.General.Website_pw
+	password := GetUserSettings().General.Website_pw
 	auth := username + ":" + password
 	authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 
@@ -171,7 +171,7 @@ func startCommunicatorInternalSERVER() {
 		for {
 			var message []byte
 			if first_message {
-				message = []byte(Gen_settings_GL.Device_settings.Id)
+				message = []byte(GetGenSettings().Device_settings.Id)
 				first_message = false
 			} else {
 				message = <- srvComm_gen_ch_out_GL

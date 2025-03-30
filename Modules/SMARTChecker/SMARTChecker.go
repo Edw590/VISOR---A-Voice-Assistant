@@ -39,16 +39,10 @@ const _SHORT_TEST_EACH_S int64 = 5*60*60*99999999999 // oo hours (test disabled)
 
 const _TIME_SLEEP_S int = 60
 
-var (
-	modDirsInfo_GL   Utils.ModDirsInfo
-	modGenInfo_GL   *ModsFileInfo.Mod3GenInfo
-	modUserInfo_GL  *ModsFileInfo.Mod3UserInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
-	modGenInfo_GL = &Utils.Gen_settings_GL.MOD_3
-	modUserInfo_GL = &Utils.User_settings_GL.SMARTChecker
 
 	if !Utils.RunningAsAdminPROCESSES() {
 		panic(errors.New("this program must be run as administrator/root"))
@@ -68,7 +62,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}
 
 	for {
-		var disks_to_chk []ModsFileInfo.DiskInfo = modUserInfo_GL.Disks_info
+		var disks_to_chk []ModsFileInfo.DiskInfo = Utils.GetUserSettings().SMARTChecker.Disks_info
 		if len(disks_to_chk) == 0 {
 			//log.Println("No disks to check.")
 
@@ -236,15 +230,19 @@ func main(module_stop *bool, moduleInfo_any any) {
 }
 
 func getDiskInfo2(disk_serial string) *ModsFileInfo.DiskInfo2 {
-	for i, disk_gen_info := range modGenInfo_GL.Disks_info {
+	for i, disk_gen_info := range getModGenSettings().Disks_info {
 		if disk_gen_info.Id == disk_serial {
-			return &modGenInfo_GL.Disks_info[i]
+			return &getModGenSettings().Disks_info[i]
 		}
 	}
 
-	modGenInfo_GL.Disks_info = append(modGenInfo_GL.Disks_info, ModsFileInfo.DiskInfo2{
+	getModGenSettings().Disks_info = append(getModGenSettings().Disks_info, ModsFileInfo.DiskInfo2{
 		Id: disk_serial,
 	})
 
-	return &modGenInfo_GL.Disks_info[len(modGenInfo_GL.Disks_info)-1]
+	return &getModGenSettings().Disks_info[len(getModGenSettings().Disks_info)-1]
+}
+
+func getModGenSettings() *ModsFileInfo.Mod3GenInfo {
+	return &Utils.GetGenSettings().MOD_3
 }
