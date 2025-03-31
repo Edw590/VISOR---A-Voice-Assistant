@@ -75,7 +75,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 	// In case Ollama was started (as opposed to already being running), send a test message for it to actually
 	// start and be ready.
-	sendToGPT(Utils.GetGenSettings().Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
+	chatWithGPT(Utils.GetGenSettings().Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
 
 	go autoMemorize()
 

@@ -77,6 +77,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		Timestamp_s: time.Now().Unix(),
 	})
 
+	var response string = ""
 	if !more_coming {
 		var history_with_system_prompt []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(curr_session.History)
 		var system_prompt string = ""
@@ -147,7 +148,8 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		}
 		defer resp.Body.Close()
 
-		var response, timestamp = readGPT(device_id, resp, true)
+		response_str, timestamp := readGPT(device_id, resp, true)
+		response = response_str
 		if response != "" {
 			response = response[:len(response)-1] // Remove the last character, which is a null character
 		}
@@ -160,8 +162,6 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 			})
 			curr_session.Last_interaction_s = time.Now().Unix()
 		}
-
-		return response
 	}
 
 	if session_id != "temp" && session_id != "dumb" {
@@ -175,7 +175,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		}
 	}
 
-	return ""
+	return response
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
