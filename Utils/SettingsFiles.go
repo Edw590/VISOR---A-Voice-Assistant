@@ -42,8 +42,8 @@ var VISOR_server_GL bool = false
 
 var Password_GL string = ""
 
-var mutex_US sync.Mutex
-var mutex_GS sync.Mutex
+var mutex_US_GL sync.Mutex
+var mutex_GS_GL sync.Mutex
 
 type UserSettings struct {
 	General         ModsFileInfo.GeneralConsts
@@ -85,8 +85,8 @@ directly - not indirectly! It's like if it was a temporary pointer that only las
   - a pointer to the user_settings_GL variable
  */
 func GetUserSettings() *UserSettings {
-	mutex_US.Lock()
-	defer mutex_US.Unlock()
+	mutex_US_GL.Lock()
+	defer mutex_US_GL.Unlock()
 
 	return &user_settings_GL
 }
@@ -105,8 +105,8 @@ directly - not indirectly! It's like if it was a temporary pointer that only las
   - a pointer to the gen_settings_GL variable
  */
 func GetGenSettings() *GenSettings {
-	mutex_GS.Lock()
-	defer mutex_GS.Unlock()
+	mutex_GS_GL.Lock()
+	defer mutex_GS_GL.Unlock()
 
 	return &gen_settings_GL
 }

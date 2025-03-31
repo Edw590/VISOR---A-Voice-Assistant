@@ -75,7 +75,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 	// In case Ollama was started (as opposed to already being running), send a test message for it to actually
 	// start and be ready.
-	chatWithGPT(Utils.GetGenSettings().Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
+	sendToGPT(Utils.GetGenSettings().Device_settings.Id, "test", "temp", GPTComm.ROLE_USER, false)
 
 	go autoMemorize()
 
@@ -127,7 +127,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + "The answer is: " + result +
 							". " + getEndString(), true)
 					} else {
-						chatWithGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
+						sendToGPT(device_id, "I've got this from WolframAlpha. Summarize it for me: " + result + "]",
 							session_id, role, more_coming)
 					}
 				} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
@@ -137,7 +137,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
 						getEndString(), true)
 				} else if !strings.Contains(text, STOP_CMD) {
-					chatWithGPT(device_id, text, session_id, role, more_coming)
+					sendToGPT(device_id, text, session_id, role, more_coming)
 				}
 			}
 
@@ -151,6 +151,12 @@ func main(module_stop *bool, moduleInfo_any any) {
 			return
 		}
 	}
+}
+
+func sendToGPT(device_id string, user_message string, session_id string, role string, more_coming bool) string {
+	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_BUSY
+
+	return chatWithGPT(device_id, user_message, session_id, role, more_coming)
 }
 
 func addSessionEntry(session_id string, last_interaction_s int64, user_message string) bool {
@@ -177,7 +183,7 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
 				"inside \"double quotation marks\", please. Don't include the date and time. Text: " +
 				message_without_add_info
-			session_name = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
+			session_name = sendToGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
 			if strings.Contains(session_name, "\"") {
 				session_name = strings.Split(session_name, "\"")[1]
 				// Sometimes the name may come like "[name here]", so remove the brackets.
