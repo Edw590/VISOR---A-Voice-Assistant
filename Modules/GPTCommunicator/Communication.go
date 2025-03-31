@@ -179,7 +179,10 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
-	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_BUSY
+	if getModGenSettings().State != ModsFileInfo.MOD_7_STATE_STARTING {
+		// If the module is starting, keep it on the starting state until it becomes ready. Else, set it to busy.
+		getModGenSettings().State = ModsFileInfo.MOD_7_STATE_BUSY
+	}
 
 	var writing_to_self bool = device_id == Utils.GetGenSettings().Device_settings.Id
 
