@@ -58,6 +58,8 @@ type Session struct {
 
 // Mod7UserInfo is the format of the custom information file about this specific module.
 type Mod7UserInfo struct {
+	// Server_uri is the URL of the LLM server
+	Server_uri string
 	// Model_name is the name of the LLM model to use
 	Model_name string
 	// Model_has_tool_role indicates if the tool role of the LLM model exists or not
