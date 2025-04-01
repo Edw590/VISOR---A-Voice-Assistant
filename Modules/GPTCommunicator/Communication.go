@@ -133,7 +133,8 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 
 		log.Println("Posting to Ollama: ", string(jsonData))
 
-		resp, err := http.Post("http://"+getModUserInfo().Server_uri+"/api/chat", "application/json; charset=utf-8", bytes.NewBuffer(jsonData))
+		resp, err := http.Post("http://" + getModUserInfo().Server_uri + "/api/chat", "application/json; charset=utf-8",
+			bytes.NewBuffer(jsonData))
 		if err != nil {
 			log.Println("Error posting to Ollama: ", err)
 
