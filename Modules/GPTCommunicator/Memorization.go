@@ -35,7 +35,9 @@ import (
 func autoMemorize() {
 	for {
 		if getModGenSettings().State == ModsFileInfo.MOD_7_STATE_READY {
-			for _, session := range getModGenSettings().Sessions {
+			var session_history []ModsFileInfo.Session = getModGenSettings().Sessions
+			for i := 0; i < len(session_history); i++ {
+				var session *ModsFileInfo.Session = &session_history[i]
 				if session.Id == getActiveSessionId() || session.Memorized || session.Id == "temp" || session.Id == "dumb" {
 					continue
 				}
