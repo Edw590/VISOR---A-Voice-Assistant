@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,8 +22,10 @@
 package OICNews
 
 import (
+	"Utils"
 	"Utils/ModsFileInfo"
 	"github.com/tebeka/selenium"
+	"log"
 )
 
 /*
@@ -44,7 +46,9 @@ func UpdateNews(driver selenium.WebDriver, news_locs []string) []ModsFileInfo.Ne
 	for _, news_loc := range news_locs {
 		texts, err := findNews(driver, news_loc + " news")
 		if err != nil {
-			panic(err)
+			log.Println("Error while searching for news for " + news_loc + ": " + Utils.GetFullErrorMsgGENERAL(err))
+
+			continue
 		}
 		//log.Println("Current news in " + news_loc + ":")
 		//for _, text := range texts {

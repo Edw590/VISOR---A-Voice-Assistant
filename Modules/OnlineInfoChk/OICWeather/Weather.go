@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,9 +22,47 @@
 package OICWeather
 
 import (
+	"Utils"
 	"Utils/ModsFileInfo"
-	"github.com/tebeka/selenium"
+	"log"
+	"strconv"
+	"strings"
 )
+
+type OpenMeteoWeather struct {
+	Current_units Current_units `json:"current_units"`
+	Current Current `json:"current"`
+	Daily_units Daily_units `json:"daily_units"`
+	Daily Daily `json:"daily"`
+}
+
+type Current_units struct {
+	Time string `json:"time"`
+	Temperature_2m string `json:"temperature_2m"`
+	Relative_humidity_2m string `json:"relative_humidity_2m"`
+	Wind_speed_10m string `json:"wind_speed_10m"`
+	Precipitation string `json:"precipitation"`
+}
+
+type Daily_units struct {
+	Time string `json:"time"`
+	Temperature_2m_max string `json:"temperature_2m_max"`
+	Temperature_2m_min string `json:"temperature_2m_min"`
+}
+
+type Current struct {
+	Time int64 `json:"time"`
+	Temperature_2m float32 `json:"temperature_2m"`
+	Relative_humidity_2m float32 `json:"relative_humidity_2m"`
+	Wind_speed_10m float32 `json:"wind_speed_10m"`
+	Precipitation float32 `json:"precipitation"`
+}
+
+type Daily struct {
+	Time []int64 `json:"time"`
+	Temperature_2m_max []float32 `json:"temperature_2m_max"`
+	Temperature_2m_min []float32 `json:"temperature_2m_min"`
+}
 
 /*
 UpdateWeather updates the weather for the given locations.
@@ -38,41 +76,61 @@ UpdateWeather updates the weather for the given locations.
 – Returns:
   - the error if any
 */
-func UpdateWeather(driver selenium.WebDriver, locations []string) []ModsFileInfo.Weather {
-	var weather []ModsFileInfo.Weather = nil
-	for _, location := range locations {
-		if location == "" {
+func UpdateWeather(locations_info []string) []ModsFileInfo.Weather {
+	var weathers []ModsFileInfo.Weather = nil
+	for _, location_info := range locations_info {
+		if location_info == "" {
 			continue
 		}
 
-		temperature, max_temp, min_temp, precipitation, humidity, wind, status, err := findWeather(driver, location)
-		if err != nil {
-			panic(err)
+		var location_parts []string = strings.Split(location_info, ": ")
+		if len(location_parts) != 2 {
+			log.Println("Invalid location format: " + location_info)
+
+			continue
 		}
 
-		//log.Println("Current temperature in " + location + ": " + temperature + "ºC")
-		//log.Println("Maximum temperature in " + location + ": " + max_temp + "ºC")
-		//log.Println("Minimum temperature in " + location + ": " + min_temp + "ºC")
-		//log.Println("Current precipitation in " + location + ": " + precipitation)
-		//log.Println("Current humidity in " + location + ": " + humidity)
-		//log.Println("Current wind in " + location + ": " + wind)
-		//log.Println("Current status in " + location + ": " + status)
+		var location string = location_parts[0]
+		var location_coords []string = strings.Split(location_parts[1], ", ")
+		if len(location_coords) != 2 {
+			log.Println("Invalid location coordinates format: " + location_info)
+
+			continue
+		}
+
+		latitude, err := strconv.ParseFloat(location_coords[0], 32)
+		if err != nil {
+			log.Println("Invalid location latitude format: " + location_info)
+
+			continue
+		}
+		longitude, err := strconv.ParseFloat(location_coords[1], 32)
+		if err != nil {
+			log.Println("Invalid location longitude format: " + location_info)
+
+			continue
+		}
+
+		weather, err := findWeather(location, float32(latitude), float32(longitude))
+		if err != nil {
+			log.Println("Error getting weather for " + location_info + " --> " + Utils.GetFullErrorMsgGENERAL(err))
+
+			continue
+		}
+
+		//log.Println("Current temperature in " + location_info + ": " + weather.Temperature + "ºC")
+		//log.Println("Maximum temperature in " + location_info + ": " + weather.Max_temp + "ºC")
+		//log.Println("Minimum temperature in " + location_info + ": " + weather.Min_temp + "ºC")
+		//log.Println("Current precipitation in " + location_info + ": " + weather.Precipitation)
+		//log.Println("Current humidity in " + location_info + ": " + weather.Humidity)
+		//log.Println("Current wind in " + location_info + ": " + weather.Wind)
+		//log.Println("Current status in " + location_info + ": " + weather.Status)
 		//log.Println("")
 
-		// write the info to an json struct
-		weather = append(weather, ModsFileInfo.Weather{
-			Location:      location,
-			Temperature:   temperature,
-			Max_temp:      max_temp,
-			Min_temp:      min_temp,
-			Precipitation: precipitation,
-			Humidity:      humidity,
-			Wind:          wind,
-			Status:        status,
-		})
+		weathers = append(weathers, weather)
 	}
 
-	return weather
+	return weathers
 }
 
 /*
@@ -94,56 +152,48 @@ The output strings will be "ERROR" if an error occurs with that specific informa
   - the wind
   - the status
  */
-func findWeather(driver selenium.WebDriver, location string) (string, string, string, string, string, string, string, error) {
-	err := driver.Get("https://www.google.com/search?q=tempo " + location + "&ie=utf-8&oe=utf-8&hl=en")
+func findWeather(location string, latitude float32, longitude float32) (ModsFileInfo.Weather, error) {
+	var latitude_str string = strconv.FormatFloat(float64(latitude), 'f', 1, 32)
+	var longitude_str string = strconv.FormatFloat(float64(longitude), 'f', 1, 32)
+	source, err := Utils.MakeGetRequest("https://api.open-meteo.com/v1/forecast?latitude=" + latitude_str + "&longitude=" + longitude_str +
+		"&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation" +
+		"&forecast_days=1&timeformat=unixtime")
 	if err != nil {
-		return "", "", "", "", "", "", "", err
+		return ModsFileInfo.Weather{}, err
 	}
 
-	temperature := "ERROR"
-	element, err := driver.FindElement(selenium.ByCSSSelector, "#wob_tm")
-	if err == nil {
-		temperature, _ = element.Text()
+	var weather OpenMeteoWeather
+	err = Utils.FromJsonGENERAL([]byte(source), &weather)
+	if err != nil {
+		return ModsFileInfo.Weather{}, err
 	}
 
-	max_temp := "ERROR"
-	min_temp := "ERROR"
-	element, err = driver.FindElement(selenium.ByCSSSelector, ".wob_df.wob_ds")
-	if err == nil {
-		elements, err := element.FindElements(selenium.ByCSSSelector, ".wob_t")
-		if err == nil {
-			if len(elements) > 0 {
-				max_temp, _ = elements[0].Text()
-			}
-			if len(elements) >= 3 {
-				min_temp, _ = elements[2].Text()
-			}
-		}
+	var temperature string = strconv.FormatFloat(float64(weather.Current.Temperature_2m), 'f', 1, 32)
+	var max_temp string = strconv.FormatFloat(float64(weather.Daily.Temperature_2m_max[0]), 'f', 1, 32)
+	var min_temp string = strconv.FormatFloat(float64(weather.Daily.Temperature_2m_min[0]), 'f', 1, 32)
+	var precipitation string = strconv.FormatFloat(float64(weather.Current.Precipitation), 'f', 1, 32) +
+		weather.Current_units.Precipitation
+	var humidity string = strconv.FormatFloat(float64(weather.Current.Relative_humidity_2m), 'f', 1, 32) +
+		weather.Current_units.Relative_humidity_2m
+	var wind string = strconv.FormatFloat(float64(weather.Current.Wind_speed_10m), 'f', 1, 32) +
+		weather.Current_units.Wind_speed_10m
+
+	var status string = ""
+	source, err = Utils.MakeGetRequest("https://wttr.in/" + location + "?lang=en&format=%C")
+	if err != nil {
+		status = "ERROR"
+	} else {
+		status = strings.TrimSpace(source)
 	}
 
-	precipitation := "ERROR"
-	element, err = driver.FindElement(selenium.ByCSSSelector, "#wob_pp")
-	if err == nil {
-		precipitation, _ = element.Text()
-	}
-
-	humidity := "ERROR"
-	element, err = driver.FindElement(selenium.ByCSSSelector, "#wob_hm")
-	if err == nil {
-		humidity, _ = element.Text()
-	}
-
-	wind := "ERROR"
-	element, err = driver.FindElement(selenium.ByCSSSelector, "#wob_ws")
-	if err == nil {
-		wind, _ = element.Text()
-	}
-
-	status := "ERROR"
-	element, err = driver.FindElement(selenium.ByCSSSelector, "#wob_dc")
-	if err == nil {
-		status, _ = element.Text()
-	}
-
-	return temperature, max_temp, min_temp, precipitation, humidity, wind, status, nil
+	return ModsFileInfo.Weather{
+		Location:      location,
+		Temperature:   temperature,
+		Max_temp:      max_temp,
+		Min_temp:      min_temp,
+		Precipitation: precipitation,
+		Humidity:      humidity,
+		Wind:          wind,
+		Status:        status,
+	}, nil
 }

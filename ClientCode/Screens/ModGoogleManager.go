@@ -36,17 +36,6 @@ import (
 	"time"
 )
 
-type date struct {
-	instruction *widget.Label
-	dateChosen  *widget.Label
-}
-
-func (d *date) onSelected(t time.Time) {
-	// use time object to set text on label with given format
-	d.instruction.SetText("Date Selected:")
-	d.dateChosen.SetText(t.Format("Mon 02 Jan 2006"))
-}
-
 func ModGoogleManager() fyne.CanvasObject {
 	Current_screen_GL = ID_GOOGLE_MANAGER
 
@@ -56,6 +45,9 @@ func ModGoogleManager() fyne.CanvasObject {
 }
 
 func googleManagerCreateSettingsTab() *container.Scroll {
+	var label_token_valid *widget.Label = widget.NewLabel("Token valid: error")
+	label_token_valid.Wrapping = fyne.TextWrapWord
+
 	link, _ := url.Parse("https://console.cloud.google.com/projectcreate")
 	var link_google *widget.Hyperlink = widget.NewHyperlink("Click here and watch the video on the link below", link)
 
@@ -138,9 +130,6 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	})
 	btn_authorize.Importance = widget.HighImportance
 
-	var label_token_valid *widget.Label = widget.NewLabel("Token valid: error")
-	label_token_valid.Wrapping = fyne.TextWrapWord
-
 	go func() {
 		for {
 			if Current_screen_GL == ID_GOOGLE_MANAGER {
@@ -162,6 +151,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	}()
 
 	return createMainContentScrollUTILS(
+		label_token_valid,
 		link_google,
 		link_video,
 		label_additional_info,
@@ -170,6 +160,5 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 		label_additional_info2,
 		label_additional_info3,
 		btn_authorize,
-		label_token_valid,
 	)
 }

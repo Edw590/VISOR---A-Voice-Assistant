@@ -45,7 +45,7 @@ func getAllWeathers() {
 }
 
 /*
-GetWeatherLocationsList returns the weathers locations list separated by "|".
+GetWeatherLocationsList returns the weather locations list separated by "|".
 
 -----------------------------------------------------------
 

@@ -47,7 +47,8 @@ func onlineInfoChkCreateAboutTab() *container.Scroll {
 
 func onlineInfoChkCreateSettingsTab() *container.Scroll {
 	var entry_weather_locs *widget.Entry = widget.NewMultiLineEntry()
-	entry_weather_locs.SetPlaceHolder("The weather locations to check, one per line")
+	entry_weather_locs.SetPlaceHolder("The weather locations to check, one per line in the format: " +
+		"\"City: latitude, longitude\"")
 	entry_weather_locs.SetMinRowsVisible(3)
 	entry_weather_locs.SetText(strings.Join(Utils.GetUserSettings().OnlineInfoChk.Temp_locs, "\n"))
 

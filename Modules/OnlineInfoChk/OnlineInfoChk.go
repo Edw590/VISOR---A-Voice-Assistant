@@ -141,7 +141,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 		_ = bypassGoogleCookies(driver)
 
-		getModGenSettings().Weather = OICWeather.UpdateWeather(driver, getModUserInfo().Temp_locs)
+		getModGenSettings().Weather = OICWeather.UpdateWeather(getModUserInfo().Temp_locs)
 		getModGenSettings().News = OICNews.UpdateNews(driver, getModUserInfo().News_locs)
 
 		_ = driver.Quit()

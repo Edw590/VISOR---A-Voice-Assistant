@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -164,7 +164,7 @@ All the needed fields of the struct must be exported like with json.Marshal().
 -----------------------------------------------------------
 
 – Params:
-  - json_str – the JSON string to parse
+  - json_data – the JSON data to parse
   - parsed_data – a pointer of where to write the parsed data to
 
 – Returns:

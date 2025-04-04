@@ -197,9 +197,28 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 						for _, weather_loc := range weather_locs {
 							var weather *ModsFileInfo.Weather = OICComm.GetWeather(weather_loc)
-							speak = "The weather in " + weather.Location + " is " + weather.Status +
-								" with a current temperature of " + weather.Temperature + " degrees, a maximum of " +
-								weather.Max_temp + " degrees and a minimum of " + weather.Min_temp +
+							if weather == nil {
+								speak = "There is no weather data associated with the location " + weather_loc + "."
+								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+
+								continue
+							}
+
+							if weather.Temperature == "" {
+								// One being empty means the whole weather is empty
+								speak = "There was a problem obtaining the weather for " + weather.Location + "."
+								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+
+								continue
+							}
+
+							var status_part string = " is " + weather.Status + " with "
+							if weather.Status == "ERROR" {
+								status_part = " has "
+							}
+
+							speak = "The weather in " + weather.Location + status_part + weather.Temperature +
+								" degrees, a high of " + weather.Max_temp + " degrees and a low of " + weather.Min_temp +
 								" degrees. The precipitation is of " + weather.Precipitation + ", humidity of " +
 								weather.Humidity + ", and wind of " + weather.Wind + "."
 							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
