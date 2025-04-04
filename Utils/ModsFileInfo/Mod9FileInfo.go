@@ -67,9 +67,9 @@ type Task struct {
 	Message     string
 	// Command is the command to be executed when the task is triggered on the chosen Device_IDs
 	Command     string
-	// Time is the time the task is set for in the format "2024-12-31 -- 23:59:59"
-	Time        string
-	// Repeat_each_min is the time in minutes between each repeatition of the task
+	// Time_s is the time the task is set for in the format "2024-12-31 -- 23:59:59"
+	Time_s int64
+	// Repeat_each_min is the time in minutes between each repetition of the task
 	Repeat_each_min int64
 	// User_location is the location the user must be in for the task to be triggered
 	User_location string

@@ -30,7 +30,7 @@ import (
 )
 
 /*
-AddTask adds a task to the user settings.
+AddTaskTASKS adds a task to the user settings.
 
 -----------------------------------------------------------
 
@@ -41,14 +41,14 @@ AddTask adds a task to the user settings.
   - message – the message of the task
   - command – the command to be executed
   - time – the time the task is set for
-  - repeat_each_min – the time in minutes between each repeatition
+  - repeat_each_min – the time in minutes between each repetition
   - user_location – the location the user must be in
   - programmable_condition – an additional condition for the task, in Go
 
 – Returns:
   - the ID of the task
  */
-func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message string, command string, time string,
+func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message string, command string, time_s int64,
 			 	  repeat_each_min int64, user_location string, programmable_condition string) int32 {
 	var tasks *[]ModsFileInfo.Task = &Utils.GetUserSettings().TasksExecutor.Tasks
 	var id int32 = 1 // 0 is reserved
@@ -67,7 +67,7 @@ func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message s
 		Device_IDs:             strings.Split(device_ids, "\n"),
 		Message:                message,
 		Command:                command,
-		Time:                   time,
+		Time_s:                 time_s,
 		Repeat_each_min:        repeat_each_min,
 		User_location:          user_location,
 		Programmable_condition: programmable_condition,
@@ -81,7 +81,7 @@ func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message s
 }
 
 /*
-RemoveTask removes a task from the user settings.
+RemoveTaskTASKS removes a task from the user settings.
 
 -----------------------------------------------------------
 
@@ -100,7 +100,7 @@ func RemoveTaskTASKS(id int32) {
 }
 
 /*
-GetIdsList returns a list of all tasks' IDs.
+GetIdsListTASKS returns a list of all tasks' IDs.
 
 -----------------------------------------------------------
 
@@ -120,7 +120,7 @@ func GetIdsListTASKS() string {
 }
 
 /*
-GetTaskById returns a task by its ID.
+GetTaskTASKS returns a task by its ID.
 
 -----------------------------------------------------------
 

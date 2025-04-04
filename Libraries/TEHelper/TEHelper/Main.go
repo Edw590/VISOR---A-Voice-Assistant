@@ -57,7 +57,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 			for _, task := range getModUserSettings().Tasks {
 				// If the task has a time set or has no location, skip it
-				if !task.Enabled || task.Time != "" || task.User_location == "" {
+				if !task.Enabled || task.Time_s != 0 || task.User_location == "" {
 					continue
 				}
 

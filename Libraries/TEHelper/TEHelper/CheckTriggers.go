@@ -34,18 +34,13 @@ import (
 func checkTime(task ModsFileInfo.Task) (bool, int64) {
 	var test_time_min int64 = 0
 	// If the task has no time set, skip it
-	if task.Time == "" {
+	if task.Time_s == 0 {
 		return true, 0
 	} else {
 		var curr_time int64 = time.Now().Unix() / 60
-		var task_time string = task.Time
-		var format string = "2006-01-02 -- 15:04:05"
-		t, err := time.ParseInLocation(format, task_time, time.Local)
-		if err != nil {
-			return false, 0
-		}
+		var task_time time.Time = time.Unix(task.Time_s, 0)
 
-		test_time_min = t.Unix() / 60
+		test_time_min = task_time.Unix() / 60
 		if task.Repeat_each_min > 0 {
 			for {
 				if test_time_min + task.Repeat_each_min <= curr_time {
