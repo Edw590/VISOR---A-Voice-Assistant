@@ -36,6 +36,9 @@ import (
 )
 
 func chatWithGPT(device_id string, user_message string, session_id string, role string, more_coming bool) string {
+	setBusyState()
+	defer setReadyState()
+
 	if session_id == "" {
 		// Get latest session ID if none is provided
 		var latest_interaction int64 = -1
@@ -48,6 +51,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 	}
 
 	addSessionEntry(session_id, time.Now().Unix(), user_message)
+	setBusyState() // Again because chatWithGPT() is called inside addSessionEntry()
 
 	var curr_session ModsFileInfo.Session = *getSession(session_id)
 	curr_session.Memorized = false
@@ -180,11 +184,6 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
-	if getModGenSettings().State != ModsFileInfo.MOD_7_STATE_STARTING {
-		// If the module is starting, keep it on the starting state until it becomes ready. Else, set it to busy.
-		getModGenSettings().State = ModsFileInfo.MOD_7_STATE_BUSY
-	}
-
 	var writing_to_self bool = device_id == Utils.GetGenSettings().Device_settings.Id
 
 	var timestamp_s int64 = -1
@@ -281,8 +280,6 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	if !writing_to_self {
 		_ = gpt_text_txt.WriteTextFile("\n" + getEndString(), true)
 	}
-
-	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_READY
 
 	return message, timestamp_s
 }
