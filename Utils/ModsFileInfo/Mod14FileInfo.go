@@ -40,8 +40,8 @@ type GTask struct {
 	Title string
 	// Details are the details of the task
 	Details string
-	// Date is the date of the task in "2006-01-02" format
-	Date string
+	// Date_s is the timestamp of the date of the task in seconds
+	Date_s int64
 	// Completed is whether the task is completed
 	Completed bool
 }
@@ -55,8 +55,8 @@ type GEvent struct {
 	Location string
 	// Description is the description of the event
 	Description string
-	// Start_time is the time of the event in RFC3339 format
-	Start_time string
+	// Start_time_s is the timestamp of the start time of the event in seconds
+	Start_time_s int64
 	// Duration_min is the duration of the event in minutes
 	Duration_min int64
 }

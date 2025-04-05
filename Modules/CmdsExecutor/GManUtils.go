@@ -37,21 +37,26 @@ func getTasksList(tasks_ids []string, cmd_variant string) string {
 		}
 
 		var add_task bool = false
-		task_date, err := time.Parse("2006-01-02", task.Date)
-		if err == nil { // Meaning, the date is empty
+		var task_date time.Time = time.Unix(task.Date_s, 0).UTC()
+		if task.Date_s == 0 {
+			// If the task has no date, we add it to the list (it's to be done every day)
+			add_task = true
+		} else {
+			// Else we check the date
 			switch cmd_variant {
-			case RET_31_TODAY:
-				if task_date.Day() == time.Now().Day() {
-					add_task = true
-				}
-			case RET_31_TOMORROW:
-				if task_date.Day() == time.Now().AddDate(0, 0, 1).Day() {
-					add_task = true
-				}
+				case RET_31_TODAY:
+					if task_date.Day() == time.Now().Day() {
+						add_task = true
+					}
+				case RET_31_TOMORROW:
+					if task_date.Day() == time.Now().AddDate(0, 0, 1).Day() {
+						add_task = true
+					}
 			}
 		}
-		if add_task || task.Date == "" {
-			speak += task.Title + "; "
+
+		if add_task {
+			speak += "\"" + task.Title + "\"; "
 		}
 	}
 
@@ -79,7 +84,7 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 			continue
 		}
 
-		event_date_time, _ := time.Parse(time.RFC3339, event.Start_time)
+		var event_date_time time.Time = time.Unix(event.Start_time_s, 0).UTC()
 
 		var add_event bool = false
 		switch cmd_variant {
@@ -111,7 +116,7 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 			if cmd_variant == RET_31_THIS_WEEK || cmd_variant == RET_31_NEXT_WEEK {
 				event_on = " on " + event_date_time.Weekday().String()
 			}
-			speak += event.Summary + event_on + " at " + event_date_time.Format("15:04") +
+			speak += "\"" + event.Summary + "\"" + event_on + " at " + event_date_time.Format("15:04") +
 				" for " + getEventDuration(event.Duration_min) + "; "
 		}
 	}

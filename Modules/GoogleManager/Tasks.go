@@ -78,17 +78,16 @@ func storeTasks(client *http.Client) bool {
 			//log.Printf("- %s (Status: %s)\n", task.Title, task.Status)
 			//log.Printf("  Notes: %s\n", task.Notes)
 
-			var task_date = ""
+			var task_date_time time.Time = time.Unix(0, 0)
 			if task.Due != "" {
-				task_date_time, _ := time.Parse(time.RFC3339, task.Due)
-				task_date = task_date_time.Format("2006-01-02")
+				task_date_time, _ = time.Parse(time.RFC3339, task.Due)
 			}
 
 			tasks_final = append(tasks_final, ModsFileInfo.GTask{
 				Id:        task.Id,
 				Title:     task.Title,
 				Details:   task.Notes,
-				Date:      task_date,
+				Date_s:    task_date_time.Unix(),
 				Completed: task.Status == "completed",
 			})
 		}

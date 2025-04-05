@@ -114,7 +114,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 					Summary:      item.Summary,
 					Location:     item.Location,
 					Description:  item.Description,
-					Start_time:   start_date,
+					Start_time_s: start_date_parsed.Unix(),
 					Duration_min: duration_min,
 				})
 			}
