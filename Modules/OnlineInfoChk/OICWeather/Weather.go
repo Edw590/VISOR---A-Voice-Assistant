@@ -153,11 +153,14 @@ The output strings will be "ERROR" if an error occurs with that specific informa
   - the status
  */
 func findWeather(location string, latitude float32, longitude float32) (ModsFileInfo.Weather, error) {
-	var latitude_str string = strconv.FormatFloat(float64(latitude), 'f', 1, 32)
-	var longitude_str string = strconv.FormatFloat(float64(longitude), 'f', 1, 32)
-	source, err := Utils.MakeGetRequest("https://api.open-meteo.com/v1/forecast?latitude=" + latitude_str + "&longitude=" + longitude_str +
-		"&daily=temperature_2m_max,temperature_2m_min&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation" +
-		"&forecast_days=1&timeformat=unixtime")
+	var latitude_str string = strconv.FormatFloat(float64(latitude), 'f', -1, 32)
+	var longitude_str string = strconv.FormatFloat(float64(longitude), 'f', -1, 32)
+	source, err := Utils.MakeGetRequest("https://api.open-meteo.com/v1/forecast?" +
+		"latitude=" + latitude_str + "&longitude=" + longitude_str +
+		"&daily=temperature_2m_max,temperature_2m_min" +
+		"&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation" +
+		"&forecast_days=1" +
+		"&timeformat=unixtime")
 	if err != nil {
 		return ModsFileInfo.Weather{}, err
 	}
