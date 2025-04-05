@@ -130,7 +130,7 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var server_uri *widget.Entry = widget.NewEntry()
-	server_uri.SetPlaceHolder("GPT Server URL (example localhost:11434)")
+	server_uri.SetPlaceHolder("GPT Server URL (example: localhost:11434)")
 	server_uri.SetText(Utils.GetUserSettings().GPTCommunicator.Server_url)
 
 	var entry_model_name *widget.Entry = widget.NewEntry()

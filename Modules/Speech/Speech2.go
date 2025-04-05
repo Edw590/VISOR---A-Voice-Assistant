@@ -91,8 +91,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 				var notified bool = rightBeforeSpeaking(curr_speech.GetID())
 				log.Println("Notified:", notified)
 
-				if err := speak(curr_speech.GetText()); err != nil {
-					log.Println("Error speaking speech:", err)
+				if !speak(curr_speech.GetText()) {
+					log.Println("Error speaking speech")
 					if !notified {
 						Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
 					}
