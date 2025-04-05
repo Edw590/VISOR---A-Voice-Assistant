@@ -61,7 +61,7 @@
 		]
 	},
 	"GPTCommunicator": {
-	    "Server_uri": "localhost:11434",
+	    "Server_url": "localhost:11434",
 		"Model_name": "llama3.2_abliterated",
 		"Model_has_tool_role": false,
 		"Context_size": 4096,

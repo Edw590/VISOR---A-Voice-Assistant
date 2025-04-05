@@ -130,8 +130,8 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var server_uri *widget.Entry = widget.NewEntry()
-	server_uri.SetPlaceHolder("GPT Server uri (example localhost:11434)")
-	server_uri.SetText(Utils.GetUserSettings().GPTCommunicator.Server_uri)
+	server_uri.SetPlaceHolder("GPT Server URL (example localhost:11434)")
+	server_uri.SetText(Utils.GetUserSettings().GPTCommunicator.Server_url)
 
 	var entry_model_name *widget.Entry = widget.NewEntry()
 	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
@@ -169,7 +169,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	entry_user_nickname.SetText(Utils.GetUserSettings().GPTCommunicator.User_nickname)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings().GPTCommunicator.Server_uri = server_uri.Text
+		Utils.GetUserSettings().GPTCommunicator.Server_url = server_uri.Text
 		Utils.GetUserSettings().GPTCommunicator.Model_name = entry_model_name.Text
 		//Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
 		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
