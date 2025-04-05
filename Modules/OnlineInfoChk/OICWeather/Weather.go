@@ -25,6 +25,7 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"log"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -171,15 +172,13 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 		return ModsFileInfo.Weather{}, err
 	}
 
-	var temperature string = strconv.FormatFloat(float64(weather.Current.Temperature_2m), 'f', 1, 32)
-	var max_temp string = strconv.FormatFloat(float64(weather.Daily.Temperature_2m_max[0]), 'f', 1, 32)
-	var min_temp string = strconv.FormatFloat(float64(weather.Daily.Temperature_2m_min[0]), 'f', 1, 32)
-	var precipitation string = strconv.FormatFloat(float64(weather.Current.Precipitation), 'f', 1, 32) +
-		weather.Current_units.Precipitation
-	var humidity string = strconv.FormatFloat(float64(weather.Current.Relative_humidity_2m), 'f', 1, 32) +
+	var temperature string = float32ToIntToString(weather.Current.Temperature_2m)
+	var max_temp string = float32ToIntToString(weather.Daily.Temperature_2m_max[0])
+	var min_temp string = float32ToIntToString(weather.Daily.Temperature_2m_min[0])
+	var precipitation string = float32ToIntToString(weather.Current.Precipitation) + weather.Current_units.Precipitation
+	var humidity string = float32ToIntToString(weather.Current.Relative_humidity_2m) +
 		weather.Current_units.Relative_humidity_2m
-	var wind string = strconv.FormatFloat(float64(weather.Current.Wind_speed_10m), 'f', 1, 32) +
-		weather.Current_units.Wind_speed_10m
+	var wind string = float32ToIntToString(weather.Current.Wind_speed_10m) + weather.Current_units.Wind_speed_10m
 
 	var status string = ""
 	source, err = Utils.MakeGetRequest("https://wttr.in/" + location + "?lang=en&format=%C")
@@ -199,4 +198,14 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 		Wind:          wind,
 		Status:        status,
 	}, nil
+}
+
+func float32ToIntToString(value float32) string {
+	var int_value int = int(math.Round(float64(value)))
+
+	log.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	log.Println(value)
+	log.Println(int_value)
+
+	return strconv.Itoa(int_value)
 }
