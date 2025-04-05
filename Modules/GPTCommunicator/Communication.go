@@ -61,7 +61,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		case GPTComm.ROLE_USER:
 			actual_role = "user"
 		case GPTComm.ROLE_TOOL:
-			user_message = "Inform the user that: \"" + user_message + "\"."
+			user_message = "As per user request, inform them that: \"" + user_message + "\"."
 			if getModUserInfo().Model_has_tool_role {
 				actual_role = "tool"
 			} else {
@@ -137,7 +137,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 
 		log.Println("Posting to Ollama: ", string(jsonData))
 
-		resp, err := http.Post("http://" + getModUserInfo().Server_uri + "/api/chat", "application/json; charset=utf-8",
+		resp, err := http.Post("http://" + getModUserInfo().Server_url+ "/api/chat", "application/json; charset=utf-8",
 			bytes.NewBuffer(jsonData))
 		if err != nil {
 			log.Println("Error posting to Ollama: ", err)

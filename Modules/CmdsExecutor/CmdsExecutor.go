@@ -287,6 +287,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
 						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 					}
+
 				case CMD_ASK_EVENTS:
 					var speak string = "Obtaining the tasks and events..."
 					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)

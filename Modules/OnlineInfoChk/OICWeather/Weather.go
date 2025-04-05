@@ -203,9 +203,5 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 func float32ToIntToString(value float32) string {
 	var int_value int = int(math.Round(float64(value)))
 
-	log.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-	log.Println(value)
-	log.Println(int_value)
-
 	return strconv.Itoa(int_value)
 }

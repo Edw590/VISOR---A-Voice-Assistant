@@ -137,7 +137,8 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
 	entry_model_name.SetText(Utils.GetUserSettings().GPTCommunicator.Model_name)
 
-	//var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
+	var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
+	checkbox_model_has_tool_role.SetChecked(Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role)
 
 	var entry_ctx_size *widget.Entry = widget.NewEntry()
 	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
@@ -171,7 +172,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		Utils.GetUserSettings().GPTCommunicator.Server_url = server_uri.Text
 		Utils.GetUserSettings().GPTCommunicator.Model_name = entry_model_name.Text
-		//Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
+		Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
 		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
 		Utils.GetUserSettings().GPTCommunicator.Context_size = int32(value1)
 		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
@@ -184,7 +185,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	return createMainContentScrollUTILS(
 		server_uri,
 		entry_model_name,
-		//checkbox_model_has_tool_role,
+		checkbox_model_has_tool_role,
 		entry_ctx_size,
 		entry_temperature,
 		entry_system_info,
