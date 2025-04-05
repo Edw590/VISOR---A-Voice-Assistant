@@ -257,13 +257,19 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 
 								var msg_role = message_parts_slash[0]
 								switch msg_role {
-								case "system":
-									continue
-								case "assistant":
-									msg_role = "VISOR"
-								case "user":
-									msg_role = "YOU"
+									case "system":
+										continue
+									case "assistant":
+										msg_role = "VISOR"
+									case "user":
+										msg_role = "YOU"
 								}
+
+								if len(message_parts_pipe) < 2 || message_parts_pipe[1] == "" {
+									// Means no message (so maybe was a "SYSTEM TASK" message - ignore those)
+									continue
+								}
+
 								var msg_timestamp_s, _ = strconv.ParseInt(message_parts_slash[1], 10, 64)
 								var msg_content = message[index_first_pipe+1:]
 
