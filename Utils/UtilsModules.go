@@ -487,18 +487,17 @@ signalledToStop checks if the module was signalled to stop.
   - true if the module was signalled to stop, false otherwise
 */
 func (modDirsInfo *ModDirsInfo) signalledToStop() bool {
-	var stop_file_1_path GPath = modDirsInfo.UserData.Add2(false, "STOP")
-	var stop_file_2_path GPath = modDirsInfo.UserData.Add2(false, "STOP_p")
-	var stop_file_3_path GPath = getVISORDirFILESDIRS().Add2(false, _USER_DATA_REL_DIR, "STOP")
-	if stop_file_1_path.Exists() {
-		err := stop_file_1_path.Remove()
+	var stop_tmp_file_path GPath = modDirsInfo.UserData.Add2(false, "STOP")
+	var stop_perm__file_path GPath = getVISORDirFILESDIRS().Add2(false, _USER_DATA_REL_DIR, "STOP")
+	if stop_tmp_file_path.Exists() {
+		err := stop_tmp_file_path.Remove()
 		if nil != err {
 			panic(err)
 		}
 
 		return true
 	}
-	if stop_file_2_path.Exists() || stop_file_3_path.Exists() {
+	if stop_perm__file_path.Exists() {
 		return true
 	}
 
