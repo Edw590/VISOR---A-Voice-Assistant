@@ -225,7 +225,7 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 		}
 
 		var title string = session_info.session.Name + " - " +
-			Utils.GetDateTimeStrTIMEDATE(GPTComm.GetSessionCreatedTime(session_info.id) * 1000)
+			Utils.GetDateTimeStrTIMEDATE(GPTComm.GetSessionCreatedTime(session_info.id))
 
 		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(title),
 			createSessionView(entries_map, session_info)))
@@ -276,7 +276,7 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 								msg_content_str +=
 									"-----------------------------------------------------------------------\n" +
 										"|" + strings.ToUpper(msg_role) + "| on " +
-										Utils.GetDateTimeStrTIMEDATE(msg_timestamp_s*1000) + ":\n" + msg_content + "\n\n"
+										Utils.GetDateTimeStrTIMEDATE(msg_timestamp_s) + ":\n" + msg_content + "\n\n"
 							}
 							if len(msg_content_str) > 2 {
 								msg_content_str = msg_content_str[:len(msg_content_str)-2]
@@ -301,7 +301,7 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 
 func createSessionView(entries_map map[string]*widget.Entry, session_info _SessionInfo) *fyne.Container {
 	var label_date *widget.Label = widget.NewLabel("Created on " +
-		Utils.GetDateTimeStrTIMEDATE(GPTComm.GetSessionCreatedTime(session_info.id) * 1000))
+		Utils.GetDateTimeStrTIMEDATE(GPTComm.GetSessionCreatedTime(session_info.id)))
 
 	var entry_name *widget.Entry = widget.NewEntry()
 	entry_name.SetPlaceHolder("Chat name")

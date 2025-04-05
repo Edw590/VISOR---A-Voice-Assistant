@@ -55,9 +55,7 @@ var modules_GL []Utils.Module = nil
 
 var content_container_GL *fyne.Container = nil
 
-var (
-	modDirsInfo_GL Utils.ModDirsInfo
-)
+var modDirsInfo_GL Utils.ModDirsInfo
 func main() {
 	var module Utils.Module = Utils.Module{
 		Num:     Utils.NUM_MOD_VISOR,

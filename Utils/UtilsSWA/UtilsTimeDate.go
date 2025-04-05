@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,37 +26,46 @@ import (
 )
 
 /*
-GetDateTimeStrTIMEDATE gets the current time and date in the format DATE_TIME_FORMAT.
+GetDateTimeStrDATETIME gets the current time and date in the format DATE_TIME_FORMAT.
 
 -----------------------------------------------------------
+
+– Params:
+  - s – the time in seconds or -1 for the current time
 
 – Returns:
   - the current time and date in the default format
  */
-func GetDateTimeStrTIMEDATE(millis int64) string {
-	return Utils.GetDateTimeStrTIMEDATE(millis)
+func GetDateTimeStrDATETIME(s int64) string {
+	return Utils.GetDateTimeStrTIMEDATE(s)
 }
 
 /*
-GetDateStrTIMEDATE gets the current date in the format DATE_FORMAT.
+GetDateStrDATETIME gets the current date in the format DATE_FORMAT.
 
 -----------------------------------------------------------
+
+– Params:
+  - s – the date in seconds or -1 for the current date
+
+– Returns:
+  - the current date in the default format
+ */
+func GetDateStrDATETIME(s int64) string {
+	return Utils.GetDateStrTIMEDATE(s)
+}
+
+/*
+GetTimeStrDATETIME gets the current time in the format TIME_FORMAT.
+
+-----------------------------------------------------------
+
+– Params:
+  - s – the time in seconds or -1 for the current time
 
 – Returns:
   - the current time in the default format
  */
-func GetDateStrTIMEDATE(millis int64) string {
-	return Utils.GetDateStrTIMEDATE(millis)
-}
-
-/*
-GetTimeStrTIMEDATE gets the current time in the format TIME_FORMAT.
-
------------------------------------------------------------
-
-– Returns:
-  - the current time in the default format
- */
-func GetTimeStrTIMEDATE(millis int64) string {
-	return Utils.GetTimeStrTIMEDATE(millis)
+func GetTimeStrDATETIME(s int64) string {
+	return Utils.GetTimeStrTIMEDATE(s)
 }

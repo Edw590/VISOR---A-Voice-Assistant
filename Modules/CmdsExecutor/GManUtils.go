@@ -37,12 +37,12 @@ func getTasksList(tasks_ids []string, cmd_variant string) string {
 		}
 
 		var add_task bool = false
-		var task_date time.Time = time.Unix(task.Date_s, 0).UTC()
 		if task.Date_s == 0 {
 			// If the task has no date, we add it to the list (it's to be done every day)
 			add_task = true
 		} else {
 			// Else we check the date
+			var task_date time.Time = time.Unix(task.Date_s, 0)
 			switch cmd_variant {
 				case RET_31_TODAY:
 					if task_date.Day() == time.Now().Day() {
@@ -84,7 +84,7 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 			continue
 		}
 
-		var event_date_time time.Time = time.Unix(event.Start_time_s, 0).UTC()
+		var event_date_time time.Time = time.Unix(event.Start_time_s, 0)
 
 		var add_event bool = false
 		switch cmd_variant {

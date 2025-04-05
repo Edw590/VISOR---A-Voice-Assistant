@@ -123,7 +123,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 			if test_type != NO_TEST {
 				// Start the test and retrieve the test time
-				var test_time int = initiateTest(test_type == LONG_TEST, disk_partition)
+				var test_time_min int = initiateTest(test_type == LONG_TEST, disk_partition)
 
 				// The total waiting time is the time the test will take in minutes + some time to make sure it's
 				// finished.
@@ -134,7 +134,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					test_type_str = "Long"
 				}
 
-				if test_time == -1 {
+				if test_time_min == -1 {
 					var msg_body string = "ATTENTION - The " + strings.ToLower(test_type_str) +
 						" test could not be executed. An attempt was made to abort any testing being " +
 						"executed, but still it was not possible to execute the test. Please execute it " +
@@ -152,8 +152,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 					continue
 				}
 
-				var millis_begin int64 = time.Now().UnixMilli()
-				var date_time_begin string = Utils.GetDateTimeStrTIMEDATE(millis_begin)
+				var seconds_begin int64 = time.Now().Unix()
+				var date_time_begin string = Utils.GetDateTimeStrTIMEDATE(seconds_begin)
 
 				// Here, this will wait until the test is concluded to report the log (test time + some waiting
 				// period to be sure the test is over).
@@ -162,9 +162,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 				// (not supposed).
 				var msg_body string = test_type_str + " test on " + disk_user_info.Label + " (" + disk_partition + ") " +
 					"started on " + date_time_begin + ".\n\n" +
-					"Test duration : " + strconv.Itoa(test_time) + " minutes.\n\n" +
+					"Test duration : " + strconv.Itoa(test_time_min) + " minutes.\n\n" +
 					"The results will be ready on or before " +
-					Utils.GetDateTimeStrTIMEDATE(millis_begin + int64(test_time)*60*1000) + "."
+					Utils.GetDateTimeStrTIMEDATE(seconds_begin + int64(test_time_min)*60) + "."
 				var things_replace = map[string]string{
 					Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrTIMEDATE(-1),
 					Utils.MODEL_INFO_MSG_BODY_EMAIL:  msg_body,

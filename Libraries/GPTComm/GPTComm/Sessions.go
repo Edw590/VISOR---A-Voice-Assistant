@@ -97,7 +97,7 @@ GetSessionCreatedTime gets the creation timestamp of the session.
 -----------------------------------------------------------
 
 – Returns:
-  - the creation timestamp
+  - the creation timestamp in seconds
  */
 func GetSessionCreatedTime(session_id string) int64 {
 	for _, session := range sessions_GL {

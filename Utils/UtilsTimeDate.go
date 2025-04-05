@@ -35,13 +35,13 @@ GetDateTimeStrTIMEDATE gets the current time and date in the format DATE_TIME_FO
 -----------------------------------------------------------
 
 – Params:
-  - millis – the time in milliseconds or -1 for the current time
+  - s – the time in seconds or -1 for the current time
 
 – Returns:
   - the current time and date in the default format
 */
-func GetDateTimeStrTIMEDATE(millis int64) string {
-	return getTimeDateInFormatTIMEDATE(millis, DATE_TIME_FORMAT)
+func GetDateTimeStrTIMEDATE(s int64) string {
+	return getTimeDateInFormatTIMEDATE(s, DATE_TIME_FORMAT)
 }
 
 /*
@@ -50,13 +50,13 @@ GetDateStrTIMEDATE gets the current date in the format DATE_FORMAT.
 -----------------------------------------------------------
 
 – Params:
-  - millis – the time in milliseconds or -1 for the current time
+  - s – the time in seconds or -1 for the current time
 
 – Returns:
   - the current time in the default format
 */
-func GetDateStrTIMEDATE(millis int64) string {
-	return getTimeDateInFormatTIMEDATE(millis, DATE_FORMAT)
+func GetDateStrTIMEDATE(s int64) string {
+	return getTimeDateInFormatTIMEDATE(s, DATE_FORMAT)
 }
 
 /*
@@ -65,13 +65,13 @@ GetTimeStrTIMEDATE gets the current time in the format TIME_FORMAT.
 -----------------------------------------------------------
 
 – Params:
-  - millis – the time in milliseconds or -1 for the current time
+  - s – the time in seconds or -1 for the current time
 
 – Returns:
   - the current date in the default format
 */
-func GetTimeStrTIMEDATE(millis int64) string {
-	return getTimeDateInFormatTIMEDATE(millis, TIME_FORMAT)
+func GetTimeStrTIMEDATE(s int64) string {
+	return getTimeDateInFormatTIMEDATE(s, TIME_FORMAT)
 }
 
 /*

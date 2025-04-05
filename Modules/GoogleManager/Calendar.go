@@ -50,8 +50,8 @@ func storeCalendarsEvents(client *http.Client) bool {
 	getModGenSettings().Token_invalid = false
 
 	// Calculate the start of the current week (Monday)
-	now := time.Now()
-	weekday := int(now.Weekday())
+	var now time.Time = time.Now()
+	var weekday int = int(now.Weekday())
 	if weekday == 0 {
 		weekday = 7 // Make Sunday 7 instead of 0 for easier calculation
 	}

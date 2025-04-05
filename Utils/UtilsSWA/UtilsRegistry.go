@@ -276,9 +276,9 @@ func GetRegistryTextREGISTRY(type_ int) string {
 			"Key: " + value.Key + "\n" +
 			"Auto set: " + strconv.FormatBool(value.Auto_set) + "\n" +
 			"Type: " + strings.ToLower(value.Type_[len("TYPE_"):]) + "\n" +
-			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
+			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev / 1000) + "\n" +
 			"Prev data: " + value.Prev_data + "\n" +
-			"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_curr) + "\n" +
+			"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_curr / 1000) + "\n" +
 			"Curr data: " + value.Curr_data + "\n" +
 			"Description: " + value.Description + "\n\n"
 	}

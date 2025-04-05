@@ -175,8 +175,8 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 			// I've titled the text for you, Sir: "App Notification Settings on OnePlus Watch".
 			// Get the text inside the quotation marks.
 			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
-				"inside \"double quotation marks\", please. Don't include the date and time. Text: " +
-				message_without_add_info
+				"inside \"double quotation marks\", please. Don't include the date and time. Text --> " +
+				message_without_add_info + " <--"
 			session_name = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
 			if strings.Contains(session_name, "\"") {
 				session_name = strings.Split(session_name, "\"")[1]
