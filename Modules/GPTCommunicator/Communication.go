@@ -51,7 +51,7 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 	}
 
 	addSessionEntry(session_id, time.Now().Unix(), user_message)
-	setBusyState() // Again because chatWithGPT() is called inside addSessionEntry()
+	setBusyState() // Again because chatWithGPT() is called inside addSessionEntry() and will set it to Ready on ending
 
 	var curr_session ModsFileInfo.Session = *getSession(session_id)
 	curr_session.Memorized = false

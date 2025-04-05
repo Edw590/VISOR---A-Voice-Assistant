@@ -86,11 +86,11 @@ getTimeDateInFormatTIMEDATE gets the time and/or date in the given format.
 – Returns:
   - the time and/or date in the given format
 */
-func getTimeDateInFormatTIMEDATE(millis int64, format string) string {
-	if millis == -1 {
+func getTimeDateInFormatTIMEDATE(s int64, format string) string {
+	if s == -1 {
 		return time.Now().Format(format)
 	} else {
-		return time.Unix(0, millis*1e6).Format(format)
+		return time.Unix(s, 0).Format(format)
 	}
 }
 

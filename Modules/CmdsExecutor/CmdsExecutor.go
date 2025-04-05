@@ -225,7 +225,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						}
 					} else {
 						speak = "Not connected to the server to get the weather."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 					}
 
 				case CMD_TELL_NEWS:
@@ -249,7 +249,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						}
 					} else {
 						speak = "Not connected to the server to get the news."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 					}
 
 				case CMD_TOGGLE_ETHERNET:
@@ -306,7 +306,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true)
 					} else {
 						speak = "Not connected to the server to get the tasks and events."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
 					}
 			}
 		}
