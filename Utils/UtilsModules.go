@@ -204,7 +204,9 @@ func ModStartup(main Main, module *Module) {
 	ModStartup2(main, module, false)
 }
 /*
-ModStartup2 is the main function for ModStartup. Read everything there, except one different parameter.
+ModStartup2 is the main function for ModStartup(). Read everything there, except one different parameter.
+
+It's to be used only by MOD_0. All the others are to use ModStartup().
 
 -----------------------------------------------------------
 

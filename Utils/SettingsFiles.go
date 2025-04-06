@@ -31,13 +31,14 @@ const USER_SETTINGS_FILE string = "UserSettings_EOG.dat"
 const GEN_SETTINGS_FILE_CLIENT string = "GeneratedSettingsClient_EOG.dat"
 const _GEN_SETTINGS_FILE_SERVER string = "GeneratedSettingsServer_EOG.dat"
 
-// User_settings_GL is the global variable that holds the user settings. It is saved to the USER_SETTINGS_FILE file
+// user_settings_GL is the global variable that holds the user settings. It is saved to the USER_SETTINGS_FILE file
 // every 5 seconds.
 var user_settings_GL UserSettings
-// Gen_settings_GL is the global variable that holds the general settings. It is saved to the GEN_SETTINGS_FILE_CLIENT
+// gen_settings_GL is the global variable that holds the general settings. It is saved to the GEN_SETTINGS_FILE_CLIENT
 // or _GEN_SETTINGS_FILE_SERVER file every 5 seconds.
 var gen_settings_GL GenSettings
 
+// VISOR_server_GL is the global variable that indicates if the server is running in VISOR mode or not.
 var VISOR_server_GL bool = false
 
 var Password_GL string = ""

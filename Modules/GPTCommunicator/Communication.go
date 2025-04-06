@@ -137,13 +137,13 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 
 		log.Println("Posting to Ollama: ", string(jsonData))
 
-		resp, err := http.Post("http://" + getModUserInfo().Server_url+ "/api/chat", "application/json; charset=utf-8",
+		resp, err := http.Post("http://" + getModUserInfo().Server_url + "/api/chat", "application/json; charset=utf-8",
 			bytes.NewBuffer(jsonData))
 		if err != nil {
 			log.Println("Error posting to Ollama: ", err)
 
-			// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the STOPPING
-			// one (they check every second).
+			// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the
+			// STOPPING one (they check every second).
 			time.Sleep(2 * time.Second)
 
 			// Ollama stopped running, so stop the module
@@ -207,11 +207,6 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	var curr_idx int = 0
 	for {
 		if *module_stop_GL || checkStopSpeech() {
-			// Write the end string before exiting
-			if !writing_to_self {
-				_ = gpt_text_txt.WriteTextFile(getEndString(), true)
-			}
-
 			// Closing the connection makes Ollama stop generating the response
 			http_response.Body.Close()
 
@@ -250,7 +245,7 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 					if one_byte_str == "\000" {
 						_ = gpt_text_txt.WriteTextFile(last_word, true)
 					} else {
-						_ = gpt_text_txt.WriteTextFile(last_word+one_byte_str, true)
+						_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
 					}
 				}
 

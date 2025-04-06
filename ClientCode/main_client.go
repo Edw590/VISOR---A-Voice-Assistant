@@ -301,9 +301,9 @@ func processCommsChannel() {
 			my_app_GL.SendNotification(notification)
 
 			time.Sleep(5 * time.Second)
-		} else if map_value, ok = comms_map["ShowApp"]; ok {
+		} else if _, ok = comms_map["ShowApp"]; ok {
 			showWindow()
-		} else if map_value, ok = comms_map["Redraw"]; ok {
+		} else if _, ok = comms_map["Redraw"]; ok {
 			showScreen(Screens.Current_screen_GL)
 		}
 	}

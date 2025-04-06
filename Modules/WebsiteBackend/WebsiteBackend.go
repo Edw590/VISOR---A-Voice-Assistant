@@ -40,7 +40,7 @@ import (
 
 const MAX_CLIENTS int = 100
 
-const PONG_WAIT = 120 * time.Second // Allow X time before considering the client unreachable.
+const PONG_WAIT = (120+10) * time.Second // Allow X time before considering the client unreachable.
 const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT. -->
 
 var channels_GL [MAX_CLIENTS]chan []byte = [MAX_CLIENTS]chan []byte{}
@@ -62,6 +62,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 				continue
 			}
 
+			// Send the message to all clients. Their handler will decide if the message is for them or not.
 			var message []byte = map_value.([]byte)
 			for i := 0; i < MAX_CLIENTS; i++ {
 				if used_channels_GL[i] {
@@ -161,7 +162,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			select {
 				case <- ticker.C:
 					if sendData(websocket.PingMessage, nil) != nil {
-						log.Println("Ping error:", err)
+						// If it wasn't possible to ping the client, close the connection.
+						_ = conn.Close()
 
 						return
 					}
@@ -409,7 +411,7 @@ func registerChannel() int {
 }
 
 func unregisterChannel(channel_num int) {
-	if channel_num >= 0 && channel_num < MAX_CLIENTS {
+	if channel_num >= 0 && channel_num < MAX_CLIENTS && channels_GL[channel_num] != nil {
 		close(channels_GL[channel_num])
 		channels_GL[channel_num] = nil
 		used_channels_GL[channel_num] = false
