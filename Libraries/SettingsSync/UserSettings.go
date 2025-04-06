@@ -77,7 +77,7 @@ func SyncUserSettings() {
 				}
 			}
 
-			if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
+			if Utils.WaitWithStopDATETIME(&stop_GL, 1) {
 				return
 			}
 		}

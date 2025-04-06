@@ -145,7 +145,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			_ = os.Remove(file_path.GPathToStringConversion())
 		}
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+		if Utils.WaitWithStopDATETIME(module_stop, _TIME_SLEEP_S) {
 			getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 			return

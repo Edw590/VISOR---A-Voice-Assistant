@@ -113,7 +113,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 				speechTreatment(speech_id)
 			}
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+			if Utils.WaitWithStopDATETIME(module_stop, 1) {
 				return
 			}
 		}
@@ -139,7 +139,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}()
 
 	for {
-		if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+		if Utils.WaitWithStopDATETIME(module_stop, 1) {
 			stop_volume_processing_GL = true
 			SpeechQueue.ClearQueue()
 

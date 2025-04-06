@@ -140,7 +140,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						"executed, but still it was not possible to execute the test. Please execute it " +
 						"manually."
 					var things_replace = map[string]string{
-						Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrTIMEDATE(-1),
+						Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrDATETIME(-1),
 						Utils.MODEL_INFO_MSG_BODY_EMAIL:  msg_body,
 					}
 					var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_INFO, things_replace)
@@ -153,7 +153,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 				}
 
 				var seconds_begin int64 = time.Now().Unix()
-				var date_time_begin string = Utils.GetDateTimeStrTIMEDATE(seconds_begin)
+				var date_time_begin string = Utils.GetDateTimeStrDATETIME(seconds_begin)
 
 				// Here, this will wait until the test is concluded to report the log (test time + some waiting
 				// period to be sure the test is over).
@@ -164,9 +164,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 					"started on " + date_time_begin + ".\n\n" +
 					"Test duration : " + strconv.Itoa(test_time_min) + " minutes.\n\n" +
 					"The results will be ready on or before " +
-					Utils.GetDateTimeStrTIMEDATE(seconds_begin + int64(test_time_min)*60) + "."
+					Utils.GetDateTimeStrDATETIME(seconds_begin + int64(test_time_min)*60) + "."
 				var things_replace = map[string]string{
-					Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrTIMEDATE(-1),
+					Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrDATETIME(-1),
 					Utils.MODEL_INFO_MSG_BODY_EMAIL:  msg_body,
 				}
 				var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_INFO, things_replace)
@@ -186,7 +186,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						break
 					}
 
-					if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
+					if Utils.WaitWithStopDATETIME(module_stop, 60) {
 						return
 					}
 				}
@@ -223,7 +223,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			return
 		}
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+		if Utils.WaitWithStopDATETIME(module_stop, _TIME_SLEEP_S) {
 			return
 		}
 	}

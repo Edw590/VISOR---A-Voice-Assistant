@@ -441,7 +441,7 @@ module.
 func SendModErrorEmailMODULES(mod_num int, err_str string) error {
 	var things_replace map[string]string = map[string]string{
 		MODEL_INFO_MSG_BODY_EMAIL : err_str,
-		MODEL_INFO_DATE_TIME_EMAIL: GetDateTimeStrTIMEDATE(-1),
+		MODEL_INFO_DATE_TIME_EMAIL: GetDateTimeStrDATETIME(-1),
 	}
 	var email_info = GetModelFileEMAIL(MODEL_FILE_INFO, things_replace)
 	email_info.Subject = "Error in module: " + GetModNameMODULES(mod_num)

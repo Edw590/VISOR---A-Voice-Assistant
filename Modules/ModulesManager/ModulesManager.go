@@ -133,7 +133,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 		//////////////////////////////////////////////////////////////////
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+		if Utils.WaitWithStopDATETIME(module_stop, _TIME_SLEEP_S) {
 			return
 		}
 	}

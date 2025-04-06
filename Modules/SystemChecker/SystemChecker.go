@@ -117,7 +117,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			getDeviceInfo().Last_time_used_s = time.Now().Unix()
 		}
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+		if Utils.WaitWithStopDATETIME(module_stop, 1) {
 			return
 		}
 	}

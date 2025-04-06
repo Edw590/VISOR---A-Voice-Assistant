@@ -68,7 +68,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 		// Store tasks
 		storeTasks(client)
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
+		if Utils.WaitWithStopDATETIME(module_stop, 60) {
 			return
 		}
 	}

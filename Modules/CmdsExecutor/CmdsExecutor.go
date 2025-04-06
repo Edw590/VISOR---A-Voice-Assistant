@@ -159,7 +159,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 
 				case CMD_ASK_DATE:
-					var speak string = "Today's " + Utils.GetDateStrTIMEDATE(-1)
+					var speak string = "Today's " + Utils.GetDateStrDATETIME(-1)
 					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 
 				case CMD_TOGGLE_WIFI:
@@ -313,7 +313,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 		}
 
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+		if Utils.WaitWithStopDATETIME(module_stop, 1) {
 			TEHelper.StopChecker()
 
 			return

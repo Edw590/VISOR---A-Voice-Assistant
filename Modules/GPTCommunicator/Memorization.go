@@ -58,7 +58,7 @@ func autoMemorize() {
 			//}
 		}
 
-		if Utils.WaitWithStopTIMEDATE(module_stop_GL, 1*60) {
+		if Utils.WaitWithStopDATETIME(module_stop_GL, 1*60) {
 			return
 		}
 	}

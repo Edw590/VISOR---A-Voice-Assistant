@@ -105,7 +105,7 @@ func realMain(module_stop *bool, moduleInfo_any any) {
 
 		Utils.WriteSettingsFile(true)
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, 5) {
+		if Utils.WaitWithStopDATETIME(module_stop, 5) {
 			break
 		}
 	}

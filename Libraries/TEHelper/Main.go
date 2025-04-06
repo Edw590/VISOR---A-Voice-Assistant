@@ -136,7 +136,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			return &task_return
 		}
 
-		if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
+		if Utils.WaitWithStopDATETIME(&stop_GL, 1) {
 			return nil
 		}
 	}

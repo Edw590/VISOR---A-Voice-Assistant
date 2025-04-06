@@ -108,7 +108,7 @@ func UpdateUserLocation() {
 			updateUserLocation(curr_location)
 		}
 
-		if Utils.WaitWithStopTIMEDATE(&stop_GL, 1) {
+		if Utils.WaitWithStopDATETIME(&stop_GL, 1) {
 			return
 		}
 	}

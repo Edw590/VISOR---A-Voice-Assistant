@@ -30,7 +30,7 @@ const DATE_FORMAT string = "Monday 2006-01-02"
 const DATE_TIME_FORMAT string = DATE_FORMAT + " -- " + TIME_FORMAT
 
 /*
-GetDateTimeStrTIMEDATE gets the current time and date in the format DATE_TIME_FORMAT.
+GetDateTimeStrDATETIME gets the current time and date in the format DATE_TIME_FORMAT.
 
 -----------------------------------------------------------
 
@@ -40,12 +40,12 @@ GetDateTimeStrTIMEDATE gets the current time and date in the format DATE_TIME_FO
 – Returns:
   - the current time and date in the default format
 */
-func GetDateTimeStrTIMEDATE(s int64) string {
-	return getTimeDateInFormatTIMEDATE(s, DATE_TIME_FORMAT)
+func GetDateTimeStrDATETIME(s int64) string {
+	return getTimeDateInFormatDATETIME(s, DATE_TIME_FORMAT)
 }
 
 /*
-GetDateStrTIMEDATE gets the current date in the format DATE_FORMAT.
+GetDateStrDATETIME gets the current date in the format DATE_FORMAT.
 
 -----------------------------------------------------------
 
@@ -55,8 +55,8 @@ GetDateStrTIMEDATE gets the current date in the format DATE_FORMAT.
 – Returns:
   - the current time in the default format
 */
-func GetDateStrTIMEDATE(s int64) string {
-	return getTimeDateInFormatTIMEDATE(s, DATE_FORMAT)
+func GetDateStrDATETIME(s int64) string {
+	return getTimeDateInFormatDATETIME(s, DATE_FORMAT)
 }
 
 /*
@@ -71,11 +71,11 @@ GetTimeStrTIMEDATE gets the current time in the format TIME_FORMAT.
   - the current date in the default format
 */
 func GetTimeStrTIMEDATE(s int64) string {
-	return getTimeDateInFormatTIMEDATE(s, TIME_FORMAT)
+	return getTimeDateInFormatDATETIME(s, TIME_FORMAT)
 }
 
 /*
-getTimeDateInFormatTIMEDATE gets the time and/or date in the given format.
+getTimeDateInFormatDATETIME gets the time and/or date in the given format.
 
 -----------------------------------------------------------
 
@@ -86,7 +86,7 @@ getTimeDateInFormatTIMEDATE gets the time and/or date in the given format.
 – Returns:
   - the time and/or date in the given format
 */
-func getTimeDateInFormatTIMEDATE(s int64, format string) string {
+func getTimeDateInFormatDATETIME(s int64, format string) string {
 	if s == -1 {
 		return time.Now().Format(format)
 	} else {
@@ -95,7 +95,7 @@ func getTimeDateInFormatTIMEDATE(s int64, format string) string {
 }
 
 /*
-WaitWithStopTIMEDATE waits for a certain amount of time or until a stop signal is received (checked every second).
+WaitWithStopDATETIME waits for a certain amount of time or until a stop signal is received (checked every second).
 
 -----------------------------------------------------------
 
@@ -106,7 +106,7 @@ WaitWithStopTIMEDATE waits for a certain amount of time or until a stop signal i
 – Returns:
   - true if the loop was stopped, false if it reached the end time
 */
-func WaitWithStopTIMEDATE(stop *bool, time_wait_s int) bool {
+func WaitWithStopDATETIME(stop *bool, time_wait_s int) bool {
 	if *stop {
 		// In case time_wait_s is 0, it returns immediately in case the stop signal has been given
 		return true

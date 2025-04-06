@@ -109,14 +109,14 @@ func main(module_stop *bool, moduleInfo_any any) {
 			}
 
 			// No mega fast email spamming - don't want the account blocked.
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
+			if Utils.WaitWithStopDATETIME(module_stop, 1) {
 				return
 			}
 		}
 
 		end_loop:
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
+		if Utils.WaitWithStopDATETIME(module_stop, _TIME_SLEEP_S) {
 			return
 		}
 	}

@@ -79,7 +79,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "ShowApp", nil)
 		}
 
-		if Utils.WaitWithStopTIMEDATE(module_stop, 0) {
+		if Utils.WaitWithStopDATETIME(module_stop, 0) {
 			return
 		}
 	}

@@ -97,7 +97,7 @@ func processVolumeChanges() {
 				}
 			}
 
-			if Utils.WaitWithStopTIMEDATE(&stop_volume_processing_GL, 1) {
+			if Utils.WaitWithStopDATETIME(&stop_volume_processing_GL, 1) {
 				processing_volume_GL = false
 
 				return
