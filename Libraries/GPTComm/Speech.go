@@ -153,7 +153,7 @@ func GetNextSpeechSentence() string {
 
 		// If the last dot index is not found, it means that the sentence is not finished yet. So, we must wait for the
 		// next entry to be added to the text file.
-		if dot_idx != -1 {
+		if dot_idx != -1 && (last_idx_begin_GL + dot_idx + 2 <= len(text)) {
 			sentence = text[last_idx_begin_GL : last_idx_begin_GL + dot_idx + 2]
 			sentence = strings.Trim(sentence, " ")
 

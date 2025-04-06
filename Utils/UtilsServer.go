@@ -77,7 +77,7 @@ func startCommunicatorInternalSERVER() {
 	var stop bool = false
 
 	// Define the WebSocket server address
-	u := url.URL{Scheme: "wss", Host: GetUserSettings().General.Website_domain + ":3234", Path: "/ws"}
+	var u url.URL = url.URL{Scheme: "wss", Host: GetUserSettings().General.Website_domain + ":3234", Path: "/ws"}
 	//log.Printf("Connecting to %s", u.String())
 
 	// Create Basic Auth credentials (username:password)
