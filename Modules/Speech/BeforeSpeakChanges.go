@@ -22,7 +22,7 @@
 package Speech
 
 import (
-	"SpeechQueue/SpeechQueue"
+	"SpeechQueue"
 	"Utils"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"

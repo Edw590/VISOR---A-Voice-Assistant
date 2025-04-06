@@ -22,9 +22,9 @@
 package Screens
 
 import (
-	"GPTComm/GPTComm"
+	"GPTComm"
 	"Speech"
-	"SpeechQueue/SpeechQueue"
+	"SpeechQueue"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"errors"

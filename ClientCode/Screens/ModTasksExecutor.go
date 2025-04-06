@@ -22,8 +22,8 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
-	"TEHelper/TEHelper"
+	"SettingsSync"
+	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"

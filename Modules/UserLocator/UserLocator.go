@@ -22,7 +22,7 @@
 package UserLocator
 
 import (
-	"ULHelper/ULHelper"
+	"ULHelper"
 	"Utils"
 )
 

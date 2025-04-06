@@ -23,7 +23,7 @@ package Screens
 
 import (
 	"Speech"
-	"SpeechQueue/SpeechQueue"
+	"SpeechQueue"
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"

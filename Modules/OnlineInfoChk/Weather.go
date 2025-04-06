@@ -19,7 +19,7 @@
  * under the License.
  ******************************************************************************/
 
-package OICWeather
+package OnlineInfoChk
 
 import (
 	"Utils"
@@ -32,9 +32,9 @@ import (
 
 type OpenMeteoWeather struct {
 	Current_units Current_units `json:"current_units"`
-	Current Current `json:"current"`
-	Daily_units Daily_units `json:"daily_units"`
-	Daily Daily `json:"daily"`
+	Current       Current       `json:"current"`
+	Daily_units   Daily_units   `json:"daily_units"`
+	Daily         Daily         `json:"daily"`
 }
 
 type Current_units struct {

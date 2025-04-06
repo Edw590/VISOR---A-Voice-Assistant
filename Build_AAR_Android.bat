@@ -19,14 +19,14 @@ gomobile bind^
  -ldflags="-v -s -w -compressdwarf=true"^
  -o="bin/MainLibraries.aar"^
  "ACD/ACD"^
- "GMan/GMan"^
- "GPTComm/GPTComm"^
- "OICComm/OICComm"^
- "SCLink/SCLink"^
- "SettingsSync/SettingsSync"^
- "SpeechQueue/SpeechQueue"^
- "TEHelper/TEHelper"^
- "ULHelper/ULHelper"^
+ "GMan"^
+ "GPTComm"^
+ "OICComm"^
+ "SCLink"^
+ "SettingsSync"^
+ "SpeechQueue"^
+ "TEHelper"^
+ "ULHelper"^
  "Utils/ModsFileInfo"^
  "Utils/UtilsSWA"
 

@@ -22,8 +22,8 @@
 package Speech
 
 import (
-	"GPTComm/GPTComm"
-	"SpeechQueue/SpeechQueue"
+	"GPTComm"
+	"SpeechQueue"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"

@@ -22,8 +22,6 @@
 package OnlineInfoChk
 
 import (
-	"OnlineInfoChk/OICNews"
-	"OnlineInfoChk/OICWeather"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fmt"
@@ -141,8 +139,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 		_ = bypassGoogleCookies(driver)
 
-		getModGenSettings().Weather = OICWeather.UpdateWeather(getModUserInfo().Temp_locs)
-		getModGenSettings().News = OICNews.UpdateNews(driver, getModUserInfo().News_locs)
+		getModGenSettings().Weather = UpdateWeather(getModUserInfo().Temp_locs)
+		getModGenSettings().News = UpdateNews(driver, getModUserInfo().News_locs)
 
 		_ = driver.Quit()
 		_ = service.Stop()

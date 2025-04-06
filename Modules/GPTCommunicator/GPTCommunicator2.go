@@ -22,7 +22,7 @@
 package GPTCommunicator
 
 import (
-	"GPTComm/GPTComm"
+	"GPTComm"
 	"OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"

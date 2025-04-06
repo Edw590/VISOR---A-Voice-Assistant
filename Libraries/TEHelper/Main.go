@@ -22,7 +22,7 @@
 package TEHelper
 
 import (
-	"ULHelper/ULHelper"
+	"ULHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"strings"

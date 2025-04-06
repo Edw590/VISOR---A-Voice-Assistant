@@ -22,7 +22,7 @@
 package GPTCommunicator
 
 import (
-	"GPTComm/GPTComm"
+	"GPTComm"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"

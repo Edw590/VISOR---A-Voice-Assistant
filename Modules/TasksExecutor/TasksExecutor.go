@@ -23,8 +23,8 @@ package TasksExecutor
 
 import (
 	"Speech"
-	"SpeechQueue/SpeechQueue"
-	"TEHelper/TEHelper"
+	"SpeechQueue"
+	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"log"

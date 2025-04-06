@@ -38,13 +38,13 @@ import (
 
 // Website Backend //
 
-const MAX_CHANNELS int = 100
+const MAX_CLIENTS int = 100
 
 const PONG_WAIT = 120 * time.Second // Allow X time before considering the client unreachable.
 const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT. -->
 
-var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
-var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
+var channels_GL [MAX_CLIENTS]chan []byte = [MAX_CLIENTS]chan []byte{}
+var used_channels_GL [MAX_CLIENTS]bool = [MAX_CLIENTS]bool{}
 
 var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
@@ -63,7 +63,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			}
 
 			var message []byte = map_value.([]byte)
-			for i := 0; i < MAX_CHANNELS; i++ {
+			for i := 0; i < MAX_CLIENTS; i++ {
 				if used_channels_GL[i] {
 					channels_GL[i] <- message
 				}
@@ -85,6 +85,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 		err := srv.ListenAndServeTLS(getModUserInfo().Crt_file, getModUserInfo().Key_file)
 		if err != nil {
 			log.Println("ListenAndServeTLS error:", err)
+
+			*module_stop = true
 		}
 	}()
 
@@ -95,15 +97,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 		if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
 			_ = srv.Shutdown(ctx)
 
-			for i := 0; i < MAX_CHANNELS; i++ {
-				if used_channels_GL[i] {
-					// Ignore the panic in case the channel is already closed (happened).
-					Tcef.Tcef{
-						Try: func() {
-							close(channels_GL[i])
-						},
-					}.Do()
-				}
+			for i := 0; i < MAX_CLIENTS; i++ {
+				unregisterChannel(i)
 			}
 
 			return
@@ -401,7 +396,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 }
 
 func registerChannel() int {
-	for i := 0; i < MAX_CHANNELS; i++ {
+	for i := 0; i < MAX_CLIENTS; i++ {
 		if !used_channels_GL[i] {
 			channels_GL[i] = make(chan []byte)
 			used_channels_GL[i] = true
@@ -414,13 +409,8 @@ func registerChannel() int {
 }
 
 func unregisterChannel(channel_num int) {
-	if channel_num >= 0 && channel_num < MAX_CHANNELS {
-		// Ignore the panic of writing to closed channels (sometimes happens when the app is shutting down).
-		Tcef.Tcef{
-			Try: func() {
-				close(channels_GL[channel_num])
-			},
-		}.Do()
+	if channel_num >= 0 && channel_num < MAX_CLIENTS {
+		close(channels_GL[channel_num])
 		channels_GL[channel_num] = nil
 		used_channels_GL[channel_num] = false
 	}

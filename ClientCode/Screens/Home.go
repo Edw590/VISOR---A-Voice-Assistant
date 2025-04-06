@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
+	"SettingsSync"
 	"Utils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"

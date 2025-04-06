@@ -57,7 +57,8 @@ If no message is available, the function will wait until a message is received.
 -----------------------------------------------------------
 
 – Returns:
-  - the message received or nil if the communicator is stopping or stopped
+  - the message received
+  - an error if the communicator is not connected
 */
 func GetGeneralMessageSERVER() ([]byte, error) {
 	bytes, received := Utils.GetGeneralMessageSERVER()

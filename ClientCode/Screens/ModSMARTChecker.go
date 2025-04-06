@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
+	"SettingsSync"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"errors"

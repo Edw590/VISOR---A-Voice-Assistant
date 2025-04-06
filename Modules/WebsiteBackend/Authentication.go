@@ -34,18 +34,21 @@ func basicAuth(next http.HandlerFunc) http.HandlerFunc {
 		auth := r.Header.Get("Authorization")
 		if !strings.HasPrefix(auth, basicAuthPrefix) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+
 			return
 		}
 
 		payload, err := base64.StdEncoding.DecodeString(auth[len(basicAuthPrefix):])
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+
 			return
 		}
 
 		pair := strings.SplitN(string(payload), ":", 2)
 		if len(pair) != 2 || !validateCredentials(pair[0], pair[1]) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+
 			return
 		}
 

@@ -23,12 +23,12 @@ package CmdsExecutor
 
 import (
 	"ACD/ACD"
-	"GMan/GMan"
-	"GPTComm/GPTComm"
-	"OICComm/OICComm"
+	"GMan"
+	"GPTComm"
+	"OICComm"
 	"Speech"
-	"SpeechQueue/SpeechQueue"
-	"TEHelper/TEHelper"
+	"SpeechQueue"
+	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"

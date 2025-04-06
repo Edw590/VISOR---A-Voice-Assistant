@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"GMan/GMan"
+	"GMan"
 	"GoogleManager"
 	"Utils"
 	"context"

@@ -23,7 +23,7 @@ package main
 
 import (
 	"ModulesManager"
-	"SettingsSync/SettingsSync"
+	"SettingsSync"
 	"Utils"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"

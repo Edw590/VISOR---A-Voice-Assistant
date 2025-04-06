@@ -19,7 +19,7 @@
  * under the License.
  ******************************************************************************/
 
-package OICNews
+package OnlineInfoChk
 
 import (
 	"Utils"

@@ -22,7 +22,7 @@
 package CmdsExecutor
 
 import (
-	"GMan/GMan"
+	"GMan"
 	"strconv"
 	"time"
 )
