@@ -212,15 +212,15 @@ func main(module_stop *bool, moduleInfo_any any) {
 								continue
 							}
 
-							var status_part string = " is " + weather.Status + " with "
-							if weather.Status == "ERROR" {
-								status_part = " has "
+							var status_part string = " is "
+							if weather.Status != "ERROR" {
+								status_part += weather.Status + " with "
 							}
 
 							speak = "The weather in " + weather.Location + status_part + weather.Temperature +
 								" degrees, a high of " + weather.Max_temp + " degrees and a low of " + weather.Min_temp +
-								" degrees. The precipitation is of " + weather.Precipitation + ", humidity of " +
-								weather.Humidity + ", and wind of " + weather.Wind + "."
+								" degrees. The maximum precipitation is of " + weather.Precipitation + ", mean " +
+								"humidity of " + weather.Humidity + ", and mean wind of " + weather.Wind + "."
 							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 						}
 					} else {
