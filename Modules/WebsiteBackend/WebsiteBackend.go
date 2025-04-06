@@ -40,8 +40,8 @@ import (
 
 const MAX_CLIENTS int = 100
 
-const PONG_WAIT = (120+10) * time.Second // Allow X time before considering the client unreachable.
-const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT. -->
+const PONG_WAIT = 120 * time.Second // Allow X time before considering the client unreachable
+const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT
 
 var channels_GL [MAX_CLIENTS]chan []byte = [MAX_CLIENTS]chan []byte{}
 var used_channels_GL [MAX_CLIENTS]bool = [MAX_CLIENTS]bool{}
@@ -162,6 +162,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			select {
 				case <- ticker.C:
 					if sendData(websocket.PingMessage, nil) != nil {
+						log.Println("Ping error:", err)
+
 						// If it wasn't possible to ping the client, close the connection.
 						_ = conn.Close()
 

@@ -219,7 +219,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 							speak = "The weather in " + weather.Location + status_part + weather.Temperature +
 								" degrees, a high of " + weather.Max_temp + " degrees and a low of " + weather.Min_temp +
-								" degrees. The maximum precipitation is of " + weather.Precipitation + ", mean " +
+								" degrees. The mean precipitation is of " + weather.Precipitation + ", mean " +
 								"humidity of " + weather.Humidity + ", and mean wind of " + weather.Wind + "."
 							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
 						}

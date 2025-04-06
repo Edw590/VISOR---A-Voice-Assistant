@@ -42,11 +42,11 @@ type Current_units struct {
 }
 
 type Daily_units struct {
-	Temperature_2m_max string `json:"temperature_2m_max"`
-	Temperature_2m_min string `json:"temperature_2m_min"`
-	Precipitation_probability_max string `json:"precipitation_probability_max"`
-	Relative_humidity_2m_mean string `json:"relative_humidity_2m_mean"`
-	Wind_speed_10m_mean string `json:"wind_speed_10m_mean"`
+	Temperature_2m_max             string `json:"temperature_2m_max"`
+	Temperature_2m_min             string `json:"temperature_2m_min"`
+	Precipitation_probability_mean string `json:"precipitation_probability_mean"`
+	Relative_humidity_2m_mean      string `json:"relative_humidity_2m_mean"`
+	Wind_speed_10m_mean            string `json:"wind_speed_10m_mean"`
 }
 
 type Current struct {
@@ -54,11 +54,11 @@ type Current struct {
 }
 
 type Daily struct {
-	Temperature_2m_max []float32 `json:"temperature_2m_max"`
-	Temperature_2m_min []float32 `json:"temperature_2m_min"`
-	Precipitation_probability_max []float32 `json:"precipitation_probability_max"`
-	Relative_humidity_2m_mean []float32 `json:"relative_humidity_2m_mean"`
-	Wind_speed_10m_mean []float32 `json:"wind_speed_10m_mean"`
+	Temperature_2m_max             []float32 `json:"temperature_2m_max"`
+	Temperature_2m_min             []float32 `json:"temperature_2m_min"`
+	Precipitation_probability_mean []float32 `json:"precipitation_probability_mean"`
+	Relative_humidity_2m_mean      []float32 `json:"relative_humidity_2m_mean"`
+	Wind_speed_10m_mean            []float32 `json:"wind_speed_10m_mean"`
 }
 
 /*
@@ -155,7 +155,7 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 	source, err := Utils.MakeGetRequest("https://api.open-meteo.com/v1/forecast?" +
 		"latitude=" + latitude_str + "&longitude=" + longitude_str +
 		"&current=temperature_2m" +
-		"&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,relative_humidity_2m_mean,wind_speed_10m_mean" +
+		"&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_mean,relative_humidity_2m_mean,wind_speed_10m_mean" +
 		"&forecast_days=1" +
 		"&timeformat=unixtime")
 	if err != nil {
@@ -173,8 +173,8 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 	var temperature string = float32ToIntToString(weather.Current.Temperature_2m)
 	var max_temp string = float32ToIntToString(weather.Daily.Temperature_2m_max[0])
 	var min_temp string = float32ToIntToString(weather.Daily.Temperature_2m_min[0])
-	var precipitation string = float32ToIntToString(weather.Daily.Precipitation_probability_max[0]) +
-		weather.Daily_units.Precipitation_probability_max
+	var precipitation string = float32ToIntToString(weather.Daily.Precipitation_probability_mean[0]) +
+		weather.Daily_units.Precipitation_probability_mean
 	var humidity string = float32ToIntToString(weather.Daily.Relative_humidity_2m_mean[0]) +
 		weather.Daily_units.Relative_humidity_2m_mean
 	var wind string = float32ToIntToString(weather.Daily.Wind_speed_10m_mean[0]) +

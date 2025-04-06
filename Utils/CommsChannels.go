@@ -90,7 +90,7 @@ GetFullChannelNum returns the full channel number.
   - the full channel number
  */
 func getFullChannelNum(num int, channel_num int) int {
-	return num *_COMMS_CH_MUL + channel_num
+	return num * _COMMS_CH_MUL + channel_num
 }
 
 /*
