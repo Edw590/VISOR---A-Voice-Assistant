@@ -56,27 +56,26 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 	var curr_session ModsFileInfo.Session = *getSession(session_id)
 	curr_session.Memorized = false
 
-	var actual_role string = ""
 	switch role {
 		case GPTComm.ROLE_USER:
-			actual_role = "user"
+			role = "user"
 		case GPTComm.ROLE_TOOL:
-			user_message = "As per user request, inform them that: \"" + user_message + "\"."
+			user_message = "As per system request, inform the user that: \"" + user_message + "\"."
 			if getModUserInfo().Model_has_tool_role {
-				actual_role = "tool"
+				role = "tool"
 			} else {
-				actual_role = "user"
+				role = "user"
 
 				// Keep the last part. He'll say less random stuff this way.
 				user_message = "[SYSTEM TASK - " + user_message + " NO SAYING YOU'RE REWORDING IT]"
 			}
 		default:
-			actual_role = role
+			// Keep the original
 	}
 
 	// Append user message to history
 	curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
-		Role:        actual_role,
+		Role:        role,
 		Content:     UtilsSWA.RemoveNonGraphicCharsGENERAL(user_message),
 		Timestamp_s: time.Now().Unix(),
 	})
