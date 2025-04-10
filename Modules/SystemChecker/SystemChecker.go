@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -39,103 +39,86 @@ import (
 const SCAN_WIFI_EACH_S int64 = 60
 var last_check_wifi_when_s int64 = 0
 
-var device_info_GL *ModsFileInfo.DeviceInfo
-
-type _Battery struct {
-	power_connected bool
-	level           int
-}
-
 type _MousePosition struct {
 	x int
 	y int
 }
 
-var (
-	realMain      Utils.RealMain = nil
-	moduleInfo_GL Utils.ModuleInfo
-	modGenInfo_GL *ModsFileInfo.Mod10GenInfo
-)
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_10
+var modDirsInfo_GL Utils.ModDirsInfo
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
-		var curr_mouse_position _MousePosition
+	var curr_mouse_position _MousePosition
 
-		device_info_GL = &modGenInfo_GL.Device_info
+	var wifi_networks []ModsFileInfo.ExtBeacon
+	for {
+		if time.Now().Unix() >= last_check_wifi_when_s + SCAN_WIFI_EACH_S {
+			// Every 3 minutes, update the wifi networks
+			wifi_networks = getWifiNetworks()
 
-		var wifi_networks []ModsFileInfo.ExtBeacon
-		for {
-			if time.Now().Unix() >= last_check_wifi_when_s + SCAN_WIFI_EACH_S {
-				// Every 3 minutes, update the wifi networks
-				wifi_networks = getWifiNetworks()
+			last_check_wifi_when_s = time.Now().Unix()
+		}
 
-				last_check_wifi_when_s = time.Now().Unix()
-			}
-
-
-			// Connectivity information
-			device_info_GL.System_state.Connectivity_info = ModsFileInfo.ConnectivityInfo{
-				Airplane_mode_enabled: false,
-				Wifi_enabled:          getWifiEnabled(),
-				Bluetooth_enabled:     false,
-				Mobile_data_enabled:   false,
-				Wifi_networks:         wifi_networks,
-				Bluetooth_devices:     nil,
-			}
+		// Connectivity information
+		getDeviceInfo().System_state.Connectivity_info = ModsFileInfo.ConnectivityInfo{
+			Airplane_mode_enabled: false,
+			Wifi_enabled:          getWifiEnabled(),
+			Bluetooth_enabled:     false,
+			Mobile_data_enabled:   false,
+			Wifi_networks:         wifi_networks,
+			Bluetooth_devices:     nil,
+		}
 
 
-			// Battery information
-			battery_level, power_connected := getBatteryInfo(device_info_GL.System_state.Battery_info.Level,
-				device_info_GL.System_state.Battery_info.Power_connected)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetInt(int32(battery_level), false)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetBool(power_connected, false)
+		// Battery information
+		battery_level, power_connected := getBatteryInfo(getDeviceInfo().System_state.Battery_info.Level,
+			getDeviceInfo().System_state.Battery_info.Power_connected)
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).SetInt(int32(battery_level), false)
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_POWER_CONNECTED).SetBool(power_connected, false)
 
-			device_info_GL.System_state.Battery_info = ModsFileInfo.BatteryInfo{
-				Level:           battery_level,
-				Power_connected: power_connected,
-			}
-
-
-			// Monitor information
-			var screen_brightness int = Utils.GetScreenBrightnessSYSTEM()
-			if screen_brightness == -1 {
-				screen_brightness = device_info_GL.System_state.Monitor_info.Brightness
-			}
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetInt(int32(screen_brightness), false)
-
-			device_info_GL.System_state.Monitor_info = ModsFileInfo.MonitorInfo{
-				Screen_on:  true,
-				Brightness: screen_brightness,
-			}
+		getDeviceInfo().System_state.Battery_info = ModsFileInfo.BatteryInfo{
+			Level:           battery_level,
+			Power_connected: power_connected,
+		}
 
 
-			// Sound information
-			var sound_volume int = getSoundVolume(device_info_GL.System_state.Sound_info.Volume)
-			var sound_muted bool = getSoundMuted(device_info_GL.System_state.Sound_info.Muted)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetInt(int32(sound_volume), false)
-			UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetBool(sound_muted, false)
+		// Monitor information
+		var screen_brightness int = Utils.GetScreenBrightnessSYSTEM()
+		if screen_brightness == -1 {
+			screen_brightness = getDeviceInfo().System_state.Monitor_info.Brightness
+		}
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SCREEN_BRIGHTNESS).SetInt(int32(screen_brightness), false)
 
-			device_info_GL.System_state.Sound_info = ModsFileInfo.SoundInfo{
-				Volume: sound_volume,
-				Muted:  sound_muted,
-			}
+		getDeviceInfo().System_state.Monitor_info = ModsFileInfo.MonitorInfo{
+			Screen_on:  true,
+			Brightness: screen_brightness,
+		}
 
 
-			// Check if the device is being used by checking if the mouse is moving
-			var x, y int = robotgo.Location()
-			if x != curr_mouse_position.x || y != curr_mouse_position.y {
-				curr_mouse_position.x = x
-				curr_mouse_position.y = y
+		// Sound information
+		var sound_volume int = getSoundVolume(getDeviceInfo().System_state.Sound_info.Volume)
+		var sound_muted bool = getSoundMuted(getDeviceInfo().System_state.Sound_info.Muted)
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_VOLUME).SetInt(int32(sound_volume), false)
+		UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SOUND_MUTED).SetBool(sound_muted, false)
 
-				device_info_GL.Last_time_used_s = time.Now().Unix()
-			}
+		getDeviceInfo().System_state.Sound_info = ModsFileInfo.SoundInfo{
+			Volume: sound_volume,
+			Muted:  sound_muted,
+		}
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1) {
-				return
-			}
+
+		// Check if the device is being used by checking if the mouse is moving
+		var x, y int = robotgo.Location()
+		if x != curr_mouse_position.x || y != curr_mouse_position.y {
+			curr_mouse_position.x = x
+			curr_mouse_position.y = y
+
+			getDeviceInfo().Last_time_used_s = time.Now().Unix()
+		}
+
+		if Utils.WaitWithStopDATETIME(module_stop, 1) {
+			return
 		}
 	}
 }
@@ -260,4 +243,8 @@ func setWifiEnabled(enabled bool) bool {
 	}
 
 	return err == nil && cmd_output.Exit_code == 0
+}
+
+func getDeviceInfo() *ModsFileInfo.DeviceInfo {
+	return &Utils.GetGenSettings().MOD_10.Device_info
 }

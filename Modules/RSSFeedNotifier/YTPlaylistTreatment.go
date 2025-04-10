@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -87,7 +87,7 @@ func ytPlaylistScraping(playlist_id string, item_num int, item_count int) _Video
 
 		// Remove the first too (it's also the rest of the page)
 		videos_info_json = videos_info_json[1:]
-		for i := 0; i < len(videos_info_json); i++ {
+		for i := range videos_info_json {
 			// Remove the last "}," from the string (it's part of the main JSON object)
 			videos_info_json[i] = videos_info_json[i][:strings.LastIndex(videos_info_json[i], "}")]
 		}

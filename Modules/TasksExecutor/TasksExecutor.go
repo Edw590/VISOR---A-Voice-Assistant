@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,47 +23,44 @@ package TasksExecutor
 
 import (
 	"Speech"
-	"SpeechQueue/SpeechQueue"
-	"TEHelper/TEHelper"
+	"SpeechQueue"
+	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"log"
 )
 
 var (
-	realMain       Utils.RealMain = nil
-	moduleInfo_GL  Utils.ModuleInfo
+	modDirsInfo_GL  Utils.ModDirsInfo
 )
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
-		go func() {
-			for {
-				var task *ModsFileInfo.Task = TEHelper.CheckDueTasks()
-				if task == nil {
-					break
-				}
-
-				log.Println("Task! -->", task.Id)
-
-				if task.Message != "" {
-					Speech.QueueSpeech(task.Message, SpeechQueue.PRIORITY_MEDIUM, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
-				}
-
-				if task.Command != "" {
-					Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, 0, "SentenceInternal", task.Command)
-				}
-			}
-		}()
-
+	go func() {
 		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
-				TEHelper.StopChecker()
-
-				return
+			var task *ModsFileInfo.Task = TEHelper.CheckDueTasks()
+			if task == nil {
+				break
 			}
+
+			log.Println("Task! -->", task.Id)
+
+			if task.Message != "" {
+				Speech.QueueSpeech(task.Message, SpeechQueue.PRIORITY_MEDIUM, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
+			}
+
+			if task.Command != "" {
+				Utils.SendToModChannel(Utils.NUM_MOD_CmdsExecutor, 0, "SentenceInternal", task.Command)
+			}
+		}
+	}()
+
+	for {
+		if Utils.WaitWithStopDATETIME(module_stop, 1000000000) {
+			TEHelper.StopChecker()
+
+			return
 		}
 	}
 }

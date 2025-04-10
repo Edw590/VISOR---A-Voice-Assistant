@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -118,19 +118,19 @@ func CopyOuterSLICES[T any](slice T) T {
 }
 
 /*
-CopyFullSLICES copies all the values from slice/array to a provided slice/array with the length and capacity of the
-original.
+CopyFullSLICES copies all the values from slice/array/map to a provided slice/array/map with the length and capacity of
+the original.
 
-Note 1: both slices/arrays must have the same type (that includes the length of each dimension with arrays).
+Note 1: both slices/arrays/map must have the same type (that includes the length of each dimension with arrays).
 
 NOTE 2: this function is slow, according to what someone told me. Don't use unless it's really necessary to copy all
-values from multidimensional slices/arrays.
+values from multidimensional slices/arrays/maps.
 
 -----------------------------------------------------------
 
 – Params:
-  - dest – a pointer to an empty destination slice/array header
-  - src – the source slice/array
+  - dest – a pointer to an empty destination slice/array/map header
+  - src – the source slice/array/map
 
 – Returns:
   - true if the slice was fully copied, false if an error occurred

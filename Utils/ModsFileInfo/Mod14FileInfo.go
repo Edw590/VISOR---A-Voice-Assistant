@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +25,8 @@ package ModsFileInfo
 type Mod14GenInfo struct {
 	// Token is the cached token
 	Token string
+	// Token_invalid is whether the token is invalid
+	Token_invalid bool
 	// Events is the list of events
 	Events []GEvent
 	// Tasks is the list of tasks
@@ -38,8 +40,8 @@ type GTask struct {
 	Title string
 	// Details are the details of the task
 	Details string
-	// Date is the date of the task in "2006-01-02" format
-	Date string
+	// Date_s is the timestamp of the date of the task in seconds
+	Date_s int64
 	// Completed is whether the task is completed
 	Completed bool
 }
@@ -53,8 +55,8 @@ type GEvent struct {
 	Location string
 	// Description is the description of the event
 	Description string
-	// Start_time is the time of the event in RFC3339 format
-	Start_time string
+	// Start_time_s is the timestamp of the start time of the event in seconds
+	Start_time_s int64
 	// Duration_min is the duration of the event in minutes
 	Duration_min int64
 }

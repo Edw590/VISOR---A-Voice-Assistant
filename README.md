@@ -18,7 +18,7 @@ The server one runs 24/7 on my Raspberry Pi. This is supposed to be VISOR's "ope
 Feel free to create an Issue or a Discussion with any questions you have about this. I'm trying to make it as generic as possible for anyone to be able to use it, but I may forget to document things or something, so if you need anything, feel free to ask about it.
 
 ## Usage
-- Download the latest Release from [here](https://github.com/Edw590/VISOR---A-Voice-Assistant/releases).
+- Download the latest Release from [here](https://github.com/Edw590/VISOR---A-Voice-Assistant/releases) (if you need an executable that is not there, tell me and I'll try to compile it for you).
 - To use the server program (very much recommended, to get all the features working), open port 3234 on your router so that the client-server communication can be made. Also, VISOR needs an email to send emails (I used a Gmail accounted created specifically for him).
 - In case you're running the server, you'll also need to generate an SSL certificate (can be self-signed). To generate a self-signed one, execute this command on either Linux or Windows: `openssl req -x509 -newkey rsa:4096 -sha256 -keyout certificate.key -out certificate.crt -subj "/CN=Common Name" -days 600 -nodes` (write the number of days you want the certificate valid for. I've left there 600 as I saw where I copied this command from), and input the path to those 2 files on the "WebsiteBackend" section inside UserSettings_EOG.dat (open with Notepad).
 - Check below the requirements for each module to work. You must have a few programs installed on your computer for VISOR to work completely.
@@ -62,7 +62,7 @@ Note: if you don't know how to put something on the PATH, just copy the program 
 | 10    | **System Checker**             | Client                | Collects information about the system, like Wi-Fi networks and Bluetooth devices in range. Or the state of the Wi-Fi adapter and the Bluetooth adapter. Or the screen brightness. Or others. The client can then use this information to determine where the device is and if it's being used or not.
 | 11    | **Speech Recognition**         | Client (Windows only) | Currently only checks if the phrase "Hey VISOR" is spoken and shows the UI, but later should be used to detect normal speech to interact with VISOR.
 | 12    | **User Locator**               | Client                | Locates the user based on everything the client knows about the user (the user must configure some things first) and on system information. For example, if the phone is communicating and the user is always with the phone (the "AlwaysWith" device), then the user is near the phone whether it's being used or not. With the computer, it must be being used because the user may leave the computer and go have lunch but not the phone.
-| 13    | **Commands Executor**          | Client                | Executes commands from a sentence given to it. The commands are processed by the ACD library.
+| 13    | **Commands Executor**          | Client                | Executes commands from a sentence given to it. The commands are processed by a library created by me, the [Advanced Commands Detection](https://github.com/Edw590/AdvancedCommandsDetection) library.
 | 14    | **Google Manager**             | Server                | Manages the Google account of the user. It can currently only *check* the calendar and tasks (won't modify anything).
 
 ## Developer notes

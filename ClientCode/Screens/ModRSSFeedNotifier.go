@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
+	"SettingsSync"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"
@@ -68,7 +68,7 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 		SettingsSync.AddFeedRSS(check_enabled.Checked, entry_feed_name.Text, entry_feed_url.Text, entry_feed_type.Text,
 			entry_custom_msg_subject.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -84,8 +84,8 @@ func rssFeedNotifierCreateAddFeedTab() *container.Scroll {
 func rssFeedNotifierCreateFeedsListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var feeds_info []ModsFileInfo.FeedInfo = Utils.User_settings_GL.RSSFeedNotifier.Feeds_info
-	for i := 0; i < len(feeds_info); i++ {
+	var feeds_info []ModsFileInfo.FeedInfo = Utils.GetUserSettings().RSSFeedNotifier.Feeds_info
+	for i := range feeds_info {
 		var feed_info ModsFileInfo.FeedInfo = feeds_info[i]
 		var title string = ""
 		if !feed_info.Enabled {
@@ -125,16 +125,16 @@ func createFeedInfoSetter(feed_info *ModsFileInfo.FeedInfo) *fyne.Container {
 		feed_info.Url = entry_url.Text
 		feed_info.Custom_msg_subject = entry_custom_msg_subject.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this feed?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveFeedRSS(feed_info.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

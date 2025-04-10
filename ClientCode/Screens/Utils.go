@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,6 +22,7 @@
 package Screens
 
 import (
+	"Utils"
 	"Utils/UtilsSWA"
 	"errors"
 	"fyne.io/fyne/v2"
@@ -59,38 +60,38 @@ func createValueChooserUTILS(value *UtilsSWA.Value) *fyne.Container {
 	var entry *widget.Entry = nil
 	var check *widget.Check = nil
 	switch value.Type_ {
-	case UtilsSWA.TYPE_INT: fallthrough
-	case UtilsSWA.TYPE_LONG: fallthrough
-	case UtilsSWA.TYPE_STRING: fallthrough
-	case UtilsSWA.TYPE_FLOAT: fallthrough
-	case UtilsSWA.TYPE_DOUBLE:
-		entry = widget.NewEntry()
-		entry.SetText(value.Curr_data)
-		entry.Validator = func(s string) error {
-			if value.Type_ == UtilsSWA.TYPE_INT {
-				if _, err := strconv.Atoi(s); err != nil {
-					return errors.New("not an int")
+		case UtilsSWA.TYPE_INT: fallthrough
+		case UtilsSWA.TYPE_LONG: fallthrough
+		case UtilsSWA.TYPE_STRING: fallthrough
+		case UtilsSWA.TYPE_FLOAT: fallthrough
+		case UtilsSWA.TYPE_DOUBLE:
+			entry = widget.NewEntry()
+			entry.SetText(value.Curr_data)
+			entry.Validator = func(s string) error {
+				if value.Type_ == UtilsSWA.TYPE_INT {
+					if _, err := strconv.Atoi(s); err != nil {
+						return errors.New("not an int")
+					}
+				} else if value.Type_ == UtilsSWA.TYPE_LONG {
+					if _, err := strconv.ParseInt(s, 10, 64); err != nil {
+						return errors.New("not a long")
+					}
+				} else if value.Type_ == UtilsSWA.TYPE_FLOAT {
+					if _, err := strconv.ParseFloat(s, 32); err != nil {
+						return errors.New("not a float")
+					}
+				} else if value.Type_ == UtilsSWA.TYPE_DOUBLE {
+					if _, err := strconv.ParseFloat(s, 64); err != nil {
+						return errors.New("not a double")
+					}
 				}
-			} else if value.Type_ == UtilsSWA.TYPE_LONG {
-				if _, err := strconv.ParseInt(s, 10, 64); err != nil {
-					return errors.New("not a long")
-				}
-			} else if value.Type_ == UtilsSWA.TYPE_FLOAT {
-				if _, err := strconv.ParseFloat(s, 32); err != nil {
-					return errors.New("not a float")
-				}
-			} else if value.Type_ == UtilsSWA.TYPE_DOUBLE {
-				if _, err := strconv.ParseFloat(s, 64); err != nil {
-					return errors.New("not a double")
-				}
+				return nil
 			}
-			return nil
-		}
-		content = append(content, entry)
-	case UtilsSWA.TYPE_BOOL:
-		check = widget.NewCheck("Check", nil)
-		check.SetChecked(value.GetBool(true))
-		content = append(content, check)
+			content = append(content, entry)
+		case UtilsSWA.TYPE_BOOL:
+			check = widget.NewCheck("Check", nil)
+			check.SetChecked(value.GetBool(true))
+			content = append(content, check)
 	}
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
@@ -118,7 +119,7 @@ func createMainContentScrollUTILS(objects... fyne.CanvasObject) *container.Scrol
 	return main_scroll
 }
 
-func createConfirmationUTILS(message string, callback func(bool)) *dialog.ConfirmDialog {
+func createConfirmationDialogUTILS(message string, callback func(bool)) *dialog.ConfirmDialog {
 	cnf := dialog.NewConfirm("Confirmation", message, callback, Current_window_GL)
 	cnf.SetDismissText("Cancel")
 	cnf.SetConfirmText("OK")
@@ -133,4 +134,8 @@ func trimAccordionTitleUTILS(title string) string {
 	}
 
 	return title
+}
+
+func reloadScreen() {
+	Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
 }

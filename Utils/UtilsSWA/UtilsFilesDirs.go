@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -36,12 +36,12 @@ PathFILESDIRS returns the path and whether it describes a directory or not.
   - paths_list – the paths list with subpaths separated by the null character
 
 – Returns:
-  - the path and whether it describes a directory or not separated by "|"
-*/
+  - the path and whether it describes a directory or not separated by the null character
+ */
 func PathFILESDIRS(describes_dir bool, paths_list string) string {
 	var array1 []string = strings.Split(paths_list, "\x00")
 	var array2 []any = make([]any, len(array1))
-	for i := 0; i < len(array1); i++ {
+	for i := range array1 {
 		array2[i] = array1[i]
 	}
 
@@ -51,5 +51,5 @@ func PathFILESDIRS(describes_dir bool, paths_list string) string {
 		describes_dir_str = "true"
 	}
 
-	return gPath.GPathToStringConversion() + "|" + describes_dir_str
+	return gPath.GPathToStringConversion() + "\x00" + describes_dir_str
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -47,18 +47,19 @@ func onlineInfoChkCreateAboutTab() *container.Scroll {
 
 func onlineInfoChkCreateSettingsTab() *container.Scroll {
 	var entry_weather_locs *widget.Entry = widget.NewMultiLineEntry()
-	entry_weather_locs.SetPlaceHolder("The weather locations to check, one per line")
+	entry_weather_locs.SetPlaceHolder("The weather locations to check, one per line in the format: " +
+		"\"City: latitude, longitude\"")
 	entry_weather_locs.SetMinRowsVisible(3)
-	entry_weather_locs.SetText(strings.Join(Utils.User_settings_GL.OnlineInfoChk.Temp_locs, "\n"))
+	entry_weather_locs.SetText(strings.Join(Utils.GetUserSettings().OnlineInfoChk.Temp_locs, "\n"))
 
 	var entry_news_locs *widget.Entry = widget.NewMultiLineEntry()
 	entry_news_locs.SetPlaceHolder("The news locations to check, one per line")
 	entry_news_locs.SetMinRowsVisible(3)
-	entry_news_locs.SetText(strings.Join(Utils.User_settings_GL.OnlineInfoChk.News_locs, "\n"))
+	entry_news_locs.SetText(strings.Join(Utils.GetUserSettings().OnlineInfoChk.News_locs, "\n"))
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.User_settings_GL.OnlineInfoChk.Temp_locs = strings.Split(entry_weather_locs.Text, "\n")
-		Utils.User_settings_GL.OnlineInfoChk.News_locs = strings.Split(entry_news_locs.Text, "\n")
+		Utils.GetUserSettings().OnlineInfoChk.Temp_locs = strings.Split(entry_weather_locs.Text, "\n")
+		Utils.GetUserSettings().OnlineInfoChk.News_locs = strings.Split(entry_news_locs.Text, "\n")
 	})
 	btn_save.Importance = widget.SuccessImportance
 

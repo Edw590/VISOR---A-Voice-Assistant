@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -77,12 +77,12 @@ func startCommunicatorInternalSERVER() {
 	var stop bool = false
 
 	// Define the WebSocket server address
-	u := url.URL{Scheme: "wss", Host: User_settings_GL.General.Website_domain + ":3234", Path: "/ws"}
+	var u url.URL = url.URL{Scheme: "wss", Host: GetUserSettings().General.Website_domain + ":3234", Path: "/ws"}
 	//log.Printf("Connecting to %s", u.String())
 
 	// Create Basic Auth credentials (username:password)
 	username := "VISOR"
-	password := User_settings_GL.General.Website_pw
+	password := GetUserSettings().General.Website_pw
 	auth := username + ":" + password
 	authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 
@@ -117,6 +117,8 @@ func startCommunicatorInternalSERVER() {
 			if err != nil {
 				//log.Println("Read error:", err)
 				stop = true
+
+				srvComm_connected_GL = false
 
 				break
 			}
@@ -169,7 +171,7 @@ func startCommunicatorInternalSERVER() {
 		for {
 			var message []byte
 			if first_message {
-				message = []byte(Gen_settings_GL.Device_settings.Id)
+				message = []byte(GetGenSettings().Device_settings.Id)
 				first_message = false
 			} else {
 				message = <- srvComm_gen_ch_out_GL
@@ -183,6 +185,8 @@ func startCommunicatorInternalSERVER() {
 				//log.Println("Write error:", err)
 				stop = true
 
+				srvComm_connected_GL = false
+
 				break
 			}
 			//log.Printf("Sent message: %s", message)
@@ -195,7 +199,7 @@ func startCommunicatorInternalSERVER() {
 	srvComm_connected_GL = true
 
 	for {
-		if WaitWithStopTIMEDATE(&stop, 1000000000) {
+		if WaitWithStopDATETIME(&stop, 1000000000) {
 			srvComm_stopping_GL = true
 			close(srvComm_gen_ch_in_GL)
 			close(srvComm_gen_ch_out_GL)
@@ -231,7 +235,7 @@ If no message is available, the function will wait until a message is received.
   - true if a message was received, false otherwise
 */
 func GetGeneralMessageSERVER() ([]byte, bool) {
-	if srvComm_stopping_GL || !srvComm_started_GL {
+	if !IsCommunicatorConnectedSERVER() {
 		return nil, false
 	}
 
@@ -247,14 +251,19 @@ It is received by GetGeneralMessageSERVER().
 
 – Params:
   - message – the message to be sent
+
+– Returns:
+  - true if the message was queued, false otherwise
 */
-func QueueGeneralMessageSERVER(message []byte) {
-	if srvComm_stopping_GL || !srvComm_started_GL {
-		return
+func QueueGeneralMessageSERVER(message []byte) bool {
+	if !IsCommunicatorConnectedSERVER() {
+		return false
 	}
 
 	var new_msg []byte = append([]byte("G|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
+
+	return true
 }
 
 /*
@@ -265,11 +274,15 @@ QueueMessageSERVER queues a message to be sent to the server.
 – Params:
   - is_mod – true if this function was called from a module, false if it was called from a library
   - num – the number of the module or library that called this function
+  - channel_num – the number of the channel to send the message to
   - message – the message to be sent
+
+– Returns:
+  - true if the message was queued, false otherwise
 */
-func QueueMessageSERVER(is_mod bool, num int, channel_num int, message []byte) {
-	if srvComm_stopping_GL || !srvComm_started_GL {
-		return
+func QueueMessageSERVER(is_mod bool, num int, channel_num int, message []byte) bool {
+	if !IsCommunicatorConnectedSERVER() {
+		return false
 	}
 
 	var mod_lib string = "M"
@@ -279,6 +292,8 @@ func QueueMessageSERVER(is_mod bool, num int, channel_num int, message []byte) {
 	var message_str string = mod_lib + "_" + strconv.Itoa(num) + "_" + strconv.Itoa(channel_num) + "|"
 	var new_msg []byte = append([]byte(message_str), message...)
 	srvComm_gen_ch_out_GL <- new_msg
+
+	return true
 }
 
 /*
@@ -288,14 +303,19 @@ QueueNoResponseMessageSERVER queues a message to be sent to the server without e
 
 – Params:
   - message – the message to be sent
+
+– Returns:
+  - true if the message was queued, false otherwise
 */
-func QueueNoResponseMessageSERVER(message []byte) {
-	if srvComm_stopping_GL || !srvComm_started_GL {
-		return
+func QueueNoResponseMessageSERVER(message []byte) bool {
+	if !IsCommunicatorConnectedSERVER() {
+		return false
 	}
 
 	var new_msg []byte = append([]byte("N|"), message...)
 	srvComm_gen_ch_out_GL <- new_msg
+
+	return true
 }
 
 /*

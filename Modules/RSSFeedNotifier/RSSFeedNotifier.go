@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -76,146 +76,151 @@ const _MAX_URLS_STORED int = 100
 
 const _TIME_SLEEP_S int = 2*60
 
-var (
-	realMain       Utils.RealMain = nil
-	moduleInfo_GL  Utils.ModuleInfo
-	modGenInfo_GL  *ModsFileInfo.Mod4GenInfo
-	modUserInfo_GL *ModsFileInfo.Mod4UserInfo
-)
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_4
-		modUserInfo_GL = &Utils.User_settings_GL.RSSFeedNotifier
+var modDirsInfo_GL Utils.ModDirsInfo
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
-		if modGenInfo_GL.Notified_news == nil {
-			modGenInfo_GL.Notified_news = make(map[int32][]ModsFileInfo.NewsInfo)
-		}
+	for {
+		for _, feedInfo := range Utils.GetUserSettings().RSSFeedNotifier.Feeds_info {
+			if !feedInfo.Enabled {
+				continue
+			}
 
-		for {
+			//if feedInfo.Feed_id != 8 {
+			//	continue
+			//}
+			//log.Println("__________________________BEGINNING__________________________")
 
-			for _, feedInfo := range modUserInfo_GL.Feeds_info {
-				if !feedInfo.Enabled {
-					continue
+			var feedType _FeedType = getFeedType(feedInfo.Type_)
+
+			if !Utils.ContainsSLICES(allowed_feed_types_1_GL, feedType.type_1) {
+				//log.Println("Feed type not allowed: " + feedInfo.Feed_type)
+				//log.Println("__________________________ENDING__________________________")
+
+				continue
+			}
+
+			if feedType.type_1 == _TYPE_1_YOUTUBE {
+				// If the feed is a YouTube feed, the feed URL is the channel or playlist ID, so we need to change it to
+				// the correct URL.
+				if feedType.type_2 == _TYPE_2_YT_CHANNEL {
+					feedInfo.Url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + feedInfo.Url
+				} else if feedType.type_2 == _TYPE_2_YT_PLAYLIST {
+					feedInfo.Url = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + feedInfo.Url
 				}
+			}
 
-				//if feedInfo.Feed_id != 8 {
-				//	continue
-				//}
-				//log.Println("__________________________BEGINNING__________________________")
+			//log.Println("feed_id: " + strconv.Itoa(feedInfo.Feed_id))
+			//log.Println("feed_url: " + feedInfo.Feed_url)
+			//log.Println("feed_type: " + feedInfo.Feed_type)
+			//log.Println("feedType.type_1: " + feedType.type_1)
+			//log.Println("feedType.type_2: " + feedType.type_2)
+			//log.Println("feedType.type_3: " + feedType.type_3)
 
-				var feedType _FeedType = getFeedType(feedInfo.Type_)
+			var new_feed bool = true
+			var newsInfo_list []ModsFileInfo.NewsInfo2 = nil
+			for _, newsInfo := range getModGenSettings().Notified_news {
+				if newsInfo.Id == feedInfo.Id {
+					new_feed = false
+					newsInfo_list = newsInfo.News_info
 
-				if !Utils.ContainsSLICES(allowed_feed_types_1_GL, feedType.type_1) {
-					//log.Println("Feed type not allowed: " + feedInfo.Feed_type)
-					//log.Println("__________________________ENDING__________________________")
-
-					continue
+					break
 				}
+			}
 
-				if feedType.type_1 == _TYPE_1_YOUTUBE {
-					// If the feed is a YouTube feed, the feed URL is the channel or playlist ID, so we need to change it to
-					// the correct URL.
-					if feedType.type_2 == _TYPE_2_YT_CHANNEL {
-						feedInfo.Url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + feedInfo.Url
-					} else if feedType.type_2 == _TYPE_2_YT_PLAYLIST {
-						feedInfo.Url = "https://www.youtube.com/feeds/videos.xml?playlist_id=" + feedInfo.Url
-					}
-				}
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			parsed_feed, err := gofeed.NewParser().ParseURLWithContext(feedInfo.Url, ctx)
+			cancel()
+			if nil != err {
+				//log.Println("Error parsing feed: " + err.Error())
+				continue
+			}
 
-				//log.Println("feed_id: " + strconv.Itoa(feedInfo.Feed_id))
-				//log.Println("feed_url: " + feedInfo.Feed_url)
-				//log.Println("feed_type: " + feedInfo.Feed_type)
-				//log.Println("feedType.type_1: " + feedType.type_1)
-				//log.Println("feedType.type_2: " + feedType.type_2)
-				//log.Println("feedType.type_3: " + feedType.type_3)
+			for item_num, item := range parsed_feed.Items {
 
-				var new_feed bool = false
-				newsInfo_list, ok := modGenInfo_GL.Notified_news[feedInfo.Id]
-				if !ok {
-					new_feed = true
-				}
+				var check_skipping_later bool = true
 
-				ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-				parsed_feed, err := gofeed.NewParser().ParseURLWithContext(feedInfo.Url, ctx)
-				cancel()
-				if nil != err {
-					//log.Println("Error parsing feed: " + err.Error())
-					continue
-				}
-
-				for item_num, item := range parsed_feed.Items {
-
-					var check_skipping_later bool = true
-
-					// Check if the news is new, and if it's not, skip it. But only if it's not a YouTube playlist, because
-					// those may need the order of the items reversed and so the ones got from this loop are wrong. Or if it
-					// is playlist, then only if the feed item ordering is correct (no scraping needed).
-					// This is also here and not just in the end to prevent useless item processing (optimized).
-					if feedType.type_2 != _TYPE_2_YT_PLAYLIST || !scrapingNeeded(parsed_feed) {
-						check_skipping_later = false
-						if !isNewNews(newsInfo_list, item.Title, item.Link) {
-							// If the news is not new, don't notify.
-							continue
-						}
-					}
-
-					var email_info Utils.EmailInfo = Utils.EmailInfo{}
-					var newsInfo ModsFileInfo.NewsInfo
-
-					switch feedType.type_1 {
-						case _TYPE_1_YOUTUBE: {
-							email_info, newsInfo = youTubeTreatment(feedType, parsed_feed, item_num, new_feed)
-						}
-						case _TYPE_1_GENERAL: {
-							email_info, newsInfo = generalTreatment(parsed_feed, item_num, new_feed,
-								feedInfo.Custom_msg_subject)
-						}
-						default: {
-							//log.Println("Unknown feed type_1: " + feedType.type_1)
-							continue
-						}
-					}
-
-					var ignore_video bool = email_info.Html == ""
-
-					if newsInfo.Url == "" { // Some error occurred
-						continue
-					}
-
-					if check_skipping_later && !isNewNews(newsInfo_list, newsInfo.Title, newsInfo.Url) {
+				// Check if the news is new, and if it's not, skip it. But only if it's not a YouTube playlist, because
+				// those may need the order of the items reversed and so the ones got from this loop are wrong. Or if it
+				// is playlist, then only if the feed item ordering is correct (no scraping needed).
+				// This is also here and not just in the end to prevent useless item processing (optimized).
+				if feedType.type_2 != _TYPE_2_YT_PLAYLIST || !scrapingNeeded(parsed_feed) {
+					check_skipping_later = false
+					if !isNewNews(newsInfo_list, item.Title, item.Link) {
 						// If the news is not new, don't notify.
 						continue
 					}
+				}
 
-					var error_notifying bool = false
+				var email_info Utils.EmailInfo
+				var newsInfo ModsFileInfo.NewsInfo2
 
-					//log.Println("New news: " + newsInfo.Title)
-					if !new_feed && !ignore_video {
-						// If the feed is a newly added one, don't send emails for ALL the items in the feed - which are
-						// being treated for the first time.
-						//log.Println("Queuing email: " + email_info.Subject)
-						error_notifying = !queueEmailAllRecps(email_info.Sender, email_info.Subject, email_info.Html)
+				switch feedType.type_1 {
+					case _TYPE_1_YOUTUBE: {
+						email_info, newsInfo = youTubeTreatment(feedType, parsed_feed, item_num, new_feed)
 					}
-
-					if !error_notifying {
-						//log.Println("Adding news to list...")
-						newsInfo_list = append(newsInfo_list, newsInfo)
-						if len(newsInfo_list) > _MAX_URLS_STORED {
-							newsInfo_list = newsInfo_list[1:]
-						}
+					case _TYPE_1_GENERAL: {
+						email_info, newsInfo = generalTreatment(parsed_feed, item_num, new_feed,
+							feedInfo.Custom_msg_subject)
+					}
+					default: {
+						//log.Println("Unknown feed type_1: " + feedType.type_1)
+						continue
 					}
 				}
 
-				modGenInfo_GL.Notified_news[feedInfo.Id] = newsInfo_list
+				var ignore_video bool = email_info.Html == ""
 
-				//log.Println("__________________________ENDING__________________________")
+				if newsInfo.Url == "" { // Some error occurred
+					continue
+				}
+
+				if check_skipping_later && !isNewNews(newsInfo_list, newsInfo.Title, newsInfo.Url) {
+					// If the news is not new, don't notify.
+					continue
+				}
+
+				var error_notifying bool = false
+
+				//log.Println("New news: " + newsInfo.Title)
+				if !new_feed && !ignore_video {
+					// If the feed is a newly added one, don't send emails for ALL the items in the feed - which are
+					// being treated for the first time.
+					//log.Println("Queuing email: " + email_info.Subject)
+					error_notifying = !queueEmailAllRecps(email_info.Sender, email_info.Subject, email_info.Html)
+				}
+
+				if !error_notifying {
+					//log.Println("Adding news to list...")
+					newsInfo_list = append(newsInfo_list, newsInfo)
+					if len(newsInfo_list) > _MAX_URLS_STORED {
+						newsInfo_list = newsInfo_list[1:]
+					}
+				}
 			}
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, _TIME_SLEEP_S) {
-				return
+			var found bool = false
+			for i, news_info := range getModGenSettings().Notified_news {
+				if news_info.Id == feedInfo.Id {
+					getModGenSettings().Notified_news[i].News_info = newsInfo_list
+					found = true
+
+					break
+				}
 			}
+			if !found {
+				getModGenSettings().Notified_news = append(getModGenSettings().Notified_news, ModsFileInfo.NewsInfo{
+					Id: feedInfo.Id,
+					News_info: newsInfo_list,
+				})
+			}
+
+			//log.Println("__________________________ENDING__________________________")
+		}
+
+		if Utils.WaitWithStopDATETIME(module_stop, _TIME_SLEEP_S) {
+			return
 		}
 	}
 }
@@ -261,7 +266,7 @@ isNewNews checks if the news is new.
 – Returns:
   - true if the news is new, false otherwise
  */
-func isNewNews(newsInfo_list []ModsFileInfo.NewsInfo, title string, url string) bool {
+func isNewNews(newsInfo_list []ModsFileInfo.NewsInfo2, title string, url string) bool {
 	//log.Println("Checking if news is new: " + title)
 	for _, newsInfo := range newsInfo_list {
 		if  newsInfo.Url == url && newsInfo.Title == title {
@@ -315,11 +320,11 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 	//}
 
 	// Write the HTML to a file in case debugging is needed.
-	_ = moduleInfo_GL.ModDirsInfo.Temp.Add2(false, "last_html_queued.html").WriteTextFile(html, false)
+	_ = modDirsInfo_GL.Temp.Add2(false, "last_html_queued.html").WriteTextFile(html, false)
 
 	err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
 		Sender:  sender_name,
-		Mail_to: Utils.User_settings_GL.General.User_email_addr,
+		Mail_to: Utils.GetUserSettings().General.User_email_addr,
 		Subject: subject,
 		Html:    html,
 		Multiparts: nil,
@@ -329,4 +334,8 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 	}
 
 	return true
+}
+
+func getModGenSettings() *ModsFileInfo.Mod4GenInfo {
+	return &Utils.GetGenSettings().MOD_4
 }

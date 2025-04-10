@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -45,7 +45,7 @@ generalTreatment does the general treatment of an RSS feed item.
   - the news info
  */
 func generalTreatment(parsed_feed *gofeed.Feed, item_num int, title_url_only bool, custom_msg_subject string) (
-					  Utils.EmailInfo, ModsFileInfo.NewsInfo) {
+					  Utils.EmailInfo, ModsFileInfo.NewsInfo2) {
 	var feed_item *gofeed.Item = parsed_feed.Items[item_num]
 
 	var author string = ""
@@ -61,7 +61,7 @@ func generalTreatment(parsed_feed *gofeed.Feed, item_num int, title_url_only boo
 		Utils.MODEL_RSS_ENTRY_PUB_DATE_EMAIL:    feed_item.Published,
 		Utils.MODEL_RSS_ENTRY_UPD_DATE_EMAIL:    feed_item.Updated,
 	}
-	var newsInfo ModsFileInfo.NewsInfo = ModsFileInfo.NewsInfo{
+	var newsInfo ModsFileInfo.NewsInfo2 = ModsFileInfo.NewsInfo2{
 		Title: things_replace[Utils.MODEL_RSS_ENTRY_TITLE_EMAIL],
 		Url:   things_replace[Utils.MODEL_RSS_ENTRY_URL_EMAIL],
 	}

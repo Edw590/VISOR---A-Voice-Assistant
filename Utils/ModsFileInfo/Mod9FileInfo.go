@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,10 +25,24 @@ import "strings"
 
 // Mod9GenInfo is the format of the custom generated information about this specific module.
 type Mod9GenInfo struct {
-	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
-	Tasks_info map[int32]int64
-	// Conds_were_true maps the task ID to whether its programmable condition was true
-	Conds_were_true map[int32]bool
+	// Tasks_info is the information about the tasks
+	Tasks_info []TaskInfo
+	// Conds_were_true is the information about if programmable conditions that were true
+	Conds_were_true []CondWasTrue
+}
+
+type TaskInfo struct {
+	// Id is the task ID
+	Id int32
+	// Last_time_reminded is the last time the task was reminded in Unix minutes
+	Last_time_reminded int64
+}
+
+type CondWasTrue struct {
+	// Id is the task ID
+	Id int32
+	// Was_true is whether the programmable condition was true
+	Was_true bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,9 +67,9 @@ type Task struct {
 	Message     string
 	// Command is the command to be executed when the task is triggered on the chosen Device_IDs
 	Command     string
-	// Time is the time the task is set for in the format "2024-12-31 -- 23:59:59"
-	Time        string
-	// Repeat_each_min is the time in minutes between each repeatition of the task
+	// Time_s is the time the task is set for in the format "2024-12-31 -- 23:59:59"
+	Time_s int64
+	// Repeat_each_min is the time in minutes between each repetition of the task
 	Repeat_each_min int64
 	// User_location is the location the user must be in for the task to be triggered
 	User_location string

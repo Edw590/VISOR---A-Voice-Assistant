@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
+	"SettingsSync"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"errors"
@@ -71,7 +71,7 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 			return
 		}
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -86,8 +86,8 @@ func smartCheckerCreateAddDiskTab() *container.Scroll {
 func smartCheckerCreateDisksListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var disks_info []ModsFileInfo.DiskInfo = Utils.User_settings_GL.SMARTChecker.Disks_info
-	for i := 0; i < len(disks_info); i++ {
+	var disks_info []ModsFileInfo.DiskInfo = Utils.GetUserSettings().SMARTChecker.Disks_info
+	for i := range disks_info {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
 		var title string = disk_info.Label
 		if !disk_info.Enabled {
@@ -117,16 +117,16 @@ func createDiskSetter(disk *ModsFileInfo.DiskInfo) *fyne.Container {
 		disk.Label = entry_label.Text
 		disk.Is_HDD = check_is_hdd.Checked
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this disk?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveDiskSMART(disk.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

@@ -1,0 +1,3 @@
+Do NOT use maps here for the settings (user or generated). Else we'll have race condition errors of the map being read
+and written to at the same time - that causes a Go panic, which is not too helpful. So need a map? Use an array pointing
+to structs with ID and data. Stuff in this folder is read and written to from multiple threads.

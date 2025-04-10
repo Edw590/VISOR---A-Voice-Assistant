@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -73,23 +73,69 @@ const (
 
 	MODS_ARRAY_SIZE
 )
-// MOD_NUMS_NAMES is a map of the numbers of the modules and their names. Use with the NUM_MOD_ constants.
-var MOD_NUMS_NAMES map[int]string = map[int]string{
-	NUM_MOD_VISOR:             "V.I.S.O.R.",
-	NUM_MOD_ModManager:        "Modules Manager",
-	NUM_MOD_Speech:            "Speech",
-	NUM_MOD_SMARTChecker:      "S.M.A.R.T. Checker",
-	NUM_MOD_RssFeedNotifier:   "RSS Feed Notifier",
-	NUM_MOD_EmailSender:       "Email Sender",
-	NUM_MOD_OnlineInfoChk:     "Online Information Checker",
-	NUM_MOD_GPTCommunicator:   "GPT Communicator",
-	NUM_MOD_WebsiteBackend:    "Website Backend",
-	NUM_MOD_TasksExecutor:     "Tasks Executor",
-	NUM_MOD_SystemChecker:     "System Checker",
-	NUM_MOD_SpeechRecognition: "Speech Recognition",
-	NUM_MOD_UserLocator:       "User Locator",
-	NUM_MOD_CmdsExecutor:      "Commands Executor",
-	NUM_MOD_GoogleManager:     "Google Manager",
+
+// MOD_NUMS_INFO is a map of the numbers of the modules and their respective ModuleInfo.
+var MOD_NUMS_INFO map[int]ModuleInfo = map[int]ModuleInfo{
+	NUM_MOD_VISOR: {
+		Name: "V.I.S.O.R.",
+		C_S_support: MOD_BOTH,
+	},
+	NUM_MOD_ModManager: {
+		Name: "Modules Manager",
+		C_S_support: MOD_BOTH,
+	},
+	NUM_MOD_Speech: {
+		Name: "Speech",
+		C_S_support: MOD_CLIENT,
+	},
+	NUM_MOD_SMARTChecker: {
+		Name: "S.M.A.R.T. Checker",
+		C_S_support: MOD_SERVER,
+	},
+	NUM_MOD_RssFeedNotifier: {
+		Name: "RSS Feed Notifier",
+		C_S_support: MOD_SERVER,
+	},
+	NUM_MOD_EmailSender: {
+		Name: "Email Sender",
+		C_S_support: MOD_SERVER,
+	},
+	NUM_MOD_OnlineInfoChk: {
+		Name: "Online Information Checker",
+		C_S_support: MOD_SERVER,
+	},
+	NUM_MOD_GPTCommunicator: {
+		Name: "GPT Communicator",
+		C_S_support: MOD_SERVER,
+	},
+	NUM_MOD_WebsiteBackend: {
+		Name: "Website Backend",
+		C_S_support: MOD_SERVER,
+	},
+	NUM_MOD_TasksExecutor: {
+		Name: "Tasks Executor",
+		C_S_support: MOD_CLIENT,
+	},
+	NUM_MOD_SystemChecker: {
+		Name: "System Checker",
+		C_S_support: MOD_CLIENT,
+	},
+	NUM_MOD_SpeechRecognition: {
+		Name: "Speech Recognition",
+		C_S_support: MOD_CLIENT,
+	},
+	NUM_MOD_UserLocator: {
+		Name: "User Locator",
+		C_S_support: MOD_CLIENT,
+	},
+	NUM_MOD_CmdsExecutor: {
+		Name: "Commands Executor",
+		C_S_support: MOD_CLIENT,
+	},
+	NUM_MOD_GoogleManager: {
+		Name: "Google Manager",
+		C_S_support: MOD_SERVER,
+	},
 }
 
 const (
@@ -97,31 +143,12 @@ const (
 	MOD_SERVER int = 1 << 1
 	MOD_BOTH   int = MOD_CLIENT | MOD_SERVER
 )
-// MOD_NUMS_SUPPORT is a map of the numbers of the modules and if they are supported on the server version, client
-// version, or both.
-var MOD_NUMS_SUPPORT map[int]int = map[int]int{
-	NUM_MOD_VISOR:             MOD_BOTH,
-	NUM_MOD_ModManager:        MOD_BOTH,
-	NUM_MOD_Speech:            MOD_CLIENT,
-	NUM_MOD_SMARTChecker:      MOD_SERVER,
-	NUM_MOD_RssFeedNotifier:   MOD_SERVER,
-	NUM_MOD_EmailSender:       MOD_SERVER,
-	NUM_MOD_OnlineInfoChk:     MOD_SERVER,
-	NUM_MOD_GPTCommunicator:   MOD_SERVER,
-	NUM_MOD_WebsiteBackend:    MOD_SERVER,
-	NUM_MOD_TasksExecutor:     MOD_CLIENT,
-	NUM_MOD_SystemChecker:     MOD_CLIENT,
-	NUM_MOD_SpeechRecognition: MOD_CLIENT,
-	NUM_MOD_UserLocator:       MOD_CLIENT,
-	NUM_MOD_CmdsExecutor:      MOD_CLIENT,
-	NUM_MOD_GoogleManager:     MOD_SERVER,
-}
 
 // _LOOP_TIME_S is the number of seconds to wait for the next timestamp to be registered by a module (must be more than
 // a second higher than the actual time, for some reason).
 const _LOOP_TIME_S int64 = 5
 
-type _ModDirsInfo struct {
+type ModDirsInfo struct {
 	// ProgramData is the path to the directory of the program data files.
 	ProgramData GPath
 	// UserData is the path to the directory of the private user data files.
@@ -133,10 +160,8 @@ type _ModDirsInfo struct {
 type ModuleInfo struct {
 	// Name is the name of the module.
 	Name string
-	// Num is the number of the module.
-	Num int
-	// ModDirsInfo is the information about the directories of the module.
-	ModDirsInfo _ModDirsInfo
+	// C_S_support is the support of the module on the client/server version (one of the MOD_-started constants).
+	C_S_support int
 }
 
 type Module struct {
@@ -153,20 +178,18 @@ type Module struct {
 }
 
 /*
-RealMain is the type of the realMain() function of a module.
-
-realMain is the function that does the actual work of a module (it's equivalent to what main() would normally be).
+Main is the type of the main() function of a module.
 
 -----------------------------------------------------------
 
 – Params:
   - module_stop – a pointer to a boolean that is set to true if the module should stop
-  - moduleInfo_any – the ModuleInfo struct of the module
+  - modDirsInfo_any – the ModDirsInfo struct of the module
 */
-type RealMain func(module_stop *bool, moduleInfo_any any)
+type Main func(module_stop *bool, modDirsInfo_any any)
 
 /*
-ModStartup does the startup routine for a module and executes its realMain() function, catching any fatal errors and
+ModStartup does the startup routine for a module and executes its main() function, catching any fatal errors and
 sending an email with them.
 
 Call this as the ONLY thing in the Start() function of a module.
@@ -174,21 +197,23 @@ Call this as the ONLY thing in the Start() function of a module.
 -----------------------------------------------------------
 
 – Params:
-  - realMain – a pointer to the realMain() function of the module
+  - main – a pointer to the main() function of the module
   - module – a pointer to the Module struct of the module
 */
-func ModStartup(realMain RealMain, module *Module) {
-	ModStartup2(realMain, module, false)
+func ModStartup(main Main, module *Module) {
+	ModStartup2(main, module, false)
 }
 /*
-ModStartup2 is the main function for ModStartup. Read everything there, except one different parameter.
+ModStartup2 is the main function for ModStartup(). Read everything there, except one different parameter.
+
+It's to be used only by MOD_0. All the others are to use ModStartup().
 
 -----------------------------------------------------------
 
 – Params:
   - server – true if the version running is the server version, false if it's the client version
  */
-func ModStartup2(realMain RealMain, module *Module, server bool) {
+func ModStartup2(main Main, module *Module, server bool) {
 	// Module startup routine //
 
 	var mod_num = module.Num
@@ -239,20 +264,16 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 		panic(errors.New("module " + strconv.Itoa(mod_num) + " is not supported on this system"))
 	}
 
-	var moduleInfo ModuleInfo = ModuleInfo{
-		Name:       mod_name,
-		Num:        mod_num,
-		ModDirsInfo: _ModDirsInfo{
-			ProgramData: getProgramDataDirMODULES(mod_num),
-			UserData:    GetUserDataDirMODULES(mod_num),
-			Temp:        getModTempDirMODULES(mod_num),
-		},
+	var modDirsInfo ModDirsInfo = ModDirsInfo{
+		ProgramData: getProgramDataDirMODULES(mod_num),
+		UserData:    GetUserDataDirMODULES(mod_num),
+		Temp:        getModTempDirMODULES(mod_num),
 	}
 
 	var errs bool = false
 	var to_do func()
 
-	if moduleInfo.signalledToStop() {
+	if modDirsInfo.signalledToStop() {
 		log.Println("Module " + strconv.Itoa(mod_num) + " was signalled to stop before starting. Exiting...")
 
 		goto end
@@ -261,7 +282,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 	// Start the loopSleep() routine asynchronously
 	go func() {
 		for {
-			if moduleInfo.loopSleep() {
+			if modDirsInfo.loopSleep() {
 				module.Stop = true
 
 				break
@@ -274,8 +295,8 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		Tcef.Tcef{
 			Try: func() {
-				// Execute realMain()
-				realMain(&module.Stop, moduleInfo)
+				// Execute main()
+				main(&module.Stop, modDirsInfo)
 			},
 			Catch: func(e Tcef.Exception) {
 				errs = true
@@ -304,7 +325,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 
 		InitializeCommsChannels()
 
-		moduleInfo.updateVISORRunInfo()
+		modDirsInfo.updateVISORRunInfo()
 
 		to_do()
 	} else {
@@ -316,7 +337,7 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 	end:
 
 	if mod_num == NUM_MOD_VISOR {
-		printShutdownSequenceMODULES(errs, moduleInfo.Name, moduleInfo.Num)
+		printShutdownSequenceMODULES(errs, mod_name, mod_num)
 
 		// Delete the PID file
 		var suffix = "_Client"
@@ -332,6 +353,60 @@ func ModStartup2(realMain RealMain, module *Module, server bool) {
 }
 
 /*
+IsModSupportedMODULES checks if a module is supported on the current machine.
+
+-----------------------------------------------------------
+
+– Params:
+  - mod_num – the number of the module
+
+– Returns:
+  - true if the module is supported, false otherwise
+*/
+func IsModSupportedMODULES(mod_num int) bool {
+	switch mod_num {
+	case NUM_MOD_VISOR:
+		return true
+	case NUM_MOD_ModManager:
+		return true
+	case NUM_MOD_SMARTChecker:
+		return CheckIfProgramIsAvailable("smartctl")
+	case NUM_MOD_Speech:
+		// Must always run, just like with the Android version - else there's no communication from him to us.
+		// The Speech module doesn't only take care of speaking with audio - also with notifications!
+		return true
+	case NUM_MOD_RssFeedNotifier:
+		return true
+	case NUM_MOD_EmailSender:
+		return CheckIfProgramIsAvailable("curl")
+	case NUM_MOD_OnlineInfoChk:
+		return CheckIfProgramIsAvailable("chromedriver")
+	case NUM_MOD_GPTCommunicator:
+		return true
+	case NUM_MOD_WebsiteBackend:
+		return true
+	case NUM_MOD_TasksExecutor:
+		return true
+	case NUM_MOD_SystemChecker:
+		if runtime.GOOS == "windows" {
+			return true
+		}
+
+		return CheckIfProgramIsAvailable("amixer")
+	case NUM_MOD_SpeechRecognition:
+		return runtime.GOOS == "windows"
+	case NUM_MOD_UserLocator:
+		return true
+	case NUM_MOD_CmdsExecutor:
+		return true
+	case NUM_MOD_GoogleManager:
+		return true
+	default:
+		return false
+	}
+}
+
+/*
 GetModNameMODULES gets the name of a module.
 
 -----------------------------------------------------------
@@ -343,8 +418,8 @@ GetModNameMODULES gets the name of a module.
   - the name of the module or an empty string if the module number is invalid
 */
 func GetModNameMODULES(mod_num int) string {
-	if mod_name, ok := MOD_NUMS_NAMES[mod_num]; ok {
-		return mod_name
+	if module_info, ok := MOD_NUMS_INFO[mod_num]; ok {
+		return module_info.Name
 	}
 
 	return "INVALID MODULE NUMBER"
@@ -368,7 +443,7 @@ module.
 func SendModErrorEmailMODULES(mod_num int, err_str string) error {
 	var things_replace map[string]string = map[string]string{
 		MODEL_INFO_MSG_BODY_EMAIL : err_str,
-		MODEL_INFO_DATE_TIME_EMAIL: GetDateTimeStrTIMEDATE(-1),
+		MODEL_INFO_DATE_TIME_EMAIL: GetDateTimeStrDATETIME(-1),
 	}
 	var email_info = GetModelFileEMAIL(MODEL_FILE_INFO, things_replace)
 	email_info.Subject = "Error in module: " + GetModNameMODULES(mod_num)
@@ -395,8 +470,8 @@ LoopSleep sleeps for _LOOP_TIME_S seconds and checks if the module was signalled
 – Returns:
   - true if the module should stop, false otherwise
 */
-func (moduleInfo *ModuleInfo) loopSleep() bool {
-	if moduleInfo.signalledToStop() {
+func (modDirsInfo *ModDirsInfo) loopSleep() bool {
+	if modDirsInfo.signalledToStop() {
 		return true
 	}
 
@@ -413,19 +488,18 @@ signalledToStop checks if the module was signalled to stop.
 – Returns:
   - true if the module was signalled to stop, false otherwise
 */
-func (moduleInfo *ModuleInfo) signalledToStop() bool {
-	var stop_file_1_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP")
-	var stop_file_2_path GPath = moduleInfo.ModDirsInfo.UserData.Add2(false, "STOP_p")
-	var stop_file_3_path GPath = getVISORDirFILESDIRS().Add2(false, _USER_DATA_REL_DIR, "STOP")
-	if stop_file_1_path.Exists() {
-		err := stop_file_1_path.Remove()
+func (modDirsInfo *ModDirsInfo) signalledToStop() bool {
+	var stop_tmp_file_path GPath = modDirsInfo.UserData.Add2(false, "STOP")
+	var stop_perm__file_path GPath = getVISORDirFILESDIRS().Add2(false, _USER_DATA_REL_DIR, "STOP")
+	if stop_tmp_file_path.Exists() {
+		err := stop_tmp_file_path.Remove()
 		if nil != err {
 			panic(err)
 		}
 
 		return true
 	}
-	if stop_file_2_path.Exists() || stop_file_3_path.Exists() {
+	if stop_perm__file_path.Exists() {
 		return true
 	}
 
@@ -522,7 +596,7 @@ updateVISORRunInfo updates the information about the running of VISOR.
 – Returns:
   - the path to the file containing the information about the running of the module
 */
-func (moduleInfo *ModuleInfo) updateVISORRunInfo() {
+func (modDirsInfo *ModDirsInfo) updateVISORRunInfo() {
 	files, _ := os.ReadDir(GetUserDataDirMODULES(NUM_MOD_VISOR).GPathToStringConversion())
 
 	var curr_pid string = strconv.Itoa(os.Getpid())
@@ -539,7 +613,7 @@ func (moduleInfo *ModuleInfo) updateVISORRunInfo() {
 			var pid_str string = strings.Split(file.Name(), "=")[1]
 			pid_str = strings.Split(pid_str, "_")[0]
 			if pid_str != curr_pid {
-				_ = moduleInfo.ModDirsInfo.UserData.Add2(false, file.Name()).Remove()
+				_ = modDirsInfo.UserData.Add2(false, file.Name()).Remove()
 			} else {
 				file_exists = true
 			}
@@ -605,68 +679,7 @@ func isVISORRunningMODULES() bool {
 }
 
 /*
-IsModSupportedMODULES checks if a module is supported on the current machine.
-
------------------------------------------------------------
-
-– Params:
-  - mod_num – the number of the module
-
-– Returns:
-  - true if the module is supported, false otherwise
- */
-func IsModSupportedMODULES(mod_num int) bool {
-	switch mod_num {
-		case NUM_MOD_VISOR:
-			return true
-		case NUM_MOD_ModManager:
-			return true
-		case NUM_MOD_SMARTChecker:
-			return CheckTerminalProgramAvailable("smartctl")
-		case NUM_MOD_Speech:
-			if runtime.GOOS == "windows" {
-				return true
-			}
-
-			return CheckTerminalProgramAvailable("festival")
-		case NUM_MOD_RssFeedNotifier:
-			return true
-		case NUM_MOD_EmailSender:
-			return CheckTerminalProgramAvailable("curl")
-		case NUM_MOD_OnlineInfoChk:
-			return CheckTerminalProgramAvailable("chromedriver")
-		case NUM_MOD_GPTCommunicator:
-			if runtime.GOOS == "windows" {
-				return false
-			}
-
-			return CheckTerminalProgramAvailable("llama-cli")
-		case NUM_MOD_WebsiteBackend:
-			return true
-		case NUM_MOD_TasksExecutor:
-			return true
-		case NUM_MOD_SystemChecker:
-			if runtime.GOOS == "windows" {
-				return true
-			}
-
-			return CheckTerminalProgramAvailable("amixer")
-		case NUM_MOD_SpeechRecognition:
-			return runtime.GOOS == "windows"
-		case NUM_MOD_UserLocator:
-			return true
-		case NUM_MOD_CmdsExecutor:
-			return true
-		case NUM_MOD_GoogleManager:
-			return true
-		default:
-			return false
-	}
-}
-
-/*
-SignalModulesStopMODULES signals all the modules to stop and waits for them to stop, also closing all communication
-channels.
+SignalModulesStopMODULES signals all the modules to stop and waits for them to stop.
 
 -----------------------------------------------------------
 

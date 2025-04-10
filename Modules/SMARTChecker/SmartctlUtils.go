@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -229,12 +229,12 @@ func initiateTest(long_test bool, partition string) int {
 		var stdout string = stdOutErrCmd.Stdout_str
 
 		if strings.Contains(stdout, "Please wait ") {
-			s, err := strconv.Atoi(strings.Split(stdout[strings.Index(stdout, "Please wait "):], " ")[2])
+			min, err := strconv.Atoi(strings.Split(stdout[strings.Index(stdout, "Please wait "):], " ")[2])
 			if nil != err {
 				continue
 			}
 
-			return s
+			return min
 		} else { // elif "Can't start self-test without aborting current test " in output: --> Doesn't matter, always try to abort.
 			cmd = []string{"smartctl{{EXE}} -X " + partition}
 			_, _ = Utils.ExecCmdSHELL(cmd)

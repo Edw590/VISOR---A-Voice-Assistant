@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -49,7 +49,7 @@ func modulesManagerCreateModulesStatusTab(modules []Utils.Module) *container.Scr
 			if Current_screen_GL == ID_MOD_MOD_MANAGER {
 				var text string = ""
 				for i, module := range modules {
-					if Utils.MOD_NUMS_SUPPORT[i] & Utils.MOD_CLIENT != 0 {
+					if Utils.MOD_NUMS_INFO[i].C_S_support & Utils.MOD_CLIENT != 0 {
 						text += "- " + Utils.GetModNameMODULES(i) + " running: " + strconv.FormatBool(!module.Stopped) +
 							"\n\n"
 					}

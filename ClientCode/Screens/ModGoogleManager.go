@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,10 +22,10 @@
 package Screens
 
 import (
+	"GMan"
 	"GoogleManager"
 	"Utils"
 	"context"
-	"encoding/json"
 	"errors"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -36,17 +36,6 @@ import (
 	"time"
 )
 
-type date struct {
-	instruction *widget.Label
-	dateChosen  *widget.Label
-}
-
-func (d *date) onSelected(t time.Time) {
-	// use time object to set text on label with given format
-	d.instruction.SetText("Date Selected:")
-	d.dateChosen.SetText(t.Format("Mon 02 Jan 2006"))
-}
-
 func ModGoogleManager() fyne.CanvasObject {
 	Current_screen_GL = ID_GOOGLE_MANAGER
 
@@ -56,8 +45,11 @@ func ModGoogleManager() fyne.CanvasObject {
 }
 
 func googleManagerCreateSettingsTab() *container.Scroll {
+	var label_token_valid *widget.Label = widget.NewLabel("Token valid: error")
+	label_token_valid.Wrapping = fyne.TextWrapWord
+
 	link, _ := url.Parse("https://console.cloud.google.com/projectcreate")
-	var link_google *widget.Hyperlink = widget.NewHyperlink("Click here and watch the video below", link)
+	var link_google *widget.Hyperlink = widget.NewHyperlink("Click here and watch the video on the link below", link)
 
 	link, _ = url.Parse("https://youtu.be/B2E82UPUnOY?si=TIHV5U1kxY5mCKsD&t=95")
 	var link_video *widget.Hyperlink = widget.NewHyperlink("How to obtain the Google credentials JSON", link)
@@ -69,10 +61,10 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 
 	var entry_credentials_json *widget.Entry = widget.NewEntry()
 	entry_credentials_json.SetPlaceHolder("Google credentials JSON file contents")
-	entry_credentials_json.SetText(Utils.User_settings_GL.GoogleManager.Credentials_JSON)
+	entry_credentials_json.SetText(Utils.GetUserSettings().GoogleManager.Credentials_JSON)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.User_settings_GL.GoogleManager.Credentials_JSON = entry_credentials_json.Text
+		Utils.GetUserSettings().GoogleManager.Credentials_JSON = entry_credentials_json.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -81,8 +73,13 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 		"= sign until just before the next & sign.")
 	label_additional_info2.Wrapping = fyne.TextWrapWord
 
+	var label_additional_info3 *widget.Label = widget.NewLabel("NOTICE: if you've set the app as a test app on the " +
+		"link above, the token will EXPIRE every 7 days. Just click on Authorize below and do the same steps and " +
+		"you're ready to go for another week.")
+	label_additional_info3.Wrapping = fyne.TextWrapWord
+
 	var btn_authorize *widget.Button = widget.NewButton("Authorize", func() {
-		if Utils.User_settings_GL.GoogleManager.Credentials_JSON == "" {
+		if Utils.GetUserSettings().GoogleManager.Credentials_JSON == "" {
 			dialog.ShowError(errors.New("no credentials JSON saved"), Current_window_GL)
 		}
 
@@ -122,10 +119,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 				return
 			}
 
-			var message []byte = []byte("S_JSON|GManTok|")
-			token_bytes, _ := json.Marshal(token)
-			message = append(message, Utils.CompressString(string(token_bytes))...)
-			Utils.QueueNoResponseMessageSERVER(message)
+			GMan.SetToken(token)
 
 			dialog.ShowInformation("Information", "Authorization code saved. You're all set!", Current_window_GL)
 		}, Current_window_GL)
@@ -136,13 +130,35 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	})
 	btn_authorize.Importance = widget.HighImportance
 
+	go func() {
+		for {
+			if Current_screen_GL == ID_GOOGLE_MANAGER {
+				var validity = "[Not connected to the server to get the token validity]"
+				if Utils.IsCommunicatorConnectedSERVER() {
+					if GMan.IsTokenValid() {
+						validity = "valid"
+					} else {
+						validity = "INVALID"
+					}
+				}
+				label_token_valid.SetText("Token is: " + validity + " (refreshes at most every 60 seconds)")
+			} else {
+				break
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
 	return createMainContentScrollUTILS(
+		label_token_valid,
 		link_google,
 		link_video,
 		label_additional_info,
 		entry_credentials_json,
 		btn_save,
 		label_additional_info2,
+		label_additional_info3,
 		btn_authorize,
 	)
 }

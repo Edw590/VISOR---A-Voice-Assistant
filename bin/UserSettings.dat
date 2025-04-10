@@ -53,7 +53,7 @@
 	},
 	"OnlineInfoChk": {
 		"Temp_locs": [
-			"Lisbon"
+			"Lisbon: 38.736946, -9.142685"
 		],
 		"News_locs": [
 			"Europe",
@@ -61,8 +61,11 @@
 		]
 	},
 	"GPTCommunicator": {
-		"Model_smart_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
-		"Model_dumb_loc": "/home/edw590/llamacpp_models/Llama-3.2-3B-Instruct-abliterated.Q6_K.gguf",
+	    "Server_url": "localhost:11434",
+		"Model_name": "llama3.2_abliterated",
+		"Model_has_tool_role": false,
+		"Context_size": 4096,
+		"Temperature": 0.8,
 		"System_info": "Cutting Knowledge Date: December 2023.",
 		"User_nickname": "Sir"
 	},
@@ -81,10 +84,10 @@
 				],
 				"Message": "Attention! Below 20% of battery. Please connect the charger.",
 				"Command": "tell me the battery percentage",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Programmable_condition": "bool(battery_level < 20) && bool(!power_connected)"
+				"Programmable_condition": "bool(battery_level >= 0) && bool(battery_level < 20) && bool(!power_connected)"
 			},
 			{
 				"Id": 9,
@@ -95,10 +98,10 @@
 				],
 				"Message": "WARNING! EXTREMELY LOW BATTERY! Please connect the charger now!",
 				"Command": "tell me the battery percentage",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "",
-				"Programmable_condition": "bool(battery_level <= 5) && bool(!power_connected)"
+				"Programmable_condition": "bool(battery_level >= 0) && bool(battery_level <= 5) && bool(!power_connected)"
 			},
 			{
 				"Id": 7,
@@ -109,7 +112,7 @@
 				],
 				"Message": "Attention! Device fully charged! Please disconnect the charger.",
 				"Command": "",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "",
 				"Programmable_condition": "bool(battery_level == 100) && bool(power_connected)"
@@ -123,7 +126,7 @@
 				],
 				"Message": "Attention! Above 80% of battery reached!. Please disconnect the charger.",
 				"Command": "tell me the battery percentage",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "",
 				"Programmable_condition": "bool(battery_level > 80) && bool(power_connected)"
@@ -137,7 +140,7 @@
 				],
 				"Message": "This is a reminder for when you're home",
 				"Command": "",
-				"Time": "2024-06-27 -- 07:00:00",
+				"Time": 1719468000,
 				"Repeat_each_min": 0,
 				"User_location": "home_*",
 				"Programmable_condition": ""
@@ -151,7 +154,7 @@
 				],
 				"Message": "You arrived at the university",
 				"Command": "",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "+university",
 				"Programmable_condition": ""
@@ -165,7 +168,7 @@
 				],
 				"Message": "You left the university",
 				"Command": "",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "-university",
 				"Programmable_condition": ""
@@ -179,7 +182,7 @@
 				],
 				"Message": "You arrived at home",
 				"Command": "",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "+home_*",
 				"Programmable_condition": ""
@@ -193,7 +196,7 @@
 				],
 				"Message": "You left home",
 				"Command": "",
-				"Time": "",
+				"Time": 0,
 				"Repeat_each_min": 0,
 				"User_location": "-home_*",
 				"Programmable_condition": ""

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -145,7 +145,7 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 			value.Curr_data = init_data
 	}
 
-	Utils.Gen_settings_GL.Registry = append(Utils.Gen_settings_GL.Registry, (*Utils.Value) (value))
+	Utils.GetGenSettings().Registry = append(Utils.GetGenSettings().Registry, (*Utils.Value) (value))
 
 	return value
 }
@@ -159,7 +159,7 @@ Call this after registering all necessary Values.
  */
 func CleanRegistryREGISTRY() {
 	var registry []*Utils.Value
-	for _, value := range Utils.Gen_settings_GL.Registry {
+	for _, value := range Utils.GetGenSettings().Registry {
 		for _, key := range keys_added_GL {
 			if value.Key == key {
 				registry = append(registry, value)
@@ -167,7 +167,7 @@ func CleanRegistryREGISTRY() {
 			}
 		}
 	}
-	Utils.Gen_settings_GL.Registry = registry
+	Utils.GetGenSettings().Registry = registry
 }
 
 /*
@@ -182,7 +182,7 @@ GetValueREGISTRY gets a value from the registry based on its key.
   - the value or nil if the value doesn't exist
  */
 func GetValueREGISTRY(key string) *Value {
-	for _, value := range Utils.Gen_settings_GL.Registry {
+	for _, value := range Utils.GetGenSettings().Registry {
 		if value.Key == key {
 			return (*Value) (value)
 		}
@@ -201,7 +201,7 @@ GetValuesREGISTRY gets all the values in the registry.
  */
 func GetValuesREGISTRY() []*Value {
 	var values []*Value
-	for _, value := range Utils.Gen_settings_GL.Registry {
+	for _, value := range Utils.GetGenSettings().Registry {
 		values = append(values, (*Value)(value))
 	}
 
@@ -219,7 +219,7 @@ GetKeysREGISTRY gets all the keys in the registry.
 func GetKeysREGISTRY() string {
 	var keys string = ""
 
-	for _, value := range Utils.Gen_settings_GL.Registry {
+	for _, value := range Utils.GetGenSettings().Registry {
 		keys += value.Key + "|"
 	}
 	keys = keys[:len(keys) - 1]
@@ -236,9 +236,9 @@ RemoveValueREGISTRY removes a value from the registry based on its key.
   - key – the key of the value
 */
 func RemoveValueREGISTRY(key string) {
-	for i, value := range Utils.Gen_settings_GL.Registry {
+	for i, value := range Utils.GetGenSettings().Registry {
 		if value.Key == key {
-			Utils.DelElemSLICES(&Utils.Gen_settings_GL.Registry, i)
+			Utils.DelElemSLICES(&Utils.GetGenSettings().Registry, i)
 
 			break
 		}
@@ -266,7 +266,7 @@ GetRegistryTextREGISTRY returns a text representation of the Registry.
 func GetRegistryTextREGISTRY(type_ int) string {
 	var text string = ""
 
-	for _, value := range Utils.Gen_settings_GL.Registry {
+	for _, value := range Utils.GetGenSettings().Registry {
 		if type_ == 1 && !value.Auto_set {
 			continue
 		} else if type_ == 2 && value.Auto_set {
@@ -276,9 +276,9 @@ func GetRegistryTextREGISTRY(type_ int) string {
 			"Key: " + value.Key + "\n" +
 			"Auto set: " + strconv.FormatBool(value.Auto_set) + "\n" +
 			"Type: " + strings.ToLower(value.Type_[len("TYPE_"):]) + "\n" +
-			"Prev time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_prev) + "\n" +
+			"Prev time: " + Utils.GetDateTimeStrDATETIME(value.Time_updated_prev / 1000) + "\n" +
 			"Prev data: " + value.Prev_data + "\n" +
-			"Curr time: " + Utils.GetDateTimeStrTIMEDATE(value.Time_updated_curr) + "\n" +
+			"Curr time: " + Utils.GetDateTimeStrDATETIME(value.Time_updated_curr / 1000) + "\n" +
 			"Curr data: " + value.Curr_data + "\n" +
 			"Description: " + value.Description + "\n\n"
 	}

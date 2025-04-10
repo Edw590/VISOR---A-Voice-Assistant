@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,8 +22,8 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
-	"TEHelper/TEHelper"
+	"SettingsSync"
+	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"
@@ -33,7 +33,10 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"strconv"
 	"strings"
+	"time"
 )
+
+const DATE_TIME_FORMAT string = "2006-01-02 -- 15:04:05"
 
 func ModTasksExecutor() fyne.CanvasObject {
 	Current_screen_GL = ID_MOD_TASKS_EXECUTOR
@@ -98,11 +101,16 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 
 	repeat_each_min, _ := strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
+		t, err := time.Parse(DATE_TIME_FORMAT, entry_time.Text)
+		if err != nil {
+			return
+		}
+
 		SettingsSync.AddTaskTASKS(check_enabled.Checked, check_device_active.Checked, entry_device_ids.Text,
-			entry_message.Text, entry_command.Text, entry_time.Text, repeat_each_min, entry_user_location.Text,
+			entry_message.Text, entry_command.Text, t.Unix(), repeat_each_min, entry_user_location.Text,
 			entry_programmable_condition.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -122,8 +130,8 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 func tasksExecutorCreateTasksListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var tasks []ModsFileInfo.Task = Utils.User_settings_GL.TasksExecutor.Tasks
-	for i := 0; i < len(tasks); i++ {
+	var tasks []ModsFileInfo.Task = Utils.GetUserSettings().TasksExecutor.Tasks
+	for i := range tasks {
 		var task *ModsFileInfo.Task = &tasks[i]
 		var title = task.Message
 		if title == "" {
@@ -161,7 +169,9 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 	entry_command.SetPlaceHolder("Command to execute after speaking")
 
 	var entry_time *widget.Entry = widget.NewEntry()
-	entry_time.SetText(task.Time)
+	if task.Time_s != 0 {
+		entry_time.SetText(time.Unix(task.Time_s, 0).Format(DATE_TIME_FORMAT))
+	}
 	entry_time.SetPlaceHolder("Time trigger (format: \"2024-12-31 -- 23:59:59\")")
 	entry_time.Validator = validation.NewRegexp(`^(\d{4}-\d{2}-\d{2} -- \d{2}:\d{2}:\d{2})?$`, "wrong format")
 
@@ -197,21 +207,24 @@ func createTaskSetter(task *ModsFileInfo.Task) *fyne.Container {
 		task.Device_IDs = strings.Split(entry_device_ids.Text, "\n")
 		task.Message = entry_message.Text
 		task.Command = entry_command.Text
-		task.Time = entry_time.Text
+		t, err := time.Parse(DATE_TIME_FORMAT, entry_time.Text)
+		if err == nil {
+			task.Time_s = t.Unix()
+		}
 		task.Repeat_each_min, _ = strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 		task.User_location = entry_user_location.Text
 		task.Programmable_condition = entry_programmable_condition.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this task?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveTaskTASKS(task.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

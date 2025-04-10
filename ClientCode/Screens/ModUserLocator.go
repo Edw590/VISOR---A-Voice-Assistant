@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,7 +22,7 @@
 package Screens
 
 import (
-	"SettingsSync/SettingsSync"
+	"SettingsSync"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"fyne.io/fyne/v2"
@@ -55,10 +55,10 @@ func userLocatorCreateSettingsTab() *container.Scroll {
 	var entry_always_with_device *widget.Entry = widget.NewEntry()
 	entry_always_with_device.SetPlaceHolder("ID of the device always with the user (user's phone for example) or " +
 		"empty if none")
-	entry_always_with_device.SetText(Utils.User_settings_GL.UserLocator.AlwaysWith_device)
+	entry_always_with_device.SetText(Utils.GetUserSettings().UserLocator.AlwaysWith_device)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.User_settings_GL.UserLocator.AlwaysWith_device = entry_always_with_device.Text
+		Utils.GetUserSettings().UserLocator.AlwaysWith_device = entry_always_with_device.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -109,7 +109,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 		SettingsSync.AddLocationLOCATIONS(check_enabled.Checked, entry_type.Text, entry_name.Text, entry_address.Text,
 			last_detection_s, int32(max_distance), entry_location_name.Text)
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 
 	return createMainContentScrollUTILS(
@@ -127,8 +127,8 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 func userLocatorCreateLocationsListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var locs_info []ModsFileInfo.LocInfo = Utils.User_settings_GL.UserLocator.Locs_info
-	for i := 0; i < len(locs_info); i++ {
+	var locs_info []ModsFileInfo.LocInfo = Utils.GetUserSettings().UserLocator.Locs_info
+	for i := range locs_info {
 		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
 		var title = loc_info.Name
 		if title == "" {
@@ -194,16 +194,16 @@ func createLocationSetter(loc_info *ModsFileInfo.LocInfo) *fyne.Container {
 		loc_info.Max_distance_m = int32(max_distance_m)
 		loc_info.Location = entry_location_name.Text
 
-		Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+		reloadScreen()
 	})
 	btn_save.Importance = widget.SuccessImportance
 
 	var btn_delete *widget.Button = widget.NewButton("Delete", func() {
-		createConfirmationUTILS("Are you sure you want to delete this location?", func(confirmed bool) {
+		createConfirmationDialogUTILS("Are you sure you want to delete this location?", func(confirmed bool) {
 			if confirmed {
 				SettingsSync.RemoveLocationLOCATIONS(loc_info.Id)
 
-				Utils.SendToModChannel(Utils.NUM_MOD_VISOR, 0, "Redraw", nil)
+				reloadScreen()
 			}
 		})
 	})

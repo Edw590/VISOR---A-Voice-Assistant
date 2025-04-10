@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,7 +29,7 @@ import (
 )
 
 func ParseConfigJSON() (*oauth2.Config, error) {
-	var credentials string = Utils.User_settings_GL.GoogleManager.Credentials_JSON
+	var credentials string = Utils.GetUserSettings().GoogleManager.Credentials_JSON
 	if credentials == "" {
 		//log.Println("No credentials found in the user settings file")
 

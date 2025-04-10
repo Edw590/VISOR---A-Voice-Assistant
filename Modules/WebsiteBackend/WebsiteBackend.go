@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,6 +30,7 @@ import (
 	"github.com/yousifnimah/Cryptx/CRC16"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -37,82 +38,71 @@ import (
 
 // Website Backend //
 
-const MAX_CHANNELS int = 100
+const MAX_CLIENTS int = 100
 
-const PONG_WAIT = 120 * time.Second // Allow X time before considering the client unreachable.
-const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT. -->
+const PONG_WAIT = 120 * time.Second // Allow X time before considering the client unreachable
+const PING_PERIOD = 60 * time.Second // Must be less than PONG_WAIT
 
-var channels_GL [MAX_CHANNELS]chan []byte = [MAX_CHANNELS]chan []byte{}
-var used_channels_GL [MAX_CHANNELS]bool = [MAX_CHANNELS]bool{}
+var channels_GL [MAX_CLIENTS]chan []byte = [MAX_CLIENTS]chan []byte{}
+var used_channels_GL [MAX_CLIENTS]bool = [MAX_CLIENTS]bool{}
 
-var (
-	realMain       Utils.RealMain = nil
-	moduleInfo_GL  Utils.ModuleInfo
-	modUserInfo_GL *ModsFileInfo.Mod8UserInfo
-)
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modUserInfo_GL = &Utils.User_settings_GL.WebsiteBackend
+var modDirsInfo_GL Utils.ModDirsInfo
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
-		go func() {
-			for {
-				var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0)
-				if comms_map == nil {
-					return
-				}
-				map_value, ok := comms_map["Message"]
-				if !ok {
-					continue
-				}
-
-				var message []byte = map_value.([]byte)
-				for i := 0; i < MAX_CHANNELS; i++ {
-					if used_channels_GL[i] {
-						channels_GL[i] <- message
-					}
-				}
-			}
-		}()
-
-		var srv *http.Server = nil
-		go func() {
-			Tcef.Tcef{
-				Try: func() {
-					// Try to register. If it's already registered, ignore the panic.
-					http.HandleFunc("/ws", basicAuth(webSocketsHandler))
-				},
-			}.Do()
-
-			//log.Println("Server running on port 3234")
-			srv = &http.Server{Addr: ":3234"}
-			err := srv.ListenAndServeTLS(modUserInfo_GL.Crt_file, modUserInfo_GL.Key_file)
-			if err != nil {
-				log.Println("ListenAndServeTLS error:", err)
-			}
-		}()
-
-		ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
-		defer cancel()
-
+	go func() {
 		for {
-			if Utils.WaitWithStopTIMEDATE(module_stop, 1000000000) {
-				_ = srv.Shutdown(ctx)
-
-				for i := 0; i < MAX_CHANNELS; i++ {
-					if used_channels_GL[i] {
-						// Ignore the panic in case the channel is already closed (happened).
-						Tcef.Tcef{
-							Try: func() {
-								close(channels_GL[i])
-							},
-						}.Do()
-					}
-				}
-
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0)
+			if comms_map == nil {
 				return
 			}
+			map_value, ok := comms_map["Message"]
+			if !ok {
+				continue
+			}
+
+			// Send the message to all clients. Their handler will decide if the message is for them or not.
+			var message []byte = map_value.([]byte)
+			for i := 0; i < MAX_CLIENTS; i++ {
+				if used_channels_GL[i] {
+					channels_GL[i] <- message
+				}
+			}
+		}
+	}()
+
+	var srv *http.Server = nil
+	go func() {
+		Tcef.Tcef{
+			Try: func() {
+				// Try to register. If it's already registered, ignore the panic.
+				http.HandleFunc("/ws", basicAuth(webSocketsHandler))
+			},
+		}.Do()
+
+		//log.Println("Server running on port 3234")
+		srv = &http.Server{Addr: ":3234"}
+		err := srv.ListenAndServeTLS(getModUserInfo().Crt_file, getModUserInfo().Key_file)
+		if err != nil {
+			log.Println("ListenAndServeTLS error:", err)
+
+			*module_stop = true
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
+	for {
+		if Utils.WaitWithStopDATETIME(module_stop, 1000000000) {
+			_ = srv.Shutdown(ctx)
+
+			for i := 0; i < MAX_CLIENTS; i++ {
+				unregisterChannel(i)
+			}
+
+			return
 		}
 	}
 }
@@ -173,6 +163,9 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 				case <- ticker.C:
 					if sendData(websocket.PingMessage, nil) != nil {
 						log.Println("Ping error:", err)
+
+						// If it wasn't possible to ping the client, close the connection.
+						_ = conn.Close()
 
 						return
 					}
@@ -303,14 +296,9 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 		case "GPT":
 			// Send a text to be processed by the GPT model.
 			// Example: a compressed string or nil to just get the return value
-			// Returns: true if the text will be processed immediately, false if the GPT is busy for now and the text
-			// will wait
-			var ret []byte
-			if Utils.Gen_settings_GL.MOD_7.State == ModsFileInfo.MOD_7_STATE_READY {
-				ret = []byte("true")
-			} else {
-				ret = []byte("false")
-			}
+			// Returns: "true" if the text will be processed immediately, "false" if the GPT is busy for now and the
+			// text will wait
+			var ret []byte = []byte(strconv.Itoa(int(Utils.GetGenSettings().MOD_7.State)))
 
 			if len(bytes) > 0 {
 				// Don't use channels for this. What if various messages are sent while one is still be processed? The
@@ -320,7 +308,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			}
 
 			return ret
-		case "JSON":
+		case "G_S":
 			// Get settings.
 			// Example: "[true to get file contents, false to get CRC16 checksum]|[one of the strings below]"
 			// Allowed strings: one of the ones on the switch statement
@@ -328,47 +316,82 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var get_json bool = bytes_split[0] == "true"
 			var json_origin string = bytes_split[1]
-			var json string = ""
+			var settings string = ""
 			switch json_origin {
 				case "US":
-					json = *Utils.ToJsonGENERAL(Utils.User_settings_GL)
+					settings = *Utils.ToJsonGENERAL(*Utils.GetUserSettings())
 				case "Weather":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.Weather)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_6.Weather)
 				case "News":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_6.News)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_6.News)
 				case "GPTMem":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_7.Memories)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_7.Memories)
+				case "GPTSessions":
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_7.Sessions)
 				case "GManTok":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Token)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_14.Token)
 				case "GManEvents":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Events)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_14.Events)
 				case "GManTasks":
-					json = *Utils.ToJsonGENERAL(Utils.Gen_settings_GL.MOD_14.Tasks)
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_14.Tasks)
+				case "GManTokVal":
+					settings = strconv.FormatBool(!Utils.GetGenSettings().MOD_14.Token_invalid)
 				default:
 					log.Println("Invalid JSON origin:", json_origin)
 			}
 			if get_json {
-				return Utils.CompressString(json)
+				return Utils.CompressString(settings)
 			} else {
-				return getCRC16([]byte(json))
+				return getCRC16([]byte(settings))
 			}
-		case "S_JSON":
+		case "S_S":
 			// Set settings.
 			// Example: "[one of the strings below]|[a compressed JSON string]"
 			// Allowed strings: one of the ones on the switch statement
 			// Returns: nothing
 			var bytes_split []string = strings.Split(string(bytes), "|")
-			var json_origin string = bytes_split[0]
-			var json string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
-			switch json_origin {
+			var origin string = bytes_split[0]
+			var settings string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
+			switch origin {
 				case "US":
-					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.User_settings_GL)
+					var user_settings Utils.UserSettings
+					_ = Utils.FromJsonGENERAL([]byte(settings), &user_settings)
+					if user_settings.General.Website_domain != "" &&
+							user_settings.General.Website_pw != "" &&
+							user_settings.General.User_email_addr != "" {
+						// Only accept the new settings if as a start the website information exists (or else the
+						// client will be locked out of the server surely), but also if the user email is set (that will
+						// mean the settings are not empty).
+						*Utils.GetUserSettings() = user_settings
+					}
 				case "GPTMem":
-					_ = Utils.FromJsonGENERAL([]byte(json), &Utils.Gen_settings_GL.MOD_7.Memories)
+					settings = strings.Replace(settings, "\\r", "", -1)
+					_ = Utils.FromJsonGENERAL([]byte(settings), &Utils.GetGenSettings().MOD_7.Memories)
 				case "GManTok":
-					Utils.Gen_settings_GL.MOD_14.Token = json
+					Utils.GetGenSettings().MOD_14.Token = settings
+				case "GPTSession":
+					var instructions []string = strings.Split(settings, "\000")
+					var session_id string = instructions[0]
+					var action string = instructions[1]
+					if action == "delete" {
+						for i, session := range Utils.GetGenSettings().MOD_7.Sessions {
+							if session.Id == session_id {
+								Utils.DelElemSLICES(&Utils.GetGenSettings().MOD_7.Sessions, i)
+
+								break
+							}
+						}
+					} else if action == "rename" {
+						for i, session := range Utils.GetGenSettings().MOD_7.Sessions {
+							if session.Id == session_id {
+								Utils.GetGenSettings().MOD_7.Sessions[i].Name = instructions[2]
+
+								break
+							}
+						}
+					}
 				default:
-					log.Println("Invalid JSON destination:", json_origin)
+					log.Println("Invalid JSON destination:", origin)
 			}
 	}
 
@@ -377,7 +400,7 @@ func handleMessage(device_id string, type_ string, bytes []byte) []byte {
 }
 
 func registerChannel() int {
-	for i := 0; i < MAX_CHANNELS; i++ {
+	for i := 0; i < MAX_CLIENTS; i++ {
 		if !used_channels_GL[i] {
 			channels_GL[i] = make(chan []byte)
 			used_channels_GL[i] = true
@@ -390,7 +413,7 @@ func registerChannel() int {
 }
 
 func unregisterChannel(channel_num int) {
-	if channel_num >= 0 && channel_num < MAX_CHANNELS {
+	if channel_num >= 0 && channel_num < MAX_CLIENTS && channels_GL[channel_num] != nil {
 		close(channels_GL[channel_num])
 		channels_GL[channel_num] = nil
 		used_channels_GL[channel_num] = false
@@ -404,4 +427,8 @@ func getCRC16(bytes []byte) []byte {
 	crc16_bytes[1] = byte(crc16)
 
 	return crc16_bytes
+}
+
+func getModUserInfo() *ModsFileInfo.Mod8UserInfo {
+	return &Utils.GetUserSettings().WebsiteBackend
 }

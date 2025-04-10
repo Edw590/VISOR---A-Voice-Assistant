@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -51,8 +51,8 @@ type GPath struct {
 type FileInfo struct {
 	// Name is the name of the file
 	Name       string
-	// Modif_time is the last modification time of the file in Unix nanoseconds
-	Modif_time int64
+	// Modif_time_ns is the last modification time of the file in Unix nanoseconds
+	Modif_time_ns int64
 	// GPath is the path to the file
 	GPath      GPath
 }
@@ -282,6 +282,7 @@ for any other, "\r\n" and "\r" are replaced by "\n".
 
 – Params:
   - content – the contents to write
+  - append – if true, appends the content to the file, else overwrites it
 
 – Returns:
   - nil if the file was written successfully, an error otherwise (including if the path describes a directory)
@@ -522,9 +523,9 @@ func (gPath GPath) GetFileList() []FileInfo {
 		var file_path GPath = gPath.Add2(false, file.Name())
 		file_stats, _ := os.Stat(file_path.GPathToStringConversion())
 		files_to_send = append(files_to_send, FileInfo{
-			Name:       file.Name(),
-			Modif_time: file_stats.ModTime().UnixNano(),
-			GPath:      file_path,
+			Name:          file.Name(),
+			Modif_time_ns: file_stats.ModTime().UnixNano(),
+			GPath:         file_path,
 		})
 	}
 
@@ -551,7 +552,7 @@ func GetOldestFileFILESDIRS(files_info []FileInfo) (FileInfo, int) {
 	var oldest_file FileInfo = files_info[0]
 	var oldest_file_idx int = 0
 	for i := 1; i < len(files_info); i++ {
-		if files_info[i].Modif_time < oldest_file.Modif_time {
+		if files_info[i].Modif_time_ns < oldest_file.Modif_time_ns {
 			oldest_file = files_info[i]
 			oldest_file_idx = i
 		}

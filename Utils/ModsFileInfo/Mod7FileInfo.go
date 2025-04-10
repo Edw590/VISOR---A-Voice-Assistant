@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,27 +21,53 @@
 
 package ModsFileInfo
 
-const MOD_7_STATE_STARTING int = 0
-const MOD_7_STATE_READY int = 1
-const MOD_7_STATE_BUSY int = 2
-const MOD_7_STATE_STOPPING int = 3
+const MOD_7_STATE_STOPPED int32 = 0
+const MOD_7_STATE_STARTING int32 = 1
+const MOD_7_STATE_READY int32 = 2
+const MOD_7_STATE_BUSY int32 = 3
 
 // Mod12GenInfo is the format of the custom generated information about this specific module.
 type Mod7GenInfo struct {
 	// State is the state of the module
-	State int
+	State int32
+	// N_mems_when_last_memorized is the number of memories when the last session was memorized
+	N_mems_when_last_memorized int
 	// Memories is the list of memories the GPT has
 	Memories []string
+	// Sessions is the list of sessions of the user with the GPT
+	Sessions []Session
+}
+
+// Session is the format of a chat session with the GPT.
+type Session struct {
+	// Id is the ID of the session
+	Id string
+	// Name is the name of the session
+	Name string
+	// Created_time_s is the timestamp of the creation of the session
+	Created_time_s int64
+	// History is the chat history of the session
+	History []OllamaMessage
+	// Last_interaction_s is the timestamp of the last interaction with the session
+	Last_interaction_s int64
+	// Memorized is whether the session has been memorized since the last interaction
+	Memorized bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 // Mod7UserInfo is the format of the custom information file about this specific module.
 type Mod7UserInfo struct {
-	// Model_smart_loc is the location of the model file for the smart LLM
-	Model_smart_loc string
-	// Model_dumb_loc is the location of the model file for the dumb LLM
-	Model_dumb_loc string
+	// Server_url is the URL of the LLM server
+	Server_url string
+	// Model_name is the name of the LLM model to use
+	Model_name string
+	// Model_has_tool_role indicates if the tool role of the LLM model exists or not
+	Model_has_tool_role bool
+	// Context_size is the context size to use
+	Context_size int32
+	// Temperature is the temperature to use
+	Temperature float32
 	// System_info is the LLM's system information, like the cutting knowledge date and today's date
 	System_info string
 	// User_nickname is the user nickname to be used by the LLM

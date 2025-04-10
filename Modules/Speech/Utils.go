@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -61,10 +61,10 @@ func processVolumeChanges() {
 		// volume (otherwise the first and next changes will be user changes). Also, detect only if the assistant is
 		// speaking, of course.
 
-		var prev_sound_volume int = Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume
+		var prev_sound_volume int = getMod10GenSettings().Device_info.System_state.Sound_info.Volume
 		for {
-			if Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume != prev_sound_volume {
-				prev_sound_volume = Utils.Gen_settings_GL.MOD_10.Device_info.System_state.Sound_info.Volume
+			if getMod10GenSettings().Device_info.System_state.Sound_info.Volume != prev_sound_volume {
+				prev_sound_volume = getMod10GenSettings().Device_info.System_state.Sound_info.Volume
 
 				var carry_on bool = false
 				if is_speaking_GL {
@@ -97,7 +97,7 @@ func processVolumeChanges() {
 				}
 			}
 
-			if Utils.WaitWithStopTIMEDATE(&stop_volume_processing_GL, 1) {
+			if Utils.WaitWithStopDATETIME(&stop_volume_processing_GL, 1) {
 				processing_volume_GL = false
 
 				return

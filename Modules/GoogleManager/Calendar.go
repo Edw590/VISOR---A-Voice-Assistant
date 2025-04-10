@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,6 +26,7 @@ import (
 	"context"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/option"
+	"log"
 	"net/http"
 	"time"
 )
@@ -33,20 +34,24 @@ import (
 func storeCalendarsEvents(client *http.Client) bool {
 	service, err := calendar.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		//log.Printf("Unable to retrieve Calendar client: %v\n", err)
+		log.Printf("Unable to retrieve Calendar client: %v\n", err)
+
 		return false
 	}
 
 	// Get the list of all calendars
 	calendarList, err := service.CalendarList.List().Do()
 	if err != nil {
-		//log.Printf("Unable to retrieve calendar list: %v\n", err)
+		log.Printf("Unable to retrieve Calendar list: %v\n", err)
+
 		return false
 	}
 
+	getModGenSettings().Token_invalid = false
+
 	// Calculate the start of the current week (Monday)
-	now := time.Now()
-	weekday := int(now.Weekday())
+	var now time.Time = time.Now()
+	var weekday int = int(now.Weekday())
 	if weekday == 0 {
 		weekday = 7 // Make Sunday 7 instead of 0 for easier calculation
 	}
@@ -109,13 +114,13 @@ func storeCalendarsEvents(client *http.Client) bool {
 					Summary:      item.Summary,
 					Location:     item.Location,
 					Description:  item.Description,
-					Start_time:   start_date,
+					Start_time_s: start_date_parsed.Unix(),
 					Duration_min: duration_min,
 				})
 			}
 		}
 
-		modGenInfo_GL.Events = events_final
+		getModGenSettings().Events = events_final
 	}
 
 	return true

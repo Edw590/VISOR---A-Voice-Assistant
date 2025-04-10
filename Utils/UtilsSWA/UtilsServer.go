@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,6 +23,7 @@ package UtilsSWA
 
 import (
 	"Utils"
+	"errors"
 )
 
 /*
@@ -42,8 +43,8 @@ It is received by GetGeneralMessageSERVER().
 – Params:
   - message – the message to be sent
 */
-func QueueGeneralMessageSERVER(message []byte) {
-	Utils.QueueGeneralMessageSERVER(message)
+func QueueGeneralMessageSERVER(message []byte) bool {
+	return Utils.QueueGeneralMessageSERVER(message)
 }
 
 /*
@@ -56,12 +57,17 @@ If no message is available, the function will wait until a message is received.
 -----------------------------------------------------------
 
 – Returns:
-  - the message received or nil if the communicator is stopping or stopped
+  - the message received
+  - an error if the communicator is not connected
 */
-func GetGeneralMessageSERVER() []byte {
-	bytes, _ := Utils.GetGeneralMessageSERVER()
+func GetGeneralMessageSERVER() ([]byte, error) {
+	bytes, received := Utils.GetGeneralMessageSERVER()
 
-	return bytes
+	if received {
+		return bytes, nil
+	}
+
+	return nil, errors.New("communicator not connected")
 }
 
 /*

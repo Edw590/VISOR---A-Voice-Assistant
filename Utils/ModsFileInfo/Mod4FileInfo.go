@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,13 +23,21 @@ package ModsFileInfo
 
 // Mod4GenInfo is the format of the custom generated information about this specific module.
 type Mod4GenInfo struct {
-	// Tasks_info maps the task ID to the last time the task was reminded in Unix minutes
-	Notified_news map[int32][]NewsInfo
+	// Notified_news is the information about the notified news from the feeds
+	Notified_news []NewsInfo
 }
 
-// NewsInfo is the information about news.
 type NewsInfo struct {
+	// Id is the ID of the feed
+	Id   int32
+	// News_info is the information about the news
+	News_info []NewsInfo2
+}
+
+type NewsInfo2 struct {
+	// Url is the URL of the news
 	Url   string
+	// Title is the title of the news
 	Title string
 }
 
@@ -43,7 +51,7 @@ type Mod4UserInfo struct {
 
 // FeedInfo is the information about a feed.
 type FeedInfo struct {
-	// Id is the number of the feed
+	// Id is the ID of the feed
 	Id int32
 	// Enabled is whether the feed is enabled
 	Enabled bool

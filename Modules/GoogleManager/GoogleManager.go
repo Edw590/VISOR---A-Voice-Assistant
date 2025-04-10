@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -40,41 +40,36 @@ var _SCOPES = []string{
 	gmail.GmailModifyScope,
 }
 
-var (
-	realMain       Utils.RealMain = nil
-	moduleInfo_GL  Utils.ModuleInfo
-	modGenInfo_GL  *ModsFileInfo.Mod14GenInfo = &Utils.Gen_settings_GL.MOD_14
-)
-func Start(module *Utils.Module) {Utils.ModStartup(realMain, module)}
-func init() {realMain =
-	func(module_stop *bool, moduleInfo_any any) {
-		moduleInfo_GL = moduleInfo_any.(Utils.ModuleInfo)
-		modGenInfo_GL = &Utils.Gen_settings_GL.MOD_14
+var modDirsInfo_GL Utils.ModDirsInfo
+func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
+func main(module_stop *bool, moduleInfo_any any) {
+	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
-		for {
-			// Parse credentials to config
-			config, err := ParseConfigJSON()
-			if err != nil {
-				log.Printf("Unable to parse client secret file to config: %v\n", err)
+	for {
+		getModGenSettings().Token_invalid = true
 
-				return
-			}
-			client := getClient(config)
-			if client == nil {
-				//log.Println("No token saved")
+		// Parse credentials to config
+		config, err := ParseConfigJSON()
+		if err != nil {
+			log.Printf("Unable to parse client secret file to config: %v\n", err)
 
-				return
-			}
+			return
+		}
+		client := getClient(config)
+		if client == nil {
+			//log.Println("No token saved")
 
-			// Store calendar events
-			storeCalendarsEvents(client)
+			return
+		}
 
-			// Store tasks
-			storeTasks(client)
+		// Store calendar events
+		storeCalendarsEvents(client)
 
-			if Utils.WaitWithStopTIMEDATE(module_stop, 60) {
-				return
-			}
+		// Store tasks
+		storeTasks(client)
+
+		if Utils.WaitWithStopDATETIME(module_stop, 60) {
+			return
 		}
 	}
 }
@@ -92,7 +87,11 @@ func getClient(config *oauth2.Config) *http.Client {
 // getToken retrieves a token from a local file
 func getToken() (*oauth2.Token, error) {
 	var token oauth2.Token
-	err := Utils.FromJsonGENERAL([]byte(modGenInfo_GL.Token), &token)
+	err := Utils.FromJsonGENERAL([]byte(getModGenSettings().Token), &token)
 
 	return &token, err
+}
+
+func getModGenSettings() *ModsFileInfo.Mod14GenInfo {
+	return &Utils.GetGenSettings().MOD_14
 }
