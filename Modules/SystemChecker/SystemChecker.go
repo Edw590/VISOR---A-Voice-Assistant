@@ -246,5 +246,5 @@ func setWifiEnabled(enabled bool) bool {
 }
 
 func getDeviceInfo() *ModsFileInfo.DeviceInfo {
-	return &Utils.GetGenSettings().MOD_10.Device_info
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_10.Device_info
 }

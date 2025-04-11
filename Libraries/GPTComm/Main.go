@@ -33,6 +33,8 @@ const ROLE_TOOL string = "TOOL"
 const SESSION_TYPE_NEW string = "NEW"
 const SESSION_TYPE_TEMP string = "TEMP"
 const SESSION_TYPE_ACTIVE string = "ACTIVE"
+const MODEL_TYPE_TEXT string = "TEXT"
+const MODEL_TYPE_VISION string = "VISION"
 /*
 SendText sends the given text to the LLM model.
 
@@ -47,18 +49,18 @@ SendText sends the given text to the LLM model.
 – Returns:
   - the state of the GPT Communicator module
 */
-func SendText(text string, session_type string, role string, more_coming bool) int32 {
-	var message []byte = []byte("GPT|")
+func SendText(text string, session_type string, role string, more_coming bool, model_type string) int32 {
+	var message []byte = []byte("GPT|[process]")
 	if text != "" {
-		var curr_location string = Utils.GetGenSettings().MOD_12.User_location.Curr_location
+		var curr_location string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_12.User_location.Curr_location
 		var date_time string = time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04")
 
 		var new_text string = text
 		if role == ROLE_USER {
 			new_text = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
 		}
-		message = append(message, Utils.CompressString("[" + Utils.GetGenSettings().Device_settings.Id + "|" +
-			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "]" + new_text)...)
+		message = append(message, Utils.CompressString("[" + Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id + "|" +
+			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "|" + model_type + "]" + new_text)...)
 	}
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message) {
 		return -1
@@ -81,7 +83,7 @@ GetModuleState gets the state of the GPT Communicator module.
 DON'T delete the function. It's useful for use in a thread other than the one used to send text.
 */
 func GetModuleState() int32 {
-	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|")) {
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|[process]")) {
 		return -1
 	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5)

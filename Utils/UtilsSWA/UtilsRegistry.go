@@ -145,7 +145,9 @@ func RegisterValueREGISTRY(key string, pretty_name string, description string, v
 			value.Curr_data = init_data
 	}
 
-	Utils.GetGenSettings().Registry = append(Utils.GetGenSettings().Registry, (*Utils.Value) (value))
+	var registry []*Utils.Value = Utils.CopyOuterSLICES(Utils.GetGenSettings(Utils.ONLY_LOCK).Registry)
+	registry = append(registry, (*Utils.Value) (value))
+	Utils.GetGenSettings(Utils.ONLY_UNLOCK).Registry = registry
 
 	return value
 }
@@ -159,7 +161,7 @@ Call this after registering all necessary Values.
  */
 func CleanRegistryREGISTRY() {
 	var registry []*Utils.Value
-	for _, value := range Utils.GetGenSettings().Registry {
+	for _, value := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).Registry {
 		for _, key := range keys_added_GL {
 			if value.Key == key {
 				registry = append(registry, value)
@@ -167,7 +169,7 @@ func CleanRegistryREGISTRY() {
 			}
 		}
 	}
-	Utils.GetGenSettings().Registry = registry
+	Utils.GetGenSettings(Utils.LOCK_UNLOCK).Registry = registry
 }
 
 /*
@@ -182,7 +184,7 @@ GetValueREGISTRY gets a value from the registry based on its key.
   - the value or nil if the value doesn't exist
  */
 func GetValueREGISTRY(key string) *Value {
-	for _, value := range Utils.GetGenSettings().Registry {
+	for _, value := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).Registry {
 		if value.Key == key {
 			return (*Value) (value)
 		}
@@ -201,7 +203,7 @@ GetValuesREGISTRY gets all the values in the registry.
  */
 func GetValuesREGISTRY() []*Value {
 	var values []*Value
-	for _, value := range Utils.GetGenSettings().Registry {
+	for _, value := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).Registry {
 		values = append(values, (*Value)(value))
 	}
 
@@ -219,7 +221,7 @@ GetKeysREGISTRY gets all the keys in the registry.
 func GetKeysREGISTRY() string {
 	var keys string = ""
 
-	for _, value := range Utils.GetGenSettings().Registry {
+	for _, value := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).Registry {
 		keys += value.Key + "|"
 	}
 	keys = keys[:len(keys) - 1]
@@ -236,13 +238,15 @@ RemoveValueREGISTRY removes a value from the registry based on its key.
   - key – the key of the value
 */
 func RemoveValueREGISTRY(key string) {
-	for i, value := range Utils.GetGenSettings().Registry {
+	var registry []*Utils.Value = Utils.CopyOuterSLICES(Utils.GetGenSettings(Utils.ONLY_LOCK).Registry)
+	for i, value := range registry {
 		if value.Key == key {
-			Utils.DelElemSLICES(&Utils.GetGenSettings().Registry, i)
+			Utils.DelElemSLICES(&registry, i)
 
 			break
 		}
 	}
+	Utils.GetGenSettings(Utils.ONLY_UNLOCK).Registry = registry
 	for i, key_added := range keys_added_GL {
 		if key_added == key {
 			Utils.DelElemSLICES(&keys_added_GL, i)
@@ -266,7 +270,7 @@ GetRegistryTextREGISTRY returns a text representation of the Registry.
 func GetRegistryTextREGISTRY(type_ int) string {
 	var text string = ""
 
-	for _, value := range Utils.GetGenSettings().Registry {
+	for _, value := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).Registry {
 		if type_ == 1 && !value.Auto_set {
 			continue
 		} else if type_ == 2 && value.Auto_set {

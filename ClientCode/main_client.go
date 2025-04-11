@@ -182,7 +182,7 @@ func realMain(module_stop *bool, moduleInfo_any any) {
 			my_app_GL.Settings().SetTheme(theme.DefaultTheme())
 		}),
 		widget.NewButton("Lock", func() {
-			if Utils.GetUserSettings().General.Pin == "" {
+			if Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Pin == "" {
 				dialog.ShowInformation("No PIN set", "You need to set a PIN in the settings to lock the app.",
 					my_window_GL)
 
@@ -363,7 +363,7 @@ func lockApp() {
 }
 
 func createPinDialog(callback func()) {
-	if Utils.GetUserSettings().General.Pin == "" {
+	if Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Pin == "" {
 		callback()
 
 		return
@@ -383,7 +383,7 @@ func createPinDialog(callback func()) {
 			return
 		}
 
-		if entry_pin.Text == Utils.GetUserSettings().General.Pin {
+		if entry_pin.Text == Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Pin {
 			callback()
 		} else {
 			dialog.ShowInformation("Wrong PIN", "The PIN you entered is wrong.", my_window_GL)

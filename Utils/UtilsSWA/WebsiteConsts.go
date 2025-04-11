@@ -36,6 +36,6 @@ the User Settings file.
   - website_pw – the password of VISOR's website
  */
 func InitWebsiteConsts(website_domain string, website_pw string) {
-	Utils.GetUserSettings().General.Website_domain = website_domain
-	Utils.GetUserSettings().General.Website_pw = website_pw
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain = website_domain
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw = website_pw
 }

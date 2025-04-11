@@ -32,5 +32,5 @@ GetDeviceInfoJsonSYSCHK returns the device info in JSON format.
   - the device info in JSON format
  */
 func GetDeviceInfoJsonSYSCHK() string {
-	return *Utils.ToJsonGENERAL(Utils.GetGenSettings().MOD_10.Device_info)
+	return *Utils.ToJsonGENERAL(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_10.Device_info)
 }

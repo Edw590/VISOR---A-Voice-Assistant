@@ -65,6 +65,7 @@ type GenSettings struct {
 	MOD_5           ModsFileInfo.Mod5GenInfo
 	MOD_6           ModsFileInfo.Mod6GenInfo
 	MOD_7           ModsFileInfo.Mod7GenInfo
+	MOD_8           ModsFileInfo.Mod8GenInfo
 	MOD_9           ModsFileInfo.Mod9GenInfo
 	MOD_10          ModsFileInfo.Mod10GenInfo
 	MOD_12          ModsFileInfo.Mod12GenInfo
@@ -72,6 +73,10 @@ type GenSettings struct {
 	Registry        []*Value
 }
 
+const LOCK_UNLOCK int = 0
+const ONLY_LOCK int = 1
+const ONLY_UNLOCK int = 2
+const DONT_LOCK_UNLOCK int = 3
 /*
 GetUserSettings is the function that returns the User settings.
 
@@ -82,12 +87,19 @@ directly - not indirectly! It's like if it was a temporary pointer that only las
 
 -----------------------------------------------------------
 
+– Params:
+  - lock_mode – the lock mode to use. It can be: LOCK_UNLOCK, ONLY_LOCK, ONLY_UNLOCK or DONT_LOCK_UNLOCK.
+
 – Returns:
   - a pointer to the user_settings_GL variable
- */
-func GetUserSettings() *UserSettings {
-	mutex_US_GL.Lock()
-	defer mutex_US_GL.Unlock()
+*/
+func GetUserSettings(lock_mode int) *UserSettings {
+	if lock_mode == LOCK_UNLOCK || lock_mode == ONLY_LOCK {
+		mutex_US_GL.Lock()
+	}
+	if lock_mode == LOCK_UNLOCK || lock_mode == ONLY_UNLOCK {
+		defer mutex_US_GL.Unlock()
+	}
 
 	return &user_settings_GL
 }
@@ -102,12 +114,23 @@ directly - not indirectly! It's like if it was a temporary pointer that only las
 
 -----------------------------------------------------------
 
+– Params:
+  - lock_mode – the lock mode to use. It can be: LOCK_UNLOCK, ONLY_LOCK, ONLY_UNLOCK or DONT_LOCK_UNLOCK.
+
 – Returns:
   - a pointer to the gen_settings_GL variable
- */
-func GetGenSettings() *GenSettings {
-	mutex_GS_GL.Lock()
-	defer mutex_GS_GL.Unlock()
+*/
+func GetGenSettings(lock_mode int) *GenSettings {
+	//if _, file, no, ok := runtime.Caller(1); ok {
+	//	fmt.Printf("called from %s#%d\n", file, no)
+	//}
+
+	if lock_mode == LOCK_UNLOCK || lock_mode == ONLY_LOCK {
+		mutex_GS_GL.Lock()
+	}
+	if lock_mode == LOCK_UNLOCK || lock_mode == ONLY_UNLOCK {
+		defer mutex_GS_GL.Unlock()
+	}
 
 	return &gen_settings_GL
 }
@@ -141,11 +164,22 @@ func ReadSettingsFile(user_settings bool) error {
 			bytes = DecryptBytesCRYPTOENDECRYPT([]byte(Password_GL), []byte(Password_GL), bytes, nil)
 		}
 
-		var p_settings any = GetGenSettings()
 		if user_settings {
-			p_settings = GetUserSettings()
+			GetUserSettings(ONLY_LOCK)
+		} else {
+			GetGenSettings(ONLY_LOCK)
 		}
-		if err := FromJsonGENERAL(bytes, p_settings); err != nil {
+		var p_settings any = GetGenSettings(DONT_LOCK_UNLOCK)
+		if user_settings {
+			p_settings = GetUserSettings(DONT_LOCK_UNLOCK)
+		}
+		err := FromJsonGENERAL(bytes, p_settings)
+		if user_settings {
+			GetUserSettings(ONLY_UNLOCK)
+		} else {
+			GetGenSettings(ONLY_UNLOCK)
+		}
+		if err != nil {
 			return err
 		}
 
@@ -188,9 +222,9 @@ WriteSettingsFile is the function that writes the User and Generated settings to
   - true if the settings were successfully saved, false otherwise
  */
 func WriteSettingsFile(user_settings bool) bool {
-	var settings any = *GetGenSettings()
+	var settings any = *GetGenSettings(LOCK_UNLOCK)
 	if user_settings {
-		settings = *GetUserSettings()
+		settings = *GetUserSettings(LOCK_UNLOCK)
 	}
 	var p_string *string = ToJsonGENERAL(settings)
 	if p_string == nil {

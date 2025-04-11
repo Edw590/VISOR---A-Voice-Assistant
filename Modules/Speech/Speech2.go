@@ -210,5 +210,5 @@ func SkipCurrentSpeech() bool {
 }
 
 func getMod10GenSettings() *ModsFileInfo.Mod10GenInfo {
-	return &Utils.GetGenSettings().MOD_10
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_10
 }

@@ -62,7 +62,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}
 
 	for {
-		var disks_to_chk []ModsFileInfo.DiskInfo = Utils.GetUserSettings().SMARTChecker.Disks_info
+		var disks_to_chk []ModsFileInfo.DiskInfo = Utils.GetUserSettings(Utils.LOCK_UNLOCK).SMARTChecker.Disks_info
 		if len(disks_to_chk) == 0 {
 			//log.Println("No disks to check.")
 
@@ -244,5 +244,5 @@ func getDiskInfo2(disk_serial string) *ModsFileInfo.DiskInfo2 {
 }
 
 func getModGenSettings() *ModsFileInfo.Mod3GenInfo {
-	return &Utils.GetGenSettings().MOD_3
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_3
 }

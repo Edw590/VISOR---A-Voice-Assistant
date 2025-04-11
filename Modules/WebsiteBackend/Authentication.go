@@ -57,5 +57,5 @@ func basicAuth(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func validateCredentials(username, password string) bool {
-	return username == "VISOR" && password == Utils.GetUserSettings().General.Website_pw
+	return username == "VISOR" && password == Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw
 }

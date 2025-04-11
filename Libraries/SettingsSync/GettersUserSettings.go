@@ -35,7 +35,7 @@ GetMod7InfoUSERSETS returns the MOD_7 user information from the user settings.
   - the MOD_7 user information from the user settings
 */
 func GetMod7InfoUSERSETS() *ModsFileInfo.Mod7UserInfo {
-	return &Utils.GetUserSettings().GPTCommunicator
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator
 }
 
 /*
@@ -47,5 +47,5 @@ GetMod12InfoUSERSETS returns the MOD_12 user information from the user settings.
   - the MOD_12 user information from the user settings
 */
 func GetMod12InfoUSERSETS() *ModsFileInfo.Mod12UserInfo {
-	return &Utils.GetUserSettings().UserLocator
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).UserLocator
 }

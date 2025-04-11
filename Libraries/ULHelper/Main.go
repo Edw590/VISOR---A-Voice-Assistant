@@ -119,7 +119,7 @@ func checkUserLocation(location string) bool {
 		return true
 	}
 
-	if getModUserInfo().AlwaysWith_device == Utils.GetGenSettings().Device_settings.Id {
+	if getModUserInfo().AlwaysWith_device == Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id {
 		return true
 	}
 
@@ -157,13 +157,13 @@ func getUserLocation() *ModsFileInfo.UserLocation {
 }
 
 func getDeviceInfo() *ModsFileInfo.DeviceInfo {
-	return &Utils.GetGenSettings().MOD_10.Device_info
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_10.Device_info
 }
 
 func getModGenSettings() *ModsFileInfo.Mod12GenInfo {
-	return &Utils.GetGenSettings().MOD_12
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_12
 }
 
 func getModUserInfo() *ModsFileInfo.Mod12UserInfo {
-	return &Utils.GetUserSettings().UserLocator
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).UserLocator
 }

@@ -60,7 +60,7 @@ func checkDeviceActive(task ModsFileInfo.Task) bool {
 		return true
 	}
 
-	return Utils.GetGenSettings().MOD_10.Device_info.Last_time_used_s + 5 >= time.Now().Unix()
+	return Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_10.Device_info.Last_time_used_s + 5 >= time.Now().Unix()
 }
 
 func checkDeviceID(task ModsFileInfo.Task) bool {
@@ -69,7 +69,7 @@ func checkDeviceID(task ModsFileInfo.Task) bool {
 	}
 
 	for _, device_id := range task.Device_IDs {
-		if device_id == Utils.GetGenSettings().Device_settings.Id {
+		if device_id == Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id {
 			return true
 		}
 	}

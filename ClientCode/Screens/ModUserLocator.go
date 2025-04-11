@@ -55,10 +55,10 @@ func userLocatorCreateSettingsTab() *container.Scroll {
 	var entry_always_with_device *widget.Entry = widget.NewEntry()
 	entry_always_with_device.SetPlaceHolder("ID of the device always with the user (user's phone for example) or " +
 		"empty if none")
-	entry_always_with_device.SetText(Utils.GetUserSettings().UserLocator.AlwaysWith_device)
+	entry_always_with_device.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).UserLocator.AlwaysWith_device)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings().UserLocator.AlwaysWith_device = entry_always_with_device.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).UserLocator.AlwaysWith_device = entry_always_with_device.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -127,7 +127,7 @@ func userLocatorCreateAddLocationTab() *container.Scroll {
 func userLocatorCreateLocationsListTab() *container.Scroll {
 	var accordion *widget.Accordion = widget.NewAccordion()
 	accordion.MultiOpen = true
-	var locs_info []ModsFileInfo.LocInfo = Utils.GetUserSettings().UserLocator.Locs_info
+	var locs_info []ModsFileInfo.LocInfo = Utils.GetUserSettings(Utils.LOCK_UNLOCK).UserLocator.Locs_info
 	for i := range locs_info {
 		var loc_info *ModsFileInfo.LocInfo = &locs_info[i]
 		var title = loc_info.Name

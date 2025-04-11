@@ -61,10 +61,10 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 
 	var entry_credentials_json *widget.Entry = widget.NewEntry()
 	entry_credentials_json.SetPlaceHolder("Google credentials JSON file contents")
-	entry_credentials_json.SetText(Utils.GetUserSettings().GoogleManager.Credentials_JSON)
+	entry_credentials_json.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GoogleManager.Credentials_JSON)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings().GoogleManager.Credentials_JSON = entry_credentials_json.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GoogleManager.Credentials_JSON = entry_credentials_json.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -79,7 +79,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	label_additional_info3.Wrapping = fyne.TextWrapWord
 
 	var btn_authorize *widget.Button = widget.NewButton("Authorize", func() {
-		if Utils.GetUserSettings().GoogleManager.Credentials_JSON == "" {
+		if Utils.GetUserSettings(Utils.LOCK_UNLOCK).GoogleManager.Credentials_JSON == "" {
 			dialog.ShowError(errors.New("no credentials JSON saved"), Current_window_GL)
 		}
 

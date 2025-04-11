@@ -81,25 +81,24 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 				var condition_device_active bool = checkDeviceActive(task)
 
-				var task_info *ModsFileInfo.TaskInfo = getTaskInfo(task.Id)
 				if condition_loc && programmable_condition && device_id_matches && condition_device_active {
-					if task_info.Last_time_reminded == 0 {
+					if getTaskInfo(task.Id).Last_time_reminded == 0 {
 						if task_return.Id == 0 {
 							// Only set the last reminded time if no other task was triggered
-							task_info.Last_time_reminded = time.Now().Unix() / 60
+							getTaskInfo(task.Id).Last_time_reminded = time.Now().Unix() / 60
 
 							task_return = task
 						}
 					}
 				} else {
-					task_info.Last_time_reminded = 0
+					getTaskInfo(task.Id).Last_time_reminded = 0
 				}
 			}
 		}
 
 		// Time/condition trigger - if the time changed (it always does), check if any task is triggered
 		for _, task := range getModUserSettings().Tasks {
-			if !task.Enabled {
+			if !task.Enabled || task.Time_s == 0 {
 				continue
 			}
 
@@ -164,13 +163,13 @@ func StopChecker() {
 }
 
 func getUserLocation() *ModsFileInfo.UserLocation {
-	return &Utils.GetGenSettings().MOD_12.User_location
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_12.User_location
 }
 
 func getModGenSettings() *ModsFileInfo.Mod9GenInfo {
-	return &Utils.GetGenSettings().MOD_9
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_9
 }
 
 func getModUserSettings() *ModsFileInfo.Mod9UserInfo {
-	return &Utils.GetUserSettings().TasksExecutor
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).TasksExecutor
 }

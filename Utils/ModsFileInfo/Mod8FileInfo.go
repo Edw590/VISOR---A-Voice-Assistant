@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +20,14 @@
  ******************************************************************************/
 
 package ModsFileInfo
+
+// Mod9GenInfo is the format of the custom generated information about this specific module.
+type Mod8GenInfo struct {
+	// Active_device_IDs is the list of active device IDs
+	Active_device_IDs []string
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 // Mod8UserInfo is the format of the custom information file about this specific module.
 type Mod8UserInfo struct {

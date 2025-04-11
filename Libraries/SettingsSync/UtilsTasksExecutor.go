@@ -50,17 +50,17 @@ AddTaskTASKS adds a task to the user settings.
  */
 func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message string, command string, time_s int64,
 			 	  repeat_each_min int64, user_location string, programmable_condition string) int32 {
-	var tasks *[]ModsFileInfo.Task = &Utils.GetUserSettings().TasksExecutor.Tasks
+	var tasks []ModsFileInfo.Task = Utils.CopyOuterSLICES(Utils.GetUserSettings(Utils.LOCK_UNLOCK).TasksExecutor.Tasks)
 	var id int32 = 1 // 0 is reserved
-	for i := 0; i < len(*tasks); i++ {
-		if (*tasks)[i].Id == id {
+	for i := 0; i < len(tasks); i++ {
+		if (tasks)[i].Id == id {
 			id++
 			i = -1
 		}
 	}
 
 	// Add the task to the user settings
-	*tasks = append(*tasks, ModsFileInfo.Task{
+	tasks = append(tasks, ModsFileInfo.Task{
 		Id:                     id,
 		Enabled:                enabled,
 		Device_active:          device_active,
@@ -73,9 +73,12 @@ func AddTaskTASKS(enabled bool, device_active bool, device_ids string, message s
 		Programmable_condition: programmable_condition,
 	})
 
-	sort.SliceStable(*tasks, func(i, j int) bool {
-		return (*tasks)[i].Id < (*tasks)[j].Id
+	sort.SliceStable(tasks, func(i, j int) bool {
+		return (tasks)[i].Id < (tasks)[j].Id
 	})
+
+	// Update the user settings
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).TasksExecutor.Tasks = tasks
 
 	return id
 }
@@ -89,14 +92,17 @@ RemoveTaskTASKS removes a task from the user settings.
   - id – the task ID
  */
 func RemoveTaskTASKS(id int32) {
-	var tasks *[]ModsFileInfo.Task = &Utils.GetUserSettings().TasksExecutor.Tasks
-	for i := range *tasks {
-		if (*tasks)[i].Id == id {
-			Utils.DelElemSLICES(tasks, i)
+	var tasks []ModsFileInfo.Task = Utils.CopyOuterSLICES(Utils.GetUserSettings(Utils.ONLY_LOCK).TasksExecutor.Tasks)
+	for i := range tasks {
+		if tasks[i].Id == id {
+			Utils.DelElemSLICES(&tasks, i)
 
 			break
 		}
 	}
+
+	// Update the user settings
+	Utils.GetUserSettings(Utils.ONLY_UNLOCK).TasksExecutor.Tasks = tasks
 }
 
 /*
@@ -109,7 +115,7 @@ GetIdsListTASKS returns a list of all tasks' IDs.
 */
 func GetIdsListTASKS() string {
 	var ids_list string
-	for _, task := range Utils.GetUserSettings().TasksExecutor.Tasks {
+	for _, task := range Utils.GetUserSettings(Utils.LOCK_UNLOCK).TasksExecutor.Tasks {
 		ids_list += strconv.Itoa(int(task.Id)) + "|"
 	}
 	if len(ids_list) > 0 {
@@ -131,7 +137,7 @@ GetTaskTASKS returns a task by its ID.
   - the task or nil if the task was not found
 */
 func GetTaskTASKS(id int32) *ModsFileInfo.Task {
-	var tasks []ModsFileInfo.Task = Utils.GetUserSettings().TasksExecutor.Tasks
+	var tasks []ModsFileInfo.Task = Utils.GetUserSettings(Utils.LOCK_UNLOCK).TasksExecutor.Tasks
 	for i := range tasks {
 		var task *ModsFileInfo.Task = &tasks[i]
 		if task.Id == id {

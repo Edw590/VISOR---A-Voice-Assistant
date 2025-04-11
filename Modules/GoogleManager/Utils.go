@@ -29,7 +29,7 @@ import (
 )
 
 func ParseConfigJSON() (*oauth2.Config, error) {
-	var credentials string = Utils.GetUserSettings().GoogleManager.Credentials_JSON
+	var credentials string = Utils.GetUserSettings(Utils.LOCK_UNLOCK).GoogleManager.Credentials_JSON
 	if credentials == "" {
 		//log.Println("No credentials found in the user settings file")
 

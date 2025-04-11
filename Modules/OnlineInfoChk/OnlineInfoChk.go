@@ -168,7 +168,7 @@ RetrieveWolframAlpha retrieves the information from the given query using Wolfra
 func RetrieveWolframAlpha(query string) (string, bool) {
 	//Initialize a new client
 	c := &wolfram.Client{
-		AppID: Utils.GetUserSettings().General.WolframAlpha_AppID,
+		AppID: Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.WolframAlpha_AppID,
 	}
 
 	//Get a result without additional parameters
@@ -237,9 +237,9 @@ func RetrieveWikipedia(query string) string {
 }
 
 func getModGenSettings() *ModsFileInfo.Mod6GenInfo {
-	return &Utils.GetGenSettings().MOD_6
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_6
 }
 
 func getModUserInfo() *ModsFileInfo.Mod6UserInfo {
-	return &Utils.GetUserSettings().OnlineInfoChk
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk
 }

@@ -19,33 +19,49 @@
  * under the License.
  ******************************************************************************/
 
-package SettingsSync
+package GPTCommunicator
 
 import (
 	"Utils"
 	"Utils/ModsFileInfo"
+	"log"
+	"strconv"
+	"time"
 )
 
-/*
-GetGeneralSettingsGENERAL returns the general constants from the user settings.
+const _START_CMD string = "[3234_START:"
+const _END_CMD string = "[3234_END]"
 
------------------------------------------------------------
-
-– Returns:
-  - the general constants from the user settings
- */
-func GetGeneralSettingsGENERAL() *ModsFileInfo.GeneralConsts {
-	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).General
+type _LocalModels struct {
+	Models []_LocalModel `json:"models"`
 }
 
-/*
-GetDeviceSettingsGENERAL returns the device settings from the general settings.
+type _LocalModel struct {
+	Name string `json:"name"`
+}
 
------------------------------------------------------------
+func getStartString(device_id string) string {
+	return _START_CMD + strconv.FormatInt(time.Now().UnixMilli(), 10) + "|" + device_id + "|]"
+}
 
-– Returns:
-  - the device settings from the general settings
- */
-func GetDeviceSettingsGENERAL() *ModsFileInfo.DeviceSettings {
-	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings
+func getEndString() string {
+	return "\n" + _END_CMD + "\n"
+}
+
+func getModUserInfo() *ModsFileInfo.Mod7UserInfo {
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator
+}
+
+func getLocalModels() _LocalModels {
+	body, err := Utils.MakeGetRequest("http://localhost:11434/api/tags")
+	if err != nil {
+		log.Println("Error making GET request to Ollama local models:", err)
+	}
+
+	var local_models _LocalModels
+	if err = Utils.FromJsonGENERAL(body, &local_models); err != nil {
+		log.Println("Error unmarshalling Ollama models JSON:", err)
+	}
+
+	return local_models
 }

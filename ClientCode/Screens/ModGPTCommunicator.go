@@ -131,23 +131,24 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var server_uri *widget.Entry = widget.NewEntry()
 	server_uri.SetPlaceHolder("GPT Server URL (example: localhost:11434)")
-	server_uri.SetText(Utils.GetUserSettings().GPTCommunicator.Server_url)
+	server_uri.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url)
 
-	var entry_model_name *widget.Entry = widget.NewEntry()
-	entry_model_name.SetPlaceHolder("GPT model name (example: llama3.2)")
-	entry_model_name.SetText(Utils.GetUserSettings().GPTCommunicator.Model_name)
+	var entry_model_name *widget.Entry = widget.NewMultiLineEntry()
+	entry_model_name.SetPlaceHolder("GPT model names and types one per line in order of preference\n" +
+		"Example: \"llama3.2 - TEXT\" - can be TEXT or VISION)")
+	entry_model_name.SetText(strings.Join(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use, "\n"))
 
 	var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
-	checkbox_model_has_tool_role.SetChecked(Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role)
+	checkbox_model_has_tool_role.SetChecked(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role)
 
 	var entry_ctx_size *widget.Entry = widget.NewEntry()
 	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
-	entry_ctx_size.SetText(strconv.Itoa(int(Utils.GetUserSettings().GPTCommunicator.Context_size)))
+	entry_ctx_size.SetText(strconv.Itoa(int(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Context_size)))
 	entry_ctx_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numberic")
 
 	var entry_temperature *widget.Entry = widget.NewEntry()
 	entry_temperature.SetPlaceHolder("GPT temperature (example: 0.8)")
-	entry_temperature.SetText(strconv.FormatFloat(float64(Utils.GetUserSettings().GPTCommunicator.Temperature), 'f', -1, 32))
+	entry_temperature.SetText(strconv.FormatFloat(float64(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Temperature), 'f', -1, 32))
 	entry_temperature.Validator = func(s string) error {
 		value, err := strconv.ParseFloat(s, 32)
 		if err != nil {
@@ -163,22 +164,22 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var entry_system_info *widget.Entry = widget.NewMultiLineEntry()
 	entry_system_info.SetPlaceHolder("LLM system information (remove any current date/time - that's automatic)")
 	entry_system_info.SetMinRowsVisible(3)
-	entry_system_info.SetText(Utils.GetUserSettings().GPTCommunicator.System_info)
+	entry_system_info.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.System_info)
 
 	var entry_user_nickname *widget.Entry = widget.NewEntry()
 	entry_user_nickname.SetPlaceHolder("User nickname (Sir, for example)")
-	entry_user_nickname.SetText(Utils.GetUserSettings().GPTCommunicator.User_nickname)
+	entry_user_nickname.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.User_nickname)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings().GPTCommunicator.Server_url = server_uri.Text
-		Utils.GetUserSettings().GPTCommunicator.Model_name = entry_model_name.Text
-		Utils.GetUserSettings().GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url = server_uri.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use = strings.Split(entry_model_name.Text, "\n")
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
 		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
-		Utils.GetUserSettings().GPTCommunicator.Context_size = int32(value1)
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Context_size = int32(value1)
 		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
-		Utils.GetUserSettings().GPTCommunicator.Temperature = float32(value2)
-		Utils.GetUserSettings().GPTCommunicator.System_info = entry_system_info.Text
-		Utils.GetUserSettings().GPTCommunicator.User_nickname = entry_user_nickname.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Temperature = float32(value2)
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.System_info = entry_system_info.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.User_nickname = entry_user_nickname.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -367,7 +368,7 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW, GPTComm.ROLE_USER, false) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW, GPTComm.ROLE_USER, false, GPTComm.MODEL_TYPE_TEXT) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -389,7 +390,7 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP, GPTComm.ROLE_USER, false) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP, GPTComm.ROLE_USER, false, GPTComm.MODEL_TYPE_TEXT) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:

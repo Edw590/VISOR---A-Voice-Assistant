@@ -39,7 +39,7 @@ func Home() fyne.CanvasObject {
 	Current_screen_GL = ID_HOME
 
 	return container.NewAppTabs(
-		container.NewTabItem("Main", homeCreateHomeTab()),
+		container.NewTabItem("Main", homeCreateMainTab()),
 		container.NewTabItem("Settings", homeCreateSettingsTab()),
 		container.NewTabItem("Local settings", homeCreateLocalSettingsTab()),
 	)
@@ -68,20 +68,20 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 
 	var entry_device_id *widget.Entry = widget.NewEntry()
 	entry_device_id.SetPlaceHolder("Unique device ID (for example \"MyComputer\")")
-	entry_device_id.SetText(Utils.GetGenSettings().Device_settings.Id)
+	entry_device_id.SetText(Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id)
 
 	var entry_device_type *widget.Entry = widget.NewEntry()
 	entry_device_type.SetPlaceHolder("Device type (for example \"computer\")")
-	entry_device_type.SetText(Utils.GetGenSettings().Device_settings.Type_)
+	entry_device_type.SetText(Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Type_)
 
 	var entry_device_description *widget.Entry = widget.NewEntry()
 	entry_device_description.SetPlaceHolder("Device description (for example the model, \"Legion Y520\")")
-	entry_device_description.SetText(Utils.GetGenSettings().Device_settings.Description)
+	entry_device_description.SetText(Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Description)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetGenSettings().Device_settings.Id = entry_device_id.Text
-		Utils.GetGenSettings().Device_settings.Type_ = entry_device_type.Text
-		Utils.GetGenSettings().Device_settings.Description = entry_device_description.Text
+		Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id = entry_device_id.Text
+		Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Type_ = entry_device_type.Text
+		Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Description = entry_device_description.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -99,50 +99,50 @@ func homeCreateLocalSettingsTab() *container.Scroll {
 func homeCreateSettingsTab() *container.Scroll {
 	var entry_pin *widget.Entry = widget.NewPasswordEntry()
 	entry_pin.SetPlaceHolder("App protection PIN (any number of digits or empty to disable)")
-	entry_pin.SetText(Utils.GetUserSettings().General.Pin)
+	entry_pin.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Pin)
 	entry_pin.Validator = validation.NewRegexp(`^(\d+)?$`, "PIN must be numberic")
 
 	var entry_visor_email_addr *widget.Entry = widget.NewEntry()
 	entry_visor_email_addr.SetPlaceHolder("V.I.S.O.R. email address")
 	entry_visor_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`,
 		"Invalid email address")
-	entry_visor_email_addr.SetText(Utils.GetUserSettings().General.VISOR_email_addr)
+	entry_visor_email_addr.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.VISOR_email_addr)
 
 	var entry_visor_email_pw *widget.Entry = widget.NewPasswordEntry()
 	entry_visor_email_pw.SetPlaceHolder("V.I.S.O.R. email password (2FA password if enabled)")
-	entry_visor_email_pw.SetText(Utils.GetUserSettings().General.VISOR_email_pw)
+	entry_visor_email_pw.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.VISOR_email_pw)
 
 	var entry_user_email_addr *widget.Entry = widget.NewEntry()
 	entry_user_email_addr.SetPlaceHolder("User email address (used for all email communication)")
 	entry_user_email_addr.Validator = validation.NewRegexp(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`,
 		"Invalid email address")
-	entry_user_email_addr.SetText(Utils.GetUserSettings().General.User_email_addr)
+	entry_user_email_addr.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.User_email_addr)
 
 	var entry_server_domain *widget.Entry = widget.NewEntry()
 	entry_server_domain.SetPlaceHolder("Server domain or IP (example: localhost)")
-	entry_server_domain.SetText(Utils.GetUserSettings().General.Website_domain)
+	entry_server_domain.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain)
 
 	var entry_server_pw *widget.Entry = widget.NewPasswordEntry()
 	entry_server_pw.SetPlaceHolder("Server password (strong letters and numbers password)")
-	entry_server_pw.SetText(Utils.GetUserSettings().General.Website_pw)
+	entry_server_pw.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw)
 
 	var entry_wolframalpha_appid *widget.Entry = widget.NewEntry()
 	entry_wolframalpha_appid.SetPlaceHolder("WolframAlpha App ID")
-	entry_wolframalpha_appid.SetText(Utils.GetUserSettings().General.WolframAlpha_AppID)
+	entry_wolframalpha_appid.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.WolframAlpha_AppID)
 
 	var entry_picovoice_api_key *widget.Entry = widget.NewEntry()
 	entry_picovoice_api_key.SetPlaceHolder("Picovoice API key")
-	entry_picovoice_api_key.SetText(Utils.GetUserSettings().General.Picovoice_API_key)
+	entry_picovoice_api_key.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Picovoice_API_key)
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings().General.Pin = entry_pin.Text
-		Utils.GetUserSettings().General.VISOR_email_addr = entry_visor_email_addr.Text
-		Utils.GetUserSettings().General.VISOR_email_pw = entry_visor_email_pw.Text
-		Utils.GetUserSettings().General.User_email_addr = entry_user_email_addr.Text
-		Utils.GetUserSettings().General.Website_domain = entry_server_domain.Text
-		Utils.GetUserSettings().General.Website_pw = entry_server_pw.Text
-		Utils.GetUserSettings().General.WolframAlpha_AppID = entry_wolframalpha_appid.Text
-		Utils.GetUserSettings().General.Picovoice_API_key = entry_picovoice_api_key.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Pin = entry_pin.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.VISOR_email_addr = entry_visor_email_addr.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.VISOR_email_pw = entry_visor_email_pw.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.User_email_addr = entry_user_email_addr.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain = entry_server_domain.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw = entry_server_pw.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.WolframAlpha_AppID = entry_wolframalpha_appid.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Picovoice_API_key = entry_picovoice_api_key.Text
 	})
 	btn_save.Importance = widget.SuccessImportance
 
@@ -167,7 +167,7 @@ func homeCreateSettingsTab() *container.Scroll {
 	)
 }
 
-func homeCreateHomeTab() *container.Scroll {
+func homeCreateMainTab() *container.Scroll {
 	var text *canvas.Text = canvas.NewText("V.I.S.O.R. Systems", color.RGBA{
 		R: 34,
 		G: 177,

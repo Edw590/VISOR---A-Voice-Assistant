@@ -93,5 +93,5 @@ func getToken() (*oauth2.Token, error) {
 }
 
 func getModGenSettings() *ModsFileInfo.Mod14GenInfo {
-	return &Utils.GetGenSettings().MOD_14
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14
 }

@@ -103,7 +103,15 @@ func memorizeSession(session_id string) bool {
 		"ONLY *). Format the output as \"* [detail]\". IGNORE specific, temporary events, schedules, or day-to-day " +
 		"plans. Summarize as KEY GENERAL information. If there is nothing, write \"* 3234_NONE\"."
 
-	var response string = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
+	var chatWithGPT_params _ChatWithGPTParams = _ChatWithGPTParams{
+		Device_id:    Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id,
+		User_message: prompt,
+		Session_id:   "temp",
+		Role:         GPTComm.ROLE_USER,
+		More_coming:  false,
+		Model_type:   GPTComm.MODEL_TYPE_TEXT,
+	}
+	var response string = chatWithGPT(chatWithGPT_params)
 
 	var lines []string = strings.Split(response, "\n")
 	for _, line := range lines {
@@ -133,7 +141,15 @@ func summarizeMemories() bool {
 		"Format the output as \"* [detail]\". Write as much as you need. If newer memories contradict old " +
 		"ones, update them. ALL MEMORIES ARE IMPORTANT, EVEN MINOR ONES!!! But again, SUMMARIZE them."
 
-	var response string = chatWithGPT(Utils.GetGenSettings().Device_settings.Id, prompt, "temp", GPTComm.ROLE_USER, false)
+	var chatWithGPT_params _ChatWithGPTParams = _ChatWithGPTParams{
+		Device_id:    Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id,
+		User_message: prompt,
+		Session_id:   "temp",
+		Role:         GPTComm.ROLE_USER,
+		More_coming:  false,
+		Model_type:   GPTComm.MODEL_TYPE_TEXT,
+	}
+	var response string = chatWithGPT(chatWithGPT_params)
 
 	var new_memories []string = nil
 	var lines []string = strings.Split(response, "\n")

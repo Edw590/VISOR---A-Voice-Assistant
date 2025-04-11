@@ -35,39 +35,55 @@ import (
 	"time"
 )
 
-func chatWithGPT(device_id string, user_message string, session_id string, role string, more_coming bool) string {
+// _ChatWithGPTParams is a struct containing the parameters for the chatWithGPT function.
+type _ChatWithGPTParams struct {
+	// Device_id is the ID of the device sending the text
+	Device_id string
+	// Session_id is the session type to use
+	Session_id string
+	// User_message is the message to send to the model
+	User_message string
+	// Role is the role of the message
+	Role string
+	// More_coming is true if more messages are coming and VISOR should wait before calling the LLM
+	More_coming bool
+	// Model_type is the type of model to use
+	Model_type string
+}
+
+func chatWithGPT(params _ChatWithGPTParams) string {
 	setBusyState()
 	defer setReadyState()
 
-	if session_id == "" {
+	if params.Session_id == "" {
 		// Get latest session ID if none is provided
 		var latest_interaction int64 = -1
 		for _, session := range getModGenSettings().Sessions {
 			if session.Last_interaction_s > latest_interaction {
-				session_id = session.Id
+				params.Session_id = session.Id
 				latest_interaction = session.Last_interaction_s
 			}
 		}
 	}
 
-	addSessionEntry(session_id, time.Now().Unix(), user_message)
+	addSessionEntry(params.Session_id, time.Now().Unix(), params.User_message)
 	setBusyState() // Again because chatWithGPT() is called inside addSessionEntry() and will set it to Ready on ending
 
-	var curr_session ModsFileInfo.Session = *getSession(session_id)
+	var curr_session ModsFileInfo.Session = *getSession(params.Session_id)
 	curr_session.Memorized = false
 
-	switch role {
+	switch params.Role {
 		case GPTComm.ROLE_USER:
-			role = "user"
+			params.Role = "user"
 		case GPTComm.ROLE_TOOL:
-			user_message = "As per system request, inform the user that: \"" + user_message + "\"."
+			params.User_message = "As per system request, inform the user that: \"" + params.User_message + "\"."
 			if getModUserInfo().Model_has_tool_role {
-				role = "tool"
+				params.Role = "tool"
 			} else {
-				role = "user"
+				params.Role = "user"
 
-				// Keep the last part. He'll say less random stuff this way.
-				user_message = "[SYSTEM TASK - " + user_message + " NO SAYING YOU'RE REWORDING IT]"
+				// Keep the last part. He'll say less random stuff this way it seems.
+				params.User_message = "[SYSTEM TASK - " + params.User_message + " NO SAYING YOU'RE REWORDING IT]"
 			}
 		default:
 			// Keep the original
@@ -75,18 +91,18 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 
 	// Append user message to history
 	curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
-		Role:        role,
-		Content:     UtilsSWA.RemoveNonGraphicCharsGENERAL(user_message),
+		Role:        params.Role,
+		Content:     UtilsSWA.RemoveNonGraphicCharsGENERAL(params.User_message),
 		Timestamp_s: time.Now().Unix(),
 	})
 
 	var response string = ""
-	if !more_coming {
+	if !params.More_coming {
 		var history_with_system_prompt []ModsFileInfo.OllamaMessage = Utils.CopyOuterSLICES(curr_session.History)
 		var system_prompt string = ""
 		// Add the system prompt every time *temporarily*, so that if it's updated, it's updated in all sessions when
 		// they're used - because it's not stored in any session.
-		if session_id == "dumb" {
+		if params.Session_id == "dumb" {
 			system_prompt = getModUserInfo().System_info + "\n\n" + "You're a voice assistant"
 		} else {
 			var visor_intro, visor_memories string = getVisorIntroAndMemories()
@@ -113,9 +129,11 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		//	}
 		//}
 
+		model_name, device_id_with_model := getModelName(params.Model_type)
+
 		// Create payload
 		var ollama_request ModsFileInfo.OllamaChatRequest = ModsFileInfo.OllamaChatRequest{
-			Model:    getModUserInfo().Model_name,
+			Model:    model_name,
 			Messages: history_with_system_prompt,
 			Options: ModsFileInfo.OllamaOptions{
 				Num_keep:    99999999,
@@ -127,38 +145,24 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 			//Tools: tools,
 		}
 
-		jsonData, err := json.Marshal(ollama_request)
+		request_json, err := json.Marshal(ollama_request)
 		if err != nil {
 			log.Println("Error marshalling JSON: ", err)
 
 			return ""
 		}
 
-		log.Println("Posting to Ollama: ", string(jsonData))
-
-		resp, err := http.Post("http://" + getModUserInfo().Server_url + "/api/chat", "application/json; charset=utf-8",
-			bytes.NewBuffer(jsonData))
-		if err != nil {
-			log.Println("Error posting to Ollama: ", err)
-
-			// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the
-			// STOPPING one (they check every second).
-			time.Sleep(2 * time.Second)
-
-			// Ollama stopped running, so stop the module
-			*module_stop_GL = true
-
+		response_str, timestamp := sendReceiveOllamaRequest(params.Device_id, request_json, device_id_with_model)
+		if timestamp == -1 {
 			return ""
 		}
-		defer resp.Body.Close()
 
-		response_str, timestamp := readGPT(device_id, resp, true)
 		response = response_str
 		if response != "" {
 			response = response[:len(response)-1] // Remove the last character, which is a null character
 		}
 
-		if session_id != "temp" && session_id != "dumb" {
+		if params.Session_id != "temp" && params.Session_id != "dumb" {
 			curr_session.History = append(curr_session.History, ModsFileInfo.OllamaMessage{
 				Role:        "assistant",
 				Content:     response,
@@ -168,10 +172,10 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 		}
 	}
 
-	if session_id != "temp" && session_id != "dumb" {
+	if params.Session_id != "temp" && params.Session_id != "dumb" {
 		// Save the session unless it's to use the temp or dumb sessions
 		for i, session := range getModGenSettings().Sessions {
-			if session.Id == session_id {
+			if session.Id == params.Session_id {
 				getModGenSettings().Sessions[i] = curr_session
 
 				break
@@ -182,20 +186,58 @@ func chatWithGPT(device_id string, user_message string, session_id string, role 
 	return response
 }
 
-func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
-	var writing_to_self bool = device_id == Utils.GetGenSettings().Device_settings.Id
+func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_with_model string) (string, int64) {
+	if device_id_with_model == Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id {
+		log.Println("Posting to Ollama locally: ", string(request_json))
 
+		resp, err := http.Post("http://localhost:11434/api/chat", "application/json; charset=utf-8",
+			bytes.NewBuffer(request_json))
+		if err != nil {
+			log.Println("Error posting to Ollama: ", err)
+
+			// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the
+			// STOPPING one (they check every second).
+			time.Sleep(2 * time.Second)
+
+			// Ollama stopped running, so stop the module
+			*module_stop_GL = true
+
+			return "", -1
+		}
+		defer resp.Body.Close()
+
+		return readGPT(device_id, resp, true)
+	} else {
+		log.Println("Posting to Ollama on \"" + device_id_with_model + "\": ", string(request_json))
+
+		var message []byte = []byte(device_id_with_model + "|M_7_0|")
+		message = append(message, Utils.CompressString(device_id + "|" + string(request_json))...)
+		Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", message)
+	}
+
+	return "", -1
+}
+
+func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
 	var timestamp_s int64 = -1
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
-	if !writing_to_self {
-		reduceGptTextTxt(gpt_text_txt)
-		_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
-	}
+	// Default is false because the client can generate text to itself (if it's true it will ignore the text - not
+	// good), but it goes to the server before returning to the client.
+	var writing_to_self bool = false
+	if Utils.VISOR_server_GL {
+		writing_to_self = device_id == Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
+		if !writing_to_self {
+			reduceGptTextTxt(gpt_text_txt)
+			_ = gpt_text_txt.WriteTextFile(getStartString(device_id), true)
+		}
 
-	// Send a message to LIB_2 saying the GPT just started writing
-	Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id + "|L_2_0|start"))
+		// Send a message to LIB_2 saying the GPT just started writing
+		Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id + "|L_2_0|start"))
+	} else {
+		sendToServer(getStartString(device_id))
+	}
 
 	// Use a JSON decoder to handle the streamed response
 	var decoder *json.Decoder = json.NewDecoder(http_response.Body)
@@ -242,9 +284,9 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 				if !writing_to_self {
 					// Meaning: new word written
 					if one_byte_str == "\000" {
-						_ = gpt_text_txt.WriteTextFile(last_word, true)
+						sendWriteText(last_word)
 					} else {
-						_ = gpt_text_txt.WriteTextFile(last_word + one_byte_str, true)
+						sendWriteText(last_word + one_byte_str)
 					}
 				}
 
@@ -272,7 +314,7 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	}
 
 	if !writing_to_self {
-		_ = gpt_text_txt.WriteTextFile("\n" + getEndString(), true)
+		sendWriteText(getEndString())
 	}
 
 	return message, timestamp_s
@@ -309,4 +351,21 @@ func getSession(session_id string) *ModsFileInfo.Session {
 	})
 
 	return &getModGenSettings().Sessions[len(getModGenSettings().Sessions)-1]
+}
+
+func sendWriteText(text string) {
+	if Utils.VISOR_server_GL {
+		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+		_ = gpt_text_txt.WriteTextFile(text, true)
+	} else {
+		sendToServer(text)
+	}
+}
+
+func sendToServer(text string) {
+	var message []byte = []byte("GPT|[redirect]")
+	message = append(message, Utils.CompressString(text)...)
+	if !Utils.QueueNoResponseMessageSERVER(message) {
+		log.Println("Error sending message to server: ", text)
+	}
 }

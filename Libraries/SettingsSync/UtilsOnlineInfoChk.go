@@ -35,7 +35,7 @@ GetTempLocsOIC returns the locations to get the weather from, from the user sett
   - the locations separated by "\n"
  */
 func GetTempLocsOIC() string {
-	return strings.Join(Utils.GetUserSettings().OnlineInfoChk.Temp_locs, "\n")
+	return strings.Join(Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.Temp_locs, "\n")
 }
 
 /*
@@ -47,7 +47,7 @@ SetTempLocsOIC sets the locations to get the weather from, in the user settings.
   - locs – the locations separated by "\n"
  */
 func SetTempLocsOIC(locs string) {
-	Utils.GetUserSettings().OnlineInfoChk.Temp_locs = strings.Split(locs, "\n")
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.Temp_locs = strings.Split(locs, "\n")
 }
 
 /*
@@ -59,7 +59,7 @@ GetNewsLocsOIC returns the locations to get the news from, from the user setting
   - the locations separated by "\n"
  */
 func GetNewsLocsOIC() string {
-	return strings.Join(Utils.GetUserSettings().OnlineInfoChk.News_locs, "\n")
+	return strings.Join(Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.News_locs, "\n")
 }
 
 /*
@@ -71,5 +71,5 @@ SetNewsLocsOIC sets the locations to get the news from, in the user settings.
   - locs – the locations separated by "\n"
  */
 func SetNewsLocsOIC(locs string) {
-	Utils.GetUserSettings().OnlineInfoChk.News_locs = strings.Split(locs, "\n")
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.News_locs = strings.Split(locs, "\n")
 }

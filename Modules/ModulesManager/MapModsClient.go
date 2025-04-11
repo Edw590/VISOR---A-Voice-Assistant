@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +25,7 @@ package ModulesManager
 
 import (
 	CommandsExecutor "CmdsExecutor"
+	"GPTCommunicator"
 	"Speech"
 	"SpeechRecognition"
 	"SystemChecker"
@@ -36,6 +37,7 @@ import (
 // Make sure to add the modules support check for each new module too...
 var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
 	Utils.NUM_MOD_Speech:            Speech.Start,
+	Utils.NUM_MOD_GPTCommunicator:   GPTCommunicator.Start,
 	Utils.NUM_MOD_TasksExecutor:     TasksExecutor.Start,
 	Utils.NUM_MOD_SystemChecker:     SystemChecker.Start,
 	Utils.NUM_MOD_SpeechRecognition: SpeechRecognition.Start,

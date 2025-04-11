@@ -163,7 +163,7 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 	}
 
 	var weather OpenMeteoWeather
-	err = Utils.FromJsonGENERAL([]byte(source), &weather)
+	err = Utils.FromJsonGENERAL(source, &weather)
 	if err != nil {
 		return ModsFileInfo.Weather{}, err
 	}
@@ -185,7 +185,7 @@ func findWeather(location string, latitude float32, longitude float32) (ModsFile
 	if err != nil {
 		status = "ERROR"
 	} else {
-		status = strings.TrimSpace(source)
+		status = strings.TrimSpace(string(source))
 	}
 
 	return ModsFileInfo.Weather{

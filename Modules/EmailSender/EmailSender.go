@@ -136,5 +136,5 @@ func reachedMaxEmailsHour() bool {
 }
 
 func getModGenSettings() *ModsFileInfo.Mod5GenInfo {
-	return &Utils.GetGenSettings().MOD_5
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_5
 }

@@ -82,7 +82,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	for {
-		for _, feedInfo := range Utils.GetUserSettings().RSSFeedNotifier.Feeds_info {
+		for _, feedInfo := range Utils.GetUserSettings(Utils.LOCK_UNLOCK).RSSFeedNotifier.Feeds_info {
 			if !feedInfo.Enabled {
 				continue
 			}
@@ -324,7 +324,7 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 
 	err := Utils.QueueEmailEMAIL(Utils.EmailInfo{
 		Sender:  sender_name,
-		Mail_to: Utils.GetUserSettings().General.User_email_addr,
+		Mail_to: Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.User_email_addr,
 		Subject: subject,
 		Html:    html,
 		Multiparts: nil,
@@ -337,5 +337,5 @@ func queueEmailAllRecps(sender_name string, subject string, html string) bool {
 }
 
 func getModGenSettings() *ModsFileInfo.Mod4GenInfo {
-	return &Utils.GetGenSettings().MOD_4
+	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_4
 }

@@ -41,24 +41,28 @@ AddDiskSMART adds a disk to the user settings.
   - true if the disk was added, false if the ID already exists
  */
 func AddDiskSMART(id string, enabled bool, label string, is_hdd bool) bool {
-	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.GetUserSettings().SMARTChecker.Disks_info
-	for _, disk_info := range *disks_info {
+	var disks_info []ModsFileInfo.DiskInfo =
+		Utils.CopyOuterSLICES(Utils.GetUserSettings(Utils.ONLY_LOCK).SMARTChecker.Disks_info)
+	for _, disk_info := range disks_info {
 		if disk_info.Id == id {
 			return false
 		}
 	}
 
 	// Add the disk to the user settings
-	*disks_info = append(*disks_info, ModsFileInfo.DiskInfo{
+	disks_info = append(disks_info, ModsFileInfo.DiskInfo{
 		Id:      id,
 		Enabled: enabled,
 		Label:   label,
 		Is_HDD:  is_hdd,
 	})
 
-	sort.SliceStable(*disks_info, func(i, j int) bool {
-		return (*disks_info)[i].Label < (*disks_info)[j].Label
+	sort.SliceStable(disks_info, func(i, j int) bool {
+		return (disks_info)[i].Label < (disks_info)[j].Label
 	})
+
+	// Update the user settings
+	Utils.GetUserSettings(Utils.ONLY_UNLOCK).SMARTChecker.Disks_info = disks_info
 
 	return true
 }
@@ -72,14 +76,18 @@ RemoveDiskSMART removes a disk from the user settings.
   - id – the disk serial number
  */
 func RemoveDiskSMART(id string) {
-	var disks_info *[]ModsFileInfo.DiskInfo = &Utils.GetUserSettings().SMARTChecker.Disks_info
-	for i := range *disks_info {
-		if (*disks_info)[i].Id == id {
-			Utils.DelElemSLICES(disks_info, i)
+	var disks_info []ModsFileInfo.DiskInfo =
+		Utils.CopyOuterSLICES(Utils.GetUserSettings(Utils.ONLY_LOCK).SMARTChecker.Disks_info)
+	for i := range disks_info {
+		if disks_info[i].Id == id {
+			Utils.DelElemSLICES(&disks_info, i)
 
 			break
 		}
 	}
+
+	// Update the user settings
+	Utils.GetUserSettings(Utils.ONLY_UNLOCK).SMARTChecker.Disks_info = disks_info
 }
 
 /*
@@ -92,7 +100,7 @@ GetIdsListSMART returns a list of all disks' IDs.
  */
 func GetIdsListSMART() string {
 	var ids_list string = ""
-	for _, disk_info := range Utils.GetUserSettings().SMARTChecker.Disks_info {
+	for _, disk_info := range Utils.GetUserSettings(Utils.LOCK_UNLOCK).SMARTChecker.Disks_info {
 		ids_list += disk_info.Id + "|"
 	}
 	ids_list = ids_list[:len(ids_list)-1]
@@ -112,7 +120,7 @@ GetDiskSMART returns a disk by its ID.
   - the disk or nil if the disk was not found
  */
 func GetDiskSMART(id string) *ModsFileInfo.DiskInfo {
-	var disks_info []ModsFileInfo.DiskInfo = Utils.GetUserSettings().SMARTChecker.Disks_info
+	var disks_info []ModsFileInfo.DiskInfo = Utils.GetUserSettings(Utils.LOCK_UNLOCK).SMARTChecker.Disks_info
 	for i := range disks_info {
 		var disk_info *ModsFileInfo.DiskInfo = &disks_info[i]
 		if disk_info.Id == id {

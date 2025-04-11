@@ -50,16 +50,16 @@ func onlineInfoChkCreateSettingsTab() *container.Scroll {
 	entry_weather_locs.SetPlaceHolder("The weather locations to check, one per line in the format: " +
 		"\"City: latitude, longitude\"")
 	entry_weather_locs.SetMinRowsVisible(3)
-	entry_weather_locs.SetText(strings.Join(Utils.GetUserSettings().OnlineInfoChk.Temp_locs, "\n"))
+	entry_weather_locs.SetText(strings.Join(Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.Temp_locs, "\n"))
 
 	var entry_news_locs *widget.Entry = widget.NewMultiLineEntry()
 	entry_news_locs.SetPlaceHolder("The news locations to check, one per line")
 	entry_news_locs.SetMinRowsVisible(3)
-	entry_news_locs.SetText(strings.Join(Utils.GetUserSettings().OnlineInfoChk.News_locs, "\n"))
+	entry_news_locs.SetText(strings.Join(Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.News_locs, "\n"))
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings().OnlineInfoChk.Temp_locs = strings.Split(entry_weather_locs.Text, "\n")
-		Utils.GetUserSettings().OnlineInfoChk.News_locs = strings.Split(entry_news_locs.Text, "\n")
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.Temp_locs = strings.Split(entry_weather_locs.Text, "\n")
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).OnlineInfoChk.News_locs = strings.Split(entry_news_locs.Text, "\n")
 	})
 	btn_save.Importance = widget.SuccessImportance
 

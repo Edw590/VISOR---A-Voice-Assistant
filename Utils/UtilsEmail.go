@@ -133,7 +133,7 @@ func GetModelFileEMAIL(file_name string, things_replace map[string]string) Email
 
 	return EmailInfo{
 		Sender:     sender,
-		Mail_to:    GetUserSettings().General.User_email_addr,
+		Mail_to:    GetUserSettings(LOCK_UNLOCK).General.User_email_addr,
 		Subject:    "",
 		Html:       msg_html,
 		Multiparts: nil,
@@ -313,12 +313,12 @@ func getCurlStringEMAIL(mail_to string, emergency_email bool) string {
 		timeout = "100000"
 	}
 
-	if GetUserSettings().General.VISOR_email_addr == "" || GetUserSettings().General.VISOR_email_pw == "" {
+	if GetUserSettings(LOCK_UNLOCK).General.VISOR_email_addr == "" || GetUserSettings(LOCK_UNLOCK).General.VISOR_email_pw == "" {
 		return "echo \"No email address or password set\""
 	}
 
 	return "curl{{EXE}} --location --connect-timeout " + timeout + " --verbose \"smtp://smtp.gmail.com:587\" --user \"" +
-		GetUserSettings().General.VISOR_email_addr + ":" + GetUserSettings().General.VISOR_email_pw +
+		GetUserSettings(LOCK_UNLOCK).General.VISOR_email_addr + ":" + GetUserSettings(LOCK_UNLOCK).General.VISOR_email_pw +
 		"\" --mail-rcpt \"" + mail_to + "\" --upload-file \"" +
 		getModTempDirMODULES(NUM_MOD_EmailSender).Add2(false, _TEMP_EML_FILE).GPathToStringConversion() + "\" --ssl-reqd"
 }

@@ -39,22 +39,22 @@ MakeGetRequest makes a GET request to the given URL and returns the response bod
   - the response body as a string
   - an error if the request fails or the response status is not OK
  */
-func MakeGetRequest(url string) (string, error) {
+func MakeGetRequest(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("response not OK: " + resp.Status)
+		return nil, errors.New("response not OK: " + resp.Status)
 	}
 
 	//We Read the response body on the line below.
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	return string(body), nil
+	return body, nil
 }

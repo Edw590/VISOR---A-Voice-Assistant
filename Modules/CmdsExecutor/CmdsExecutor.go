@@ -325,9 +325,9 @@ const _SESSION_TYPE_NONE string = "NONE"
 func speakInternal(txt_to_speak string, speech_priority int32, mode int32, session_type string, wait_for_gpt bool) {
 	if session_type != _SESSION_TYPE_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
 				Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt ||
-				GPTComm.SendText("", "", "", false) == ModsFileInfo.MOD_7_STATE_READY) {
+				GPTComm.SendText("", "", "", false, GPTComm.MODEL_TYPE_TEXT) == ModsFileInfo.MOD_7_STATE_READY) {
 		var speak string = ""
-		switch GPTComm.SendText(txt_to_speak, session_type, GPTComm.ROLE_TOOL, false) {
+		switch GPTComm.SendText(txt_to_speak, session_type, GPTComm.ROLE_TOOL, false, GPTComm.MODEL_TYPE_TEXT) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -354,7 +354,7 @@ func sendToGPT(txt_to_send string) {
 	}
 
 	var speak string = ""
-	switch GPTComm.SendText(txt_to_send, GPTComm.SESSION_TYPE_ACTIVE, GPTComm.ROLE_USER, false) {
+	switch GPTComm.SendText(txt_to_send, GPTComm.SESSION_TYPE_ACTIVE, GPTComm.ROLE_USER, false, GPTComm.MODEL_TYPE_TEXT) {
 		case ModsFileInfo.MOD_7_STATE_STOPPED:
 			speak = "The GPT is stopped. Text on hold."
 		case ModsFileInfo.MOD_7_STATE_STARTING:

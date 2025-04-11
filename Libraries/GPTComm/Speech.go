@@ -96,7 +96,7 @@ func GetNextSpeechSentence() string {
 
 		var entry *_Entry = getEntry(-1, -1)
 		var device_id string = entry.getDeviceID()
-		if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.GetGenSettings().Device_settings.Id ||
+		if entry.getTime() >= time_begin_ms_GL && (device_id == Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id ||
 				device_id == ALL_DEVICES_ID) {
 			curr_entry_time_ms_GL = entry.getTime()
 			if curr_entry_time_ms_GL != 1 {

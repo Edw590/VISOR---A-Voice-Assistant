@@ -72,7 +72,7 @@ func SyncUserSettings() {
 
 					var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
 
-					_ = Utils.FromJsonGENERAL(json, Utils.GetUserSettings())
+					_ = Utils.FromJsonGENERAL(json, Utils.GetUserSettings(Utils.LOCK_UNLOCK))
 					last_user_settings_json = GetJsonUserSettings()
 				}
 			}
@@ -123,7 +123,7 @@ GetUserSettings returns the user settings in JSON format.
   - the user settings in JSON format
  */
 func GetJsonUserSettings() string {
-	return *Utils.ToJsonGENERAL(*Utils.GetUserSettings())
+	return *Utils.ToJsonGENERAL(*Utils.GetUserSettings(Utils.LOCK_UNLOCK))
 }
 
 /*
@@ -142,9 +142,12 @@ func LoadUserSettings(json string) error {
 		return errors.New("empty JSON string")
 	}
 
-	if err := Utils.FromJsonGENERAL([]byte(json), Utils.GetUserSettings()); err != nil {
+	var user_settings Utils.UserSettings
+	if err := Utils.FromJsonGENERAL([]byte(json), &user_settings); err != nil {
 		return err
 	}
+
+	*Utils.GetUserSettings(Utils.LOCK_UNLOCK) = user_settings
 
 	return nil
 }
@@ -158,7 +161,7 @@ IsWebsiteInfoEmpty returns true if the website domain and password are empty, fa
   - true if the website domain and password are empty, false otherwise
  */
 func IsWebsiteInfoEmpty() bool {
-	return Utils.GetUserSettings().General.Website_domain == "" && Utils.GetUserSettings().General.Website_pw == ""
+	return Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain == "" && Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw == ""
 }
 
 /*
@@ -171,6 +174,6 @@ SetWebsiteInfo sets the website domain and password.
   - website_password – the password for the VISOR website
  */
 func SetWebsiteInfo(website_domain string, website_password string) {
-	Utils.GetUserSettings().General.Website_domain = website_domain
-	Utils.GetUserSettings().General.Website_pw = website_password
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain = website_domain
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw = website_password
 }

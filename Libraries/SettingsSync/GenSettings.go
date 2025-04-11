@@ -32,7 +32,7 @@ GetJsonGenSettings returns the generated settings in JSON format.
   - the generated settings in JSON format
  */
 func GetJsonGenSettings() string {
-	return *Utils.ToJsonGENERAL(*Utils.GetGenSettings())
+	return *Utils.ToJsonGENERAL(*Utils.GetGenSettings(Utils.LOCK_UNLOCK))
 }
 
 /*
@@ -51,9 +51,12 @@ func LoadGenSettings(json string) bool {
 		return false
 	}
 
-	if err := Utils.FromJsonGENERAL([]byte(json), Utils.GetGenSettings()); err != nil {
+	var gen_settings Utils.GenSettings
+	if err := Utils.FromJsonGENERAL([]byte(json), &gen_settings); err != nil {
 		return false
 	}
+
+	*Utils.GetGenSettings(Utils.LOCK_UNLOCK) = gen_settings
 
 	return true
 }
@@ -69,7 +72,7 @@ SetDeviceSettings sets the device settings.
   - description – the device description
  */
 func SetDeviceSettings(id string, type_ string, description string) {
-	Utils.GetGenSettings().Device_settings.Id = id
-	Utils.GetGenSettings().Device_settings.Type_ = type_
-	Utils.GetGenSettings().Device_settings.Description = description
+	Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id = id
+	Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Type_ = type_
+	Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Description = description
 }
