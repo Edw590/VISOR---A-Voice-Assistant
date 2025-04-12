@@ -245,9 +245,6 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 	var decoder *json.Decoder = json.NewDecoder(http_response.Body)
 
 	var message string = ""
-	var last_word string = ""
-	var save_words bool = true
-	var curr_idx int = 0
 	for {
 		if *module_stop_GL || checkStopSpeech() {
 			// Closing the connection makes Ollama stop generating the response
@@ -262,56 +259,20 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 
 		var response ModsFileInfo.OllamaChatResponse
 		if err := decoder.Decode(&response); err == nil {
-			message += response.Message.Content
+			var content string = response.Message.Content
+			message += content
+			if !writing_to_self {
+				sendWriteText(content)
+			}
+			if print {
+				fmt.Print(content)
+			}
 		} else {
-			message += "\000"
+			break
 		}
 
 		if timestamp_s == -1 {
 			timestamp_s = time.Now().Unix()
-		}
-
-		for {
-			if curr_idx >= len(message) {
-				break
-			}
-
-			var one_byte_str string = string(message[curr_idx])
-
-			if print {
-				fmt.Print(one_byte_str)
-			}
-
-			if one_byte_str == " " || one_byte_str == "\n" || one_byte_str == "\000" {
-				if !writing_to_self {
-					// Meaning: new word written
-					if one_byte_str == "\000" {
-						sendWriteText(last_word)
-					} else {
-						sendWriteText(last_word + one_byte_str)
-					}
-				}
-
-				last_word = ""
-			} else {
-				// VISOR may start by writing the current date and time like "[date and time here]" - this below cuts
-				// that out of the answer.
-				//if last_word == "" {
-				//	if one_byte_str == "[" {
-				//		save_words = false
-				//	} else if one_byte_str == "]" {
-				//		save_words = true
-				//
-				//		continue
-				//	}
-				//}
-
-				if save_words {
-					last_word += one_byte_str
-				}
-			}
-
-			curr_idx++
 		}
 	}
 
