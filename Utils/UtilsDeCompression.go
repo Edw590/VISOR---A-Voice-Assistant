@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,24 +28,24 @@ import (
 )
 
 /*
-CompressString compresses a string.
+CompressBytes compresses bytes.
 
 -----------------------------------------------------------
 
 – Params:
-  - to_compress – the string to compress
+  - to_compress – the bytes to compress
 
 – Returns:
-  - the compressed string or nil if an error occurred
+  - the compressed bytes or nil if an error occurred
 */
-func CompressString(to_compress string) []byte {
+func CompressBytes(to_compress []byte) []byte {
 	var buffer bytes.Buffer
 
 	writer := brotli.NewWriterLevel(&buffer, brotli.BestCompression)
 
 	// Reset the compressor and encode from some input stream.
 	writer.Reset(&buffer)
-	if _, err := io.WriteString(writer, to_compress); err != nil {
+	if _, err := writer.Write(to_compress); err != nil {
 		return nil
 	}
 	if err := writer.Close(); err != nil {
@@ -56,23 +56,23 @@ func CompressString(to_compress string) []byte {
 }
 
 /*
-DecompressString decompresses a string.
+DecompressBytes decompresses bytes.
 
 -----------------------------------------------------------
 
 – Params:
-  - to_decompress – the string to decompress
+  - to_decompress – the bytes to decompress
 
 – Returns:
-  - the decompressed string or an empty string if an error occurred
+  - the decompressed bytes or nil if an error occurred
 */
-func DecompressString(to_decompress []byte) string {
+func DecompressBytes(to_decompress []byte) []byte {
 	reader := brotli.NewReader(bytes.NewReader(to_decompress))
 
 	var buffer bytes.Buffer
 	if _, err := io.Copy(&buffer, reader); err != nil {
-		return ""
+		return nil
 	}
 
-	return buffer.String()
+	return buffer.Bytes()
 }

@@ -161,6 +161,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		return err
 	}
 
+	// Sender
 	go func() {
 		for {
 			select {
@@ -198,6 +199,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	// Receiver
 	var first_message bool = true
 	for {
 		// Read message from WebSocket
@@ -211,6 +213,8 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		if message_type != websocket.BinaryMessage {
 			continue
 		}
+		message = Utils.DecompressBytes(message)
+
 		if first_message {
 			first_message = false
 
@@ -247,10 +251,11 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
+			response = Utils.CompressBytes(response)
 
 			if err = sendData(websocket.BinaryMessage, response); err == nil {
-				log.Printf("Message sent 1. Length: %d; CRC16: %d; Content: %s", len(response),
-					CRC16.Result(response, "CCIT_ZERO"), response[:strings.Index(string(response), "|")])
+				log.Printf("Message sent 1. Length: %d; CRC16: %d; To: %s", len(response),
+					CRC16.Result(response, "CCIT_ZERO"), msg_to)
 			} else {
 				log.Println("Write error:", err)
 
@@ -277,16 +282,16 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			return bytes
 		case "Email":
 			// Send an email.
-			// Example: "email_to@gmail.com|a compressed EML file"
+			// Example: "email_to@gmail.com|an EML file"
 			// Returns: nothing
 			_ = Utils.QueueEmailEMAIL(Utils.EmailInfo{
 				Mail_to: strings.Split(string(bytes), "|")[0],
-				Eml:     Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:]),
+				Eml:     string(bytes[strings.Index(string(bytes), "|") + 1:]),
 			})
 		case "File":
 			// Get a file from the website.
 			// Example: "true to get CRC16 checksum, false to get file contents|partial_path"
-			// Returns: a CRC16 checksum or a compressed file
+			// Returns: a CRC16 checksum or a file
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var get_crc16 bool = bytes_split[0] == "true"
 			var partial_path string = bytes_split[1]
@@ -301,19 +306,19 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			if get_crc16 {
 				return getCRC16([]byte(*p_file_contents))
 			} else {
-				return Utils.CompressString(*p_file_contents)
+				return []byte(*p_file_contents)
 			}
 		case "GPT":
 			// Send a text to be processed by the GPT model or redirected to the right client.
-			// Example: "["process", "redirect" or "models"]in case of processing, a compressed string or nil to just
-			// get the return value; in case of redirecting and models, a compressed string"
+			// Example: "["process", "redirect" or "models"]in case of processing, a string or nil to just
+			// get the return value; in case of redirecting and models, a string"
 			// Returns: in case of processing, "true" if the text will be processed immediately, "false" if the GPT is
 			// busy for now and the text will wait; in case of redirecting and models, nothing
 			var bytes_str string = string(bytes)
 			var params_split []string = strings.Split(bytes_str[1:strings.Index(bytes_str, "]")], "|")
 			var action string = params_split[0]
 
-			var str string = Utils.DecompressString(bytes[strings.Index(bytes_str, "]")+1:])
+			var str string = string(bytes[strings.Index(bytes_str, "]")+1:])
 
 			switch action {
 				case "process":
@@ -338,7 +343,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			// Get settings.
 			// Example: "true to get file contents, false to get CRC16 checksum|one of the strings below"
 			// Allowed strings: one of the ones on the switch statement
-			// Returns: the user settings in JSON format compressed
+			// Returns: the user settings in JSON format
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var get_json bool = bytes_split[0] == "true"
 			var json_origin string = bytes_split[1]
@@ -366,18 +371,18 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					log.Println("Invalid JSON origin:", json_origin)
 			}
 			if get_json {
-				return Utils.CompressString(settings)
+				return []byte(settings)
 			} else {
 				return getCRC16([]byte(settings))
 			}
 		case "S_S":
 			// Set settings.
-			// Example: "one of the strings below|a compressed JSON string"
+			// Example: "one of the strings below|a JSON string"
 			// Allowed strings: one of the ones on the switch statement
 			// Returns: nothing
 			var bytes_split []string = strings.Split(string(bytes), "|")
 			var origin string = bytes_split[0]
-			var settings string = Utils.DecompressString(bytes[strings.Index(string(bytes), "|") + 1:])
+			var settings string = string(bytes[strings.Index(string(bytes), "|")+1:])
 			switch origin {
 				case "US":
 					var user_settings Utils.UserSettings

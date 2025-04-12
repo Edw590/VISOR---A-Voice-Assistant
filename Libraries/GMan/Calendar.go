@@ -37,7 +37,7 @@ func getEvents() {
 		return
 	}
 
-	var json_bytes []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+	var json_bytes []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
 	if err := Utils.FromJsonGENERAL(json_bytes, &events_GL); err != nil {
 		return

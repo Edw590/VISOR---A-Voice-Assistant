@@ -39,7 +39,7 @@ SetToken sets the token for the Google Manager.
 func SetToken(token *oauth2.Token) {
 	var message []byte = []byte("S_S|GManTok|")
 	token_bytes, _ := json.Marshal(token)
-	message = append(message, Utils.CompressString(string(token_bytes))...)
+	message = append(message, token_bytes...)
 	Utils.QueueNoResponseMessageSERVER(message)
 }
 
@@ -60,7 +60,7 @@ func IsTokenValid() bool {
 		return false
 	}
 
-	var response []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
 	ret, err := strconv.ParseBool(string(response))
 	if err != nil {

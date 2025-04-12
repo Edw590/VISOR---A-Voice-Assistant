@@ -51,7 +51,7 @@ func SyncUserSettings() {
 				last_user_settings_json = new_user_settings_json
 
 				var message []byte = []byte("S_S|US|")
-				message = append(message, Utils.CompressString(last_user_settings_json)...)
+				message = append(message, last_user_settings_json...)
 				Utils.QueueNoResponseMessageSERVER(message)
 			} else {
 				var get_settings bool = false
@@ -70,7 +70,7 @@ func SyncUserSettings() {
 						return
 					}
 
-					var json []byte = []byte(Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)))
+					var json []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
 					_ = Utils.FromJsonGENERAL(json, Utils.GetUserSettings(Utils.LOCK_UNLOCK))
 					last_user_settings_json = GetJsonUserSettings()

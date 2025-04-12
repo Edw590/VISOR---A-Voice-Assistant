@@ -110,6 +110,7 @@ func startCommunicatorInternalSERVER() {
 	}
 	defer conn.Close()
 
+	// Receiver
 	go func() {
 		routines_working[0] = true
 		for {
@@ -125,12 +126,14 @@ func startCommunicatorInternalSERVER() {
 			if message_type != websocket.BinaryMessage {
 				continue
 			}
+			message = DecompressBytes(message)
 
-			var msg_to string = strings.Split(string(message), "|")[0]
-			var index_bar int = strings.Index(string(message), "|")
+			var message_str string = string(message)
+			var msg_to string = strings.Split(message_str, "|")[0]
+			var index_bar int = strings.Index(message_str, "|")
 			var truncated_msg []byte = message[index_bar+1:]
 
-			log.Println("Received message:", string(message[:index_bar]))
+			log.Println("Received message:", message_str[:index_bar])
 
 			if msg_to == "G" {
 				if !srvComm_stopping_GL {
@@ -165,6 +168,7 @@ func startCommunicatorInternalSERVER() {
 		routines_working[0] = false
 	}()
 
+	// Sender
 	go func() {
 		var first_message bool = true
 		routines_working[1] = true
@@ -180,7 +184,7 @@ func startCommunicatorInternalSERVER() {
 				}
 			}
 
-			err = conn.WriteMessage(websocket.BinaryMessage, message)
+			err = conn.WriteMessage(websocket.BinaryMessage, CompressBytes(message))
 			if err != nil {
 				//log.Println("Write error:", err)
 				stop = true
@@ -189,7 +193,7 @@ func startCommunicatorInternalSERVER() {
 
 				break
 			}
-			//log.Printf("Sent message: %s", message)
+			//log.Println("Sent message:", string(message))
 		}
 		routines_working[1] = false
 	}()

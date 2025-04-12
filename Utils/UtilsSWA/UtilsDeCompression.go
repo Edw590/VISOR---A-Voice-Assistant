@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,31 +26,31 @@ import (
 )
 
 /*
-CompressString compresses a string.
+CompressBytes compresses bytes.
 
 -----------------------------------------------------------
 
 – Params:
-	- to_compress – the string to compress
+	- to_compress – the bytes to compress
 
 – Returns:
-	- the compressed string or nil if an error occurred
+	- the compressed bytes or nil if an error occurred
 */
-func CompressString(to_compress string) []byte {
-	return Utils.CompressString(to_compress)
+func CompressBytes(to_compress []byte) []byte {
+	return Utils.CompressBytes(to_compress)
 }
 
 /*
-DecompressString decompresses a string.
+DecompressBytes decompresses bytes.
 
 -----------------------------------------------------------
 
 – Params:
-	- to_decompress – the string to decompress
+	- to_decompress – the bytes to decompress
 
 – Returns:
-	- the decompressed string or an empty string if an error occurred
+	- the decompressed bytes or nil if an error occurred
 */
-func DecompressString(to_decompress []byte) string {
-	return Utils.DecompressString(to_decompress)
+func DecompressBytes(to_decompress []byte) []byte {
+	return Utils.DecompressBytes(to_decompress)
 }

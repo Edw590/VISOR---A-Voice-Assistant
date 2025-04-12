@@ -59,8 +59,8 @@ func SendText(text string, session_type string, role string, more_coming bool, m
 		if role == ROLE_USER {
 			new_text = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
 		}
-		message = append(message, Utils.CompressString("[" + Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id + "|" +
-			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "|" + model_type + "]" + new_text)...)
+		message = append(message, "[" + Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id + "|" +
+			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "|" + model_type + "]" + new_text...)
 	}
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message) {
 		return -1
@@ -115,9 +115,7 @@ func GetMemories() string {
 		return ""
 	}
 
-	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-
-	var json_bytes []byte = []byte(Utils.DecompressString(response))
+	var json_bytes []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
 	var memories []string
 	if err := Utils.FromJsonGENERAL(json_bytes, &memories); err != nil {
@@ -139,7 +137,7 @@ func SetMemories(memories_str string) {
 	var memories []string = strings.Split(memories_str, "\n")
 
 	var message []byte = []byte("S_S|GPTMem|")
-	message = append(message, Utils.CompressString(*Utils.ToJsonGENERAL(memories))...)
+	message = append(message, *Utils.ToJsonGENERAL(memories)...)
 	Utils.QueueNoResponseMessageSERVER(message)
 }
 
@@ -183,7 +181,7 @@ func getEntry(time int64, num int) *_Entry {
 		}
 	}
 
-	var file_contents string = Utils.DecompressString(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte))
+	var file_contents string = string(comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte))
 	if file_contents == "" {
 		return &_Entry{
 			device_id: "",

@@ -211,7 +211,7 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 		log.Println("Posting to Ollama on \"" + device_id_with_model + "\": ", string(request_json))
 
 		var message []byte = []byte(device_id_with_model + "|M_7_0|")
-		message = append(message, Utils.CompressString(device_id + "|" + string(request_json))...)
+		message = append(message, device_id + "|" + string(request_json)...)
 		Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", message)
 	}
 
@@ -364,7 +364,7 @@ func sendWriteText(text string) {
 
 func sendToServer(text string) {
 	var message []byte = []byte("GPT|[redirect]")
-	message = append(message, Utils.CompressString(text)...)
+	message = append(message, text...)
 	if !Utils.QueueNoResponseMessageSERVER(message) {
 		log.Println("Error sending message to server: ", text)
 	}

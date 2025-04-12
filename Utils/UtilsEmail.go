@@ -180,7 +180,7 @@ func QueueEmailEMAIL(emailInfo EmailInfo) error {
 		}
 	} else {
 		var message []byte = []byte("Email|" + emailInfo.Mail_to + "|")
-		message = append(message, CompressString(message_eml)...)
+		message = append(message, message_eml...)
 		QueueNoResponseMessageSERVER(message)
 
 		return nil

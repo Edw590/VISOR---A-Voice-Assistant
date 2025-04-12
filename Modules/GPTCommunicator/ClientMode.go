@@ -40,7 +40,7 @@ func clientMode() {
 				return
 			}
 
-			var request string = Utils.DecompressString(map_value)
+			var request string = string(map_value)
 			log.Println("request", request)
 			if request == "" {
 				continue
@@ -77,7 +77,7 @@ func clientMode() {
 			var models string = *Utils.ToJsonGENERAL(getLocalModels())
 
 			var message []byte = []byte("GPT|[models]")
-			message = append(message, Utils.CompressString(models)...)
+			message = append(message, models...)
 			Utils.QueueNoResponseMessageSERVER(message)
 		}
 	}()

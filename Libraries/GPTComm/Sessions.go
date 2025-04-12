@@ -42,9 +42,7 @@ func retrieveSessions() {
 		return
 	}
 
-	var response []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-
-	var json_bytes []byte = []byte(Utils.DecompressString(response))
+	var json_bytes []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
 	if err := Utils.FromJsonGENERAL(json_bytes, &sessions_GL); err != nil {
 		return
@@ -169,7 +167,7 @@ DeleteSession deletes the session.
  */
 func DeleteSession(session_id string) {
 	var message []byte = []byte("S_S|GPTSession|")
-	message = append(message, Utils.CompressString(session_id + "\000" + "delete")...)
+	message = append(message, session_id + "\000" + "delete"...)
 	Utils.QueueNoResponseMessageSERVER(message)
 }
 
@@ -184,6 +182,6 @@ SetSessionName sets the name of the session.
  */
 func SetSessionName(session_id string, name string) {
 	var message []byte = []byte("S_S|GPTSession|")
-	message = append(message, Utils.CompressString(session_id + "\000" + "rename" + "\000" + name)...)
+	message = append(message, session_id + "\000" + "rename" + "\000" + name...)
 	Utils.QueueNoResponseMessageSERVER(message)
 }
