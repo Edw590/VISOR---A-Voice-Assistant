@@ -40,10 +40,6 @@ func getModelName(model_type_to_use string) (string, string) {
 		return model_to_use, Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
 	}
 
-	log.Println("No model name found for type:", model_type_to_use)
-
-	return "", Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
-
 	var device_models map[string][]string = make(map[string][]string)
 	var active_device_ids []string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_8.Active_device_IDs
 	for _, device_id := range active_device_ids {
