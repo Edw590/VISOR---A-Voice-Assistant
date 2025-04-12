@@ -141,14 +141,18 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
 	checkbox_model_has_tool_role.SetChecked(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role)
 
+	var checkbox_prioritize_clients *widget.Check = widget.NewCheck("Give priority to models on the clients?", nil)
+	checkbox_prioritize_clients.SetChecked(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models)
+
 	var entry_ctx_size *widget.Entry = widget.NewEntry()
 	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
 	entry_ctx_size.SetText(strconv.Itoa(int(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Context_size)))
-	entry_ctx_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numberic")
+	entry_ctx_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numeric")
 
 	var entry_temperature *widget.Entry = widget.NewEntry()
 	entry_temperature.SetPlaceHolder("GPT temperature (example: 0.8)")
-	entry_temperature.SetText(strconv.FormatFloat(float64(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Temperature), 'f', -1, 32))
+	entry_temperature.SetText(
+		strconv.FormatFloat(float64(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Temperature), 'f', -1, 32))
 	entry_temperature.Validator = func(s string) error {
 		value, err := strconv.ParseFloat(s, 32)
 		if err != nil {
@@ -174,6 +178,8 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url = server_uri.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use = strings.Split(entry_model_name.Text, "\n")
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models =
+			checkbox_prioritize_clients.Checked
 		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Context_size = int32(value1)
 		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
@@ -187,6 +193,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 		server_uri,
 		entry_model_name,
 		checkbox_model_has_tool_role,
+		checkbox_prioritize_clients,
 		entry_ctx_size,
 		entry_temperature,
 		entry_system_info,

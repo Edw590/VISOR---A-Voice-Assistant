@@ -64,6 +64,8 @@ type Mod7UserInfo struct {
 	Models_to_use []string
 	// Model_has_tool_role indicates if the tool role of the LLM model exists or not
 	Model_has_tool_role bool
+	// Prioritize_clients_models indicates if the clients models should be prioritized over the server ones
+	Prioritize_clients_models bool
 	// Context_size is the context size to use
 	Context_size int32
 	// Temperature is the temperature to use

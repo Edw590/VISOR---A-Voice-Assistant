@@ -28,36 +28,65 @@ import (
 )
 
 func getModelName(model_type_to_use string) (string, string) {
-	log.Println("model_type_to_use:", model_type_to_use)
-	var self_models []string = nil
-	for _, model := range getLocalModels().Models {
-		self_models = append(self_models, model.Name)
-	}
-	log.Println("self_models:", self_models)
-	var model_to_use string = checkModels(self_models, model_type_to_use)
-	if model_to_use != "" {
-		log.Println("Model found in self models:", model_to_use)
-		return model_to_use, Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
-	}
-
-	var device_models map[string][]string = make(map[string][]string)
-	var active_device_ids []string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_8.Active_device_IDs
-	for _, device_id := range active_device_ids {
-		device_models[device_id] = getDeviceLocalModels(device_id)
-	}
-	log.Println("device_models:", device_models)
-
-	for device_id, models := range device_models {
-		model_to_use = checkModels(models, model_type_to_use)
+	var model_to_use string = ""
+	var device_id_to_use string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
+	getServerModels := func() {
+		log.Println("model_type_to_use:", model_type_to_use)
+		var self_models []string = nil
+		for _, model := range getLocalModels().Models {
+			self_models = append(self_models, model.Name)
+		}
+		log.Println("self_models:", self_models)
+		model_to_use = checkModels(self_models, model_type_to_use)
 		if model_to_use != "" {
-			log.Println("Model found in \"" + device_id + "\" models:", model_to_use)
-			return model_to_use, device_id
+			log.Println("Model found in self models:", model_to_use)
+		}
+	}
+
+	getClientsModels := func() {
+		var device_models map[string][]string = make(map[string][]string)
+		var active_device_ids []string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_8.Active_device_IDs
+		for _, device_id := range active_device_ids {
+			device_models[device_id] = getDeviceLocalModels(device_id)
+		}
+		log.Println("device_models:", device_models)
+
+		for device_id, models := range device_models {
+			model_to_use = checkModels(models, model_type_to_use)
+			if model_to_use != "" {
+				device_id_to_use = device_id
+				log.Println("Model found in \"" + device_id + "\" models:", model_to_use)
+			}
+		}
+	}
+
+	if Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models {
+		getClientsModels()
+		if model_to_use != "" {
+			goto end
+		}
+
+		getServerModels()
+		if model_to_use != "" {
+			goto end
+		}
+	} else {
+		getServerModels()
+		if model_to_use != "" {
+			goto end
+		}
+
+		getClientsModels()
+		if model_to_use != "" {
+			goto end
 		}
 	}
 
 	log.Println("No model name found for type:", model_type_to_use)
 
-	return "", Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
+	end:
+
+	return model_to_use, device_id_to_use
 }
 
 func checkModels(models []string, model_type_to_use string) string {
