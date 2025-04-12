@@ -130,6 +130,9 @@ func chatWithGPT(params _ChatWithGPTParams) string {
 		//}
 
 		model_name, device_id_with_model := getModelName(params.Model_type)
+		if model_name == "" {
+			return ""
+		}
 
 		// Create payload
 		var ollama_request ModsFileInfo.OllamaChatRequest = ModsFileInfo.OllamaChatRequest{
@@ -210,9 +213,8 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 	} else {
 		log.Println("Posting to Ollama on \"" + device_id_with_model + "\": ", string(request_json))
 
-		var message []byte = []byte(device_id_with_model + "|M_7_0|")
-		message = append(message, device_id + "|" + string(request_json)...)
-		Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", message)
+		Utils.QueueMessageBACKEND(true, Utils.NUM_MOD_GPTCommunicator, 0, device_id_with_model,
+			[]byte(device_id + "|" + string(request_json)))
 	}
 
 	return "", -1
@@ -234,7 +236,7 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 		}
 
 		// Send a message to LIB_2 saying the GPT just started writing
-		Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id + "|L_2_0|start"))
+		Utils.QueueMessageBACKEND(false, Utils.NUM_LIB_GPTComm, 0, device_id, []byte("start"))
 	} else {
 		sendToServer(getStartString(device_id))
 	}

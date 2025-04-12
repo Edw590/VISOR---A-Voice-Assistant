@@ -170,8 +170,8 @@ func startCommunicatorInternalSERVER() {
 
 	// Sender
 	go func() {
-		var first_message bool = true
 		routines_working[1] = true
+		var first_message bool = true
 		for {
 			var message []byte
 			if first_message {

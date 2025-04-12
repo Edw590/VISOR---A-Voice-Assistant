@@ -179,15 +179,16 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 
-					var msg_device_id string = strings.Split(string(message), "|")[0]
+					var message_str string = string(message)
+					var msg_device_id string = strings.Split(message_str, "|")[0]
 					if msg_device_id != device_id && msg_device_id != "3234_ALL" {
 						continue
 					}
 
-					var index_bar int = strings.Index(string(message), "|")
+					var index_bar int = strings.Index(message_str, "|")
 					var truncated_msg []byte = message[index_bar + 1:]
 
-					if err = sendData(websocket.BinaryMessage, truncated_msg); err == nil {
+					if err = sendData(websocket.BinaryMessage, Utils.CompressBytes(truncated_msg)); err == nil {
 						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(truncated_msg),
 							CRC16.Result(truncated_msg, "CCIT_ZERO"), truncated_msg[:strings.Index(string(truncated_msg), "|")])
 					} else {
@@ -310,7 +311,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			}
 		case "GPT":
 			// Send a text to be processed by the GPT model or redirected to the right client.
-			// Example: "["process", "redirect" or "models"]in case of processing, a string or nil to just
+			// Example: "["process", "redirect" or "models"]in case of processing, a string or empty string to just
 			// get the return value; in case of redirecting and models, a string"
 			// Returns: in case of processing, "true" if the text will be processed immediately, "false" if the GPT is
 			// busy for now and the text will wait; in case of redirecting and models, nothing

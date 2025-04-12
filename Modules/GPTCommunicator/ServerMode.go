@@ -96,7 +96,7 @@ func serverMode() {
 				device_id = strings.Split(after_colon, "|")[1]
 
 				// Send a message to LIB_2 saying the GPT just started writing
-				Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id + "|L_2_0|start"))
+				Utils.QueueMessageBACKEND(false, Utils.NUM_LIB_GPTComm, 0, device_id, []byte("start"))
 
 				reduceGptTextTxt(gpt_text_txt)
 			} else if strings.HasPrefix(map_value, _END_CMD) {

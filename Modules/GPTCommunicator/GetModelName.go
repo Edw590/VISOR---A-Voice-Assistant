@@ -82,8 +82,7 @@ func checkModels(models []string, model_type_to_use string) string {
 }
 
 func getDeviceLocalModels(device_id string) []string {
-	Utils.SendToModChannel(Utils.NUM_MOD_WebsiteBackend, 0, "Message", []byte(device_id + "|M_7_1|"))
-	log.Println("Sent to mod channel on:", device_id)
+	Utils.QueueMessageBACKEND(true, Utils.NUM_MOD_GPTCommunicator, 1, device_id, nil)
 
 	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1)
 	if comms_map == nil {
@@ -94,8 +93,6 @@ func getDeviceLocalModels(device_id string) []string {
 	if map_value == nil {
 		return nil
 	}
-
-	log.Println("map_value:", string(map_value))
 
 	var local_models _LocalModels
 	err := Utils.FromJsonGENERAL(map_value, &local_models)
