@@ -65,7 +65,7 @@ func SyncUserSettings() {
 					if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 0, []byte("G_S|true|US")) {
 						return
 					}
-					var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 0)
+					var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 0, -1)
 					if comms_map == nil {
 						return
 					}
@@ -88,7 +88,7 @@ func remoteSettingsChanged() bool {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 1, []byte("G_S|false|US")) {
 		return false
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 1, -1)
 	if comms_map == nil {
 		return false
 	}

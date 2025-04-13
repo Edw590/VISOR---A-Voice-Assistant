@@ -45,7 +45,7 @@ const _TIME_SLEEP_S int = 1
 func serverMode() {
 	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STARTING
 
-	if len(getModUserInfo().Models_to_use) == 0 || getModUserInfo().Context_size == 0 {
+	if getModUserInfo().Models_to_use == "" || getModUserInfo().Context_size == 0 {
 		time.Sleep(2 * time.Second)
 
 		getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STOPPED
@@ -77,35 +77,6 @@ func serverMode() {
 	chatWithGPT(chatWithGPT_params)
 
 	//go autoMemorize() TODO
-
-	go func() {
-		var device_id string = ""
-		for {
-			// Don't use the START and END commands to put the states. Imagine there's a connection failure and he
-			// doesn't receive one of those - infinity on the wrong state.
-			setReadyState()
-			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 0)
-			if comms_map == nil {
-				return
-			}
-			setBusyState()
-
-			var map_value string = comms_map["Redirect"].(string)
-			if strings.HasPrefix(map_value, _START_CMD) {
-				var after_colon string = strings.Split(map_value, ":")[1]
-				device_id = strings.Split(after_colon, "|")[1]
-
-				// Send a message to LIB_2 saying the GPT just started writing
-				Utils.QueueMessageBACKEND(false, Utils.NUM_LIB_GPTComm, 0, device_id, []byte("start"))
-
-				reduceGptTextTxt(gpt_text_txt)
-			} else if strings.HasPrefix(map_value, _END_CMD) {
-				device_id = ""
-			}
-
-			_ = gpt_text_txt.WriteTextFile(map_value, true)
-		}
-	}()
 
 	// Process the text to input to the LLM model
 	for {

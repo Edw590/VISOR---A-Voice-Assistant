@@ -37,7 +37,7 @@ func retrieveSessions() {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 4, []byte("G_S|true|GPTSessions")) {
 		return
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 4)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 4, -1)
 	if comms_map == nil {
 		return
 	}

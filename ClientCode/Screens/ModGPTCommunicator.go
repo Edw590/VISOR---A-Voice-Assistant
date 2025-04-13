@@ -133,10 +133,10 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	server_uri.SetPlaceHolder("GPT Server URL (example: localhost:11434)")
 	server_uri.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url)
 
-	var entry_model_name *widget.Entry = widget.NewMultiLineEntry()
-	entry_model_name.SetPlaceHolder("GPT model names and types one per line in order of preference\n" +
+	var entry_models_to_use *widget.Entry = widget.NewMultiLineEntry()
+	entry_models_to_use.SetPlaceHolder("GPT model names and types one per line in order of preference\n" +
 		"Example: \"llama3.2 - TEXT\" - can be TEXT or VISION)")
-	entry_model_name.SetText(strings.Join(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use, "\n"))
+	entry_models_to_use.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use)
 
 	var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
 	checkbox_model_has_tool_role.SetChecked(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role)
@@ -176,7 +176,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 
 	var btn_save *widget.Button = widget.NewButton("Save", func() {
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url = server_uri.Text
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use = strings.Split(entry_model_name.Text, "\n")
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use = entry_models_to_use.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models =
 			checkbox_prioritize_clients.Checked
@@ -191,7 +191,7 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 
 	return createMainContentScrollUTILS(
 		server_uri,
-		entry_model_name,
+		entry_models_to_use,
 		checkbox_model_has_tool_role,
 		checkbox_prioritize_clients,
 		entry_ctx_size,

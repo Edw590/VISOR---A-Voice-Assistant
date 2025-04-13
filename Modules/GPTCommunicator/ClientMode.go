@@ -30,7 +30,7 @@ import (
 func clientMode() {
 	go func() {
 		for {
-			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 0)
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 0, -1)
 			if comms_map == nil {
 				return
 			}
@@ -64,7 +64,7 @@ func clientMode() {
 
 	go func() {
 		for {
-			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1)
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1, -1)
 			if comms_map == nil {
 				return
 			}

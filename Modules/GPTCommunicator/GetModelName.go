@@ -90,7 +90,7 @@ func getModelName(model_type_to_use string) (string, string) {
 }
 
 func checkModels(models []string, model_type_to_use string) string {
-	for _, model_info := range getModUserInfo().Models_to_use {
+	for _, model_info := range strings.Split(getModUserInfo().Models_to_use, "\n") {
 		var model_info_split []string = strings.Split(model_info, " - ")
 		var model_name string = model_info_split[0]
 		var model_type string = model_info_split[1]
@@ -109,7 +109,7 @@ func checkModels(models []string, model_type_to_use string) string {
 func getDeviceLocalModels(device_id string) []string {
 	Utils.QueueMessageBACKEND(true, Utils.NUM_MOD_GPTCommunicator, 1, device_id, nil)
 
-	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1, -1)
 	if comms_map == nil {
 		return nil
 	}

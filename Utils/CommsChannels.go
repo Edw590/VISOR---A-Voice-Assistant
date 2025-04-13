@@ -21,7 +21,10 @@
 
 package Utils
 
-import Tcef "github.com/Edw590/TryCatch-go"
+import (
+	Tcef "github.com/Edw590/TryCatch-go"
+	"time"
+)
 
 const _COMMS_CH_MUL int = 10
 
@@ -64,16 +67,35 @@ GetFromCommsChannel gets data from a module or library communication channel.
   - is_mod – whether it's a channel from a module or library
   - num – the number of the module or library
   - ch_num – the channel number
+  - timeout_s – the timeout in seconds or -1 for no timeout
 
 – Returns:
   - the data from the channel
 */
-func GetFromCommsChannel(is_mod bool, num int, ch_num int) map[string]any {
+func GetFromCommsChannel(is_mod bool, num int, ch_num int, timeout_s int) map[string]any {
 	var full_channel_num int = getFullChannelNum(num, ch_num)
-	if is_mod {
-		return <- mods_comms_channels_GL[full_channel_num]
+	if timeout_s == -1 {
+		if is_mod {
+			return <- mods_comms_channels_GL[full_channel_num]
+		} else {
+			return <- libs_comms_channels_GL[full_channel_num]
+		}
 	} else {
-		return <- libs_comms_channels_GL[full_channel_num]
+		if is_mod {
+			select {
+				case <- time.After(time.Duration(timeout_s) * time.Second):
+					return nil
+				case data := <- mods_comms_channels_GL[full_channel_num]:
+					return data
+			}
+		} else {
+			select {
+				case <- time.After(time.Duration(timeout_s) * time.Second):
+					return nil
+				case data := <- libs_comms_channels_GL[full_channel_num]:
+					return data
+			}
+		}
 	}
 }
 

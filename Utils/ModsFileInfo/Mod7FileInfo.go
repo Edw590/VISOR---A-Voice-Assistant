@@ -60,8 +60,8 @@ type Session struct {
 type Mod7UserInfo struct {
 	// Server_url is the URL of the LLM server
 	Server_url string
-	// Models_to_use are the names and types of the LLM models to use in order of preference
-	Models_to_use []string
+	// Models_to_use are the names and types of the LLM models to use in order of preference, one per line
+	Models_to_use string
 	// Model_has_tool_role indicates if the tool role of the LLM model exists or not
 	Model_has_tool_role bool
 	// Prioritize_clients_models indicates if the clients models should be prioritized over the server ones

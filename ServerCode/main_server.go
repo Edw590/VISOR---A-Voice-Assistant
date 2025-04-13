@@ -91,6 +91,11 @@ func realMain(module_stop *bool, moduleInfo_any any) {
 	// The Manager needs to be started first. It'll handle the others.
 	modules[Utils.NUM_MOD_ModManager].Stop = false
 
+	// Empty the active device IDs list as soon as the server starts. Else devices previously active might be used and
+	// stuff sent to them waiting for a response - this is because other modules start before Website Backend which also
+	// empties the list.
+	Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_8.Active_device_IDs = nil
+
 	ModulesManager.Start(modules)
 
 	handleCtrlCGracefully(module_stop)

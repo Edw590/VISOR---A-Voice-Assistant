@@ -215,9 +215,38 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 
 		Utils.QueueMessageBACKEND(true, Utils.NUM_MOD_GPTCommunicator, 0, device_id_with_model,
 			[]byte(device_id + "|" + string(request_json)))
-	}
 
-	return "", -1
+		var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
+		var message string = ""
+		var timestamp_s int64 = -1
+		for {
+			// Don't use the START and END commands to put the states. Imagine there's a connection failure and he
+			// doesn't receive one of those - infinity on the wrong state.
+			setReadyState()
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 0, 20)
+			if comms_map == nil {
+				break
+			}
+			setBusyState()
+
+			var map_value string = comms_map["Redirect"].(string)
+			if strings.HasPrefix(map_value, _START_CMD) {
+				timestamp_s = time.Now().Unix()
+
+				// Send a message to LIB_2 saying the GPT just started writing
+				Utils.QueueMessageBACKEND(false, Utils.NUM_LIB_GPTComm, 0, device_id, []byte("start"))
+
+				reduceGptTextTxt(gpt_text_txt)
+			} else if strings.HasPrefix(map_value, _END_CMD) {
+				break
+			}
+
+			_ = gpt_text_txt.WriteTextFile(map_value, true)
+			message += map_value
+		}
+
+		return message, timestamp_s
+	}
 }
 
 func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {

@@ -56,7 +56,7 @@ func SetPreparations(time_begin_ms int64) {
 	go func() {
 		for {
 			// Get the start message but ignore it (we just need to know *when* to start).
-			Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 0)
+			Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 0, -1)
 
 			// Keep waiting until the start message is received. If multiple are received, stack them up.
 			start_checking_GL = append(start_checking_GL, true)

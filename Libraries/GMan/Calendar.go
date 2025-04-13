@@ -32,7 +32,7 @@ func getEvents() {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|GManEvents")) {
 		return
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0, -1)
 	if comms_map == nil {
 		return
 	}
@@ -45,7 +45,7 @@ func getEvents() {
 }
 
 /*
-GetEventsIdsListGMAN updates and gets a list of all events' IDs.
+GetEventsIdsList updates and gets a list of all events' IDs.
 
 -----------------------------------------------------------
 
@@ -67,7 +67,7 @@ func GetEventsIdsList() string {
 }
 
 /*
-GetEventGMAN returns an event by its ID.
+GetEvent returns an event by its ID.
 
 -----------------------------------------------------------
 

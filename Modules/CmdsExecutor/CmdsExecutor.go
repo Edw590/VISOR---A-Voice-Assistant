@@ -53,7 +53,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	ACD.ReloadCmdsArray(prepareCommandsString())
 
 	for {
-		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_CmdsExecutor, 0)
+		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_CmdsExecutor, 0, -1)
 		if comms_map == nil {
 			return
 		}

@@ -290,7 +290,7 @@ processCommsChannel processes in a different thread the communications channel.
 */
 func processCommsChannel() {
 	for {
-		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_VISOR, 0)
+		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_VISOR, 0, -1)
 		if comms_map == nil {
 			return
 		}

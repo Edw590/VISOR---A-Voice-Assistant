@@ -55,7 +55,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 	go func() {
 		for {
-			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0)
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_WebsiteBackend, 0, -1)
 			if comms_map == nil {
 				return
 			}
