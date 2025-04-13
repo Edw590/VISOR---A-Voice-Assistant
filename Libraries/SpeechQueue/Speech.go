@@ -27,7 +27,7 @@ type Speech struct {
 	id string
 	// text is the text of the speech
 	text string
-	// time is the time the speech was added in milliseconds
+	// time is the time the speech was added (any chosen resolution)
 	time int64
 	// priority is the priority of the speech
 	priority int32
@@ -68,12 +68,12 @@ func (speech *Speech) GetText() string {
 }
 
 /*
-GetTime gets the time the speech was added in milliseconds.
+GetTime gets the time the speech was added.
 
 -----------------------------------------------------------
 
 – Returns:
-  - the time the speech was added in milliseconds
+  - the time the speech was added
  */
 func (speech *Speech) GetTime() int64 {
 	return speech.time

@@ -175,7 +175,10 @@ func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, 
 	}
 	if SpeechQueue.GetSpeech(speech_id_to_use) == nil {
 		// If it's a new speech, add to the lists.
-		speech_id_to_use = SpeechQueue.AddSpeech(to_speak, "", time.Now().UnixMilli(), priority, mode, 0, task_id)
+
+		// Keep this with nanoseconds. He already swapped the supposed order of speeches, I imagine because of having
+		// been added in the same millisecond. So use nanoseconds.
+		speech_id_to_use = SpeechQueue.AddSpeech(to_speak, "", time.Now().UnixNano(), priority, mode, 0, task_id)
 	}
 
 	if curr_speech_GL == nil {
