@@ -245,7 +245,10 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 			message += map_value
 		}
 
-		return message, timestamp_s
+		var just_text_msg string = strings.Replace(message, "\n" + _END_CMD, "", -1)
+		just_text_msg = just_text_msg[strings.Index(just_text_msg, "]") + 1:]
+
+		return just_text_msg, timestamp_s
 	}
 }
 
