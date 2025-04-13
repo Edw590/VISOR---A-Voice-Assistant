@@ -237,12 +237,14 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 				Utils.QueueMessageBACKEND(false, Utils.NUM_LIB_GPTComm, 0, device_id, []byte("start"))
 
 				reduceGptTextTxt(gpt_text_txt)
-			} else if strings.HasPrefix(map_value, _END_CMD) {
-				break
 			}
 
 			_ = gpt_text_txt.WriteTextFile(map_value, true)
 			message += map_value
+
+			if strings.Contains(map_value, _END_CMD) {
+				break
+			}
 		}
 
 		var just_text_msg string = strings.Replace(message, "\n" + _END_CMD, "", -1)
