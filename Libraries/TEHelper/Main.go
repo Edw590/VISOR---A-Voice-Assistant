@@ -45,7 +45,6 @@ This function will block until a Task is due. When that happens, the Task is ret
   - the Task that is due or nil if the checker was stopped
  */
 func CheckDueTasks() *ModsFileInfo.Task {
-	var task_return ModsFileInfo.Task
 	stop_GL = false
 	for {
 		// Location trigger - if the user location changed, check if any task is triggered
@@ -83,12 +82,11 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 				if condition_loc && programmable_condition && device_id_matches && condition_device_active {
 					if getTaskInfo(task.Id).Last_time_reminded == 0 {
-						if task_return.Id == 0 {
-							// Only set the last reminded time if no other task was triggered
-							getTaskInfo(task.Id).Last_time_reminded = time.Now().Unix() / 60
+						// Read about Conds_were_true being checked and set in checkProgrammableCondition() below on the
+						// other loop.
+						getTaskInfo(task.Id).Last_time_reminded = time.Now().Unix() / 60
 
-							task_return = task
-						}
+						return &task
 					}
 				} else {
 					getTaskInfo(task.Id).Last_time_reminded = 0
@@ -98,7 +96,7 @@ func CheckDueTasks() *ModsFileInfo.Task {
 
 		// Time/condition trigger - if the time changed (it always does), check if any task is triggered
 		for _, task := range getModUserSettings().Tasks {
-			if !task.Enabled || task.Time_s == 0 {
+			if !task.Enabled {
 				continue
 			}
 
@@ -122,17 +120,13 @@ func CheckDueTasks() *ModsFileInfo.Task {
 			var condition_device_active bool = checkDeviceActive(task)
 
 			if condition_time && condition_loc && programmable_condition && device_id_matches && condition_device_active {
-				if task_return.Id == 0 {
-					// Only set the last reminded time if no other task was triggered
-					getTaskInfo(task.Id).Last_time_reminded = test_time_min
+				// If checkTime() returns 0 on test_time_min and the task has a programmable condition, no worries
+				// because checkProgrammableCondition() internally checks and updates the Conds_were_true array with the
+				// last state of the condition (so that it's not always reminded forever).
+				getTaskInfo(task.Id).Last_time_reminded = test_time_min
 
-					task_return = task
-				}
+				return &task
 			}
-		}
-
-		if task_return.Id != 0 {
-			return &task_return
 		}
 
 		if Utils.WaitWithStopDATETIME(&stop_GL, 1) {
