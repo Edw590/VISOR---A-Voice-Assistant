@@ -52,7 +52,9 @@ func systemCheckerCreateSystemStateTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_MOD_SYS_CHECKER {
-				sys_state_text.SetText(SettingsSync.GetDeviceInfoJsonSYSCHK())
+				fyne.Do(func() {
+					sys_state_text.SetText(SettingsSync.GetDeviceInfoJsonSYSCHK())
+				})
 			} else {
 				break
 			}

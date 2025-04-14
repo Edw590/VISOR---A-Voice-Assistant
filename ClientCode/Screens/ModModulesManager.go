@@ -55,7 +55,9 @@ func modulesManagerCreateModulesStatusTab(modules []Utils.Module) *container.Scr
 					}
 				}
 				text = text[:len(text)-2] // Remove the last 2 newlines
-				module_status_text.SetText(text)
+				fyne.Do(func() {
+					module_status_text.SetText(text)
+				})
 			} else {
 				break
 			}

@@ -292,7 +292,9 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 							}
 
 							if entries_map[session_id] != nil && entries_map[session_id].Text != msg_content_str {
-								entries_map[session_id].SetText(msg_content_str)
+								fyne.Do(func() {
+									entries_map[session_id].SetText(msg_content_str)
+								})
 							}
 						}
 					}
@@ -422,7 +424,9 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 				var new_text string = GPTComm.GetLastText()
 				if new_text != old_text {
 					old_text = new_text
-					response_text.SetText(new_text)
+					fyne.Do(func() {
+						response_text.SetText(new_text)
+					})
 				}
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
@@ -440,7 +444,9 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 							gpt_state = "invalid"
 					}
 				}
-				label_gpt_comm_state.SetText("GPT state: " + gpt_state)
+				fyne.Do(func() {
+					label_gpt_comm_state.SetText("GPT state: " + gpt_state)
+				})
 			} else {
 				break
 			}

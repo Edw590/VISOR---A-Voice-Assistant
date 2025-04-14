@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -53,7 +53,9 @@ func registryCreateAutomaticValuesTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_REGISTRY {
-				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(1))
+				fyne.Do(func() {
+					registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(1))
+				})
 			} else {
 				break
 			}
@@ -72,7 +74,9 @@ func registryCreateManualValuesTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_REGISTRY {
-				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(2))
+				fyne.Do(func() {
+					registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(2))
+				})
 			} else {
 				break
 			}

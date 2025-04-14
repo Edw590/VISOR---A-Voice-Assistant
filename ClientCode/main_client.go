@@ -349,7 +349,9 @@ func quitApp(modules []Utils.Module) {
 	// Ignore a "runtime error: invalid memory address or nil pointer dereference" that happens who knows why.
 	Tcef.Tcef{
 		Try: func() {
-			my_app_GL.Quit()
+			fyne.Do(func() {
+				my_app_GL.Quit()
+			})
 		},
 	}.Do()
 }

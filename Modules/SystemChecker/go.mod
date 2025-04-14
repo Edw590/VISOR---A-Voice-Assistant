@@ -36,7 +36,7 @@ require (
 	github.com/vcaesar/imgo v0.40.0 // indirect
 	github.com/vcaesar/keycode v0.10.1 // indirect
 	github.com/vcaesar/tt v0.20.0 // indirect
-	golang.org/x/image v0.12.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/image v0.24.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	howett.net/plist v1.0.0 // indirect
 )

@@ -14,6 +14,6 @@ require (
 	github.com/anaskhan96/soup v1.2.5 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 )
