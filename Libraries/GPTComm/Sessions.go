@@ -44,6 +44,7 @@ func retrieveSessions() {
 
 	var json_bytes []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
 
+	sessions_GL = nil
 	if err := Utils.FromJsonGENERAL(json_bytes, &sessions_GL); err != nil {
 		return
 	}
