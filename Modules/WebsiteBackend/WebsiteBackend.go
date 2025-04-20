@@ -125,6 +125,13 @@ var upgrader = websocket.Upgrader{
 func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("WebSocketsHandler called")
 
+	var channel_num int = registerChannel()
+	if channel_num == -1 {
+		log.Println("No available channels")
+
+		return
+	}
+
 	// Upgrade HTTP connection to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -145,13 +152,6 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 	ticker := time.NewTicker(PING_PERIOD)
 	defer ticker.Stop()
-
-	var channel_num int = registerChannel()
-	if channel_num == -1 {
-		log.Println("No available channels")
-
-		return
-	}
 
 	var mutex sync.Mutex
 
@@ -327,10 +327,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					var ret []byte = []byte(strconv.Itoa(int(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.State)))
 
 					if len(data) > 0 {
-						// Don't use channels for this. What if various messages are sent while one is still be processed? The
-						// module will lock - as it did now.
-						_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
-							Utils.RandStringGENERAL(10) + ".dat").WriteFile(data, false)
+						Utils.SendToModChannel(Utils.NUM_MOD_GPTCommunicator, 2, "Process", data)
 					}
 
 					return ret

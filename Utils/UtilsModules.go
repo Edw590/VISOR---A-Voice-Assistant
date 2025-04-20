@@ -107,6 +107,7 @@ var MOD_NUMS_INFO map[int]ModuleInfo = map[int]ModuleInfo{
 	NUM_MOD_GPTCommunicator: {
 		Name: "GPT Communicator",
 		C_S_support: MOD_BOTH,
+		Chan_size: 10,
 	},
 	NUM_MOD_WebsiteBackend: {
 		Name: "Website Backend",
