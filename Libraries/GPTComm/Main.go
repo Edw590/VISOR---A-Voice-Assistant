@@ -28,15 +28,26 @@ import (
 	"time"
 )
 
+type File struct {
+	Is_image bool
+	Size int
+	Contents []byte
+}
+
+var files_to_send_GL []File = nil
+
+const MODEL_TYPE_TEXT string = "T"
+const MODEL_TYPE_VISION string = "T+V"
+
 const ROLE_USER string = "USER"
 const ROLE_TOOL string = "TOOL"
 const SESSION_TYPE_NEW string = "NEW"
 const SESSION_TYPE_TEMP string = "TEMP"
 const SESSION_TYPE_ACTIVE string = "ACTIVE"
-const MODEL_TYPE_TEXT string = "TEXT"
-const MODEL_TYPE_VISION string = "VISION"
 /*
-SendText sends the given text to the LLM model.
+SendText sends the given text to the LLM model along with the selected files added by AddFileToSend().
+
+After this function returns, all files have been removed from the list of files to send.
 
 -----------------------------------------------------------
 
@@ -47,10 +58,10 @@ SendText sends the given text to the LLM model.
   - more_coming – whether more messages are coming or not and the LLM should wait for them before replying
 
 – Returns:
-  - the state of the GPT Communicator module
+  - the state of the GPT Communicator module or -1 in case of errors
 */
-func SendText(text string, session_type string, role string, more_coming bool, model_type string) int32 {
-	var message []byte = []byte("GPT|[process]")
+func SendText(text string, session_type string, role string, more_coming bool) int32 {
+	var message []byte = []byte("GPT|process|")
 	if text != "" {
 		var curr_location string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_12.User_location.Curr_location
 		var date_time string = time.Now().Weekday().String() + " " + time.Now().Format("2006-01-02 15:04")
@@ -59,12 +70,50 @@ func SendText(text string, session_type string, role string, more_coming bool, m
 		if role == ROLE_USER {
 			new_text = "[current user location: " + curr_location + " | date/time: " + date_time + "]" + text
 		}
-		message = append(message, "[" + Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id + "|" +
-			session_type + "|" + role + "|" + strconv.FormatBool(more_coming) + "|" + model_type + "]" + new_text...)
+
+		var images []File = nil
+		var audios []File = nil
+		for _, file := range files_to_send_GL {
+			if file.Is_image {
+				images = append(images, file)
+			} else {
+				audios = append(audios, file)
+			}
+		}
+
+		///////////////////////////////////////////
+		var metadata string = "["
+
+		metadata += strconv.Itoa(len(images)) + "|" + strconv.Itoa(len(audios)) + "|"
+		for _, file := range images {
+			metadata += strconv.Itoa(file.Size) + "|"
+		}
+		for _, file := range audios {
+			metadata += strconv.Itoa(file.Size) + "|"
+		}
+
+		metadata += Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id + "|" + session_type + "|" + role + "|" +
+			strconv.FormatBool(more_coming)
+
+		metadata += "]"
+		///////////////////////////////////////////
+
+		message = append(message, metadata + new_text + "\x00"...)
+
+		for _, file := range images {
+			message = append(message, file.Contents...)
+		}
+		for _, file := range audios {
+			message = append(message, file.Contents...)
+		}
 	}
-	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message) {
+
+	var successful_queue bool = Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 1, message)
+	files_to_send_GL = nil
+	if !successful_queue {
 		return -1
 	}
+
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1, -1)
 	if comms_map == nil {
 		return -1
@@ -78,12 +127,29 @@ func SendText(text string, session_type string, role string, more_coming bool, m
 }
 
 /*
+AddFileToSend adds a file to the list of files to send.
+
+-----------------------------------------------------------
+
+– Params:
+  - is_image – whether the file is an image or not (an audio then)
+  - contents – the raw contents of the file
+ */
+func AddFileToSend(is_image bool, contents []byte) {
+	files_to_send_GL = append(files_to_send_GL, File{
+		Is_image: is_image,
+		Size:     len(contents),
+		Contents: contents,
+	})
+}
+
+/*
 GetModuleState gets the state of the GPT Communicator module.
 
 DON'T delete the function. It's useful for use in a thread other than the one used to send text.
 */
 func GetModuleState() int32 {
-	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|[process]")) {
+	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|process|")) {
 		return -1
 	}
 	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5, -1)

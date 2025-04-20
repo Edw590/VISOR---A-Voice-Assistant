@@ -23,13 +23,14 @@ package GPTComm
 
 import (
 	"Utils"
+	"Utils/ModsFileInfo"
 )
 
 /*
-StartReportingNoModelsOLLAMA starts the reporting of no Ollama LLM models for the server.
+StartReportingNoModelsOLLAMA starts the reporting of no available LLM models to the server.
 
-Call this function if the client version of the GPT Communicator module does not exist (for example on Android).
- */
+Call this function if the client version of the GPT Communicator module is not available (for example on Android).
+*/
 func StartReportingNoModelsOLLAMA() {
 	go func() {
 		for {
@@ -43,8 +44,66 @@ func StartReportingNoModelsOLLAMA() {
 				return
 			}
 
-			var message []byte = []byte("GPT|[models]")
+			var message []byte = []byte("GPT|models|")
 			Utils.QueueNoResponseMessageSERVER(message)
 		}
 	}()
+}
+
+/*
+GetModelOLLAMA gets a model from the list of models.
+
+-----------------------------------------------------------
+
+– Params:
+  - model_name – the name of the model to get
+
+– Returns:
+  - the model or nil if the model does not exist
+ */
+func GetModelOLLAMA(model_name string) *ModsFileInfo.Model {
+	// Get the model from the list of models
+	model, ok := Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models[model_name]
+	if !ok {
+		return nil
+	}
+
+	return model
+}
+
+/*
+AddUpdateModelOLLAMA adds or updates a model in the list of models.
+
+-----------------------------------------------------------
+
+– Params:
+  - model_name – the name of the model to add or update
+  - model_type – the type of the model one of the GPTComm.MODEL_TYPE_* constants
+  - has_tool_role – whether the model has the tool role available or not
+  - context_size – the context size of the model
+  - temperature – the temperature of the model
+  - system_info – the system info of the model
+ */
+func AddUpdateModelOLLAMA(model_name string, model_type string, has_tool_role bool, context_size int32,
+						  temperature float32, system_info string) {
+	// Add the model to the list of models
+	Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models[model_name] = &ModsFileInfo.Model{
+		Type:          model_type,
+		Has_tool_role: has_tool_role,
+		Context_size:  context_size,
+		Temperature:   temperature,
+		System_info:   system_info,
+	}
+}
+
+/*
+DeleteModelOLLAMA deletes a model from the list of models.
+
+-----------------------------------------------------------
+
+– Params:
+  - model_name – the name of the model to delete
+ */
+func DeleteModelOLLAMA(model_name string) {
+	delete(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models, model_name)
 }

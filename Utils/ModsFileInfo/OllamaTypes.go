@@ -23,16 +23,18 @@ package ModsFileInfo
 
 // ----- Prepared for Ollama 0.6.2 -----
 
+// Taken from: https://github.com/ollama/ollama/blob/main/api/types.go.
+
 type OllamaChatRequest struct {
 	Model string `json:"model"`
 	Messages []OllamaMessage `json:"messages"`
 
-	Format  string `json:"format"`
+	Format  string `json:"format,omitempty"`
 	Options OllamaOptions `json:"options"`
-	Stream bool `json:"stream"`
-	Keep_alive string `json:"keep_alive"` // This must be a string
+	Stream bool `json:"stream,omitempty"`
+	Keep_alive string `json:"keep_alive,omitempty"` // This must be a string
 
-	Tools OllamaTools `json:"tools"`
+	Tools OllamaTools `json:"tools,omitempty"`
 }
 
 type OllamaOptions struct {
@@ -49,10 +51,12 @@ type OllamaChatResponse struct {
 type OllamaMessage struct {
 	Role string `json:"role"`
 	Content string `json:"content"`
-	Images []byte `json:"images"`
-	Tool_calls []OllamaToolCall `json:"tool_calls"`
+	Images []ImageData `json:"images,omitempty"`
+	Tool_calls []OllamaToolCall `json:"tool_calls,omitempty"`
 	Timestamp_s int64
 }
+
+type ImageData []byte
 
 type OllamaTools []OllamaTool
 

@@ -115,10 +115,14 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 		"--> (Ask for the news)\n" +
 		"--> Turn on/off Ethernet\n" +
 		"--> Turn on/off networking\n" +
+		"--> (Ask for the weather)\n" +
+		"--> (Ask for the news)\n" +
 		"--> (Ask what you have for today/tomorrow/this week/next week - Google Calendar events and tasks (tasks " +
-			"are only retrieved if you ask for today or tomorrow). After asking and if you asked with the server " +
-			"connected (meaning will be the LLM answering), you can then talk normally about your events and tasks " +
-			"with VISOR)\n",
+			"are only retrieved if you ask for today or tomorrow). After asking, you can then talk normally about " +
+			"your events and tasks with VISOR)\n" +
+		"--> Ask for help with a picture (that you have on clipboard - must be a PNG specifically! Image or path to " +
+			"image). Example: \"Help me with this picture what do you see in it? (no punctuation, like the comma, on " +
+			"the first part)\"\n",
 	)
 	label_list_commands.Wrapping = fyne.TextWrapWord
 
@@ -130,29 +134,111 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 
 func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	var server_uri *widget.Entry = widget.NewEntry()
-	server_uri.SetPlaceHolder("GPT Server URL (example: localhost:11434)")
+	server_uri.SetPlaceHolder("Ollama URL for use in the server (example: localhost:11434)")
 	server_uri.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url)
 
-	var entry_models_to_use *widget.Entry = widget.NewMultiLineEntry()
-	entry_models_to_use.SetPlaceHolder("GPT model names and types one per line in order of preference\n" +
-		"Example: \"llama3.2 - TEXT\" - can be TEXT or VISION)")
-	entry_models_to_use.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use)
-
-	var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?", nil)
-	checkbox_model_has_tool_role.SetChecked(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role)
+	var entry_user_nickname *widget.Entry = widget.NewEntry()
+	entry_user_nickname.SetPlaceHolder("User nickname (Sir, for example)")
+	entry_user_nickname.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.User_nickname)
 
 	var checkbox_prioritize_clients *widget.Check = widget.NewCheck("Give priority to models on the clients?", nil)
 	checkbox_prioritize_clients.SetChecked(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models)
 
-	var entry_ctx_size *widget.Entry = widget.NewEntry()
-	entry_ctx_size.SetPlaceHolder("GPT context size (example: 4096)")
-	entry_ctx_size.SetText(strconv.Itoa(int(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Context_size)))
-	entry_ctx_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numeric")
+	var entry_models_priorities *widget.Entry = widget.NewMultiLineEntry()
+	entry_models_priorities.SetPlaceHolder("Models to use, one per line by order of priority (add them first below)")
+	entry_models_priorities.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_priorities)
+
+	var btn_save *widget.Button = widget.NewButton("Save", func() {
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url = server_uri.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models =
+			checkbox_prioritize_clients.Checked
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.User_nickname = entry_user_nickname.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_priorities = entry_models_priorities.Text
+	})
+	btn_save.Importance = widget.SuccessImportance
+
+	var entry_new_model_name *widget.Entry = widget.NewEntry()
+	entry_new_model_name.SetPlaceHolder("New model name (example: llama3.2:latest)")
+
+	var btn_add_model *widget.Button = widget.NewButton("Add model", func() {
+		var model_name string = entry_new_model_name.Text
+		if model_name == "" {
+			dialog.ShowError(errors.New("the model name must not be empty"), Current_window_GL)
+
+			return
+		}
+
+		if GPTComm.GetModelOLLAMA(model_name) != nil {
+			dialog.ShowError(errors.New("the model name already exists"), Current_window_GL)
+
+			return
+		}
+
+		GPTComm.AddUpdateModelOLLAMA(model_name, GPTComm.MODEL_TYPE_TEXT, false, 4096, 0.8, "")
+
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_priorities += "\n" + model_name
+
+		reloadScreen()
+	})
+
+	var accordion *widget.Accordion = widget.NewAccordion()
+	accordion.MultiOpen = true
+	var models_priorities string = Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_priorities
+	for _, model_name := range strings.Split(models_priorities, "\n") {
+		if model_name == "" {
+			continue
+		}
+
+		accordion.Append(widget.NewAccordionItem(trimAccordionTitleUTILS(model_name), createModelSetter(model_name)))
+	}
+
+	return createMainContentScrollUTILS(
+		server_uri,
+		entry_user_nickname,
+		checkbox_prioritize_clients,
+		entry_models_priorities,
+		btn_save,
+		entry_new_model_name,
+		btn_add_model,
+		accordion,
+	)
+}
+
+func createModelSetter(model_name string) *fyne.Container {
+	var model_info *ModsFileInfo.Model = GPTComm.GetModelOLLAMA(model_name)
+	if model_info == nil {
+		return container.NewVBox(
+			widget.NewLabel("Model not found: " + model_name),
+		)
+	}
+
+	var label_model_name *widget.Label = widget.NewLabel("Model name: " + model_name)
+
+	var selector_mode_type *widget.Select = widget.NewSelect([]string{
+		"Text",
+		"Text+Vision",
+	}, nil)
+	switch model_info.Type {
+		case GPTComm.MODEL_TYPE_TEXT:
+			selector_mode_type.SetSelected("Text")
+		case GPTComm.MODEL_TYPE_VISION:
+			selector_mode_type.SetSelected("Text+Vision")
+	}
+
+	var checkbox_model_has_tool_role *widget.Check = widget.NewCheck("Is the tool role available for the model?",
+		func(checked bool) {
+			model_info.Has_tool_role = checked
+		})
+	checkbox_model_has_tool_role.SetChecked(model_info.Has_tool_role)
+
+	var entry_context_size *widget.Entry = widget.NewEntry()
+	entry_context_size.SetPlaceHolder("Context size (example: 4096)")
+	entry_context_size.SetText(strconv.Itoa(int(model_info.Context_size)))
+	entry_context_size.Validator = validation.NewRegexp(`^(\d+)?$`, "Context size must be numeric")
 
 	var entry_temperature *widget.Entry = widget.NewEntry()
-	entry_temperature.SetPlaceHolder("GPT temperature (example: 0.8)")
-	entry_temperature.SetText(
-		strconv.FormatFloat(float64(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Temperature), 'f', -1, 32))
+	entry_temperature.SetPlaceHolder("Temperature (example: 0.8)")
+	entry_temperature.SetText(strconv.FormatFloat(float64(model_info.Temperature), 'f', -1, 32))
 	entry_temperature.Validator = func(s string) error {
 		value, err := strconv.ParseFloat(s, 32)
 		if err != nil {
@@ -166,39 +252,64 @@ func gptCommunicatorCreateSettingsTab() *container.Scroll {
 	}
 
 	var entry_system_info *widget.Entry = widget.NewMultiLineEntry()
-	entry_system_info.SetPlaceHolder("LLM system information (remove any current date/time - that's automatic)")
-	entry_system_info.SetMinRowsVisible(3)
-	entry_system_info.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.System_info)
+	entry_system_info.SetPlaceHolder("System information (remove any current date/time - that's automatic)")
+	entry_system_info.SetText(model_info.System_info)
 
-	var entry_user_nickname *widget.Entry = widget.NewEntry()
-	entry_user_nickname.SetPlaceHolder("User nickname (Sir, for example)")
-	entry_user_nickname.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.User_nickname)
+	var btn_save *widget.Button = widget.NewButton("Save model", func() {
+		switch selector_mode_type.Selected {
+			case "Text":
+				model_info.Type = GPTComm.MODEL_TYPE_TEXT
+			case "Text+Vision":
+				model_info.Type = GPTComm.MODEL_TYPE_VISION
+		}
+		model_info.Has_tool_role = checkbox_model_has_tool_role.Checked
+		tmp, err := strconv.ParseInt(entry_context_size.Text, 10, 32)
+		if err == nil {
+			model_info.Context_size = int32(tmp)
+		}
+		tmp2, err := strconv.ParseFloat(entry_temperature.Text, 32)
+		if err == nil {
+			model_info.Temperature = float32(tmp2)
+		}
+		model_info.System_info = entry_system_info.Text
 
-	var btn_save *widget.Button = widget.NewButton("Save", func() {
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Server_url = server_uri.Text
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models_to_use = entry_models_to_use.Text
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Model_has_tool_role = checkbox_model_has_tool_role.Checked
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Prioritize_clients_models =
-			checkbox_prioritize_clients.Checked
-		value1, _ := strconv.ParseInt(entry_ctx_size.Text, 10, 32)
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Context_size = int32(value1)
-		value2, _ := strconv.ParseFloat(entry_temperature.Text, 32)
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Temperature = float32(value2)
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.System_info = entry_system_info.Text
-		Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.User_nickname = entry_user_nickname.Text
+		GPTComm.AddUpdateModelOLLAMA(model_name, model_info.Type, model_info.Has_tool_role, model_info.Context_size,
+			model_info.Temperature, model_info.System_info)
 	})
 	btn_save.Importance = widget.SuccessImportance
 
-	return createMainContentScrollUTILS(
-		server_uri,
-		entry_models_to_use,
+	var btn_delete *widget.Button = widget.NewButton("Delete model", func() {
+		createConfirmationDialogUTILS("Are you sure you want to delete this model?", func(confirmed bool) {
+			if confirmed {
+				GPTComm.DeleteModelOLLAMA(model_name)
+
+				var model_priorities []string = strings.Split(
+					Utils.GetUserSettings(Utils.ONLY_LOCK).GPTCommunicator.Model_priorities, "\n")
+				var new_model_priorities string = ""
+				for _, model := range model_priorities {
+					if model != model_name {
+						new_model_priorities += model + "\n"
+					}
+				}
+				if new_model_priorities != "" {
+					new_model_priorities = new_model_priorities[:len(new_model_priorities)-1]
+				}
+				Utils.GetUserSettings(Utils.ONLY_UNLOCK).GPTCommunicator.Model_priorities = new_model_priorities
+
+				reloadScreen()
+			}
+		})
+	})
+	btn_delete.Importance = widget.DangerImportance
+
+	return container.NewVBox(
+		label_model_name,
+		selector_mode_type,
 		checkbox_model_has_tool_role,
-		checkbox_prioritize_clients,
-		entry_ctx_size,
+		entry_context_size,
 		entry_temperature,
 		entry_system_info,
-		entry_user_nickname,
-		btn_save,
+		container.New(layout.NewGridLayout(2), btn_save, btn_delete),
 	)
 }
 
@@ -284,17 +395,15 @@ func gptCommunicatorCreateSessionsTab() *container.Scroll {
 
 								msg_content_str +=
 									"-----------------------------------------------------------------------\n" +
-										"|" + msg_role + "| on " +
-										Utils.GetDateTimeStrDATETIME(msg_timestamp_s) + ":\n" + msg_content + "\n\n"
+										"|" + msg_role + "| on " + Utils.GetDateTimeStrDATETIME(msg_timestamp_s) +
+										":\n" + msg_content + "\n\n"
 							}
 							if len(msg_content_str) > 2 {
 								msg_content_str = msg_content_str[:len(msg_content_str)-2]
 							}
 
 							if entries_map[session_id] != nil && entries_map[session_id].Text != msg_content_str {
-								fyne.Do(func() {
-									entries_map[session_id].SetText(msg_content_str)
-								})
+								entries_map[session_id].SetText(msg_content_str)
 							}
 						}
 					}
@@ -377,7 +486,7 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW, GPTComm.ROLE_USER, false, GPTComm.MODEL_TYPE_TEXT) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_NEW, GPTComm.ROLE_USER, false) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -399,7 +508,7 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 		}
 
 		var speak string = ""
-		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP, GPTComm.ROLE_USER, false, GPTComm.MODEL_TYPE_TEXT) {
+		switch GPTComm.SendText(text_to_send.Text, GPTComm.SESSION_TYPE_TEMP, GPTComm.ROLE_USER, false) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -424,9 +533,7 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 				var new_text string = GPTComm.GetLastText()
 				if new_text != old_text {
 					old_text = new_text
-					fyne.Do(func() {
-						response_text.SetText(new_text)
-					})
+					response_text.SetText(new_text)
 				}
 
 				var gpt_state string = "[Not connected to the server to get the GPT state]"
@@ -444,9 +551,7 @@ func gptCommunicatorCreateMainTab() *container.Scroll {
 							gpt_state = "invalid"
 					}
 				}
-				fyne.Do(func() {
-					label_gpt_comm_state.SetText("GPT state: " + gpt_state)
-				})
+				label_gpt_comm_state.SetText("GPT state: " + gpt_state)
 			} else {
 				break
 			}

@@ -26,7 +26,9 @@ import (
 	"OnlineInfoChk"
 	"Utils"
 	"Utils/ModsFileInfo"
+	"bytes"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -40,12 +42,11 @@ const STOP_CMD string = "/stop"
 
 const _INACTIVE_SESSION_TIME_S int64 = 30*60
 
-const _TIME_SLEEP_S int = 1
-
 func serverMode() {
 	getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STARTING
 
-	if getModUserInfo().Models_to_use == "" || getModUserInfo().Context_size == 0 {
+	if len(getModUserInfo().Models) == 0 {
+		// This is here to signal users that they need to do something to make the module work (add models).
 		time.Sleep(2 * time.Second)
 
 		getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STOPPED
@@ -59,20 +60,19 @@ func serverMode() {
 
 	// Prepare the session for the temp and dumb sessions
 	// Very low timestamp to avoid being selected as latest sessions
-	addSessionEntry("temp", -1000000, "")
-	addSessionEntry("dumb", -1000000, "")
+	addSessionEntry("temp", -1000000, "", nil)
+	addSessionEntry("dumb", -1000000, "", nil)
 
 	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 
-	// In case Ollama was started (as opposed to already being running), send a test message for it to actually
-	// start and be ready.
+	// In case Ollama was started (as opposed to already being running), send a test message for it to actually start
+	// and be ready.
 	var chatWithGPT_params _ChatWithGPTParams = _ChatWithGPTParams{
 		Device_id:    Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id,
 		User_message: "test",
 		Session_id:   "temp",
 		Role:         GPTComm.ROLE_USER,
 		More_coming:  false,
-		Model_type:   GPTComm.MODEL_TYPE_TEXT,
 	}
 	chatWithGPT(chatWithGPT_params)
 
@@ -86,42 +86,83 @@ func serverMode() {
 			file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
 			var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
 
-			var to_process string = *file_path.ReadTextFile()
-			if to_process != "" {
-				// It comes like: "[device ID|session type|role|true/false|model type]text"
-				var params_split []string = strings.Split(to_process[1:strings.Index(to_process, "]")], "|")
-				var device_id string = params_split[0]
-				// Session type to use
-				var session_type string = params_split[1]
+			var to_process []byte = file_path.ReadFile()
+			var to_process_str string = string(to_process)
+			if len(to_process) > 0 {
+				chatWithGPT_params = _ChatWithGPTParams{}
 
+				// It comes like: "[number of images|number of audios|size of first file|size of second file|...|device ID|
+				// session type|role|true/false|model type]text + '\x00' [+ each file bytes one after the other - optional]"
+				var idx_first_closing_bracket int = strings.Index(to_process_str, "]")
+				var params_split []string = strings.Split(to_process_str[1:idx_first_closing_bracket], "|")
+
+				// Get number of images and audios and their sizes
+				n_images, _ := strconv.Atoi(params_split[0])
+				n_audios, _ := strconv.Atoi(params_split[1])
+				var size_images []int = nil
+				var size_audios []int = nil
+				for i := 0; i < n_images; i++ {
+					size, _ := strconv.Atoi(params_split[2+i])
+					size_images = append(size_images, size)
+				}
+				for i := 0; i < n_audios; i++ {
+					size, _ := strconv.Atoi(params_split[2+n_images+i])
+					size_audios = append(size_audios, size)
+				}
+
+				var idx_begin_other_params int = 2 + n_images + n_audios
+
+				var device_id string = params_split[idx_begin_other_params+0]
+				chatWithGPT_params.Device_id = device_id
+
+				var session_type string = params_split[idx_begin_other_params+1]
 				var session_id string = ""
 				switch session_type {
 				case GPTComm.SESSION_TYPE_NEW:
-					session_id = Utils.RandStringGENERAL(10)
+					session_id = Utils.RandStringGENERAL(50)
 				case GPTComm.SESSION_TYPE_TEMP:
 					session_id = "temp"
 				case GPTComm.SESSION_TYPE_ACTIVE:
 					session_id = getActiveSessionId()
 					if session_id == "" {
-						session_id = Utils.RandStringGENERAL(10)
+						session_id = Utils.RandStringGENERAL(50)
 					}
 				default:
 					session_id = session_type
 				}
+				chatWithGPT_params.Session_id = session_id
 
-				var text string = to_process[strings.Index(to_process, "]") + 1:]
+				chatWithGPT_params.Role = params_split[idx_begin_other_params+2]
+				chatWithGPT_params.More_coming = params_split[idx_begin_other_params+3] == "true"
 
-				chatWithGPT_params = _ChatWithGPTParams{
-					Device_id:    params_split[0],
-					User_message: to_process[strings.Index(to_process, "]") + 1:],
-					Session_id:   session_id,
-					Role:         params_split[2],
-					More_coming:  params_split[3] == "true",
-					Model_type:   params_split[4],
+				var idx_null int = bytes.Index(to_process, []byte{0})
+				var text string = to_process_str[idx_first_closing_bracket+1 : idx_null]
+				chatWithGPT_params.User_message = text
+
+				// Get the images and audios
+				var files []byte = to_process[idx_null+1:]
+				var files_param []GPTComm.File = nil
+				for i := 0; i < n_images; i++ {
+					files_param = append(files_param, GPTComm.File{
+						Is_image: true,
+						Size:     size_images[i],
+						Contents: files[:size_images[i]],
+					})
+					files = files[size_images[i]:]
+				}
+				for i := 0; i < n_audios; i++ {
+					files_param = append(files_param, GPTComm.File{
+						Is_image: false,
+						Size:     size_audios[i],
+						Contents: files[:size_audios[i]],
+					})
+					files = files[size_audios[i]:]
 				}
 
+				chatWithGPT_params.Files = files_param
+
 				// Control commands begin with a slash
-				if strings.Contains(text, ASK_WOLFRAM_ALPHA) {
+				if strings.HasSuffix(text, ASK_WOLFRAM_ALPHA) {
 					// Ask Wolfram Alpha the question
 					var question string = text[strings.Index(text, ASK_WOLFRAM_ALPHA)+len(ASK_WOLFRAM_ALPHA):]
 					result, direct_result := OnlineInfoChk.RetrieveWolframAlpha(question)
@@ -134,13 +175,13 @@ func serverMode() {
 							result + "]"
 						chatWithGPT(chatWithGPT_params)
 					}
-				} else if strings.Contains(text, SEARCH_WIKIPEDIA) {
+				} else if strings.HasSuffix(text, SEARCH_WIKIPEDIA) {
 					// Search for the Wikipedia page title
 					var query string = text[strings.Index(text, SEARCH_WIKIPEDIA)+len(SEARCH_WIKIPEDIA):]
 
-					_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
+					_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+OnlineInfoChk.RetrieveWikipedia(query)+
 						getEndString(), true)
-				} else if !strings.Contains(text, STOP_CMD) {
+				} else if !strings.HasSuffix(text, STOP_CMD) {
 					chatWithGPT(chatWithGPT_params)
 				}
 			}
@@ -149,7 +190,7 @@ func serverMode() {
 			_ = os.Remove(file_path.GPathToStringConversion())
 		}
 
-		if Utils.WaitWithStopDATETIME(module_stop_GL, _TIME_SLEEP_S) {
+		if Utils.WaitWithStopDATETIME(module_stop_GL, 1) {
 			getModGenSettings().State = ModsFileInfo.MOD_7_STATE_STOPPED
 
 			return
@@ -157,10 +198,10 @@ func serverMode() {
 	}
 }
 
-func addSessionEntry(session_id string, last_interaction_s int64, user_message string) bool {
+func addSessionEntry(session_id string, last_interaction_s int64, user_message string, files []GPTComm.File) {
 	var session_exists bool = false
-	for _, session := range getModGenSettings().Sessions {
-		if session.Id == session_id {
+	for id := range getModGenSettings().Sessions {
+		if id == session_id {
 			session_exists = true
 
 			break
@@ -178,41 +219,52 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 			var message_without_add_info string = user_message[strings.Index(user_message, "]") + 1:]
 			// I've titled the text for you, Sir: "App Notification Settings on OnePlus Watch".
 			// Get the text inside the quotation marks.
-			var prompt string = "Create a title for the following text (beginning of a conversation) and put it " +
-				"inside \"double quotation marks\", please. Don't include the date and time. Text --> " +
-				message_without_add_info + " <--"
+			var prompt string = "Create a title for the following text and possible files (beginning of a " +
+				"conversation) and put it inside \"double quotation marks\", please. Don't include the date and time. " +
+				"Text --> " + message_without_add_info + " <--"
 			var chatWithGPT_params _ChatWithGPTParams = _ChatWithGPTParams{
 				Device_id:    Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id,
 				User_message: prompt,
 				Session_id:   "temp",
 				Role:         GPTComm.ROLE_USER,
 				More_coming:  false,
-				Model_type:   GPTComm.MODEL_TYPE_TEXT,
+				Files:        files,
 			}
 			session_name = chatWithGPT(chatWithGPT_params)
+			var delimiter_start string = ""
+			var delimiter_end string = ""
 			if strings.Contains(session_name, "\"") {
-				session_name = strings.Split(session_name, "\"")[1]
+				delimiter_start = "\""
+				delimiter_end = "\""
+			} else if strings.Contains(session_name, "“") && strings.Contains(session_name, "”") {
+				delimiter_start = "“"
+				delimiter_end = "”"
+			}
+			if delimiter_start != "" {
+				var idx_start int = strings.Index(session_name, delimiter_start)
+				var idx_end int = strings.LastIndex(session_name, delimiter_end)
+				if idx_start != -1 && idx_end != -1 {
+					session_name = session_name[idx_start+len(delimiter_start):idx_end]
+				} else {
+					session_name = "[Error naming the session]"
+				}
 				// Sometimes the name may come like "[name here]", so remove the brackets.
 				session_name = strings.Replace(session_name, "[", "", -1)
 				session_name = strings.Replace(session_name, "]", "", -1)
+				session_name = strings.TrimSpace(session_name)
 			} else {
 				session_name = "[Error naming the session]"
 			}
 		}
 
-		getModGenSettings().Sessions = append(getModGenSettings().Sessions, ModsFileInfo.Session{
-			Id:                 session_id,
+		getModGenSettings().Sessions[session_id] = &ModsFileInfo.Session{
 			Name:               session_name,
 			Created_time_s:     time.Now().Unix(),
 			History:            nil,
 			Last_interaction_s: last_interaction_s,
 			Memorized:          false,
-		})
-
-		return true
+		}
 	}
-
-	return false
 }
 
 /*
@@ -223,38 +275,31 @@ checkStopSpeech checks if the text to process contains the /stop command.
 – Returns:
   - true if the /stop command was found, false otherwise
 */
-func checkStopSpeech() bool {
-	var to_process_dir Utils.GPath = modDirsInfo_GL.UserData.Add2(false, _TO_PROCESS_REL_FOLDER)
-	var file_list []Utils.FileInfo = to_process_dir.GetFileList()
-	for len(file_list) > 0 {
-		file_to_process, idx_to_remove := Utils.GetOldestFileFILESDIRS(file_list)
-		var file_path Utils.GPath = to_process_dir.Add2(false, file_to_process.Name)
-
-		var to_process string = *file_path.ReadTextFile()
-		if to_process != "" {
-			var text string = to_process[strings.Index(to_process, "]") + 1:]
-
-			if strings.HasSuffix(text, STOP_CMD) {
-				_ = os.Remove(file_path.GPathToStringConversion())
-
-				return true
-			}
-		}
-
-		Utils.DelElemSLICES(&file_list, idx_to_remove)
+func checkStopSpeechServer() bool {
+	if !Utils.VISOR_server_GL {
+		return false
 	}
 
-	return false
+	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 2, 0)
+	if comms_map == nil {
+		return false
+	}
+
+	var to_process []byte = comms_map["Process"].([]byte)
+	var to_process_str string = string(to_process)
+
+	// len(to_process_str) - 1 to remove the '\x00' at the end
+	return strings.HasSuffix(to_process_str[:len(to_process_str)-1], STOP_CMD)
 }
 
 func getActiveSessionId() string {
 	// The latest session with less than 30 minutes of inactivity is considered the active one
 	var latest_interaction int64 = 0
 	var active_session_id string = ""
-	for _, session := range getModGenSettings().Sessions {
+	for session_id, session := range getModGenSettings().Sessions {
 		if session.Last_interaction_s > latest_interaction &&
 			time.Now().Unix() - session.Last_interaction_s < _INACTIVE_SESSION_TIME_S {
-			active_session_id = session.Id
+			active_session_id = session_id
 			latest_interaction = session.Last_interaction_s
 		}
 	}
@@ -270,7 +315,8 @@ reduceGptTextTxt reduces the GPT text file to the last 5 entries.
 – Params:
   - gpt_text_txt – the GPT text file
 */
-func reduceGptTextTxt(gpt_text_txt Utils.GPath) {
+func reduceGptTextTxt() {
+	var gpt_text_txt Utils.GPath = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, "gpt_text.txt")
 	var p_text *string = gpt_text_txt.ReadTextFile()
 	if p_text == nil {
 		// The file doesn't yet exist

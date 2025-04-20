@@ -172,3 +172,35 @@ func ContainsSLICES[T comparable](s []T, e T) bool {
 
 	return false
 }
+
+/*
+InitializeAllMapsSLICES initializes all map fields in a struct (including in inner other structs) to empty maps.
+
+------------------------------------------------------------
+
+– Params:
+  - v – a pointer to the struct
+*/
+func InitializeAllMapsSLICES(v any) {
+	val := reflect.ValueOf(v)
+
+	// Ensure we have a pointer to a struct
+	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
+		return
+	}
+
+	val = val.Elem() // Dereference the pointer
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+
+		// Check if the field is a map and initialize it if nil
+		if field.Kind() == reflect.Map && field.IsNil() {
+			field.Set(reflect.MakeMap(field.Type()))
+		}
+
+		// If the field is a struct, recurse into it
+		if field.Kind() == reflect.Struct {
+			InitializeAllMapsSLICES(field.Addr().Interface())
+		}
+	}
+}

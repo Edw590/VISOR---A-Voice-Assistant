@@ -174,6 +174,9 @@ func ReadSettingsFile(user_settings bool) error {
 			p_settings = GetUserSettings(DONT_LOCK_UNLOCK)
 		}
 		err := FromJsonGENERAL(bytes, p_settings)
+
+		InitializeAllMapsSLICES(p_settings)
+
 		if user_settings {
 			GetUserSettings(ONLY_UNLOCK)
 		} else {

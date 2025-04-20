@@ -53,9 +53,7 @@ func registryCreateAutomaticValuesTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_REGISTRY {
-				fyne.Do(func() {
-					registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(1))
-				})
+				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(1))
 			} else {
 				break
 			}
@@ -74,9 +72,7 @@ func registryCreateManualValuesTab() *container.Scroll {
 	go func() {
 		for {
 			if Current_screen_GL == ID_REGISTRY {
-				fyne.Do(func() {
-					registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(2))
-				})
+				registry_text.SetText(UtilsSWA.GetRegistryTextREGISTRY(2))
 			} else {
 				break
 			}

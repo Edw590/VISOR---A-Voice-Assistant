@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,34 +29,35 @@ import (
 ///////////////////////////////////////////////////////////////////
 // Commands list
 
-//const CMD_TOGGLE_FLASHLIGHT string = "1";
-const CMD_ASK_TIME string = "2";
-const CMD_ASK_DATE string = "3";
-const CMD_TOGGLE_WIFI string = "4";
-//const CMD_TOGGLE_MOBILE_DATA string = "5";
-//const CMD_TOGGLE_BLUETOOTH string = "6";
-//const CMD_ANSWER_CALL string = "7";
-//const CMD_END_CALL string = "9";
-//const CMD_TOGGLE_SPEAKERS  string = "10";
-//const CMD_TOGGLE_AIRPLANE_MODE  string = "11";
-const CMD_ASK_BATTERY_PERCENT  string = "12";
-//const CMD_POWER_SHUT_DOWN  string = "13";
-//const CMD_POWER_REBOOT  string = "14";
-//const CMD_TAKE_PHOTO  string = "15";
-//const CMD_RECORD_MEDIA  string = "16";
-//const CMD_SAY_AGAIN  string = "17";
-//const CMD_CALL_CONTACT  string = "18";
-//const CMD_TOGGLE_POWER_SAVER_MODE  string = "19";
-//const CMD_STOP_RECORD_MEDIA  string = "20";
-//const CMD_CONTROL_MEDIA  string = "21";
-//const CMD_STOP_LISTENING  string = "24";
-//const CMD_START_LISTENING  string = "25";
-const CMD_TELL_WEATHER  string = "26";
-const CMD_TELL_NEWS  string = "27";
-//const CMD_GONNA_SLEEP  string = "28";
-const CMD_TOGGLE_ETHERNET string = "29";
-const CMD_TOGGLE_NETWORKING string = "30";
-const CMD_ASK_EVENTS string = "31";
+//const CMD_TOGGLE_FLASHLIGHT string = "1"
+const CMD_ASK_TIME string = "2"
+const CMD_ASK_DATE string = "3"
+const CMD_TOGGLE_WIFI string = "4"
+//const CMD_TOGGLE_MOBILE_DATA string = "5"
+//const CMD_TOGGLE_BLUETOOTH string = "6"
+//const CMD_ANSWER_CALL string = "7"
+//const CMD_END_CALL string = "9"
+//const CMD_TOGGLE_SPEAKERS  string = "10"
+//const CMD_TOGGLE_AIRPLANE_MODE  string = "11"
+const CMD_ASK_BATTERY_PERCENT  string = "12"
+//const CMD_POWER_SHUT_DOWN  string = "13"
+//const CMD_POWER_REBOOT  string = "14"
+//const CMD_TAKE_PHOTO  string = "15"
+//const CMD_RECORD_MEDIA  string = "16"
+//const CMD_SAY_AGAIN  string = "17"
+//const CMD_CALL_CONTACT  string = "18"
+//const CMD_TOGGLE_POWER_SAVER_MODE  string = "19"
+//const CMD_STOP_RECORD_MEDIA  string = "20"
+//const CMD_CONTROL_MEDIA  string = "21"
+//const CMD_STOP_LISTENING  string = "24"
+//const CMD_START_LISTENING  string = "25"
+const CMD_TELL_WEATHER  string = "26"
+const CMD_TELL_NEWS  string = "27"
+//const CMD_GONNA_SLEEP  string = "28"
+const CMD_TOGGLE_ETHERNET string = "29"
+const CMD_TOGGLE_NETWORKING string = "30"
+const CMD_ASK_EVENTS string = "31"
+const CMD_HELP_PICTURE string = "32"
 
 ///////////////////////////////////////////////////////////////////
 // Return IDs
@@ -64,34 +65,34 @@ const CMD_ASK_EVENTS string = "31";
 const RET_ON string = ".00001"
 const RET_OFF string = ".00002"
 
-const RET_14_FAST string = ".00001";
-const RET_14_NORMAL string = ".00002";
-const RET_14_RECOVERY string = ".00003";
-const RET_14_SAFE_MODE string = ".00004";
-const RET_14_BOOTLOADER string = ".00005";
+const RET_14_FAST string = ".00001"
+const RET_14_NORMAL string = ".00002"
+const RET_14_RECOVERY string = ".00003"
+const RET_14_SAFE_MODE string = ".00004"
+const RET_14_BOOTLOADER string = ".00005"
 
-const RET_15_REAR string = ".00001";
-const RET_15_FRONTAL string = ".00002";
+const RET_15_REAR string = ".00001"
+const RET_15_FRONTAL string = ".00002"
 
-const RET_16_AUDIO_1 string = ".00001";
-const RET_16_AUDIO_2 string = ".00003";
-const RET_16_VIDEO_1 string = ".00002";
-const RET_16_VIDEO_2 string = ".00004";
+const RET_16_AUDIO_1 string = ".00001"
+const RET_16_AUDIO_2 string = ".00003"
+const RET_16_VIDEO_1 string = ".00002"
+const RET_16_VIDEO_2 string = ".00004"
 
-const RET_20_ANY string = ".00001";
-const RET_20_AUDIO string = ".00002";
-const RET_20_VIDEO string = ".00003";
+const RET_20_ANY string = ".00001"
+const RET_20_AUDIO string = ".00002"
+const RET_20_VIDEO string = ".00003"
 
-const RET_21_PLAY string = ".00001";
-const RET_21_PAUSE string = ".00002";
-const RET_21_STOP string = ".00003";
-const RET_21_NEXT string = ".00004";
-const RET_21_PREVIOUS string = ".00005";
+const RET_21_PLAY string = ".00001"
+const RET_21_PAUSE string = ".00002"
+const RET_21_STOP string = ".00003"
+const RET_21_NEXT string = ".00004"
+const RET_21_PREVIOUS string = ".00005"
 
-const RET_31_TODAY string = ".00001";
-const RET_31_TOMORROW string = ".00002";
-const RET_31_THIS_WEEK string = ".00003";
-const RET_31_NEXT_WEEK string = ".00004";
+const RET_31_TODAY string = ".00001"
+const RET_31_TOMORROW string = ".00002"
+const RET_31_THIS_WEEK string = ".00003"
+const RET_31_NEXT_WEEK string = ".00004"
 
 ///////////////////////////////////////////////////////////////////
 // Additional command info
@@ -131,9 +132,10 @@ var cmdi_info map[string]string = map[string]string{
 	CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
 	CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
 	//CMD_GONNA_SLEEP:               CMDi_INF1_ONLY_SPEAK,       // 28
-	CMD_TOGGLE_ETHERNET:           CMDi_INF1_DO_SOMETHING,     // 29
-	CMD_TOGGLE_NETWORKING:         CMDi_INF1_DO_SOMETHING,     // 30
-	CMD_ASK_EVENTS:                CMDi_INF1_ONLY_SPEAK,       // 31
+	CMD_TOGGLE_ETHERNET:   CMDi_INF1_DO_SOMETHING, // 29
+	CMD_TOGGLE_NETWORKING: CMDi_INF1_DO_SOMETHING, // 30
+	CMD_ASK_EVENTS:        CMDi_INF1_ONLY_SPEAK,   // 31
+	CMD_HELP_PICTURE:      CMDi_INF1_DO_SOMETHING, // 32
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -181,6 +183,7 @@ func prepareCommandsString() string {
 		{CMD_TOGGLE_ETHERNET, ACD.CMDi_TYPE_TURN_ONFF, "", "", "ethernet"},
 		{CMD_TOGGLE_NETWORKING, ACD.CMDi_TYPE_TURN_ONFF, "", "", "networking/internet"},
 		{CMD_ASK_EVENTS, ACD.CMDi_TYPE_ASK, "", "", "have today|have tomorrow|have this week|have next week"},
+		{CMD_HELP_PICTURE, ACD.CMDi_TYPE_NONE, "help", "", "this image/picture|image/picture clipboard/copied"},
 	}
 
 	var commands_almost_str []string = nil

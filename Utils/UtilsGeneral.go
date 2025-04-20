@@ -25,6 +25,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"golang.design/x/clipboard"
 	"log"
 	"math/rand"
 	"os"
@@ -238,4 +239,32 @@ func GetInputString(prompt string) string {
 	}
 
 	return str
+}
+
+/*
+GetClipboardGENERAL gets the clipboard content.
+
+It returns either text or a PNG image. If something else is on the clipboard, the function will ignore it.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the clipboard content as a byte array or nil if the clipboard is empty or if the clipboard could not be initialized
+*/
+func GetClipboardGENERAL() []byte {
+	if err := clipboard.Init(); err != nil {
+		return nil
+	}
+
+	var clip_board []byte = clipboard.Read(clipboard.FmtImage)
+	if len(clip_board) > 0 {
+		return clip_board
+	}
+
+	clip_board = clipboard.Read(clipboard.FmtText)
+	if len(clip_board) > 0 {
+		return clip_board
+	}
+
+	return nil
 }

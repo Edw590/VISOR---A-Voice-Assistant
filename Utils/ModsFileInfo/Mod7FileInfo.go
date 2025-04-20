@@ -35,13 +35,11 @@ type Mod7GenInfo struct {
 	// Memories is the list of memories the GPT has
 	Memories []string
 	// Sessions is the list of sessions of the user with the GPT
-	Sessions []Session
+	Sessions map[string]*Session
 }
 
 // Session is the format of a chat session with the GPT.
 type Session struct {
-	// Id is the ID of the session
-	Id string
 	// Name is the name of the session
 	Name string
 	// Created_time_s is the timestamp of the creation of the session
@@ -60,18 +58,26 @@ type Session struct {
 type Mod7UserInfo struct {
 	// Server_url is the URL of the LLM server
 	Server_url string
-	// Models_to_use are the names and types of the LLM models to use in order of preference, one per line
-	Models_to_use string
-	// Model_has_tool_role indicates if the tool role of the LLM model exists or not
-	Model_has_tool_role bool
 	// Prioritize_clients_models indicates if the clients models should be prioritized over the server ones
 	Prioritize_clients_models bool
-	// Context_size is the context size to use
-	Context_size int32
-	// Temperature is the temperature to use
-	Temperature float32
-	// System_info is the LLM's system information, like the cutting knowledge date and today's date
-	System_info string
 	// User_nickname is the user nickname to be used by the LLM
 	User_nickname string
+	// Model_priorities is the list of model priorities (one model per line by order of priority)
+	Model_priorities string
+	// Models maps the name of the models the GPT is authorized to attempt to use to their information
+	Models map[string]*Model
+}
+
+// Model is the format of a model used by the GPT.
+type Model struct {
+	// Type is the type of the model (one of the GPTComm.MODEL_TYPE_-started constants)
+	Type string
+	// Has_tool_role indicates if the tool role is available for the model or not
+	Has_tool_role bool
+	// Context_size is the context size of the model
+	Context_size int32
+	// Temperature is the temperature of the model
+	Temperature float32
+	// System_info is the system information of the model, like the cutting knowledge date for Llama models
+	System_info string
 }

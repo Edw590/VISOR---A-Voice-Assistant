@@ -38,8 +38,10 @@ var libs_comms_channels_GL [_LIBS_COMMS_CHANNELS_SIZE]chan map[string]any = [_LI
 InitializeCommsChannels initializes the modules and libraries communication channels.
 */
 func InitializeCommsChannels() {
-	for i := 0; i < _MODS_COMMS_CHANNELS_SIZE; i++ {
-		mods_comms_channels_GL[i] = make(chan map[string]any)
+	for i := 0; i < MODS_ARRAY_SIZE; i++ {
+		for j := 0; j < _COMMS_CH_MUL; j++ {
+			mods_comms_channels_GL[getFullChannelNum(i, j)] = make(chan map[string]any, MOD_NUMS_INFO[i].Chan_size)
+		}
 	}
 	for i := 0; i < _LIBS_COMMS_CHANNELS_SIZE; i++ {
 		libs_comms_channels_GL[i] = make(chan map[string]any)
@@ -67,10 +69,10 @@ GetFromCommsChannel gets data from a module or library communication channel.
   - is_mod – whether it's a channel from a module or library
   - num – the number of the module or library
   - ch_num – the channel number
-  - timeout_s – the timeout in seconds or -1 for no timeout
+  - timeout_s – the timeout in seconds (>= 0) or -1 for no timeout
 
 – Returns:
-  - the data from the channel
+  - the data from the channel or nil if the timeout is reached
 */
 func GetFromCommsChannel(is_mod bool, num int, ch_num int, timeout_s int) map[string]any {
 	var full_channel_num int = getFullChannelNum(num, ch_num)
@@ -79,6 +81,22 @@ func GetFromCommsChannel(is_mod bool, num int, ch_num int, timeout_s int) map[st
 			return <- mods_comms_channels_GL[full_channel_num]
 		} else {
 			return <- libs_comms_channels_GL[full_channel_num]
+		}
+	} else if timeout_s == 0 {
+		if is_mod {
+			select {
+				case data := <- mods_comms_channels_GL[full_channel_num]:
+					return data
+				default:
+					return nil
+			}
+		} else {
+			select {
+				case data := <- libs_comms_channels_GL[full_channel_num]:
+					return data
+				default:
+					return nil
+			}
 		}
 	} else {
 		if is_mod {

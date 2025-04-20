@@ -92,14 +92,14 @@ func remoteSettingsChanged() bool {
 	if comms_map == nil {
 		return false
 	}
-	map_value, ok := comms_map[Utils.COMMS_MAP_SRV_KEY]
-	if !ok {
+
+	var map_value []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
+	if map_value == nil {
 		return false
 	}
 
-	var new_crc16 []byte = map_value.([]byte)
-	if !bytes.Equal(new_crc16, last_remote_crc16_GL) {
-		last_remote_crc16_GL = new_crc16
+	if !bytes.Equal(map_value, last_remote_crc16_GL) {
+		last_remote_crc16_GL = map_value
 
 		return true
 	}

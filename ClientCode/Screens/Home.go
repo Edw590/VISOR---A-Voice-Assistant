@@ -188,13 +188,9 @@ func homeCreateMainTab() *container.Scroll {
 				communicator_checkbox.SetChecked(Utils.IsCommunicatorConnectedSERVER())
 
 				if SettingsSync.IsWebsiteInfoEmpty() {
-					fyne.Do(func() {
-						no_website_info_label.SetText("No server info exists. Enter it to activate full functionality.")
-					})
+					no_website_info_label.SetText("No server info exists. Enter it to activate full functionality.")
 				} else {
-					fyne.Do(func() {
-						no_website_info_label.SetText("Server info exists")
-					})
+					no_website_info_label.SetText("Server info exists")
 				}
 			} else {
 				break

@@ -68,7 +68,12 @@ func main(module_stop *bool, moduleInfo_any any) {
 			// Send the message to all clients. Their handler will decide if the message is for them or not.
 			for i := 0; i < MAX_CLIENTS; i++ {
 				if used_channels_GL[i] {
-					channels_GL[i] <- map_value
+					// Ignore the panic of writing to a closed channel. Not sure why that happens.
+					Tcef.Tcef{
+						Try: func() {
+							channels_GL[i] <- map_value
+						},
+					}.Do()
 				}
 			}
 		}
@@ -189,12 +194,11 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 					var truncated_msg []byte = message[index_bar + 1:]
 
 					if err = sendData(websocket.BinaryMessage, Utils.CompressBytes(truncated_msg)); err == nil {
-						log.Printf("Message sent 2. Length: %d; CRC16: %d; Content: %s", len(truncated_msg),
-							CRC16.Result(truncated_msg, "CCIT_ZERO"), truncated_msg[:strings.Index(string(truncated_msg), "|")])
+						log.Printf("Message sent 2. Length: %d; CRC16: %d; To: %s; On: %s", len(truncated_msg),
+							CRC16.Result(truncated_msg, "CCIT_ZERO"),
+							truncated_msg[:strings.Index(string(truncated_msg), "|")], device_id)
 					} else {
-						log.Println("Write error:", err)
-
-						return
+						log.Println("Write error 2:", err)
 					}
 			}
 		}
@@ -236,7 +240,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Print received message
-		log.Printf("Received: %s", message[:index_bar + index_2nd_bar + 2])
+		log.Printf("Received: %s; From: %s", message[:index_bar + index_2nd_bar + 2], device_id)
 
 		var message_parts []string = strings.Split(message_str, "|")
 		if len(message_parts) < 3 {
@@ -255,12 +259,10 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			response = Utils.CompressBytes(response)
 
 			if err = sendData(websocket.BinaryMessage, response); err == nil {
-				log.Printf("Message sent 1. Length: %d; CRC16: %d; To: %s", len(response),
-					CRC16.Result(response, "CCIT_ZERO"), msg_to)
+				log.Printf("Message sent 1. Length: %d; CRC16: %d; To: %s; On: %s", len(response),
+					CRC16.Result(response, "CCIT_ZERO"), msg_to, device_id)
 			} else {
-				log.Println("Write error:", err)
-
-				break
+				log.Println("Write error 1:", err)
 			}
 		}
 	}
@@ -311,32 +313,31 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			}
 		case "GPT":
 			// Send a text to be processed by the GPT model or redirected to the right client.
-			// Example: "["process", "redirect" or "models"]in case of processing, a string or empty string to just
-			// get the return value; in case of redirecting and models, a string"
-			// Returns: in case of processing, "true" if the text will be processed immediately, "false" if the GPT is
-			// busy for now and the text will wait; in case of redirecting and models, nothing
+			// Example: "'process', 'redirect' or 'models'|in case of processing, the dataa or nothing to just get the
+			// return value; in case of redirecting and models, a string"
+			// Returns: in case of processing, the GPT Communicator module state; in case of redirecting and models,
+			// nothing
 			var bytes_str string = string(bytes)
-			var params_split []string = strings.Split(bytes_str[1:strings.Index(bytes_str, "]")], "|")
-			var action string = params_split[0]
+			var action string = strings.Split(bytes_str, "|")[0]
 
-			var str string = string(bytes[strings.Index(bytes_str, "]")+1:])
+			var data []byte = bytes[strings.Index(bytes_str, "|")+1:]
 
 			switch action {
 				case "process":
 					var ret []byte = []byte(strconv.Itoa(int(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.State)))
 
-					if len(str) > 0 {
+					if len(data) > 0 {
 						// Don't use channels for this. What if various messages are sent while one is still be processed? The
 						// module will lock - as it did now.
 						_ = Utils.GetUserDataDirMODULES(Utils.NUM_MOD_GPTCommunicator).Add2(false, "to_process",
-							Utils.RandStringGENERAL(10) + ".txt").WriteTextFile(str, false)
+							Utils.RandStringGENERAL(10) + ".dat").WriteFile(data, false)
 					}
 
 					return ret
 				case "redirect":
-					Utils.SendToModChannel(Utils.NUM_MOD_GPTCommunicator, 0, "Redirect", str)
+					Utils.SendToModChannel(Utils.NUM_MOD_GPTCommunicator, 0, "Redirect", string(data))
 				case "models":
-					Utils.SendToModChannel(Utils.NUM_MOD_GPTCommunicator, 1, "Models", str)
+					Utils.SendToModChannel(Utils.NUM_MOD_GPTCommunicator, 1, "Models", string(data))
 				default:
 					// Nothing
 			}
@@ -382,9 +383,9 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			// Allowed strings: one of the ones on the switch statement
 			// Returns: nothing
 			var bytes_split []string = strings.Split(string(bytes), "|")
-			var origin string = bytes_split[0]
+			var json_dest string = bytes_split[0]
 			var settings string = string(bytes[strings.Index(string(bytes), "|")+1:])
-			switch origin {
+			switch json_dest {
 				case "US":
 					var user_settings Utils.UserSettings
 					_ = Utils.FromJsonGENERAL([]byte(settings), &user_settings)
@@ -406,24 +407,12 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					var session_id string = instructions[0]
 					var action string = instructions[1]
 					if action == "delete" {
-						for i, session := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions {
-							if session.Id == session_id {
-								Utils.DelElemSLICES(&Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions, i)
-
-								break
-							}
-						}
+						delete(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions, session_id)
 					} else if action == "rename" {
-						for i, session := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions {
-							if session.Id == session_id {
-								Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions[i].Name = instructions[2]
-
-								break
-							}
-						}
+						Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions[session_id].Name = instructions[2]
 					}
 				default:
-					log.Println("Invalid JSON destination:", origin)
+					log.Println("Invalid JSON destination:", json_dest)
 			}
 	}
 
@@ -445,9 +434,9 @@ func registerChannel() int {
 
 func unregisterChannel(channel_num int) {
 	if channel_num >= 0 && channel_num < MAX_CLIENTS && channels_GL[channel_num] != nil {
+		used_channels_GL[channel_num] = false
 		close(channels_GL[channel_num])
 		channels_GL[channel_num] = nil
-		used_channels_GL[channel_num] = false
 	}
 }
 

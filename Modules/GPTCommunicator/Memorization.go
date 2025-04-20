@@ -35,15 +35,13 @@ import (
 func autoMemorize() {
 	for {
 		if getModGenSettings().State == ModsFileInfo.MOD_7_STATE_READY {
-			var session_history []ModsFileInfo.Session = getModGenSettings().Sessions
-			for i := 0; i < len(session_history); i++ {
-				var session *ModsFileInfo.Session = &session_history[i]
-				if session.Id == getActiveSessionId() || session.Memorized || session.Id == "temp" || session.Id == "dumb" {
+			for session_id, session := range getModGenSettings().Sessions {
+				if session_id == getActiveSessionId() || session.Memorized || session_id == "temp" || session_id == "dumb" {
 					continue
 				}
 
 				// If the session is no longer the active one, memorize it
-				if memorizeSession(session.Id) {
+				if memorizeSession(session_id) {
 					session.Memorized = true
 				}
 			}
@@ -66,8 +64,8 @@ func autoMemorize() {
 
 func memorizeSession(session_id string) bool {
 	var session_history []ModsFileInfo.OllamaMessage = nil
-	for _, session := range getModGenSettings().Sessions {
-		if session.Id == session_id {
+	for id, session := range getModGenSettings().Sessions {
+		if id == session_id {
 			session_history = Utils.CopyOuterSLICES(session.History)
 
 			break
@@ -109,7 +107,6 @@ func memorizeSession(session_id string) bool {
 		Session_id:   "temp",
 		Role:         GPTComm.ROLE_USER,
 		More_coming:  false,
-		Model_type:   GPTComm.MODEL_TYPE_TEXT,
 	}
 	var response string = chatWithGPT(chatWithGPT_params)
 
@@ -147,7 +144,6 @@ func summarizeMemories() bool {
 		Session_id:   "temp",
 		Role:         GPTComm.ROLE_USER,
 		More_coming:  false,
-		Model_type:   GPTComm.MODEL_TYPE_TEXT,
 	}
 	var response string = chatWithGPT(chatWithGPT_params)
 

@@ -141,9 +141,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 						validity = "INVALID"
 					}
 				}
-				fyne.Do(func() {
-					label_token_valid.SetText("Token is: " + validity + " (refreshes at most every 60 seconds)")
-				})
+				label_token_valid.SetText("Token is: " + validity + " (refreshes at most every 60 seconds)")
 			} else {
 				break
 			}

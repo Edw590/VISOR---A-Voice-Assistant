@@ -109,7 +109,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 		var send_to_GPT bool = false
 		if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
-			var speak string = "WARNING! There was a problem processing the commands Sir. This needs a fix. The " +
+			var speak string = "WARNING! There was a problem processing the commands, Sir. This needs a fix. The " +
 				"error was the following: " + cmds_info_str + ". You said: " + sentence_str
 			Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 			log.Println("EXECUTOR - ERR_PROC_CMDS")
@@ -156,11 +156,11 @@ func main(module_stop *bool, moduleInfo_any any) {
 			switch cmd_id {
 				case CMD_ASK_TIME:
 					var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
-					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
+					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false, true)
 
 				case CMD_ASK_DATE:
 					var speak string = "Today's " + Utils.GetDateStrDATETIME(-1)
-					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
+					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false, true)
 
 				case CMD_TOGGLE_WIFI:
 					if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
@@ -170,25 +170,25 @@ func main(module_stop *bool, moduleInfo_any any) {
 						} else {
 							speak = "Wi-Fi turned off."
 						}
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					} else {
 						var on_off string = "off"
 						if cmd_variant == RET_ON {
 							on_off = "on"
 						}
 						var speak string = "Sorry, I couldn't turn the Wi-Fi " + on_off + "."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					}
 
 				case CMD_ASK_BATTERY_PERCENT:
 					var battery_percentage int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 						GetInt(true))
 					var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 
 				case CMD_TELL_WEATHER:
 					var speak string = "Obtaining the weather..."
-					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
+					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 
 					// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -199,7 +199,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 							var weather *ModsFileInfo.Weather = OICComm.GetWeather(weather_loc)
 							if weather == nil {
 								speak = "There is no weather data associated with the location " + weather_loc + "."
-								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 
 								continue
 							}
@@ -207,7 +207,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 							if weather.Temperature == "" {
 								// One being empty means the whole weather is empty
 								speak = "There was a problem obtaining the weather for " + weather.Location + "."
-								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+								speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 
 								continue
 							}
@@ -221,16 +221,16 @@ func main(module_stop *bool, moduleInfo_any any) {
 								" degrees, a high of " + weather.Max_temp + " degrees and a low of " + weather.Min_temp +
 								" degrees. The mean precipitation is of " + weather.Precipitation + ", mean " +
 								"humidity of " + weather.Humidity + ", and mean wind of " + weather.Wind + "."
-							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false)
+							speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false, true)
 						}
 					} else {
 						speak = "Not connected to the server to get the weather."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					}
 
 				case CMD_TELL_NEWS:
 					var speak string = "Obtaining the latest news..."
-					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
+					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 
 					// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -245,11 +245,11 @@ func main(module_stop *bool, moduleInfo_any any) {
 							for _, n := range news.News {
 								speak += n + ". "
 							}
-							speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
+							speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 						}
 					} else {
 						speak = "Not connected to the server to get the news."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					}
 
 				case CMD_TOGGLE_ETHERNET:
@@ -260,14 +260,14 @@ func main(module_stop *bool, moduleInfo_any any) {
 						} else {
 							speak = "Ethernet turned off."
 						}
-						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
+						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 					} else {
 						var on_off string = "off"
 						if cmd_variant == RET_ON {
 							on_off = "on"
 						}
 						var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					}
 
 				case CMD_TOGGLE_NETWORKING:
@@ -278,19 +278,19 @@ func main(module_stop *bool, moduleInfo_any any) {
 						} else {
 							speak = "Networking turned off."
 						}
-						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
+						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 					} else {
 						var on_off string = "off"
 						if cmd_variant == RET_ON {
 							on_off = "on"
 						}
 						var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					}
 
 				case CMD_ASK_EVENTS:
 					var speak string = "Obtaining the tasks and events..."
-					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false)
+					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 
 					// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
@@ -304,11 +304,25 @@ func main(module_stop *bool, moduleInfo_any any) {
 							speak += " " + getTasksList(tasks_ids, cmd_variant)
 						}
 
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true, true)
 					} else {
 						speak = "Not connected to the server to get the tasks and events."
-						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false)
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					}
+
+				case CMD_HELP_PICTURE:
+					var clipboard []byte = Utils.GetClipboardGENERAL()
+					var png []byte = isPng(clipboard)
+					if png == nil {
+						var speak string = "There is no PNG image in the clipboard. Remember, it has to be a PNG image."
+						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
+
+						continue
+					}
+
+					GPTComm.AddFileToSend(true, png)
+
+					speakInternal(sentence_str, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true, false)
 			}
 		}
 
@@ -322,12 +336,17 @@ func main(module_stop *bool, moduleInfo_any any) {
 }
 
 const _SESSION_TYPE_NONE string = "NONE"
-func speakInternal(txt_to_speak string, speech_priority int32, mode int32, session_type string, wait_for_gpt bool) {
+func speakInternal(txt_to_speak string, speech_priority int32, mode int32, session_type string, wait_for_gpt bool,
+				   use_tool_role bool) {
 	if session_type != _SESSION_TYPE_NONE && speech_priority <= SpeechQueue.PRIORITY_USER_ACTION &&
 				Utils.IsCommunicatorConnectedSERVER() && (wait_for_gpt ||
-				GPTComm.SendText("", "", "", false, GPTComm.MODEL_TYPE_TEXT) == ModsFileInfo.MOD_7_STATE_READY) {
+				GPTComm.SendText("", "", "", false) == ModsFileInfo.MOD_7_STATE_READY) {
+		var role_to_use string = GPTComm.ROLE_USER
+		if use_tool_role {
+			role_to_use = GPTComm.ROLE_TOOL
+		}
 		var speak string = ""
-		switch GPTComm.SendText(txt_to_speak, session_type, GPTComm.ROLE_TOOL, false, GPTComm.MODEL_TYPE_TEXT) {
+		switch GPTComm.SendText(txt_to_speak, session_type, role_to_use, false) {
 			case ModsFileInfo.MOD_7_STATE_STOPPED:
 				speak = "The GPT is stopped. Text on hold."
 			case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -354,7 +373,7 @@ func sendToGPT(txt_to_send string) {
 	}
 
 	var speak string = ""
-	switch GPTComm.SendText(txt_to_send, GPTComm.SESSION_TYPE_ACTIVE, GPTComm.ROLE_USER, false, GPTComm.MODEL_TYPE_TEXT) {
+	switch GPTComm.SendText(txt_to_send, GPTComm.SESSION_TYPE_ACTIVE, GPTComm.ROLE_USER, false) {
 		case ModsFileInfo.MOD_7_STATE_STOPPED:
 			speak = "The GPT is stopped. Text on hold."
 		case ModsFileInfo.MOD_7_STATE_STARTING:
@@ -365,4 +384,52 @@ func sendToGPT(txt_to_send string) {
 	if speak != "" && txt_to_send != "/stop" {
 		Speech.QueueSpeech(speak, SpeechQueue.PRIORITY_USER_ACTION, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
 	}
+}
+
+/*
+isPng checks if the given byte slice is a PNG image (path or PNG bytes).
+
+-----------------------------------------------------------
+
+– Params:
+  - clipboard – the byte slice to check
+
+– Returns:
+  - the PNG image bytes if it's a PNG image, nil otherwise
+ */
+func isPng(clipboard []byte) []byte {
+	if clipboard == nil {
+		return nil
+	}
+
+	var png []byte = clipboard
+
+	var png_path string = string(png)
+	if strings.HasPrefix(png_path, "\"") && strings.HasSuffix(png_path, "\"") {
+		png_path = png_path[1 : len(png_path)-1]
+	}
+	var image_path Utils.GPath = Utils.PathFILESDIRS(false, "", png_path)
+	if image_path.Exists() {
+		// If it's a file path, use its contents. If it's not, check if it's a PNG already.
+		png = image_path.ReadFile()
+	}
+
+	var png_header []byte = []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}
+	if len(png) < len(png_header) {
+		return nil
+	}
+
+	var is_png bool = true
+	for i := 0; i < len(png_header); i++ {
+		if png_header[i] != png[i] {
+			is_png = false
+
+			break
+		}
+	}
+	if !is_png {
+		return nil
+	}
+
+	return png
 }

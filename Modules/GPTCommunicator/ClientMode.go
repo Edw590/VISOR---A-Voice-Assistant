@@ -23,7 +23,6 @@ package GPTCommunicator
 
 import (
 	"Utils"
-	"log"
 	"strings"
 )
 
@@ -41,7 +40,6 @@ func clientMode() {
 			}
 
 			var request string = string(map_value)
-			log.Println("request", request)
 			if request == "" {
 				continue
 			}
@@ -69,14 +67,9 @@ func clientMode() {
 				return
 			}
 
-			var map_value []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
-			if map_value == nil {
-				return
-			}
-
 			var models string = *Utils.ToJsonGENERAL(getLocalModels())
 
-			var message []byte = []byte("GPT|[models]")
+			var message []byte = []byte("GPT|models|")
 			message = append(message, models...)
 			Utils.QueueNoResponseMessageSERVER(message)
 		}
@@ -87,4 +80,17 @@ func clientMode() {
 			return
 		}
 	}
+}
+
+func checkStopSpeechClient() bool {
+	if Utils.VISOR_server_GL {
+		return false
+	}
+
+	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 2, 0)
+	if comms_map == nil {
+		return false
+	}
+
+	return true
 }

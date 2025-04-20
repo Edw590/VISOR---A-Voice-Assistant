@@ -162,6 +162,8 @@ type ModuleInfo struct {
 	Name string
 	// C_S_support is the support of the module on the client/server version (one of the MOD_-started constants).
 	C_S_support int
+	// Chan_size is the size of the communication channels for the module.
+	Chan_size int
 }
 
 type Module struct {

@@ -22,23 +22,31 @@
 package GPTCommunicator
 
 import (
+	"GPTComm"
 	"Utils"
 	"log"
 	"strings"
 )
 
-func getModelName(model_type_to_use string) (string, string) {
+func getModelName(images_needed bool) (string, string) {
 	var model_to_use string = ""
-	var device_id_to_use string = Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
+	var device_id_to_use string = ""
+
+	var model_type_to_use string = ""
+	if images_needed {
+		model_type_to_use = GPTComm.MODEL_TYPE_VISION
+	} else {
+		model_type_to_use = GPTComm.MODEL_TYPE_TEXT
+	}
+
 	getServerModels := func() {
-		log.Println("model_type_to_use:", model_type_to_use)
 		var self_models []string = nil
 		for _, model := range getLocalModels().Models {
 			self_models = append(self_models, model.Name)
 		}
-		log.Println("self_models:", self_models)
 		model_to_use = checkModels(self_models, model_type_to_use)
 		if model_to_use != "" {
+			device_id_to_use = Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id
 			log.Println("Model found in self models:", model_to_use)
 		}
 	}
@@ -49,13 +57,14 @@ func getModelName(model_type_to_use string) (string, string) {
 		for _, device_id := range active_device_ids {
 			device_models[device_id] = getDeviceLocalModels(device_id)
 		}
-		log.Println("device_models:", device_models)
 
 		for device_id, models := range device_models {
 			model_to_use = checkModels(models, model_type_to_use)
 			if model_to_use != "" {
 				device_id_to_use = device_id
 				log.Println("Model found in \"" + device_id + "\" models:", model_to_use)
+
+				break
 			}
 		}
 	}
@@ -89,13 +98,22 @@ func getModelName(model_type_to_use string) (string, string) {
 	return model_to_use, device_id_to_use
 }
 
-func checkModels(models []string, model_type_to_use string) string {
-	for _, model_info := range strings.Split(getModUserInfo().Models_to_use, "\n") {
-		var model_info_split []string = strings.Split(model_info, " - ")
-		var model_name string = model_info_split[0]
-		var model_type string = model_info_split[1]
-		if model_type == model_type_to_use {
-			for _, model := range models {
+func checkModels(device_models []string, model_type_to_use string) string {
+	var model_priorities []string = strings.Split(getModUserInfo().Model_priorities, "\n")
+	for _, model_name := range model_priorities {
+		if model_name == "" {
+			continue
+		}
+
+		model_info, ok := Utils.GetUserSettings(Utils.LOCK_UNLOCK).GPTCommunicator.Models[model_name]
+		if !ok {
+			log.Println("Model not found in user settings:", model_name)
+
+			continue
+		}
+
+		if strings.Contains(model_info.Type, model_type_to_use) {
+			for _, model := range device_models {
 				if model == model_name {
 					return model_name
 				}
@@ -122,7 +140,7 @@ func getDeviceLocalModels(device_id string) []string {
 	var local_models _LocalModels
 	err := Utils.FromJsonGENERAL(map_value, &local_models)
 	if err != nil {
-		log.Println("Error parsing local models:", err)
+		log.Println("Error parsing local models for \"" + device_id + "\":", err)
 
 		return nil
 	}
