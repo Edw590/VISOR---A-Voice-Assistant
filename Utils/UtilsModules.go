@@ -42,8 +42,6 @@ const (
 	_TEMP_FOLDER string = _DATA_REL_DIR + "/Temp"
 	// _USER_DATA_REL_DIR is the relative path to the user data directory from PersonalConsts._VISOR_DIR.
 	_USER_DATA_REL_DIR string = _DATA_REL_DIR + "/UserData"
-	// _PROGRAM_DATA_REL_DIR is the relative path to the program data directory from PersonalConsts._VISOR_DIR.
-	_PROGRAM_DATA_REL_DIR string = _DATA_REL_DIR + "/ProgramData"
 	// _WEBSITE_FILES_REL_DIR is the relative path to the website files directory from PersonalConsts._WEBSITE_DIR.
 	_WEBSITE_FILES_REL_DIR string = "files_EOG"
 )
@@ -150,7 +148,7 @@ const (
 const _LOOP_TIME_S int64 = 5
 
 type ModDirsInfo struct {
-	// ProgramData is the path to the directory of the program data files.
+	// ProgramData is the path to the directory of the program data asset files.
 	ProgramData GPath
 	// UserData is the path to the directory of the private user data files.
 	UserData GPath
@@ -558,7 +556,7 @@ getProgramDataDirMODULES gets the full path to the program data directory of a m
   - the full path to the program data directory of the module
 */
 func getProgramDataDirMODULES(mod_num int) GPath {
-	return getVISORDirFILESDIRS().Add2(true, _PROGRAM_DATA_REL_DIR, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
+	return PathFILESDIRS(true, "", ASSETS_PREFIX, _MOD_FOLDER_PREFFIX + strconv.Itoa(mod_num))
 }
 
 /*

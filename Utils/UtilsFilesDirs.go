@@ -22,13 +22,17 @@
 package Utils
 
 import (
+	ProgramData "Assets"
 	"errors"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 )
+
+const ASSETS_PREFIX string = "?assets?/"
 
 /*
 GPath (GoodPath) is sort of a copy of the string type but that represents a *surely* valid and correct path, also
@@ -65,6 +69,7 @@ Note: the path separators used are always converted to the OS ones.
 -----------------------------------------------------------
 
 – Params:
+  - describes_dir – true if the path describes a directory, false if it describes a file
   - separator – the path separator to use or "" for the OS default one
   - sub_paths – the subpaths to combine
 
@@ -235,14 +240,11 @@ Note: all line breaks are replaced by "\n" for internal use, just like Python do
   - the contents of the file or nil if an error occurs (including if the path describes a directory)
 */
 func (gPath GPath) ReadTextFile() *string {
-	if gPath.dir || !gPath.Exists() {
+	var data []byte = gPath.ReadFile()
+	if data == nil {
 		return nil
 	}
 
-	data, err := os.ReadFile(gPath.p)
-	if nil != err {
-		return nil
-	}
 	var ret string = string(data)
 
 	ret = strings.ReplaceAll(ret, "\r\n", "\n")
@@ -264,12 +266,22 @@ func (gPath GPath) ReadFile() []byte {
 		return nil
 	}
 
-	data, err := os.ReadFile(gPath.p)
-	if nil != err {
-		return nil
-	}
+	if gPath.isAssetPath() {
+		// If the path is an asset path, read the file from the assets directory.
+		file, err := ProgramData.Assets_GL.ReadFile(strings.Replace(gPath.p, ASSETS_PREFIX, "", 1))
+		if err != nil {
+			return nil
+		}
 
-	return data
+		return file
+	} else {
+		data, err := os.ReadFile(gPath.p)
+		if err != nil {
+			return nil
+		}
+
+		return data
+	}
 }
 
 /*
@@ -321,7 +333,7 @@ func (gPath GPath) WriteFile(content []byte, append bool) error {
 		var flags int = os.O_WRONLY | os.O_APPEND
 
 		file, err := os.OpenFile(gPath.p, flags, 0o777)
-		if nil != err {
+		if err != nil {
 			return err
 		}
 		defer file.Close()
@@ -331,7 +343,7 @@ func (gPath GPath) WriteFile(content []byte, append bool) error {
 		// This way is here too because the other one doesn't seem to work well when it's not to append. Sometimes it
 		// adds stuff to the file who knows why. This way here doesn't at least.
 		err := os.WriteFile(gPath.p, content, 0o777)
-		if nil != err {
+		if err != nil {
 			return err
 		}
 	}
@@ -374,12 +386,27 @@ Exists checks if a path exists.
   - true if the path exists (meaning the program also has permissions to *see* the file), false otherwise
 */
 func (gPath GPath) Exists() bool {
-	if nil != gPath.IsSupported() {
+	if gPath.IsSupported() != nil {
 		return false
 	}
 
-	_, err := os.Stat(gPath.p)
-	return err == nil
+	if gPath.isAssetPath() {
+		// If the path is an asset path, check if it exists in the assets directory.
+		file, err := ProgramData.Assets_GL.Open(strings.Replace(gPath.p, ASSETS_PREFIX, "", 1))
+		if err != nil {
+			return false
+		}
+		defer file.Close()
+
+		return true
+	} else {
+		_, err := os.Stat(gPath.p)
+		return err == nil
+	}
+}
+
+func (gPath GPath) isAssetPath() bool {
+	return strings.HasPrefix(gPath.p, ASSETS_PREFIX)
 }
 
 /*
@@ -394,7 +421,7 @@ Create creates a path and any necessary subdirectories in case they don't exist 
   - nil if the path was created successfully, an error otherwise
 */
 func (gPath GPath) Create(create_file bool) error {
-	if err := gPath.IsSupported(); nil != err {
+	if err := gPath.IsSupported(); err != nil {
 		return err
 	}
 
@@ -440,7 +467,7 @@ func (gPath GPath) Create(create_file bool) error {
 	// Create the file if the path represents a file.
 	if create_file && describes_file && !gPath.Exists() {
 		file, err := os.Create(gPath.p)
-		if nil != err {
+		if err != nil {
 			return err
 		}
 		_ = os.Chmod(gPath.p, 0o777)
@@ -459,7 +486,7 @@ Remove removes a file or directory.
   - nil if the file or directory was removed successfully, an error otherwise
  */
 func (gPath GPath) Remove() error {
-	if err := gPath.IsSupported(); nil != err {
+	if err := gPath.IsSupported(); err != nil {
 		return err
 	}
 
@@ -513,9 +540,21 @@ func (gPath GPath) GetFileList() []FileInfo {
 		return nil
 	}
 
-	files, err := os.ReadDir(gPath.GPathToStringConversion())
-	if nil != err {
-		return nil
+	var files []fs.DirEntry = nil
+	if gPath.isAssetPath() {
+		var err error = nil
+		files, err = ProgramData.Assets_GL.ReadDir(strings.Replace(gPath.p, ASSETS_PREFIX, "", 1))
+		log.Println("Files:", files)
+		log.Println("Error:", err)
+		if err != nil {
+			return nil
+		}
+	} else {
+		var err error = nil
+		files, err = os.ReadDir(gPath.GPathToStringConversion())
+		if err != nil {
+			return nil
+		}
 	}
 
 	var files_to_send []FileInfo = make([]FileInfo, 0, len(files))

@@ -19,27 +19,11 @@
  * under the License.
  ******************************************************************************/
 
-//go:build client
+//go:build server
 
-package ModulesManager
+package ProgramData
 
-import (
-	CommandsExecutor "CmdsExecutor"
-	"GPTCommunicator"
-	"Speech"
-	"SystemChecker"
-	"TasksExecutor"
-	"UserLocator"
-	"Utils"
-)
+import "embed"
 
-// Make sure to add the modules support check for each new module too...
-var _MAP_MOD_NUM_START = map[int]func(modules *Utils.Module){
-	Utils.NUM_MOD_Speech:            Speech.Start,
-	Utils.NUM_MOD_GPTCommunicator:   GPTCommunicator.Start,
-	Utils.NUM_MOD_TasksExecutor:     TasksExecutor.Start,
-	Utils.NUM_MOD_SystemChecker:     SystemChecker.Start,
-	//Utils.NUM_MOD_SpeechRecognition: SpeechRecognition.Start,
-	Utils.NUM_MOD_UserLocator:       UserLocator.Start,
-	Utils.NUM_MOD_CmdsExecutor:      CommandsExecutor.Start,
-}
+//go:embed MOD_4/* MOD_5/* MOD_7/*
+var Assets_GL embed.FS

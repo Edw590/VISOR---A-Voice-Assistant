@@ -28,6 +28,10 @@ import (
 	"log"
 )
 
+// TODO: Go find a real way of making him listen to us
+//  For the moment this module is disabled - less work with the new Program Data assets directory.
+//  The module doesn't do anything useful anyway.
+
 var in_GL []int16
 var stream_GL *portaudio.Stream
 
