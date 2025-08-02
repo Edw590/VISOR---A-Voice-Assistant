@@ -93,6 +93,8 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 		things_replace[Utils.MODEL_YT_VIDEO_SUBSCRIPTION_LINK_EMAIL] = "playlist?list=" + things_replace[Utils.MODEL_YT_VIDEO_PLAYLIST_CODE_EMAIL]
 	}
 
+	var video_url string = ""
+
 	if feedType.type_2 == _TYPE_2_YT_PLAYLIST && scrapingNeeded(parsed_feed) {
 		// Scraping is only needed for video information. The feed has the rest.
 		// For scraping we only use the number of the item to guide through the video array. The rest comes from the
@@ -106,6 +108,8 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 		things_replace[Utils.MODEL_YT_VIDEO_VIDEO_CODE_EMAIL] = video_info.id
 		things_replace[Utils.MODEL_YT_VIDEO_VIDEO_IMAGE_EMAIL] = video_info.image
 		things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL] = video_info.length
+
+		video_url = "https://www.youtube.com/watch?v=" + video_info.id
 
 		// No way to get the description from the playlist visual page unless the video appears on the RSS feed.
 		things_replace[Utils.MODEL_YT_VIDEO_VIDEO_DESCRIPTION_EMAIL] = _GEN_ERROR
@@ -125,6 +129,8 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 		if !title_url_only {
 			things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL] = getVideoDuration(feed_item.Link)
 		}
+
+		video_url = feed_item.Link
 	}
 
 	var is_short bool = isShort([]string{things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TITLE_EMAIL], things_replace[Utils.MODEL_YT_VIDEO_VIDEO_DESCRIPTION_EMAIL]}, things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TIME_EMAIL])
@@ -134,7 +140,7 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 	if (feedType.type_3 != _TYPE_3_YT_INC_SHORTS && is_short) || title_url_only {
 		return Utils.EmailInfo{}, ModsFileInfo.NewsInfo2{
 			Title: things_replace[Utils.MODEL_YT_VIDEO_VIDEO_TITLE_EMAIL],
-			Url:   "https://www.youtube.com/watch?v=" + things_replace[Utils.MODEL_YT_VIDEO_VIDEO_CODE_EMAIL],
+			Url:   video_url,
 		}
 	}
 
@@ -183,7 +189,7 @@ func youTubeTreatment(feedType _FeedType, parsed_feed *gofeed.Feed, item_num int
 	return email_info,
 	ModsFileInfo.NewsInfo2{
 		Title: vid_title_original,
-		Url:   "https://www.youtube.com/watch?v=" + things_replace[Utils.MODEL_YT_VIDEO_VIDEO_CODE_EMAIL],
+		Url:   video_url,
 	}
 }
 

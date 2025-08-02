@@ -87,16 +87,16 @@ func main(module_stop *bool, moduleInfo_any any) {
 				continue
 			}
 
-			//if feedInfo.Feed_id != 8 {
+			//if feedInfo.Id != 2 {
 			//	continue
 			//}
-			//log.Println("__________________________BEGINNING__________________________")
+			//Utils.LogLnDebug("__________________________BEGINNING__________________________")
 
 			var feedType _FeedType = getFeedType(feedInfo.Type_)
 
 			if !Utils.ContainsSLICES(allowed_feed_types_1_GL, feedType.type_1) {
-				//log.Println("Feed type not allowed: " + feedInfo.Feed_type)
-				//log.Println("__________________________ENDING__________________________")
+				//Utils.LogLnDebug("Feed type not allowed: " + feedType.type_1)
+				//Utils.LogLnDebug("__________________________ENDING__________________________")
 
 				continue
 			}
@@ -111,12 +111,12 @@ func main(module_stop *bool, moduleInfo_any any) {
 				}
 			}
 
-			//log.Println("feed_id: " + strconv.Itoa(feedInfo.Feed_id))
-			//log.Println("feed_url: " + feedInfo.Feed_url)
-			//log.Println("feed_type: " + feedInfo.Feed_type)
-			//log.Println("feedType.type_1: " + feedType.type_1)
-			//log.Println("feedType.type_2: " + feedType.type_2)
-			//log.Println("feedType.type_3: " + feedType.type_3)
+			//Utils.LogLnDebug("feed_id: " + strconv.Itoa(int(feedInfo.Id)))
+			//Utils.LogLnDebug("feed_url: " + feedInfo.Url)
+			//Utils.LogLnDebug("feed_type: " + feedInfo.Type_)
+			//Utils.LogLnDebug("feedType.type_1: " + feedType.type_1)
+			//Utils.LogLnDebug("feedType.type_2: " + feedType.type_2)
+			//Utils.LogLnDebug("feedType.type_3: " + feedType.type_3)
 
 			var new_feed bool = true
 			var newsInfo_list []ModsFileInfo.NewsInfo2 = nil
@@ -133,7 +133,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			parsed_feed, err := gofeed.NewParser().ParseURLWithContext(feedInfo.Url, ctx)
 			cancel()
 			if nil != err {
-				//log.Println("Error parsing feed: " + err.Error())
+				//Utils.LogLnDebug("Error parsing feed: " + err.Error())
 				continue
 			}
 
@@ -165,7 +165,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 							feedInfo.Custom_msg_subject)
 					}
 					default: {
-						//log.Println("Unknown feed type_1: " + feedType.type_1)
+						//Utils.LogLnDebug("Unknown feed type_1: " + feedType.type_1)
 						continue
 					}
 				}
@@ -183,16 +183,16 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 				var error_notifying bool = false
 
-				//log.Println("New news: " + newsInfo.Title)
+				//Utils.LogLnDebug("New news: " + newsInfo.Title)
 				if !new_feed && !ignore_video {
 					// If the feed is a newly added one, don't send emails for ALL the items in the feed - which are
 					// being treated for the first time.
-					//log.Println("Queuing email: " + email_info.Subject)
+					//Utils.LogLnDebug("Queuing email: " + email_info.Subject)
 					error_notifying = !queueEmailAllRecps(email_info.Sender, email_info.Subject, email_info.Html)
 				}
 
 				if !error_notifying {
-					//log.Println("Adding news to list...")
+					//Utils.LogLnDebug("Adding news to list...")
 					newsInfo_list = append(newsInfo_list, newsInfo)
 					if len(newsInfo_list) > _MAX_URLS_STORED {
 						newsInfo_list = newsInfo_list[1:]
@@ -216,7 +216,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 				})
 			}
 
-			//log.Println("__________________________ENDING__________________________")
+			//Utils.LogLnDebug("__________________________ENDING__________________________")
 		}
 
 		if Utils.WaitWithStopDATETIME(module_stop, _TIME_SLEEP_S) {
@@ -267,14 +267,16 @@ isNewNews checks if the news is new.
   - true if the news is new, false otherwise
  */
 func isNewNews(newsInfo_list []ModsFileInfo.NewsInfo2, title string, url string) bool {
-	//log.Println("Checking if news is new: " + title)
+	//Utils.LogLnDebug("-------------------------------------------")
+	//Utils.LogLnDebug("Checking if news is new: " + title + " - " + url)
 	for _, newsInfo := range newsInfo_list {
+		//Utils.LogLnDebug("Checking news: " + newsInfo.Title + " - " + newsInfo.Url)
 		if  newsInfo.Url == url && newsInfo.Title == title {
 			return false
 		}
 	}
 
-	//log.Println("News is new ^^^^^")
+	//Utils.LogLnDebug("News is new ^^^^^")
 
 	return true
 }
