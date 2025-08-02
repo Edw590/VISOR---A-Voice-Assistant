@@ -25,7 +25,6 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"github.com/tebeka/selenium"
-	"log"
 )
 
 /*
@@ -46,7 +45,7 @@ func UpdateNews(driver selenium.WebDriver, news_locs []string) []ModsFileInfo.Ne
 	for _, news_loc := range news_locs {
 		texts, err := findNews(driver, news_loc + " news")
 		if err != nil {
-			log.Println("Error while searching for news for " + news_loc + ": " + Utils.GetFullErrorMsgGENERAL(err))
+			Utils.LogLnError("Error while searching for news for " + news_loc + ": " + Utils.GetFullErrorMsgGENERAL(err))
 
 			continue
 		}

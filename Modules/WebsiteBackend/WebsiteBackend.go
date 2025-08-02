@@ -28,7 +28,6 @@ import (
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/gorilla/websocket"
 	"github.com/yousifnimah/Cryptx/CRC16"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -84,6 +83,8 @@ func main(module_stop *bool, moduleInfo_any any) {
 		Tcef.Tcef{
 			Try: func() {
 				// Try to register. If it's already registered, ignore the panic.
+				http.HandleFunc("/add_comment1", DELETE_THIS_1) // Personal stuff - delete it
+				http.HandleFunc("/add_comment2", DELETE_THIS_2) // Personal stuff - delete it
 				http.HandleFunc("/ws", basicAuth(webSocketsHandler))
 			},
 		}.Do()
@@ -92,7 +93,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 		srv = &http.Server{Addr: ":3234"}
 		err := srv.ListenAndServeTLS(getModUserInfo().Crt_file, getModUserInfo().Key_file)
 		if err != nil {
-			log.Println("ListenAndServeTLS error:", err)
+			Utils.LogLnError(err)
 
 			*module_stop = true
 		}
@@ -123,11 +124,11 @@ var upgrader = websocket.Upgrader{
 }
 
 func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("WebSocketsHandler called")
+	Utils.LogLnInfo("WebSocketsHandler called")
 
 	var channel_num int = registerChannel()
 	if channel_num == -1 {
-		log.Println("No available channels")
+		Utils.LogLnWarning("No available channels")
 
 		return
 	}
@@ -135,7 +136,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 	// Upgrade HTTP connection to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("Upgrade error:", err)
+		Utils.LogLnError(err)
 
 		return
 	}
@@ -172,7 +173,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			select {
 				case <- ticker.C:
 					if sendData(websocket.PingMessage, nil) != nil {
-						log.Println("Ping error:", err)
+						Utils.LogLnError(err)
 
 						// If it wasn't possible to ping the client, close the connection.
 						_ = conn.Close()
@@ -194,11 +195,11 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 					var truncated_msg []byte = message[index_bar + 1:]
 
 					if err = sendData(websocket.BinaryMessage, Utils.CompressBytes(truncated_msg)); err == nil {
-						log.Printf("Message sent 2. Length: %d; CRC16: %d; To: %s; On: %s", len(truncated_msg),
+						Utils.LogfDebug("Message sent 2. Length: %d; CRC16: %d; To: %s; On: %s", len(truncated_msg),
 							CRC16.Result(truncated_msg, "CCIT_ZERO"),
 							truncated_msg[:strings.Index(string(truncated_msg), "|")], device_id)
 					} else {
-						log.Println("Write error 2:", err)
+						Utils.LogLnError(err)
 					}
 			}
 		}
@@ -210,7 +211,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		// Read message from WebSocket
 		message_type, message, err := conn.ReadMessage()
 		if err != nil {
-			log.Println("Read error:", err)
+			Utils.LogLnError(err)
 
 			break
 		}
@@ -225,7 +226,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 			device_id = string(message)
 
-			log.Println("Device ID connected:", device_id)
+			Utils.LogLnInfo(device_id)
 
 			addActiveDeviceID(device_id)
 
@@ -240,7 +241,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Print received message
-		log.Printf("Received: %s; From: %s", message[:index_bar + index_2nd_bar + 2], device_id)
+		Utils.LogfInfo("Received: %s; From: %s", message[:index_bar + index_2nd_bar + 2], device_id)
 
 		var message_parts []string = strings.Split(message_str, "|")
 		if len(message_parts) < 3 {
@@ -252,28 +253,28 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 
 		var partial_resp []byte = handleMessage(type_, bytes)
 		if msg_to == "N" {
-			log.Println("Returning no response")
+			Utils.LogLnDebug("Returning no response")
 		} else {
 			var response []byte = []byte(msg_to + "|")
 			response = append(response, partial_resp...)
 			response = Utils.CompressBytes(response)
 
 			if err = sendData(websocket.BinaryMessage, response); err == nil {
-				log.Printf("Message sent 1. Length: %d; CRC16: %d; To: %s; On: %s", len(response),
+				Utils.LogfDebug("Message sent 1. Length: %d; CRC16: %d; To: %s; On: %s", len(response),
 					CRC16.Result(response, "CCIT_ZERO"), msg_to, device_id)
 			} else {
-				log.Println("Write error 1:", err)
+				Utils.LogLnError(err)
 			}
 		}
 	}
 
-	log.Println("Client disconnected:", device_id)
+	Utils.LogLnInfo(device_id)
 
 	removeActiveDeviceID(device_id)
 
 	unregisterChannel(channel_num)
 
-	log.Println("WebSocketsHandler ended")
+	Utils.LogLnInfo("WebSocketsHandler ended")
 }
 
 func handleMessage(type_ string, bytes []byte) []byte {
@@ -301,7 +302,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 
 			var p_file_contents *string = Utils.GetWebsiteFilesDirFILESDIRS().Add2(false, partial_path).ReadTextFile()
 			if p_file_contents == nil {
-				log.Println("Error file not found:", partial_path)
+				Utils.LogLnError(partial_path)
 
 				break
 			}
@@ -367,7 +368,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 				case "GManTokVal":
 					settings = strconv.FormatBool(!Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14.Token_invalid)
 				default:
-					log.Println("Invalid JSON origin:", json_origin)
+					Utils.LogLnError(json_origin)
 			}
 			if get_json {
 				return []byte(settings)
@@ -409,7 +410,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 						Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions[session_id].Name = instructions[2]
 					}
 				default:
-					log.Println("Invalid JSON destination:", json_dest)
+					Utils.LogLnError(json_dest)
 			}
 	}
 

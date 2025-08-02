@@ -28,7 +28,6 @@ import (
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
-	"log"
 	"math"
 	"strconv"
 	"sync"
@@ -89,10 +88,10 @@ func main(module_stop *bool, moduleInfo_any any) {
 				//	curr_speech.GetID()[:10] + "(...)...")
 
 				var notified bool = rightBeforeSpeaking(curr_speech.GetID())
-				log.Println("Notified:", notified)
+				Utils.LogLnDebug(notified)
 
 				if !speak(curr_speech.GetText()) {
-					log.Println("Error speaking speech")
+					Utils.LogLnError("Error speaking speech")
 					if !notified {
 						Utils.QueueNotificationNOTIFS("Speeches", curr_speech.GetText())
 					}
@@ -182,17 +181,17 @@ func QueueSpeech(to_speak string, priority int32, mode int32, speech_id string, 
 	}
 
 	if curr_speech_GL == nil {
-		log.Println("No speech in progress. Speaking speech with ID " + speech_id_to_use[:10] + "(...)...")
+		Utils.LogLnDebug("No speech in progress. Speaking speech with ID " + speech_id_to_use[:10] + "(...)...")
 		// If there's no speech in progress, send it to be spoken.
 		curr_speech_GL = SpeechQueue.GetSpeech(speech_id_to_use)
 	} else {
-		log.Println("Speech in progress. Adding speech with ID " + speech_id_to_use[:10] + "(...) to the queue...")
+		Utils.LogLnDebug("Speech in progress. Adding speech with ID " + speech_id_to_use[:10] + "(...) to the queue...")
 		// If there's a speech already being spoken, the new one is just added to the list (when the current one
 		// stops, it will take care of starting the next ones on the queues).
 		// Except if the new speech has a higher priority than the current one. In that case, the current one
 		// stops temporarily to give place to the new one.
 		if priority > curr_speech_GL.GetPriority() {
-			log.Println("Priority: " + strconv.Itoa(int(priority)) + " > " + strconv.Itoa(int(curr_speech_GL.GetPriority())))
+			Utils.LogLnDebug("Priority: " + strconv.Itoa(int(priority)) + " > " + strconv.Itoa(int(curr_speech_GL.GetPriority())))
 			if stopTts() {
 				higher_priority_came_GL = true
 			}

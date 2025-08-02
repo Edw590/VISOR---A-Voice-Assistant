@@ -24,7 +24,6 @@ package GPTCommunicator
 import (
 	"Utils"
 	"Utils/ModsFileInfo"
-	"log"
 	"strconv"
 	"time"
 )
@@ -55,12 +54,12 @@ func getModUserInfo() *ModsFileInfo.Mod7UserInfo {
 func getLocalModels() _LocalModels {
 	body, err := Utils.MakeGetRequest("http://localhost:11434/api/tags")
 	if err != nil {
-		log.Println("Error making GET request to Ollama local models:", err)
+		Utils.LogLnError(err)
 	}
 
 	var local_models _LocalModels
 	if err = Utils.FromJsonGENERAL(body, &local_models); err != nil {
-		log.Println("Error unmarshalling Ollama models JSON:", err)
+		Utils.LogLnError(err)
 	}
 
 	return local_models

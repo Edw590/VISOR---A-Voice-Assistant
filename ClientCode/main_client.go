@@ -39,7 +39,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/go-gl/glfw/v3.3/glfw"
-	"log"
+	flag "github.com/spf13/pflag"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -57,6 +57,15 @@ var content_container_GL *fyne.Container = nil
 
 var modDirsInfo_GL Utils.ModDirsInfo
 func main() {
+	// Command line arguments
+	var flag_log_level *int = flag.IntP("loglevel", "l", 0, "Log level to use. 0 = ERROR, 1 = WARNING, 2 = INFO, 3 = " +
+		"DEBUG. Default is 0 (ERROR).")
+	flag.Bool("nohide", false, "Don't hide the terminal window on startup.")
+	flag.Bool("conhost", false, "Set this if the process was started by conhost.exe to be able to hide the terminal " +
+		"window on Windows 10 Build 2004 or newer.")
+	flag.Parse()
+	Utils.SetLogLevel(*flag_log_level)
+
 	var module Utils.Module = Utils.Module{
 		Num:     Utils.NUM_MOD_VISOR,
 		Name:    Utils.GetModNameMODULES(Utils.NUM_MOD_VISOR),
@@ -73,15 +82,15 @@ func realMain(module_stop *bool, moduleInfo_any any) {
 	// Get the user settings
 
 	if err := Utils.ReadSettingsFile(true); err != nil {
-		log.Println("Failed to load user settings. Using empty ones...")
-		log.Println(err)
+		Utils.LogLnInfo("Failed to load user settings. Using empty ones...")
+		Utils.LogLnInfo(err)
 	}
 
 	//////////////////////////////////////////
 	// Prepare to hide the window
 
 	if !isOpenGLSupported() {
-		log.Println("Required OpenGL version not supported. Exiting...")
+		Utils.LogLnError("Required OpenGL version not supported. Exiting...")
 
 		return
 	}

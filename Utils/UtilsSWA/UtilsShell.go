@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -39,18 +39,17 @@ ExecCmdSHELL executes a list of commands in a shell and returns the stdout and s
 -----------------------------------------------------------
 
 – Params:
-  - attempt_su – whether to attempt to execute the commands as root (using su -c)
+  - attempt_su – whether to attempt to execute the commands as root
   - command_list – the list of commands to execute, separated by "\n", joined internally by the function
 
 – Returns:
   - first 4 bytes of the output are the exit code in Big Endian; then comes stdout; after that comes _OUTPUT_SEP;
     finally comes stderr
   - the error returned by the command execution, if any. Will be nil in case everything related to the command execution
-    went smoothly - CmdOutput.Error_code can still be non-zero! Will be non-nil if a major error occurred. in which case
+    went smoothly - CmdOutput.Error_code can still be non-zero! Will be non-nil if a major error occurred, in which case
     CmdOutput.Error_code = GENERIC_ERR.
 */
 func ExecCmdSHELL(attempt_su bool, commands_list string) ([]byte, error) {
-
 	// Android needs the full path specified for some reason
 	const ANDROID_SH string = "/system/bin/sh"
 

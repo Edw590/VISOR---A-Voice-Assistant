@@ -24,7 +24,6 @@ package Speech
 import (
 	"SpeechQueue"
 	"Utils"
-	"log"
 	"time"
 )
 
@@ -39,7 +38,7 @@ func speechTreatment(speech_id string) {
 	}
 
 	var next_speech *SpeechQueue.Speech = SpeechQueue.GetNextSpeech(-1)
-	log.Println("next_speech != nil?", next_speech != nil)
+	Utils.LogLnDebug(next_speech != nil)
 	if next_speech != nil {
 		if volume_mute_done_GL && ((last_speech == nil || last_speech.GetPriority() != SpeechQueue.PRIORITY_CRITICAL) &&
 					next_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL) ||
@@ -60,7 +59,7 @@ func speechTreatment(speech_id string) {
 		// guess.
 		time.Sleep(500 * time.Millisecond)
 
-		log.Println("Returning from speechTreatment() after speech queued...")
+		Utils.LogLnDebug("Returning from speechTreatment() after speech queued...")
 
 		return
 	}
@@ -72,12 +71,12 @@ func resetToSpeakChanges() {
 	setResetWillChangeVolume(false)
 
 	// Reset the volume
-	log.Println("volumeMutedState_GL.old_volume:", volumeMutedState_GL.old_volume)
-	log.Println("user_changed_volume_GL:", user_changed_volume_GL)
+	Utils.LogLnDebug(volumeMutedState_GL.old_volume)
+	Utils.LogLnDebug(user_changed_volume_GL)
 	if volumeMutedState_GL.old_volume != _DEFAULT_VALUE && !user_changed_volume_GL {
-		log.Println("Setting the volume back to the previous value...")
+		Utils.LogLnDebug("Setting the volume back to the previous value...")
 		if !Utils.SetVolumeVOLUME(volumeMutedState_GL.old_volume) {
-			log.Println("Error setting the volume back to the previous value")
+			Utils.LogLnError("Error setting the volume back to the previous value")
 		}
 	}
 

@@ -27,7 +27,6 @@ import (
 	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
-	"log"
 )
 
 var (
@@ -44,7 +43,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 				break
 			}
 
-			log.Println("Task! -->", task.Id)
+			Utils.LogLnDebug(task.Id)
 
 			if task.Message != "" {
 				Speech.QueueSpeech(task.Message, SpeechQueue.PRIORITY_MEDIUM, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)

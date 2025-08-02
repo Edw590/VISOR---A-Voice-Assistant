@@ -24,7 +24,6 @@ package OnlineInfoChk
 import (
 	"Utils"
 	"Utils/ModsFileInfo"
-	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -82,7 +81,7 @@ func UpdateWeather(locations_info []string) []ModsFileInfo.Weather {
 
 		var location_parts []string = strings.Split(location_info, ": ")
 		if len(location_parts) != 2 {
-			log.Println("Invalid location format: " + location_info)
+			Utils.LogLnError("Invalid location format: " + location_info)
 
 			continue
 		}
@@ -90,27 +89,27 @@ func UpdateWeather(locations_info []string) []ModsFileInfo.Weather {
 		var location string = location_parts[0]
 		var location_coords []string = strings.Split(location_parts[1], ", ")
 		if len(location_coords) != 2 {
-			log.Println("Invalid location coordinates format: " + location_info)
+			Utils.LogLnError("Invalid location coordinates format: " + location_info)
 
 			continue
 		}
 
 		latitude, err := strconv.ParseFloat(location_coords[0], 32)
 		if err != nil {
-			log.Println("Invalid location latitude format: " + location_info)
+			Utils.LogLnError("Invalid location latitude format: " + location_info)
 
 			continue
 		}
 		longitude, err := strconv.ParseFloat(location_coords[1], 32)
 		if err != nil {
-			log.Println("Invalid location longitude format: " + location_info)
+			Utils.LogLnError("Invalid location longitude format: " + location_info)
 
 			continue
 		}
 
 		weather, err := findWeather(location, float32(latitude), float32(longitude))
 		if err != nil {
-			log.Println("Error getting weather for " + location_info + " --> " + Utils.GetFullErrorMsgGENERAL(err))
+			Utils.LogLnError("Error getting weather for " + location_info + " --> " + Utils.GetFullErrorMsgGENERAL(err))
 
 			continue
 		}

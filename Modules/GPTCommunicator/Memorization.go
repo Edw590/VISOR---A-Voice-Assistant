@@ -27,7 +27,6 @@ import (
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 )
@@ -90,8 +89,8 @@ func memorizeSession(session_id string) bool {
 
 	session_history_json, err := json.Marshal(session_history)
 	if err != nil {
-		log.Println("Error memorizing session " + session_id)
-		log.Println(err)
+		Utils.LogLnError("Error memorizing session " + session_id)
+		Utils.LogLnError(err)
 
 		return false
 	}

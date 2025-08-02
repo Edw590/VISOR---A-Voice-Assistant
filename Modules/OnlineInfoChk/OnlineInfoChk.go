@@ -29,7 +29,6 @@ import (
 	"github.com/tebeka/selenium"
 	"github.com/tebeka/selenium/chrome"
 	gowiki "github.com/trietmn/go-wiki"
-	"log"
 )
 
 // Online Information Checker //
@@ -174,7 +173,7 @@ func RetrieveWolframAlpha(query string) (string, bool) {
 	//Get a result without additional parameters
 	res, err := c.GetQueryResult(query, nil)
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return "ERROR", true
 	}
@@ -221,14 +220,14 @@ RetrieveWikipedia retrieves the information from the given query using Wikipedia
 func RetrieveWikipedia(query string) string {
 	page, err := gowiki.GetPage(query, -1, true, true)
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return "ERROR"
 	}
 
 	content, err := page.GetContent()
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return "ERROR"
 	}

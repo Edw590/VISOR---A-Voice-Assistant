@@ -100,6 +100,7 @@ ExecCmdSHELL for more information.
 
 – Returns:
   - the CmdOutput struct containing the stdout, stderr and error code of the command. Note that their string versions
+	have all line endings replaced with "\n".
 */
 func ExecCmdMainSHELL(commands_list[] string, windows_shell string, linux_shell string) (CmdOutput, error) {
 	var shell string = GetShellSHELL(windows_shell, linux_shell)

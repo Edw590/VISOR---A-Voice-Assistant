@@ -26,7 +26,6 @@ import (
 	"Utils"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
-	"log"
 	"strconv"
 )
 
@@ -50,7 +49,7 @@ func rightBeforeSpeaking(speech_id string) bool {
 		}
 	} else {
 		// If it's to speak, prepare the app to speak.
-		log.Println("(curr_speech.GetMode() & SpeechQueue.MODE1_NO_NOTIF == 0):", curr_speech.GetMode() & SpeechQueue.MODE1_NO_NOTIF == 0)
+		Utils.LogLnDebug(curr_speech.GetMode()&SpeechQueue.MODE1_NO_NOTIF == 0)
 		var still_notify = false
 		if !volume_mute_done_GL {
 			still_notify = setToSpeakChanges(speech_id)
@@ -71,7 +70,7 @@ func setToSpeakChanges(speech_id string) bool {
 
 	var still_notify bool = false
 
-	log.Println("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+	Utils.LogLnDebug("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 
 	if curr_speech.GetPriority() == SpeechQueue.PRIORITY_CRITICAL {
 		// Set the muted state
@@ -109,18 +108,18 @@ func setToSpeakChanges(speech_id string) bool {
 			var curr_volume int = getMod10GenSettings().Device_info.System_state.Sound_info.Volume
 			volumeMutedState_GL.old_volume = curr_volume
 
-			log.Println("GGGGGGGGGGGGGGGGGGGGGGGGG")
+			Utils.LogLnDebug("GGGGGGGGGGGGGGGGGGGGGGGGG")
 
 			var new_volume int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_SPEECH_NORMAL_VOL).GetInt(true))
 			if curr_volume < new_volume {
 				volumeMutedState_GL.old_volume = curr_volume
 
-				log.Println("Setting the volume to speak to " + strconv.Itoa(new_volume) + "...")
+				Utils.LogLnDebug("Setting the volume to speak to " + strconv.Itoa(new_volume) + "...")
 
 				setResetWillChangeVolume(true)
 
 				if !Utils.SetVolumeVOLUME(new_volume) {
-					log.Println("Error setting the volume to speak")
+					Utils.LogLnError("Error setting the volume to speak")
 					still_notify = true
 				}
 			}
@@ -129,7 +128,7 @@ func setToSpeakChanges(speech_id string) bool {
 
 	volume_mute_done_GL = true
 
-	log.Println("Still notify:", still_notify)
+	Utils.LogLnDebug(still_notify)
 
 	return still_notify
 }

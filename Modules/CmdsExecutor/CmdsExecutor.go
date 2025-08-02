@@ -33,8 +33,6 @@ import (
 	"Utils/ModsFileInfo"
 	"Utils/UtilsSWA"
 	"VISOR_Client/ClientRegKeys"
-	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -76,9 +74,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 			continue
 		}
 		var cmds_info_str = ACD.Main(strings.ToLower(sentence_str), false, true, last_it + "|" + last_and)
-		log.Println("*****************************")
-		fmt.Println(sentence_str)
-		log.Println(cmds_info_str)
+		Utils.LogLnDebug("*****************************")
+		Utils.LogLnDebug(sentence_str)
+		Utils.LogLnDebug(cmds_info_str)
 		var cmds_info []string = strings.Split(cmds_info_str, ACD.INFO_CMDS_SEPARATOR)
 		if len(cmds_info) < 2 {
 			sendToGPT(sentence_str)
@@ -90,9 +88,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 		var prev_cmd_info []string = strings.Split(cmds_info[0], ACD.PREV_CMD_INFO_SEPARATOR)
 		var detected_cmds []string = strings.Split(cmds_info[1], ACD.CMDS_SEPARATOR)
 
-		log.Println(last_it)
-		log.Println(last_and)
-		log.Println("***************")
+		Utils.LogLnDebug(last_it)
+		Utils.LogLnDebug(last_and)
+		Utils.LogLnDebug("***************")
 
 		if prev_cmd_info[0] != "" {
 			last_it = prev_cmd_info[0]
@@ -103,16 +101,16 @@ func main(module_stop *bool, moduleInfo_any any) {
 			last_and_when = time.Now().UnixMilli()
 		}
 
-		log.Println(last_it)
-		log.Println(last_and)
-		log.Println("*****************************")
+		Utils.LogLnDebug(last_it)
+		Utils.LogLnDebug(last_and)
+		Utils.LogLnDebug("*****************************")
 
 		var send_to_GPT bool = false
 		if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
 			var speak string = "WARNING! There was a problem processing the commands, Sir. This needs a fix. The " +
 				"error was the following: " + cmds_info_str + ". You said: " + sentence_str
 			Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
-			log.Println("EXECUTOR - ERR_PROC_CMDS")
+			Utils.LogLnError("EXECUTOR - ERR_PROC_CMDS")
 
 			send_to_GPT = true
 		}

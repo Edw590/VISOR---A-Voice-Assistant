@@ -25,7 +25,6 @@ import (
 	ProgramData "Assets"
 	"errors"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -544,8 +543,6 @@ func (gPath GPath) GetFileList() []FileInfo {
 	if gPath.isAssetPath() {
 		var err error = nil
 		files, err = ProgramData.Assets_GL.ReadDir(strings.Replace(gPath.p, ASSETS_PREFIX, "", 1))
-		log.Println("Files:", files)
-		log.Println("Error:", err)
 		if err != nil {
 			return nil
 		}
@@ -611,7 +608,7 @@ getVISORDirFILESDIRS gets the full path to the VISOR directory.
 func getVISORDirFILESDIRS() GPath {
 	var visor_path, err = os.Executable()
 	if err != nil {
-		log.Println("CRITICAL ERROR - Could not obtain VISOR's path. Error below.")
+		LogLnError("CRITICAL ERROR - Could not obtain VISOR's path. Error below.")
 		panic(err)
 	}
 

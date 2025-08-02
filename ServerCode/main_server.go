@@ -25,6 +25,7 @@ import (
 	"ModulesManager"
 	"Utils"
 	"VISOR_Server/ServerRegKeys"
+	flag "github.com/spf13/pflag"
 	"log"
 	"os"
 	"os/signal"
@@ -34,6 +35,12 @@ import (
 
 var modDirsInfo_GL   Utils.ModDirsInfo
 func main() {
+	// Command line arguments
+	var flag_log_level *int = flag.IntP("loglevel", "l", 0, "Log level to use. 0 = ERROR, 1 = WARNING, 2 = INFO, 3 = DEBUG. Default is 0 (ERROR).")
+	flag.Bool("status", false, "Keeps printing the status of the modules.")
+	flag.Parse()
+	Utils.SetLogLevel(*flag_log_level)
+
 	var module Utils.Module = Utils.Module{
 		Num:     Utils.NUM_MOD_VISOR,
 		Name:    Utils.GetModNameMODULES(Utils.NUM_MOD_VISOR),
@@ -63,13 +70,13 @@ func realMain(module_stop *bool, moduleInfo_any any) {
 	}
 
 	if err := Utils.ReadSettingsFile(true); err != nil {
-		log.Println("Failed to load user settings. Exiting...")
+		Utils.LogLnError("Failed to load user settings. Exiting...")
 
 		return
 	}
 
 	if !Utils.RunningAsAdminPROCESSES() {
-		log.Println("Not running as administrator/root. Exiting...")
+		Utils.LogLnError("Not running as administrator/root. Exiting...")
 
 		return
 	}

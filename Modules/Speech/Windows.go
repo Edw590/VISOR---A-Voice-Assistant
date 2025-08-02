@@ -24,9 +24,9 @@
 package Speech
 
 import (
+	"Utils"
 	"github.com/Edw590/sapi-go"
 	"github.com/go-ole/go-ole"
-	"log"
 )
 
 var tts_GL *sapi.Sapi = nil
@@ -57,7 +57,7 @@ func speak(text string) bool {
 func stopTts() bool {
 	_, err := tts_GL.Skip(50) // Equivalent to stopping all speeches it seems
 	if err != nil {
-		log.Println("Error stopping speech: ", err)
+		Utils.LogLnError(err)
 
 		return false
 	}

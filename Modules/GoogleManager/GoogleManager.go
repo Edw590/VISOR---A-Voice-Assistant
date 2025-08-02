@@ -29,7 +29,6 @@ import (
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/gmail/v1"
 	"google.golang.org/api/tasks/v1"
-	"log"
 	"net/http"
 )
 
@@ -51,7 +50,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 		// Parse credentials to config
 		config, err := ParseConfigJSON()
 		if err != nil {
-			log.Printf("Unable to parse client secret file to config: %v\n", err)
+			Utils.LogfError("Unable to parse client secret file to config: %v\n", err)
 
 			return
 		}

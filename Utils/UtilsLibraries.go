@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -45,4 +45,23 @@ var LIB_NUMS_NAMES map[int]string = map[int]string{
 	NUM_LIB_ULHelper:     "User Locator Helper",
 	NUM_LIB_SCLink:       "System Checker Link",
 	NUM_LIB_GMan:         "Google Manager",
+}
+
+/*
+GetLibNameMODULES gets the name of a module.
+
+-----------------------------------------------------------
+
+– Params:
+  - mod_num – the number of the module
+
+– Returns:
+  - the name of the module or an empty string if the module number is invalid
+*/
+func GetLibNameMODULES(lib_num int) string {
+	if library_info, ok := LIB_NUMS_NAMES[lib_num]; ok {
+		return library_info
+	}
+
+	return "INVALID LIBRARY NUMBER"
 }

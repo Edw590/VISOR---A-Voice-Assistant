@@ -29,7 +29,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -174,7 +173,7 @@ func chatWithGPT(params _ChatWithGPTParams) string {
 
 		request_json, err := json.Marshal(ollama_request)
 		if err != nil {
-			log.Println("Error marshalling JSON:", err)
+			Utils.LogLnError(err)
 
 			return ""
 		}
@@ -217,12 +216,12 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 	if device_id_with_model == Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id {
 		// Code run by both client and server
 
-		log.Println("Posting to Ollama locally:", string(request_json))
+		Utils.LogLnDebug(string(request_json))
 
 		resp, err := http.Post("http://localhost:11434/api/chat", "application/json; charset=utf-8",
 			bytes.NewBuffer(request_json))
 		if err != nil {
-			log.Println("Error posting to Ollama: ", err)
+			Utils.LogLnError(err)
 
 			// Wait 2 seconds before stopping the module for the clients to receive the STARTING state before the
 			// STOPPING one (they check every second).
@@ -239,7 +238,7 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 	} else {
 		// Only the server runs this code
 
-		log.Println("Posting to Ollama on \"" + device_id_with_model + "\": ", string(request_json))
+		Utils.LogLnDebug(string(request_json))
 
 		Utils.QueueMessageBACKEND(true, Utils.NUM_MOD_GPTCommunicator, 0, device_id_with_model,
 			[]byte(device_id + "|" + string(request_json)))
@@ -317,7 +316,7 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 			// Closing the connection makes Ollama stop generating the response
 			http_response.Body.Close()
 
-			log.Println("Stopping LLM...")
+			Utils.LogLnDebug("Stopping LLM text generation...")
 
 			sendWriteText(getEndString())
 
@@ -377,7 +376,7 @@ func sendWriteText(text string) {
 		var message []byte = []byte("GPT|redirect|")
 		message = append(message, text...)
 		if !Utils.QueueNoResponseMessageSERVER(message) {
-			log.Println("Error sending message to server: ", text)
+			Utils.LogLnError(text)
 		}
 	}
 }

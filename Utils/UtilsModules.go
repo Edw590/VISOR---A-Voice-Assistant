@@ -229,8 +229,8 @@ func ModStartup2(main Main, module *Module, server bool) {
 
 		readGenSettingsInternal := func() bool {
 			if err := ReadSettingsFile(false); err != nil {
-				log.Println("warning: Error obtaining generated settings - aborting")
-				log.Println(err)
+				LogLnError("Error obtaining generated settings - aborting")
+				LogLnError(err)
 
 				log.Println("Overwrite settings with empty file? Press ENTER to overwrite, write the password in case " +
 					"the settings have been encrypted, or press Ctrl+C to abort.")
@@ -275,7 +275,7 @@ func ModStartup2(main Main, module *Module, server bool) {
 	var to_do func()
 
 	if modDirsInfo.signalledToStop() {
-		log.Println("Module " + strconv.Itoa(mod_num) + " was signalled to stop before starting. Exiting...")
+		LogLnInfo("Module " + strconv.Itoa(mod_num) + " was signalled to stop before starting. Exiting...")
 
 		goto end
 	}
@@ -305,9 +305,9 @@ func ModStartup2(main Main, module *Module, server bool) {
 				var str_error string = GetFullErrorMsgGENERAL(e)
 
 				// Print the error and send an email with it
-				log.Println(str_error)
+				LogLnError(str_error)
 				if err := SendModErrorEmailMODULES(mod_num, str_error); nil != err {
-					log.Println("Error sending email with error:\n" + GetFullErrorMsgGENERAL(err) + "\n-----\n" + str_error)
+					LogLnError("Error sending email with error:\n" + GetFullErrorMsgGENERAL(err) + "\n-----\n" + str_error)
 				}
 			},
 		}.Do()
@@ -319,7 +319,7 @@ func ModStartup2(main Main, module *Module, server bool) {
 		// Don't run in another thread if it's the main program - it must be run on the main thread.
 
 		if isVISORRunningMODULES() {
-			log.Println("Module " + strconv.Itoa(mod_num) + " is already running. Exiting...")
+			log.Println("VISOR is already running. Exiting...")
 
 			goto end
 		}

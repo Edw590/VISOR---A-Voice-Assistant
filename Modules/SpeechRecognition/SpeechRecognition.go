@@ -51,7 +51,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}
 	err := porcupine_.Init()
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return
 	}
@@ -59,7 +59,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 	err = portaudio.Initialize()
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return
 	}
@@ -67,13 +67,13 @@ func main(module_stop *bool, moduleInfo_any any) {
 	in_GL = make([]int16, porcupine.FrameLength)
 	stream_GL, err = portaudio.OpenDefaultStream(1, 0, float64(porcupine.SampleRate), porcupine.FrameLength, in_GL)
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return
 	}
 	err = stream_GL.Start()
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return
 	}
@@ -93,7 +93,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 func getNextFrameAudio() []int16 {
 	err := stream_GL.Read()
 	if err != nil {
-		log.Println(err)
+		Utils.LogLnError(err)
 
 		return nil
 	}
