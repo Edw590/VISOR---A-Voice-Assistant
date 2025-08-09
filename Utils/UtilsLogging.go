@@ -22,11 +22,13 @@
 package Utils
 
 import (
-	"github.com/fatih/color"
+	"fmt"
 	"log"
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 var log_level_GL int = 90
@@ -186,24 +188,28 @@ func logPrintln(log_level int, file string, line int, fn_name string, args ...an
 	if strings.Contains(file, "/") {
 		just_file = file[strings.LastIndex(file, "/") + 1:]
 	}
-	var prefix string = just_file + ":" + strconv.Itoa(line) + " (" + fn_name + "()) "
+	var prefix string = just_file + ":" + strconv.Itoa(line) + " (" + fn_name + "()):"
 
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	switch log_level {
 		case LOG_LEVEL_ERROR:
 			color.Set(color.FgHiRed)
-			log.Println(prefix + "[E] --", args)
+			log.Println(prefix)
+			fmt.Println("[E] --", args)
 			color.Unset()
 		case LOG_LEVEL_WARNING:
 			color.Set(color.FgYellow)
-			log.Println(prefix + "[W] --", args)
+			log.Println(prefix)
+			fmt.Println("[W] --", args)
 			color.Unset()
 		case LOG_LEVEL_INFO:
 			color.Set(color.FgCyan)
-			log.Println(prefix + "[I] --", args)
+			log.Println(prefix)
+			fmt.Println("[I] --", args)
 			color.Unset()
 		case LOG_LEVEL_DEBUG:
-			log.Println(prefix + "[D] --", args)
+			log.Println(prefix)
+			fmt.Println("[D] --", args)
 		default:
 			// Won't get here
 	}
@@ -234,24 +240,28 @@ func logPrintf(log_level int, file string, line int, fn_name string, format stri
 	if strings.Contains(file, "/") {
 		just_file = file[strings.LastIndex(file, "/") + 1:]
 	}
-	var prefix string = just_file + ":" + strconv.Itoa(line) + " (" + fn_name + "()) "
+	var prefix string = just_file + ":" + strconv.Itoa(line) + " (" + fn_name + "()):"
 
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	switch log_level {
 		case LOG_LEVEL_ERROR:
 			color.Set(color.FgHiRed)
-			log.Printf(prefix + "[E] -- " + format, args...)
+			log.Println(prefix)
+			fmt.Printf("[E] -- " + format, args...)
 			color.Unset()
 		case LOG_LEVEL_WARNING:
 			color.Set(color.FgYellow)
-			log.Printf(prefix + "[W] -- " + format, args...)
+			log.Println(prefix)
+			fmt.Printf("[W] -- " + format, args...)
 			color.Unset()
 		case LOG_LEVEL_INFO:
 			color.Set(color.FgCyan)
-			log.Printf(prefix + "[I] -- " + format, args...)
+			log.Println(prefix)
+			fmt.Printf("[I] -- " + format, args...)
 			color.Unset()
 		case LOG_LEVEL_DEBUG:
-			log.Printf(prefix + "[D] -- " + format, args...)
+			log.Println(prefix)
+			fmt.Printf("[D] -- " + format, args...)
 		default:
 			// Won't get here
 	}
