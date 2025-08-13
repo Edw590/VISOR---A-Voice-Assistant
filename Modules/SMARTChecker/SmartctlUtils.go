@@ -27,6 +27,20 @@ import (
 	"strings"
 )
 
+// Critical attributes, as per the Wikipedia page on SMART
+var critical_attributes_GL []int = []int{
+	1,   // Read Error Rate
+	5,   // Reallocated Sectors Count
+	10,  // Spin Retry Count
+	184, // End-to-End error / IOEDC
+	187, // Reported Uncorrectable Errors
+	188, // Command Timeout
+	196, // Reallocation Event Count
+	197, // Current Pending Sector Count
+	198, // (Offline) Uncorrectable Sector Count
+	201, // Soft Read Error Rate or TA Counter Detected
+}
+
 func getHTMLReport(disk_partition string) string {
 	stdOutErrCmd, _ := Utils.ExecCmdSHELL([]string{"smartctl{{EXE}} -x " + disk_partition})
 
@@ -37,47 +51,59 @@ func getHTMLReport(disk_partition string) string {
 		if strings.Contains(line, "ID#") {
 			for j := i + 1; j < len(output); j++ {
 				if strings.Contains(output[j], "K auto-keep") {
+					// Means the section just ended
 					break
 				}
 
 				var line_trimmed []string = strings.Fields(output[j])
 
 				id, _ := strconv.Atoi(line_trimmed[0])
-				var attribute_name string = strings.ToLower(line_trimmed[1])
+				//var attribute_name string = strings.ToLower(line_trimmed[1])
 				var flags string = line_trimmed[2]
 				//value, _ := strconv.Atoi(line_trimmed[3])
 				worst, _ := strconv.Atoi(line_trimmed[4])
 				threshold, _ := strconv.Atoi(line_trimmed[5])
-				//var fail string = line_trimmed[6]
+				var fail string = line_trimmed[6]
 				raw_value, _ := strconv.Atoi(line_trimmed[7])
 
-				if strings.Contains(flags, "P") {
-					// Pre-fail attribute
+				var is_critical bool = false
+				for _, critical_id := range critical_attributes_GL {
+					if id == critical_id {
+						is_critical = true
+
+						break
+					}
+				}
+
+				if strings.Contains(flags, "P") || is_critical {
+					// Pre-fail or critical attribute (underline it)
 					output[j] = "<u>" + output[j] + "</u>"
 				}
 
-				if strings.Contains(flags, "C") {
-					if raw_value > 0 {
-						// Exclude some IDs
-						if id != 4 && id != 9 && id != 12 && id != 192 && id != 193 {
-							// Attribute has errors
-							output[j] = "<strong style='color:#FFA500;'>" + output[j] + "</strong>"
-						}
-					}
+				if fail != "-" {
+					// Failing now or has failed (red)
+					output[j] = "<strong style='color:#FF0000;'>" + output[j] + "</strong>"
+
+					continue
 				}
 
-				if strings.Contains(attribute_name, "rate") {
-					if raw_value > 0 {
-						output[j] = "<strong style='color:#FFA500;'>" + output[j] + "</strong>"
-					}
+				if is_critical && raw_value > 0 {
+					// Critical attribute is above 0 (yellow)
+					output[j] = "<strong style='color:#FFA500;'>" + output[j] + "</strong>"
+
+					continue
 				}
 
 				if worst <= threshold {
-					// Attribute is on or below threshold
+					// Attribute is below or on threshold (red)
 					output[j] = "<strong style='color:#FF0000;'>" + output[j] + "</strong>"
+
+					continue
 				} else if worst - int(float64(threshold)*0.2) <= threshold {
-					// Attribute is close to threshold
+					// Attribute is close to threshold (orange)
 					output[j] = "<strong style='color:#FF7800;'>" + output[j] + "</strong>"
+
+					continue
 				} else {
 					// Attribute is above threshold, nothing to do
 				}
