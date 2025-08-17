@@ -25,17 +25,18 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"context"
-	"google.golang.org/api/option"
-	"google.golang.org/api/tasks/v1"
 	"net/http"
 	"time"
+
+	"google.golang.org/api/option"
+	"google.golang.org/api/tasks/v1"
 )
 
 func storeTasks(client *http.Client) bool {
 	// Create a new Tasks service.
 	srv, err := tasks.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Tasks client: %v", err)
+		Utils.LogfError("Unable to retrieve Tasks client: %v\n", err)
 
 		return false
 	}
@@ -43,7 +44,7 @@ func storeTasks(client *http.Client) bool {
 	// Retrieve the user's task lists.
 	task_lists, err := srv.Tasklists.List().MaxResults(9999).Do()
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Task lists: %v", err)
+		Utils.LogfError("Unable to retrieve Task lists: %v\n", err)
 
 		return false
 	}

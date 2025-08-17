@@ -25,14 +25,15 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"context"
-	Tcef "github.com/Edw590/TryCatch-go"
-	"github.com/gorilla/websocket"
-	"github.com/yousifnimah/Cryptx/CRC16"
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	Tcef "github.com/Edw590/TryCatch-go"
+	"github.com/gorilla/websocket"
+	"github.com/yousifnimah/Cryptx/CRC16"
 )
 
 // Website Backend //
@@ -195,7 +196,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 					var truncated_msg []byte = message[index_bar + 1:]
 
 					if err = sendData(websocket.BinaryMessage, Utils.CompressBytes(truncated_msg)); err == nil {
-						Utils.LogfDebug("Message sent 2. Length: %d; CRC16: %d; To: %s; On: %s", len(truncated_msg),
+						Utils.LogfDebug("Message sent 2. Length: %d; CRC16: %d; To: %s; On: %s\n", len(truncated_msg),
 							CRC16.Result(truncated_msg, "CCIT_ZERO"),
 							truncated_msg[:strings.Index(string(truncated_msg), "|")], device_id)
 					} else {
@@ -241,7 +242,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Print received message
-		Utils.LogfInfo("Received: %s; From: %s", message[:index_bar + index_2nd_bar + 2], device_id)
+		Utils.LogfInfo("Received: %s; From: %s\n", message[:index_bar + index_2nd_bar + 2], device_id)
 
 		var message_parts []string = strings.Split(message_str, "|")
 		if len(message_parts) < 3 {
@@ -260,7 +261,7 @@ func webSocketsHandler(w http.ResponseWriter, r *http.Request) {
 			response = Utils.CompressBytes(response)
 
 			if err = sendData(websocket.BinaryMessage, response); err == nil {
-				Utils.LogfDebug("Message sent 1. Length: %d; CRC16: %d; To: %s; On: %s", len(response),
+				Utils.LogfDebug("Message sent 1. Length: %d; CRC16: %d; To: %s; On: %s\n", len(response),
 					CRC16.Result(response, "CCIT_ZERO"), msg_to, device_id)
 			} else {
 				Utils.LogLnError(err)

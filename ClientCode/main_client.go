@@ -29,6 +29,11 @@ import (
 	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
+	"os"
+	"path/filepath"
+	"runtime"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -40,10 +45,6 @@ import (
 	Tcef "github.com/Edw590/TryCatch-go"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	flag "github.com/spf13/pflag"
-	"os"
-	"path/filepath"
-	"runtime"
-	"time"
 )
 
 var my_app_GL fyne.App = nil
@@ -58,7 +59,7 @@ var content_container_GL *fyne.Container = nil
 var modDirsInfo_GL Utils.ModDirsInfo
 func main() {
 	// Command line arguments
-	var flag_log_level *int = flag.IntP("loglevel", "l", 0, "Log level to use. 0 = ERROR, 1 = WARNING, 2 = INFO, 3 = " +
+	var flag_log_level *int = flag.IntP("loglevel", "l", 9, "Log level to use. 0 = ERROR, 1 = WARNING, 2 = INFO, 3 = " +
 		"DEBUG. Default is 0 (ERROR).")
 	flag.Bool("nohide", false, "Don't hide the terminal window on startup.")
 	flag.Bool("conhost", false, "Set this if the process was started by conhost.exe to be able to hide the terminal " +
