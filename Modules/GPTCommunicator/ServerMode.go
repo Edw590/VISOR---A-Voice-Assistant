@@ -229,11 +229,13 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 				delimiter_start = "“"
 				delimiter_end = "”"
 			}
-			if delimiter_start != "" {
+			if delimiter_start == "" {
+				session_name = "[Error naming the session]"
+			} else {
 				var idx_start int = strings.Index(session_name, delimiter_start)
-				var idx_end int = strings.LastIndex(session_name, delimiter_end)
+				var idx_end int = strings.Index(session_name[idx_start+len(delimiter_start):], delimiter_end)
 				if idx_start != -1 && idx_end != -1 {
-					session_name = session_name[idx_start+len(delimiter_start):idx_end]
+					session_name = session_name[idx_start+len(delimiter_start) : idx_end]
 				} else {
 					session_name = "[Error naming the session]"
 				}
@@ -241,8 +243,6 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 				session_name = strings.Replace(session_name, "[", "", -1)
 				session_name = strings.Replace(session_name, "]", "", -1)
 				session_name = strings.TrimSpace(session_name)
-			} else {
-				session_name = "[Error naming the session]"
 			}
 		}
 
