@@ -84,8 +84,6 @@ func main(module_stop *bool, moduleInfo_any any) {
 		Tcef.Tcef{
 			Try: func() {
 				// Try to register. If it's already registered, ignore the panic.
-				http.HandleFunc("/add_comment1", DELETE_THIS_1) // Personal stuff - delete it
-				http.HandleFunc("/add_comment2", DELETE_THIS_2) // Personal stuff - delete it
 				http.HandleFunc("/ws", basicAuth(webSocketsHandler))
 			},
 		}.Do()
