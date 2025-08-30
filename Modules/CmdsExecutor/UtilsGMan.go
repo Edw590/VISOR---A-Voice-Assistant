@@ -23,7 +23,8 @@ package CmdsExecutor
 
 import (
 	"GMan"
-	"strconv"
+	"Utils/ModsFileInfo"
+	"Utils/UtilsSWA"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func getTasksList(tasks_ids []string, cmd_variant string) string {
 	var speak string = ""
 
 	for _, task_id := range tasks_ids {
-		var task = GMan.GetTask(task_id)
+		var task *ModsFileInfo.GTask = GMan.GetTask(task_id)
 		if task == nil {
 			continue
 		}
@@ -79,45 +80,76 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 	var speak string = ""
 
 	for _, event_id := range events_ids {
-		var event = GMan.GetEvent(event_id)
+		var event *ModsFileInfo.GEvent = GMan.GetEvent(event_id)
 		if event == nil {
 			continue
 		}
 
-		var event_date_time time.Time = time.Unix(event.Start_time_s, 0)
+		var event_end_time_s int64 = event.Start_time_s + event.Duration_min*60
+		if event_end_time_s < time.Now().Unix() {
+			// Event already ended
+			continue
+		}
+
+		var now time.Time = time.Now()
+
+		var start_of_day_s int64 = UtilsSWA.GetStartOfDayS(now.Unix())
+		var end_of_day_s int64 = start_of_day_s + 86400 - 1 // 86400 seconds in a day (24*60*60)
+
+		var start_of_next_day_s int64 = start_of_day_s + 86400
+		var end_of_next_day_s int64 = start_of_next_day_s + 86400 - 1
+
+		var start_of_week_s int64 = UtilsSWA.GetStartOfDayS(now.Unix() - int64(now.Weekday())*86400)
+		var end_of_week_s int64 = start_of_week_s + 7*86400 - 1
+
+		var start_of_next_week_s int64 = start_of_week_s + 7*86400
+		var end_of_next_week_s int64 = start_of_next_week_s + 7*86400 - 1
 
 		var add_event bool = false
 		switch cmd_variant {
 			case RET_31_TODAY:
-				if event_date_time.Day() == time.Now().Day() {
+				if (event.Start_time_s >= start_of_day_s && event.Start_time_s <= end_of_day_s) ||
+					(event_end_time_s >= start_of_day_s && event_end_time_s <= end_of_day_s) ||
+					(start_of_day_s >= event.Start_time_s && end_of_day_s <= event_end_time_s) {
 					add_event = true
 				}
 			case RET_31_TOMORROW:
-				if event_date_time.Day() == time.Now().AddDate(0, 0, 1).Day() {
+				if (event.Start_time_s >= start_of_next_day_s && event.Start_time_s <= end_of_next_day_s) ||
+					(event_end_time_s >= start_of_next_day_s && event_end_time_s <= end_of_next_day_s) ||
+					(start_of_next_day_s >= event.Start_time_s && end_of_next_day_s <= event_end_time_s) {
 					add_event = true
 				}
 			case RET_31_THIS_WEEK:
-				if event_date_time.Weekday() >= time.Now().Weekday() {
+				if (event.Start_time_s >= start_of_week_s && event.Start_time_s <= end_of_week_s) ||
+					(event_end_time_s >= start_of_week_s && event_end_time_s <= end_of_week_s) ||
+					(start_of_week_s >= event.Start_time_s && end_of_week_s <= event_end_time_s) {
 					add_event = true
 				}
 			case RET_31_NEXT_WEEK:
-				var days_until_next_monday int = int((8 - time.Now().Weekday()) % 7)
-				if days_until_next_monday == 0 {
-					days_until_next_monday = 7
-				}
-				next_monday := time.Now().AddDate(0, 0, days_until_next_monday)
-				if event_date_time.Unix() >= next_monday.Unix() &&
-					event_date_time.Unix() < next_monday.AddDate(0, 0, 7).Unix() {
+				if (event.Start_time_s >= start_of_next_week_s && event.Start_time_s <= end_of_next_week_s) ||
+					(event_end_time_s >= start_of_next_week_s && event_end_time_s <= end_of_next_week_s) ||
+					(start_of_next_week_s >= event.Start_time_s && end_of_next_week_s <= event_end_time_s) {
 					add_event = true
 				}
 		}
 		if add_event {
+			var event_date_time time.Time = time.Unix(event.Start_time_s, 0)
+
 			var event_on string = ""
 			if cmd_variant == RET_31_THIS_WEEK || cmd_variant == RET_31_NEXT_WEEK {
 				event_on = " on " + event_date_time.Weekday().String()
 			}
-			speak += "\"" + event.Summary + "\"" + event_on + " at " + event_date_time.Format("15:04") +
-				" for " + getEventDuration(event.Duration_min) + "; "
+
+			var event_began_today bool = event.Start_time_s >= start_of_day_s && event.Start_time_s <= end_of_day_s
+			var event_at string = ""
+			if event_began_today {
+				event_at = "at " + event_date_time.Format("15:04")
+			}
+
+			var curr_duration int64 = event.Start_time_s/60 + event.Duration_min - now.Unix()/60
+
+			speak += "\"" + event.Summary + "\"" + event_on + " " + event_at + " for " +
+				UtilsSWA.GetEventDuration(curr_duration) + "; "
 		}
 	}
 
@@ -138,62 +170,4 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 	}
 
 	return speak
-}
-
-func getEventDuration(min int64) string {
-	if min >= 60 {
-		if min >= 24*60 {
-			if min >= 7*24*60 {
-				weeks := min / (7 * 24 * 60)
-				days := (min % (7 * 24 * 60)) / (24 * 60)
-				var week_weeks string = "weeks"
-				if weeks == 1 {
-					week_weeks = "week"
-				}
-				var day_days string = "days"
-				if days == 1 {
-					day_days = "day"
-				}
-				if days > 0 {
-					return strconv.Itoa(int(weeks)) + " " + week_weeks + " and " + strconv.Itoa(int(days)) + " " + day_days
-				}
-				return strconv.Itoa(int(weeks)) + " " + week_weeks
-			}
-			days := min / (24 * 60)
-			hours := (min % (24 * 60)) / 60
-			var day_days string = "days"
-			if days == 1 {
-				day_days = "day"
-			}
-			var hour_hours string = "hours"
-			if hours == 1 {
-				hour_hours = "hour"
-			}
-			if hours > 0 {
-				return strconv.Itoa(int(days)) + " " + day_days + " and " + strconv.Itoa(int(hours)) + " " + hour_hours
-			}
-			return strconv.Itoa(int(days)) + " " + day_days
-		}
-		hours := min / 60
-		minutes := min % 60
-		var hour_hours string = "hours"
-		if hours == 1 {
-			hour_hours = "hour"
-		}
-		var minute_minutes string = "minutes"
-		if minutes == 1 {
-			minute_minutes = "minute"
-		}
-		if minutes > 0 {
-			return strconv.Itoa(int(hours)) + " " + hour_hours + " and " + strconv.Itoa(int(minutes)) + " " + minute_minutes
-		}
-		return strconv.Itoa(int(hours)) + " " + hour_hours
-	}
-
-	var minute_minutes string = "minutes"
-	if min == 1 {
-		minute_minutes = "minute"
-	}
-
-	return strconv.Itoa(int(min)) + " " + minute_minutes
 }
