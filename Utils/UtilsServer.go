@@ -24,12 +24,13 @@ package Utils
 import (
 	"crypto/tls"
 	"encoding/base64"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const COMMS_MAP_SRV_KEY string = "SrvComm"
@@ -75,8 +76,13 @@ func startCommunicatorInternalSERVER() {
 	var routines_working [2]bool
 	var stop bool = false
 
+	var port string = GetUserSettings(LOCK_UNLOCK).General.Website_port
+	if port == "" {
+		port = "3234"
+	}
 	// Define the WebSocket server address
-	var u url.URL = url.URL{Scheme: "wss", Host: GetUserSettings(LOCK_UNLOCK).General.Website_domain + ":3234", Path: "/ws"}
+	var u url.URL = url.URL{Scheme: "wss", Host: GetUserSettings(LOCK_UNLOCK).General.Website_domain + ":" + port,
+		Path: "/ws"}
 	//log.Printf("Connecting to %s", u.String())
 
 	// Create Basic Auth credentials (username:password)

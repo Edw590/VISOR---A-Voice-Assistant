@@ -24,15 +24,18 @@ package Screens
 import (
 	"SettingsSync"
 	"Utils"
+	"errors"
+	"image/color"
+	"net/url"
+	"strconv"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"image/color"
-	"net/url"
-	"time"
 )
 
 func Home() fyne.CanvasObject {
@@ -122,6 +125,27 @@ func homeCreateSettingsTab() *container.Scroll {
 	entry_server_domain.SetPlaceHolder("Server domain or IP (example: localhost)")
 	entry_server_domain.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain)
 
+	var entry_server_port *widget.Entry = widget.NewEntry()
+	entry_server_port.SetPlaceHolder("External server port (empty means default of 3234)")
+	entry_server_port.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_port)
+	entry_server_port.Validator = func(s string) error {
+		if s == "" {
+			return nil
+		}
+
+		_, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		val, _ := strconv.Atoi(s)
+		if val < 0 || val > 65535 {
+			return errors.New("port must be a number between 0 and 65535")
+		}
+
+		return nil
+	}
+
 	var entry_server_pw *widget.Entry = widget.NewPasswordEntry()
 	entry_server_pw.SetPlaceHolder("Server password (strong letters and numbers password)")
 	entry_server_pw.SetText(Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw)
@@ -140,6 +164,7 @@ func homeCreateSettingsTab() *container.Scroll {
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.VISOR_email_pw = entry_visor_email_pw.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.User_email_addr = entry_user_email_addr.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain = entry_server_domain.Text
+		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_port = entry_server_port.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw = entry_server_pw.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.WolframAlpha_AppID = entry_wolframalpha_appid.Text
 		Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Picovoice_API_key = entry_picovoice_api_key.Text
@@ -158,6 +183,7 @@ func homeCreateSettingsTab() *container.Scroll {
 		entry_visor_email_pw,
 		entry_user_email_addr,
 		entry_server_domain,
+		entry_server_port,
 		entry_server_pw,
 		entry_wolframalpha_appid,
 		entry_picovoice_api_key,

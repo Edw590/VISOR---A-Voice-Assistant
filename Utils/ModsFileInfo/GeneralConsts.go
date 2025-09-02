@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -35,6 +35,8 @@ type GeneralConsts struct {
 
 	// Website_domain is the domain of the VISOR website
 	Website_domain string
+	// Website_port is the external port of the VISOR website
+	Website_port string
 	// Website_pw is the password for the VISOR website
 	Website_pw string
 
