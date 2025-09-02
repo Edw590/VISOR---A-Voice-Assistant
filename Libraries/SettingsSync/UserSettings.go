@@ -163,17 +163,3 @@ IsWebsiteInfoEmpty returns true if the website domain and password are empty, fa
 func IsWebsiteInfoEmpty() bool {
 	return Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain == "" && Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw == ""
 }
-
-/*
-SetWebsiteInfo sets the website domain and password.
-
------------------------------------------------------------
-
-– Params:
-  - website_domain – the domain of the VISOR website
-  - website_password – the password for the VISOR website
- */
-func SetWebsiteInfo(website_domain string, website_password string) {
-	Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_domain = website_domain
-	Utils.GetUserSettings(Utils.LOCK_UNLOCK).General.Website_pw = website_password
-}
