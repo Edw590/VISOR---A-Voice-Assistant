@@ -235,7 +235,7 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 				var idx_start int = strings.Index(session_name, delimiter_start)
 				var idx_end int = strings.Index(session_name[idx_start+len(delimiter_start):], delimiter_end)
 				if idx_start != -1 && idx_end != -1 {
-					session_name = session_name[idx_start+len(delimiter_start) : idx_end]
+					session_name = session_name[idx_start+len(delimiter_start) : idx_end+1]
 				} else {
 					session_name = "[Error naming the session]"
 				}
