@@ -25,11 +25,12 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"context"
+	"net/http"
+
 	"golang.org/x/oauth2"
 	"google.golang.org/api/calendar/v3"
 	"google.golang.org/api/gmail/v1"
 	"google.golang.org/api/tasks/v1"
-	"net/http"
 )
 
 // _SCOPES defines the Google Calendar scope required for read-only access
@@ -67,6 +68,20 @@ func main(module_stop *bool, moduleInfo_any any) {
 		// Store tasks
 		storeTasks(client)
 
+		if getModGenSettings().Token_invalid && !getModGenSettings().Token_invalid_notified {
+			var msg_body string = "The saved Google token is invalid. Please re-authenticate."
+			var things_replace = map[string]string{
+				Utils.MODEL_INFO_DATE_TIME_EMAIL: Utils.GetDateTimeStrDATETIME(-1),
+				Utils.MODEL_INFO_MSG_BODY_EMAIL:  msg_body,
+			}
+			var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_INFO, things_replace)
+			email_info.Subject = "Google token is INVALID"
+			err = Utils.QueueEmailEMAIL(email_info)
+			if err == nil {
+				getModGenSettings().Token_invalid_notified = true
+			}
+		}
+
 		if Utils.WaitWithStopDATETIME(module_stop, 60) {
 			return
 		}
@@ -93,4 +108,9 @@ func getToken() (*oauth2.Token, error) {
 
 func getModGenSettings() *ModsFileInfo.Mod14GenInfo {
 	return &Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14
+}
+
+func setTokenValid() {
+	getModGenSettings().Token_invalid = false
+	getModGenSettings().Token_invalid_notified = false
 }

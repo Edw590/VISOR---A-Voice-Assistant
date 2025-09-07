@@ -25,10 +25,11 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"context"
-	"google.golang.org/api/calendar/v3"
-	"google.golang.org/api/option"
 	"net/http"
 	"time"
+
+	"google.golang.org/api/calendar/v3"
+	"google.golang.org/api/option"
 )
 
 func storeCalendarsEvents(client *http.Client) bool {
@@ -47,7 +48,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 		return false
 	}
 
-	getModGenSettings().Token_invalid = false
+	setTokenValid()
 
 	// Calculate the start of the current week (Monday)
 	var now time.Time = time.Now()

@@ -49,7 +49,7 @@ func storeTasks(client *http.Client) bool {
 		return false
 	}
 
-	getModGenSettings().Token_invalid = false
+	setTokenValid()
 
 	if len(task_lists.Items) == 0 {
 		//log.Println("No task lists found.")

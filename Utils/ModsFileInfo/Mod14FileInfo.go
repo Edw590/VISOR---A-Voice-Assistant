@@ -27,6 +27,8 @@ type Mod14GenInfo struct {
 	Token string
 	// Token_invalid is whether the token is invalid
 	Token_invalid bool
+	// Token_invalid_notified is whether the user has been notified about the invalid token
+	Token_invalid_notified bool
 	// Events is the list of events
 	Events []GEvent
 	// Tasks is the list of tasks
