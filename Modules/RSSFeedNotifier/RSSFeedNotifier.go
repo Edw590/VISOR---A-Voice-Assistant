@@ -82,7 +82,35 @@ func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	for {
-		for _, feedInfo := range Utils.GetUserSettings(Utils.LOCK_UNLOCK).RSSFeedNotifier.Feeds_info {
+		// This first part deletes unused feeds from the notified list.
+		var feeds_info *[]ModsFileInfo.FeedInfo = &Utils.GetUserSettings(Utils.LOCK_UNLOCK).RSSFeedNotifier.Feeds_info
+		var notified_news *[]ModsFileInfo.NewsInfo = &getModGenSettings().Notified_news
+		for i := len(*notified_news) - 1; i >= 0; i-- {
+			var delete_from_notified bool = true
+			var feed_info_idx int = -1
+			for feed_info_idx = range *feeds_info {
+				if (*notified_news)[i].Id == (*feeds_info)[feed_info_idx].Id {
+					delete_from_notified = false
+
+					break
+				}
+			}
+			if !delete_from_notified {
+				// If not deleted because of not found, check if the feed is enabled.
+				if !(*feeds_info)[feed_info_idx].Enabled {
+					// The feed is disabled, so remove it from the notified list.
+					// Useful for when it's enabled again, not to spam with old news.
+					delete_from_notified = true
+				}
+			}
+
+			if delete_from_notified {
+				// The feed no longer exists, so remove it from the notified list.
+				Utils.DelElemSLICES(notified_news, i)
+			}
+		}
+
+		for _, feedInfo := range *feeds_info {
 			if !feedInfo.Enabled {
 				continue
 			}
