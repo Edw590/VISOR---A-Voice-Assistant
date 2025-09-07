@@ -4,9 +4,9 @@ module CmdsExecutor
 // supporting it).
 go 1.20
 
+require github.com/olebedev/when v1.1.0
+
 require (
-	golang.org/x/exp v0.0.0-20240529005216-23cca8864a10 // indirect
-	golang.org/x/image v0.24.0 // indirect
-	golang.org/x/mobile v0.0.0-20240707233753-b765e5d5218f // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	github.com/AlekSi/pointer v1.0.0 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
 )

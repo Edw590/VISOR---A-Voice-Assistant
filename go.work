@@ -20,6 +20,7 @@ use (
 	./ClientCode
 	./data/ProgramData
 	./Libraries/ACD
+	./Libraries/DialogMan
 	./Libraries/SettingsSync
 	./Libraries/GMan
 	./Libraries/GPTComm

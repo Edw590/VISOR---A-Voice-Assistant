@@ -23,6 +23,7 @@ package CmdsExecutor
 
 import (
 	"ACD/ACD"
+	"DialogMan"
 	"GMan"
 	"GPTComm"
 	"OICComm"
@@ -35,13 +36,7 @@ import (
 	"VISOR_Client/ClientRegKeys"
 	"strconv"
 	"strings"
-	"time"
 )
-
-var last_it string = ""
-var last_it_when int64 = 0
-var last_and string = ""
-var last_and_when int64 = 0
 
 var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
@@ -49,109 +44,51 @@ func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	ACD.ReloadCmdsArray(prepareCommandsString())
+	DialogMan.ReloadIntentList(getIntentList())
 
+	var handle_input_result *DialogMan.HandleInputResult = nil
 	for {
 		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_CmdsExecutor, 0, -1)
 		if comms_map == nil {
 			return
 		}
 
-		if time.Now().UnixMilli() > last_it_when + 60*1000 {
-			last_it = ""
-		}
-		if time.Now().UnixMilli() > last_and_when + 60*1000 {
-			last_and = ""
-		}
-
 		var speech_priority int32 = SpeechQueue.PRIORITY_MEDIUM
-		var sentence_str string = ""
+		var sentence string = ""
 		if map_value, ok := comms_map["SentenceInternal"]; ok {
-			sentence_str = map_value.(string)
+			sentence = map_value.(string)
 		} else if map_value, ok = comms_map["Sentence"]; ok {
 			speech_priority = SpeechQueue.PRIORITY_USER_ACTION
-			sentence_str = map_value.(string)
+			sentence = map_value.(string)
 		} else {
 			continue
 		}
-		var cmds_info_str = ACD.Main(strings.ToLower(sentence_str), false, true, last_it + "|" + last_and)
-		Utils.LogLnDebug("*****************************")
-		Utils.LogLnDebug(sentence_str)
-		Utils.LogLnDebug(cmds_info_str)
-		var cmds_info []string = strings.Split(cmds_info_str, ACD.INFO_CMDS_SEPARATOR)
-		if len(cmds_info) < 2 {
-			sendToGPT(sentence_str)
 
-			time.Sleep(1 * time.Second)
+		handle_input_result = DialogMan.HandleInput(sentence, handle_input_result)
+		if handle_input_result == nil {
+			sendToGPT(sentence)
 
 			continue
 		}
-		var prev_cmd_info []string = strings.Split(cmds_info[0], ACD.PREV_CMD_INFO_SEPARATOR)
-		var detected_cmds []string = strings.Split(cmds_info[1], ACD.CMDS_SEPARATOR)
 
-		Utils.LogLnDebug(last_it)
-		Utils.LogLnDebug(last_and)
-		Utils.LogLnDebug("***************")
-
-		if prev_cmd_info[0] != "" {
-			last_it = prev_cmd_info[0]
-			last_it_when = time.Now().UnixMilli()
-		}
-		if prev_cmd_info[1] != "" {
-			last_and = prev_cmd_info[1]
-			last_and_when = time.Now().UnixMilli()
+		if handle_input_result.Response != "" {
+			speakInternal(handle_input_result.Response, speech_priority, SpeechQueue.MODE_DEFAULT, _SESSION_TYPE_NONE,
+				false, true)
 		}
 
-		Utils.LogLnDebug(last_it)
-		Utils.LogLnDebug(last_and)
-		Utils.LogLnDebug("*****************************")
-
-		var send_to_GPT bool = false
-		if strings.HasPrefix(cmds_info_str, ACD.ERR_CMD_DETECT) {
-			var speak string = "WARNING! There was a problem processing the commands, Sir. This needs a fix. The " +
-				"error was the following: " + cmds_info_str + ". You said: " + sentence_str
-			Speech.QueueSpeech(speak, speech_priority, SpeechQueue.MODE1_ALWAYS_NOTIFY, "", 0)
-			Utils.LogLnError("EXECUTOR - ERR_PROC_CMDS")
-
-			send_to_GPT = true
-		}
-
-		if len(detected_cmds) == 0 || detected_cmds[0] == "" {
-			send_to_GPT = true
-		} else {
-			send_to_GPT = true
-			for _, command := range detected_cmds {
-				num, _ := strconv.ParseFloat(command, 32)
-				if num >= 1 {
-					// If there's any command detected, don't send to GPT
-					send_to_GPT = false
-
-					break
-				}
+		var any_intent_detected bool = false
+		for _, intent := range handle_input_result.Intents {
+			if intent == nil {
+				break
 			}
-			// If there are only WARN_-started constants (negative numbers), send to GPT
-		}
-		if send_to_GPT {
-			sendToGPT(sentence_str)
-
-			return
-		}
-
-		for _, command := range detected_cmds {
-			var dot_index int = strings.Index(command, ".")
-			if dot_index == -1 {
-				// No command.
-				continue
-			}
-
-			var cmd_id string = command[:dot_index] // "14.3" --> "14"
-			var cmd_variant string = command[dot_index:] // "14.3" --> ".3"
+			any_intent_detected = true
 
 			var speech_mode2 = SpeechQueue.MODE_DEFAULT
-			if cmdi_info[cmd_id] == CMDi_INF1_ONLY_SPEAK {
+			if cmdi_info[intent.Acd_cmd_id] == CMDi_INF1_ONLY_SPEAK {
 				speech_mode2 = SpeechQueue.MODE2_BYPASS_NO_SND
 			}
 
-			switch cmd_id {
+			switch intent.Acd_cmd_id {
 				case CMD_ASK_TIME:
 					var speak string = "It's " + Utils.GetTimeStrTIMEDATE(-1)
 					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false, true)
@@ -161,9 +98,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, false, true)
 
 				case CMD_TOGGLE_WIFI:
-					if Utils.ToggleWifiCONNECTIVITY(cmd_variant == RET_ON) {
+					if Utils.ToggleWifiCONNECTIVITY(intent.Value == RET_ON) {
 						var speak string
-						if cmd_variant == RET_ON {
+						if intent.Value == RET_ON {
 							speak = "Wi-Fi turned on."
 						} else {
 							speak = "Wi-Fi turned off."
@@ -171,7 +108,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 					} else {
 						var on_off string = "off"
-						if cmd_variant == RET_ON {
+						if intent.Value == RET_ON {
 							on_off = "on"
 						}
 						var speak string = "Sorry, I couldn't turn the Wi-Fi " + on_off + "."
@@ -251,9 +188,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 					}
 
 				case CMD_TOGGLE_ETHERNET:
-					if Utils.ToggleEthernetCONNECTIVITY(cmd_variant == RET_ON) {
+					if Utils.ToggleEthernetCONNECTIVITY(intent.Value == RET_ON) {
 						var speak string
-						if cmd_variant == RET_ON {
+						if intent.Value == RET_ON {
 							speak = "Ethernet turned on."
 						} else {
 							speak = "Ethernet turned off."
@@ -261,7 +198,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 					} else {
 						var on_off string = "off"
-						if cmd_variant == RET_ON {
+						if intent.Value == RET_ON {
 							on_off = "on"
 						}
 						var speak string = "Sorry, I couldn't turn the Ethernet " + on_off + "."
@@ -269,9 +206,9 @@ func main(module_stop *bool, moduleInfo_any any) {
 					}
 
 				case CMD_TOGGLE_NETWORKING:
-					if Utils.ToggleNetworkingCONNECTIVITY(cmd_variant == RET_ON) {
+					if Utils.ToggleNetworkingCONNECTIVITY(intent.Value == RET_ON) {
 						var speak string
-						if cmd_variant == RET_ON {
+						if intent.Value == RET_ON {
 							speak = "Networking turned on."
 						} else {
 							speak = "Networking turned off."
@@ -279,7 +216,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 						speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 					} else {
 						var on_off string = "off"
-						if cmd_variant == RET_ON {
+						if intent.Value == RET_ON {
 							on_off = "on"
 						}
 						var speak string = "Sorry, I couldn't turn the networking " + on_off + "."
@@ -296,10 +233,10 @@ func main(module_stop *bool, moduleInfo_any any) {
 						var events_ids []string = strings.Split(GMan.GetEventsIdsList(), "|")
 						var tasks_ids []string = strings.Split(GMan.GetTasksIdsList(), "|")
 
-						speak = getEventsList(events_ids, cmd_variant)
+						speak = getEventsList(events_ids, intent.Value)
 
-						if cmd_variant == RET_31_TODAY || cmd_variant == RET_31_TOMORROW {
-							speak += " " + getTasksList(tasks_ids, cmd_variant)
+						if intent.Value == RET_31_TODAY || intent.Value == RET_31_TOMORROW {
+							speak += " " + getTasksList(tasks_ids, intent.Value)
 						}
 
 						speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true, true)
@@ -320,8 +257,14 @@ func main(module_stop *bool, moduleInfo_any any) {
 
 					GPTComm.AddFileToSend(true, png)
 
-					speakInternal(sentence_str, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true, false)
+					speakInternal(sentence, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true, false)
 			}
+		}
+
+		if !any_intent_detected {
+			sendToGPT(sentence)
+
+			continue
 		}
 
 

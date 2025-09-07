@@ -73,8 +73,8 @@ func ExecCmdSHELL(attempt_su bool, commands_list string) ([]byte, error) {
 	return output, err
 }
 
-func GetExitCodeSHELL(cmd_output []byte) int {
-	return int(binary.BigEndian.Uint32(cmd_output[0:4]))
+func GetExitCodeSHELL(cmd_output []byte) int32 {
+	return int32(binary.BigEndian.Uint32(cmd_output[0:4]))
 }
 
 func GetStdoutSHELL(cmd_output []byte) []byte {

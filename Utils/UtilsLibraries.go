@@ -31,6 +31,7 @@ const (
 	NUM_LIB_ULHelper
 	NUM_LIB_SCLink
 	NUM_LIB_GMan
+	NUM_LIB_DialogMan
 
 	LIBS_ARRAY_SIZE
 )
@@ -45,6 +46,7 @@ var LIB_NUMS_NAMES map[int]string = map[int]string{
 	NUM_LIB_ULHelper:     "User Locator Helper",
 	NUM_LIB_SCLink:       "System Checker Link",
 	NUM_LIB_GMan:         "Google Manager",
+	NUM_LIB_DialogMan:    "Dialogue Manager",
 }
 
 /*

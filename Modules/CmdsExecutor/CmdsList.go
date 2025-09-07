@@ -23,6 +23,7 @@ package CmdsExecutor
 
 import (
 	"ACD/ACD"
+	"DialogMan"
 	"strings"
 )
 
@@ -58,6 +59,10 @@ const CMD_TOGGLE_ETHERNET string = "29"
 const CMD_TOGGLE_NETWORKING string = "30"
 const CMD_ASK_EVENTS string = "31"
 const CMD_HELP_PICTURE string = "32"
+const CMD_CREATE_REMINDER string = "33"
+const CMD_AT_TIME string = "34" // Used only as slot command
+const CMD_CREATE_EVENT string = "35"
+const CMD_CREATE_TASK string = "36"
 
 ///////////////////////////////////////////////////////////////////
 // Return IDs
@@ -102,6 +107,8 @@ const CMDi_INF1_DO_SOMETHING = "0"
 // CMDi_INF1_ONLY_SPEAK signals that the referring command only requires the assistant to say something (like asking
 // what time is it).
 const CMDi_INF1_ONLY_SPEAK = "1"
+// CMDi_INF1_ONLY_SPEAK signals that the referring command doesn't require the assistant to say or do anything at all.
+const CMDi_INF1_DO_NOTHING = "2"
 // CMDi_INF1_ASSIST_CMD signals that the referring command is an assistance to another command (like saying "I confirm"
 // (the previous command)).
 //const CMDi_INF1_ASSIST_CMD = ""
@@ -132,10 +139,14 @@ var cmdi_info map[string]string = map[string]string{
 	CMD_TELL_WEATHER:              CMDi_INF1_ONLY_SPEAK,       // 26
 	CMD_TELL_NEWS:                 CMDi_INF1_ONLY_SPEAK,       // 27
 	//CMD_GONNA_SLEEP:               CMDi_INF1_ONLY_SPEAK,       // 28
-	CMD_TOGGLE_ETHERNET:   CMDi_INF1_DO_SOMETHING, // 29
-	CMD_TOGGLE_NETWORKING: CMDi_INF1_DO_SOMETHING, // 30
-	CMD_ASK_EVENTS:        CMDi_INF1_ONLY_SPEAK,   // 31
-	CMD_HELP_PICTURE:      CMDi_INF1_DO_SOMETHING, // 32
+	CMD_TOGGLE_ETHERNET:           CMDi_INF1_DO_SOMETHING, // 29
+	CMD_TOGGLE_NETWORKING:         CMDi_INF1_DO_SOMETHING, // 30
+	CMD_ASK_EVENTS:                CMDi_INF1_ONLY_SPEAK,   // 31
+	CMD_HELP_PICTURE:              CMDi_INF1_DO_SOMETHING, // 32
+	CMD_CREATE_REMINDER:           CMDi_INF1_DO_SOMETHING, // 33
+	CMD_AT_TIME:                   CMDi_INF1_DO_NOTHING,   // 34
+	CMD_CREATE_EVENT:              CMDi_INF1_DO_SOMETHING, // 35
+	CMD_CREATE_TASK:               CMDi_INF1_DO_SOMETHING, // 36
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -184,6 +195,10 @@ func prepareCommandsString() string {
 		{CMD_TOGGLE_NETWORKING, ACD.CMDi_TYPE_TURN_ONFF, "", "", "networking/internet"},
 		{CMD_ASK_EVENTS, ACD.CMDi_TYPE_ASK, "", "", "have today|have tomorrow|have this week|have next week"},
 		{CMD_HELP_PICTURE, ACD.CMDi_TYPE_NONE, "help", "", "this image/picture|image/picture clipboard/copied"},
+		{CMD_CREATE_REMINDER, ACD.CMDi_TYPE_NONE, "create set", "", "reminder/alarm/alert"},
+		{CMD_AT_TIME, ACD.CMDi_TYPE_NONE, "at", "", ";8;([012]?[0-9])(:([0-5][0-9]))?"},
+		{CMD_CREATE_EVENT, ACD.CMDi_TYPE_NONE, "create set", "", "event/meeting"},
+		{CMD_CREATE_TASK, ACD.CMDi_TYPE_NONE, "create set", "", "task/to-do/todo"},
 	}
 
 	var commands_almost_str []string = nil
@@ -191,5 +206,110 @@ func prepareCommandsString() string {
 		commands_almost_str = append(commands_almost_str, strings.Join(array, "||"))
 	}
 
-	return strings.Join(commands_almost_str, "\\")
+	return strings.Join(commands_almost_str, "\000")
+}
+
+func getIntentList() []*DialogMan.Intent {
+	return []*DialogMan.Intent{
+		{
+			Acd_cmd_id: CMD_TOGGLE_WIFI,
+			Task_name: "Toggle the Wi-Fi",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_TOGGLE_ETHERNET,
+			Task_name: "Toggle the Ethernet",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_TOGGLE_NETWORKING,
+			Task_name: "Toggle all networking",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_TELL_WEATHER,
+			Task_name: "Tell the weather",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_TELL_NEWS,
+			Task_name: "Tell the news",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_ASK_TIME,
+			Task_name: "Ask the time",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_ASK_DATE,
+			Task_name: "Ask the date",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_ASK_BATTERY_PERCENT,
+			Task_name: "Ask the battery percentage",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_ASK_EVENTS,
+			Task_name: "Ask about events and tasks",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_HELP_PICTURE,
+			Task_name: "Help with a picture",
+			Slots: nil,
+		},
+		{
+			Acd_cmd_id: CMD_CREATE_REMINDER,
+			Task_name: "Create a reminder",
+			Slots: []*DialogMan.Slot{
+				{
+					Prompt: "What is the reminder about?",
+					Acd_cmd_id: "",
+				},
+				{
+					Prompt: "At what time?",
+					Acd_cmd_id: CMD_AT_TIME,
+				},
+			},
+		},
+		{
+			Acd_cmd_id: CMD_CREATE_EVENT,
+			Task_name: "Create an event",
+			Slots: []*DialogMan.Slot{
+				{
+					Prompt: "What is the event about?",
+					Acd_cmd_id: "",
+				},
+				{
+					Prompt: "On what date?",
+					Acd_cmd_id: "",
+				},
+				{
+					Prompt: "At what time?",
+					Acd_cmd_id: CMD_AT_TIME,
+				},
+				{
+					Prompt: "For how long?",
+					Acd_cmd_id: "",
+				},
+			},
+		},
+		{
+			Acd_cmd_id: CMD_CREATE_TASK,
+			Task_name: "Create a task",
+			Slots: []*DialogMan.Slot{
+				{
+					Prompt: "What is the task about?",
+					Acd_cmd_id: "",
+				},
+				{
+					Prompt: "On what date?",
+					Acd_cmd_id: "",
+				},
+			},
+		},
+	}
 }
