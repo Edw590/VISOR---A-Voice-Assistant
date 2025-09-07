@@ -2,7 +2,7 @@ module OnlineInfoChk
 
 // Keep it on 1.20, so that it can be compiled for Windows 7 too if it's compiled with Go 1.20 (it's the last version
 // supporting it).
-go 1.20
+go 1.23.0
 
 require (
 	github.com/Edw590/go-wolfram v0.0.0-20241010091529-fb9031908c5d
@@ -14,6 +14,6 @@ require (
 	github.com/anaskhan96/soup v1.2.5 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )
