@@ -6,7 +6,9 @@ go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.5.1
+	github.com/Edw590/TryCatch-go v0.0.0-20240613213244-892990200ac0
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20240506104042-037f3cc74f2a
+	github.com/spf13/pflag v1.0.5
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 )
 
@@ -23,6 +25,7 @@ require (
 	github.com/go-text/render v0.1.1-0.20240418202334-dd62631dae9b // indirect
 	github.com/go-text/typesetting v0.1.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20240223122105-ce5225dcaa49 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
@@ -39,6 +42,6 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
