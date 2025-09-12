@@ -21,10 +21,19 @@
 
 package UtilsSWA
 
-import "strconv"
+import (
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/olebedev/when"
+	"github.com/olebedev/when/rules/common"
+	"github.com/olebedev/when/rules/en"
+)
 
 /*
-GetStartOfDayS returns the timestamp at the start of the day for a given timestamp.
+GetStartOfDayDATETIME returns the timestamp at the start of the day for a given timestamp.
 
 -----------------------------------------------------------
 
@@ -34,12 +43,42 @@ GetStartOfDayS returns the timestamp at the start of the day for a given timesta
 – Returns:
   - the timestamp at the start of the day
 */
-func GetStartOfDayS(timestamp int64) int64 {
+func GetStartOfDayDATETIME(timestamp int64) int64 {
 	return timestamp - timestamp % 86400;
 }
 
 /*
-GetEventDuration converts a duration in minutes to a human-readable string.
+TimeDateToTimestampDATETIME converts a time and/or date string to a timestamp using NLP.
+
+For information on supported formats and examples, check https://github.com/olebedev/when.
+
+-----------------------------------------------------------
+
+– Params:
+  - time_date_str – the time and/or date string to convert
+
+– Returns:
+  - the timestamp in seconds, or -1 if the string could not be parsed
+*/
+func TimeDateToTimestampDATETIME(time_date_str string) int64 {
+	w := when.New(nil)
+	w.Add(en.All...)
+	w.Add(common.All...)
+
+	r, err := w.Parse(time_date_str, time.Now())
+	if err != nil || r == nil {
+		return -1
+	}
+
+	return r.Time.Unix()
+}
+
+/*
+ToReadableDurationDATETIME converts a duration in minutes to a human-readable string.
+
+The largest unit used is decade(s), and the smallest is second(s).
+
+A years is considered to have 365 days, and a month is considered to have 30 days.
 
 -----------------------------------------------------------
 
@@ -48,61 +87,109 @@ GetEventDuration converts a duration in minutes to a human-readable string.
 
 – Returns:
   - a human-readable string representing the duration
- */
-func GetEventDuration(min int64) string {
-	if min >= 60 {
-		if min >= 24*60 {
-			if min >= 7*24*60 {
-				weeks := min / (7 * 24 * 60)
-				days := (min % (7 * 24 * 60)) / (24 * 60)
-				var week_weeks string = "weeks"
-				if weeks == 1 {
-					week_weeks = "week"
-				}
-				var day_days string = "days"
-				if days == 1 {
-					day_days = "day"
-				}
-				if days > 0 {
-					return strconv.Itoa(int(weeks)) + " " + week_weeks + " and " + strconv.Itoa(int(days)) + " " + day_days
-				}
-				return strconv.Itoa(int(weeks)) + " " + week_weeks
-			}
-			days := min / (24 * 60)
-			hours := (min % (24 * 60)) / 60
-			var day_days string = "days"
-			if days == 1 {
-				day_days = "day"
-			}
-			var hour_hours string = "hours"
-			if hours == 1 {
-				hour_hours = "hour"
-			}
-			if hours > 0 {
-				return strconv.Itoa(int(days)) + " " + day_days + " and " + strconv.Itoa(int(hours)) + " " + hour_hours
-			}
-			return strconv.Itoa(int(days)) + " " + day_days
-		}
-		hours := min / 60
-		minutes := min % 60
-		var hour_hours string = "hours"
-		if hours == 1 {
-			hour_hours = "hour"
-		}
-		var minute_minutes string = "minutes"
-		if minutes == 1 {
-			minute_minutes = "minute"
-		}
-		if minutes > 0 {
-			return strconv.Itoa(int(hours)) + " " + hour_hours + " and " + strconv.Itoa(int(minutes)) + " " + minute_minutes
-		}
-		return strconv.Itoa(int(hours)) + " " + hour_hours
+*/
+func ToReadableDurationDATETIME(min int64) string {
+	// Units in descending order
+	units := []struct {
+		nameSingular string
+		namePlural   string
+		sizeInMin    int64
+	}{
+		{"decade", "decades", 10 * 365 * 24 * 3600},
+		{"year", "years", 365 * 24 * 3600},
+		{"month", "months", 30 * 24 * 3600},
+		{"week", "weeks", 7 * 24 * 3600},
+		{"day", "days", 24 * 3600},
+		{"hour", "hours", 3600},
+		{"minute", "minutes", 60},
+		{"second", "seconds", 1},
 	}
 
-	var minute_minutes string = "minutes"
-	if min == 1 {
-		minute_minutes = "minute"
+	var parts []string
+	var remaining int64 = min
+
+	for _, u := range units {
+		if remaining >= u.sizeInMin {
+			var val int64 = remaining / u.sizeInMin
+			remaining = remaining % u.sizeInMin
+
+			var name string = u.namePlural
+			if val == 1 {
+				name = u.nameSingular
+			}
+			parts = append(parts, strconv.FormatInt(val, 10) + " " + name)
+		}
 	}
 
-	return strconv.Itoa(int(min)) + " " + minute_minutes
+	if len(parts) == 0 {
+		return "0 seconds"
+	}
+
+	// Join all parts with commas, but the last with "and"
+	if len(parts) == 1 {
+		return parts[0]
+	}
+
+	return strings.Join(parts[:len(parts)-1], ", ") + " and " + parts[len(parts)-1]
+}
+
+/*
+ParseDurationDATETIME parses a duration string and returns the duration in seconds.
+
+Supported units range from second(s) to decade(s). The function is case-insensitive.
+
+A year is considered to have 365 days, and a month is considered to have 30 days.
+
+-----------------------------------------------------------
+
+– Params:
+  - input – the duration string to parse
+
+– Returns:
+  - the duration in seconds or -1 if the input could not be parsed
+*/
+func ParseDurationDATETIME(input string) int64 {
+	input = strings.ToLower(input)
+	var re *regexp.Regexp = regexp.MustCompile(`(\d+)\s*(second|minute|hour|day|week|month|year|decade)s?`)
+	var matches [][]string = re.FindAllStringSubmatch(input, -1)
+
+	var duration int = 0
+	var any_parsed bool = false
+	for _, match := range matches {
+		val, _ := strconv.Atoi(match[1])
+		var unit string = match[2]
+
+		switch unit {
+			case "second":
+				duration += val
+				any_parsed = true
+			case "minute":
+				duration += val * 60
+				any_parsed = true
+			case "hour":
+				duration += val * 3600
+				any_parsed = true
+			case "day":
+				duration += val * 24 * 3600
+				any_parsed = true
+			case "week":
+				duration += val * 7 * 24 * 3600
+				any_parsed = true
+			case "month":
+				duration += val * 30 * 24 * 3600
+				any_parsed = true
+			case "year":
+				duration += val * 365 * 24 * 3600
+				any_parsed = true
+			case "decade":
+				duration += val * 10 * 365 * 24 * 3600
+				any_parsed = true
+		}
+	}
+
+	if any_parsed {
+		return int64(duration)
+	}
+
+	return -1
 }

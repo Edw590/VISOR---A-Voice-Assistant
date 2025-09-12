@@ -24,8 +24,9 @@ package GMan
 import (
 	"Utils"
 	"encoding/json"
-	"golang.org/x/oauth2"
 	"strconv"
+
+	"golang.org/x/oauth2"
 )
 
 /*

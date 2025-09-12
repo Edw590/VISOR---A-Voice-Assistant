@@ -281,7 +281,11 @@ func QueueGeneralMessageSERVER(message []byte) bool {
 }
 
 /*
-QueueMessageSERVER queues a message to be sent to the server.
+QueueMessageSERVER queues a message to be sent to the server, expecting a response.
+
+The first 3 parameters refer to the module or library that is sending the message --> the ones used to send the response
+back to the client. So for example, module 2 with channel number 3 sends a message to the server: the server will know
+where to send the response back to (module 2, channel number 3 of the client that sent the message).
 
 -----------------------------------------------------------
 

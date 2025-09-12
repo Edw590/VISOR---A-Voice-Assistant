@@ -93,13 +93,13 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 
 		var now time.Time = time.Now()
 
-		var start_of_day_s int64 = UtilsSWA.GetStartOfDayS(now.Unix())
+		var start_of_day_s int64 = UtilsSWA.GetStartOfDayDATETIME(now.Unix())
 		var end_of_day_s int64 = start_of_day_s + 86400 - 1 // 86400 seconds in a day (24*60*60)
 
 		var start_of_next_day_s int64 = start_of_day_s + 86400
 		var end_of_next_day_s int64 = start_of_next_day_s + 86400 - 1
 
-		var start_of_week_s int64 = UtilsSWA.GetStartOfDayS(now.Unix() - int64(now.Weekday())*86400)
+		var start_of_week_s int64 = UtilsSWA.GetStartOfDayDATETIME(now.Unix() - int64(now.Weekday())*86400)
 		var end_of_week_s int64 = start_of_week_s + 7*86400 - 1
 
 		var start_of_next_week_s int64 = start_of_week_s + 7*86400
@@ -149,7 +149,7 @@ func getEventsList(events_ids []string, cmd_variant string) string {
 			var curr_duration int64 = event.Start_time_s/60 + event.Duration_min - now.Unix()/60
 
 			speak += "\"" + event.Summary + "\"" + event_on + " " + event_at + " for " +
-				UtilsSWA.GetEventDuration(curr_duration) + "; "
+				UtilsSWA.ToReadableDurationDATETIME(curr_duration) + "; "
 		}
 	}
 
