@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -44,8 +44,42 @@ The functions does so by checking if the elements is inside a range of mean +- X
 
 */
 func IsOutlierMATH(value float64, sum float64, sum_squares float64, n int, accuracy_parameter float64) bool {
-	mean := sum / float64(n)
-	std_dev := math.Sqrt(sum_squares/float64(n) - mean*mean)
+	var mean float64 = sum / float64(n)
+	var std_dev float64 = math.Sqrt(sum_squares/float64(n) - mean*mean)
 
 	return (value < mean - accuracy_parameter * std_dev) || (value > mean + accuracy_parameter * std_dev)
+}
+
+/*
+IsFloatClose checks if two float32 numbers are close to each other within a given tolerance.
+
+-----------------------------------------------------------
+
+– Params:
+  - a – the first number
+  - b – the second number
+  - tolerance – the maximum difference to consider them close
+
+– Returns:
+  - true if they are close, false otherwise
+ */
+func IsFloatClose(a float32, b float32, tolerance float32) bool {
+	return math.Abs(float64(a - b)) < float64(tolerance)
+}
+
+/*
+IsDoubleClose checks if two float64 numbers are close to each other within a given tolerance.
+
+-----------------------------------------------------------
+
+– Params:
+  - a – the first number
+  - b – the second number
+  - tolerance – the maximum difference to consider them close
+
+– Returns:
+  - true if they are close, false otherwise
+ */
+func IsDoubleClose(a float64, b float64, tolerance float64) bool {
+	return math.Abs(a - b) < tolerance
 }
