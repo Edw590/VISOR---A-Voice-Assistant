@@ -28,16 +28,17 @@ import (
 	"Utils"
 	"Utils/ModsFileInfo"
 	"errors"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type _SessionInfo struct {
@@ -121,8 +122,11 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 			"are only retrieved if you ask for today or tomorrow). After asking, you can then talk normally about " +
 			"your events and tasks with VISOR)\n" +
 		"--> Ask for help with a picture (that you have on clipboard - must be a PNG specifically! Image or path to " +
-			"image). Example: \"Help me with this picture what do you see in it? (no punctuation, like the comma, on " +
-			"the first part)\"\n",
+			"image). Example: \"Help me with this picture what do you see in it\" (no punctuation, like the comma, on " +
+			"the first part)\n" +
+		"--> Create a reminder (VISOR will ask you for the reminder details)\n" +
+		"--> Create a Google Calendar event (VISOR will ask you for the event details)\n" +
+		"--> Create a Google task (VISOR will ask you for the task details)\n",
 	)
 	label_list_commands.Wrapping = fyne.TextWrapWord
 

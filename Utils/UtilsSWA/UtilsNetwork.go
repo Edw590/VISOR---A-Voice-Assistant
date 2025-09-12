@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2023-2024 The V.I.S.O.R. authors
+ * Copyright 2023-2025 The V.I.S.O.R. authors
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,7 +21,10 @@
 
 package UtilsSWA
 
-import "time"
+import (
+	"Utils"
+	"time"
+)
 
 /*
 WaitForNetwork waits for the network to be connected by checking the server communicator connection status.
@@ -36,7 +39,7 @@ WaitForNetwork waits for the network to be connected by checking the server comm
  */
 func WaitForNetwork(timeout_s int64) bool {
 	var start_time int64 = time.Now().Unix()
-	for !IsCommunicatorConnectedSERVER() {
+	for !Utils.IsCommunicatorConnectedSERVER() {
 		if time.Now().Unix() - start_time >= timeout_s {
 			return false
 		}
@@ -44,5 +47,5 @@ func WaitForNetwork(timeout_s int64) bool {
 		time.Sleep(1 * time.Second)
 	}
 
-	return IsCommunicatorConnectedSERVER()
+	return Utils.IsCommunicatorConnectedSERVER()
 }

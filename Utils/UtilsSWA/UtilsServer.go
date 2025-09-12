@@ -71,6 +71,21 @@ func GetGeneralMessageSERVER() ([]byte, error) {
 }
 
 /*
+QueueNoResponseMessageSERVER queues a message to be sent to the server without expecting a response.
+
+-----------------------------------------------------------
+
+– Params:
+  - message – the message to be sent
+
+– Returns:
+  - true if the message was queued, false otherwise
+*/
+func QueueNoResponseMessageSERVER(message []byte) bool {
+	return Utils.QueueNoResponseMessageSERVER(message)
+}
+
+/*
 IsCommunicatorConnectedSERVER checks if the communicator is connected.
 
 -----------------------------------------------------------

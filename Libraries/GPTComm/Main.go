@@ -199,12 +199,13 @@ SetMemories sets the memories in the GPT.
 – Params:
   - json – the memories separated by new lines
  */
-func SetMemories(memories_str string) {
+func SetMemories(memories_str string) bool {
 	var memories []string = strings.Split(memories_str, "\n")
 
 	var message []byte = []byte("S_S|GPTMem|")
 	message = append(message, *Utils.ToJsonGENERAL(memories)...)
-	Utils.QueueNoResponseMessageSERVER(message)
+
+	return Utils.QueueNoResponseMessageSERVER(message)
 }
 
 /*

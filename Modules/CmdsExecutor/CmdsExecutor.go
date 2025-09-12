@@ -258,6 +258,99 @@ func main(module_stop *bool, moduleInfo_any any) {
 					GPTComm.AddFileToSend(true, png)
 
 					speakInternal(sentence, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_ACTIVE, true, false)
+
+				case CMD_CREATE_EVENT:
+					var about_str string = ""
+					var when_s int64 = 0
+					var how_long_min int64 = 0
+					for slot_idx, slot := range intent.Slots {
+						switch slot_idx {
+							case 0: // About?
+								about_str = slot.Value
+							case 1: // When?
+								when_s = UtilsSWA.TimeDateToTimestampDATETIME(slot.Value)
+								if when_s == -1 {
+									var speak string = "Sorry, I couldn't understand the date you mentioned. Set the " +
+										"event again please with another format for the date."
+									speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
+
+									break
+								}
+							case 2: // For how long?
+								how_long_min = UtilsSWA.ParseDurationDATETIME(slot.Value)
+								if how_long_min == -1 {
+									var speak string = "Sorry, I couldn't understand the duration you mentioned. Set " +
+										"the event again please with another format for the duration."
+									speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
+
+									break
+								}
+
+								how_long_min /= 60
+						}
+					}
+					if about_str == "" || when_s == 0 || how_long_min == 0 {
+						break
+					}
+
+					var speak string
+					if UtilsSWA.WaitForNetwork(0) {
+						GMan.AddEvent(&ModsFileInfo.GEvent{
+							Summary:      about_str,
+							Start_time_s: when_s,
+							Duration_min: how_long_min,
+						})
+
+						if GMan.IsTokenValid() {
+							speak = "The event will be created now."
+						} else {
+							speak = "Apologies Sir, but the event will not be created: the Google Manager " +
+								"token is not valid. Please set it up again."
+						}
+					} else {
+						speak = "Not connected to the server to add event."
+					}
+					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
+
+				case CMD_CREATE_TASK:
+					var about_str string = ""
+					var when_s int64 = 0
+					for slot_idx, slot := range intent.Slots {
+						switch slot_idx {
+							case 0:
+								about_str = slot.Value
+							case 1:
+								when_s = UtilsSWA.TimeDateToTimestampDATETIME(slot.Value)
+								if when_s == -1 {
+									var speak string = "Sorry, I couldn't understand the date you mentioned. Set the " +
+										"task again please with another format for the date."
+									speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
+
+									break
+								}
+						}
+					}
+					if about_str == "" || when_s == 0 {
+						break
+					}
+
+					var speak string
+					if UtilsSWA.WaitForNetwork(0) {
+						GMan.AddTask(&ModsFileInfo.GTask{
+							Title:   about_str,
+							Date_s:  when_s,
+						})
+
+						if GMan.IsTokenValid() {
+							speak = "The task will be created now."
+						} else {
+							speak = "Apologies Sir, but the task will not be created: the Google Manager " +
+								"token is not valid. Please set it up again."
+						}
+					} else {
+						speak = "Not connected to the server to add task."
+					}
+					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
 			}
 		}
 

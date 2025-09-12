@@ -48,8 +48,6 @@ func storeCalendarsEvents(client *http.Client) bool {
 		return false
 	}
 
-	setTokenValid()
-
 	// Calculate the start of the current week (Monday)
 	var now time.Time = time.Now()
 	var weekday int = int(now.Weekday())
@@ -123,6 +121,44 @@ func storeCalendarsEvents(client *http.Client) bool {
 
 		getModGenSettings().Events = events_final
 	}
+
+	return true
+}
+
+func addEvent(event ModsFileInfo.GEvent, client *http.Client) bool {
+	service, err := calendar.NewService(context.Background(), option.WithHTTPClient(client))
+	if err != nil {
+		Utils.LogfError("Unable to retrieve Calendar client: %v\n", err)
+
+		return false
+	}
+
+	var startTime time.Time = time.Unix(event.Start_time_s, 0)
+	var endTime time.Time = startTime.Add(time.Duration(event.Duration_min) * time.Minute)
+
+	var google_event *calendar.Event = &calendar.Event{
+		Summary:     event.Summary,
+		Location:    event.Location,
+		Description: event.Description,
+		Start: &calendar.EventDateTime{
+			DateTime: startTime.Format(time.RFC3339),
+			TimeZone: "UTC", // TODO: make timezone configurable
+		},
+		End: &calendar.EventDateTime{
+			DateTime: endTime.Format(time.RFC3339),
+			TimeZone: "UTC",
+		},
+	}
+
+	// Insert the event into the primary calendar
+	createdEvent, err := service.Events.Insert("primary", google_event).Do()
+	if err != nil {
+		Utils.LogfError("Unable to create event: %v\n", err)
+
+		return false
+	}
+
+	Utils.LogfInfo("Event created: %s\n", createdEvent.HtmlLink)
 
 	return true
 }

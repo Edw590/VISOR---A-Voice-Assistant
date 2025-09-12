@@ -59,10 +59,8 @@ const CMD_TOGGLE_ETHERNET string = "29"
 const CMD_TOGGLE_NETWORKING string = "30"
 const CMD_ASK_EVENTS string = "31"
 const CMD_HELP_PICTURE string = "32"
-const CMD_CREATE_REMINDER string = "33"
-const CMD_AT_TIME string = "34" // Used only as slot command
-const CMD_CREATE_EVENT string = "35"
-const CMD_CREATE_TASK string = "36"
+const CMD_CREATE_EVENT string = "33"
+const CMD_CREATE_TASK string = "34"
 
 ///////////////////////////////////////////////////////////////////
 // Return IDs
@@ -143,10 +141,8 @@ var cmdi_info map[string]string = map[string]string{
 	CMD_TOGGLE_NETWORKING:         CMDi_INF1_DO_SOMETHING, // 30
 	CMD_ASK_EVENTS:                CMDi_INF1_ONLY_SPEAK,   // 31
 	CMD_HELP_PICTURE:              CMDi_INF1_DO_SOMETHING, // 32
-	CMD_CREATE_REMINDER:           CMDi_INF1_DO_SOMETHING, // 33
-	CMD_AT_TIME:                   CMDi_INF1_DO_NOTHING,   // 34
-	CMD_CREATE_EVENT:              CMDi_INF1_DO_SOMETHING, // 35
-	CMD_CREATE_TASK:               CMDi_INF1_DO_SOMETHING, // 36
+	CMD_CREATE_EVENT:              CMDi_INF1_DO_SOMETHING, // 33
+	CMD_CREATE_TASK:               CMDi_INF1_DO_SOMETHING, // 34
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -195,8 +191,6 @@ func prepareCommandsString() string {
 		{CMD_TOGGLE_NETWORKING, ACD.CMDi_TYPE_TURN_ONFF, "", "", "networking/internet"},
 		{CMD_ASK_EVENTS, ACD.CMDi_TYPE_ASK, "", "", "have today|have tomorrow|have this week|have next week"},
 		{CMD_HELP_PICTURE, ACD.CMDi_TYPE_NONE, "help", "", "this image/picture|image/picture clipboard/copied"},
-		{CMD_CREATE_REMINDER, ACD.CMDi_TYPE_NONE, "create set", "", "reminder/alarm/alert"},
-		{CMD_AT_TIME, ACD.CMDi_TYPE_NONE, "at", "", ";8;([012]?[0-9])(:([0-5][0-9]))?"},
 		{CMD_CREATE_EVENT, ACD.CMDi_TYPE_NONE, "create set", "", "event/meeting"},
 		{CMD_CREATE_TASK, ACD.CMDi_TYPE_NONE, "create set", "", "task/to-do/todo"},
 	}
@@ -262,20 +256,6 @@ func getIntentList() []*DialogMan.Intent {
 			Slots: nil,
 		},
 		{
-			Acd_cmd_id: CMD_CREATE_REMINDER,
-			Task_name: "Create a reminder",
-			Slots: []*DialogMan.Slot{
-				{
-					Prompt: "What is the reminder about?",
-					Acd_cmd_id: "",
-				},
-				{
-					Prompt: "At what time?",
-					Acd_cmd_id: CMD_AT_TIME,
-				},
-			},
-		},
-		{
 			Acd_cmd_id: CMD_CREATE_EVENT,
 			Task_name: "Create an event",
 			Slots: []*DialogMan.Slot{
@@ -284,12 +264,8 @@ func getIntentList() []*DialogMan.Intent {
 					Acd_cmd_id: "",
 				},
 				{
-					Prompt: "On what date?",
+					Prompt: "When?",
 					Acd_cmd_id: "",
-				},
-				{
-					Prompt: "At what time?",
-					Acd_cmd_id: CMD_AT_TIME,
 				},
 				{
 					Prompt: "For how long?",

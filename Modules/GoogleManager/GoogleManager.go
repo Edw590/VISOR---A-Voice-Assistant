@@ -45,28 +45,79 @@ func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
 func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
+	go func() {
+		for {
+			var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GoogleManager, 0, -1)
+			if comms_map == nil {
+				break
+			}
+
+			var to_process []byte = nil
+			var is_event bool = true
+			if _, ok := comms_map["Event"]; ok {
+				to_process = comms_map["Event"].([]byte)
+			} else if _, ok = comms_map["Task"]; ok {
+				to_process = comms_map["Task"].([]byte)
+				is_event = false
+			} else {
+				continue
+			}
+			var to_process_str string = string(to_process)
+
+			client := getClient()
+			if client == nil {
+				Utils.WaitWithStopDATETIME(module_stop, 15)
+
+				continue
+			}
+
+			if is_event {
+				var event ModsFileInfo.GEvent
+				err := Utils.FromJsonGENERAL([]byte(to_process_str), &event)
+				if err != nil {
+					Utils.LogfError("Unable to parse calendar event: %v\n", err)
+
+					continue
+				}
+
+				if !addEvent(event, client) {
+					Utils.LogfError("Unable to add calendar event: %v\n", err)
+				}
+			} else {
+				var task ModsFileInfo.GTask
+				err := Utils.FromJsonGENERAL([]byte(to_process_str), &task)
+				if err != nil {
+					Utils.LogfError("Unable to parse task: %v\n", err)
+
+					continue
+				}
+
+				if !addTask(task, client) {
+					Utils.LogfError("Unable to add task: %v\n", err)
+				}
+			}
+		}
+	}()
+
 	for {
 		getModGenSettings().Token_invalid = true
 
-		// Parse credentials to config
-		config, err := ParseConfigJSON()
-		if err != nil {
-			Utils.LogfError("Unable to parse client secret file to config: %v\n", err)
-
-			return
-		}
-		client := getClient(config)
+		client := getClient()
 		if client == nil {
-			//log.Println("No token saved")
+			Utils.WaitWithStopDATETIME(module_stop, 15)
 
-			return
+			continue
 		}
 
 		// Store calendar events
-		storeCalendarsEvents(client)
+		if storeCalendarsEvents(client) {
+			setTokenValid()
+		}
 
 		// Store tasks
-		storeTasks(client)
+		if storeTasks(client) {
+			setTokenValid()
+		}
 
 		if getModGenSettings().Token_invalid && !getModGenSettings().Token_invalid_notified {
 			var msg_body string = "The saved Google token is invalid. Please re-authenticate."
@@ -76,7 +127,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			}
 			var email_info Utils.EmailInfo = Utils.GetModelFileEMAIL(Utils.MODEL_FILE_INFO, things_replace)
 			email_info.Subject = "Google token is INVALID"
-			err = Utils.QueueEmailEMAIL(email_info)
+			err := Utils.QueueEmailEMAIL(email_info)
 			if err == nil {
 				getModGenSettings().Token_invalid_notified = true
 			}
@@ -89,12 +140,21 @@ func main(module_stop *bool, moduleInfo_any any) {
 }
 
 // getClient retrieves a token, saves it, and returns a new client
-func getClient(config *oauth2.Config) *http.Client {
+func getClient() *http.Client {
+	// Parse credentials to config
+	config, err := ParseConfigJSON()
+	if err != nil {
+		Utils.LogfError("Unable to parse client secret file to config: %v\n", err)
+
+		return nil
+	}
+
 	// Check if the token file exists
 	token, err := getToken()
 	if err != nil {
 		return nil
 	}
+
 	return config.Client(context.Background(), token)
 }
 

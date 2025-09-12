@@ -313,7 +313,7 @@ func handleMessage(type_ string, bytes []byte) []byte {
 			}
 		case "GPT":
 			// Send a text to be processed by the GPT model or redirected to the right client.
-			// Example: "'process', 'redirect' or 'models'|in case of processing, the dataa or nothing to just get the
+			// Example: "'process', 'redirect' or 'models'|in case of processing, the data or nothing to just get the
 			// return value; in case of redirecting and models, a string"
 			// Returns: in case of processing, the GPT Communicator module state; in case of redirecting and models,
 			// nothing
@@ -410,6 +410,23 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					}
 				default:
 					Utils.LogLnError(json_dest)
+			}
+		case "GMan":
+			// Add a calendar event or task.
+			// Example: "'event' or 'task'|the JSON of the GEvent or GTask struct"
+			// Returns: nothing
+			var bytes_str string = string(bytes)
+			var action string = strings.Split(bytes_str, "|")[0]
+
+			var data []byte = bytes[strings.Index(bytes_str, "|")+1:]
+
+			switch action {
+				case "event":
+					Utils.SendToModChannel(Utils.NUM_MOD_GoogleManager, 0, "Event", data)
+				case "task":
+					Utils.SendToModChannel(Utils.NUM_MOD_GoogleManager, 0, "Task", data)
+				default:
+					// Nothing
 			}
 	}
 

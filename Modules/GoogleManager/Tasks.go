@@ -49,8 +49,6 @@ func storeTasks(client *http.Client) bool {
 		return false
 	}
 
-	setTokenValid()
-
 	if len(task_lists.Items) == 0 {
 		//log.Println("No task lists found.")
 
@@ -95,6 +93,38 @@ func storeTasks(client *http.Client) bool {
 	}
 
 	getModGenSettings().Tasks = tasks_final
+
+	return true
+}
+
+func addTask(task ModsFileInfo.GTask, client *http.Client) bool {
+	srv, err := tasks.NewService(context.Background(), option.WithHTTPClient(client))
+	if err != nil {
+		Utils.LogfError("Unable to retrieve Tasks client: %v\n", err)
+
+		return false
+	}
+
+	var new_task *tasks.Task = &tasks.Task{
+		Title: task.Title,
+		Notes: task.Details,
+		Due:  time.Unix(task.Date_s, 0).Format(time.RFC3339),
+		Status: func() string {
+			if task.Completed {
+				return "completed"
+			}
+
+			return "needsAction"
+		}(),
+	}
+
+	// Insert the new task into the primary task list
+	_, err = srv.Tasks.Insert("@default", new_task).Do()
+	if err != nil {
+		Utils.LogfError("Unable to add task: %v\n", err)
+
+		return false
+	}
 
 	return true
 }

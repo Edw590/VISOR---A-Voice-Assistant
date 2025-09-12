@@ -87,3 +87,21 @@ func GetEvent(event_id string) *ModsFileInfo.GEvent {
 
 	return nil
 }
+
+/*
+AddEvent adds a new event to Google Calendar.
+
+-----------------------------------------------------------
+
+– Params:
+  - event – the event to add
+
+– Returns:
+  - true if the event was added successfully, false otherwise
+ */
+func AddEvent(event *ModsFileInfo.GEvent) bool {
+	var message []byte = []byte("GMan|event|")
+	message = append(message, *Utils.ToJsonGENERAL(*event)...)
+
+	return Utils.QueueNoResponseMessageSERVER(message)
+}

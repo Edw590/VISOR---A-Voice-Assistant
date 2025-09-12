@@ -238,7 +238,7 @@ func startCommunicatorInternalSERVER() {
 /*
 GetGeneralMessageSERVER gets a general message from the server.
 
-The message is sent by QueueGeneralMessageSERVER().
+It is sent by QueueGeneralMessageSERVER().
 
 If no message is available, the function will wait until a message is received.
 

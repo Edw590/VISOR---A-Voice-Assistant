@@ -87,3 +87,21 @@ func GetTask(task_id string) *ModsFileInfo.GTask {
 
 	return nil
 }
+
+/*
+AddTask adds a new task to Google Calendar.
+
+-----------------------------------------------------------
+
+– Params:
+  - task – the task to add
+
+– Returns:
+  - true if the task was added successfully, false otherwise
+*/
+func AddTask(task *ModsFileInfo.GTask) bool {
+	var message []byte = []byte("GMan|task|")
+	message = append(message, *Utils.ToJsonGENERAL(*task)...)
+
+	return Utils.QueueNoResponseMessageSERVER(message)
+}

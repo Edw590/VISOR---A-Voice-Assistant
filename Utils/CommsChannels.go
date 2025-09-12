@@ -22,8 +22,9 @@
 package Utils
 
 import (
-	Tcef "github.com/Edw590/TryCatch-go"
 	"time"
+
+	Tcef "github.com/Edw590/TryCatch-go"
 )
 
 const _COMMS_CH_MUL int = 10
@@ -69,7 +70,7 @@ GetFromCommsChannel gets data from a module or library communication channel.
   - is_mod – whether it's a channel from a module or library
   - num – the number of the module or library
   - ch_num – the channel number
-  - timeout_s – the timeout in seconds (>= 0) or -1 for no timeout
+  - timeout_s – the timeout in seconds (>= 0) or -1 for no timeout (blocking)
 
 – Returns:
   - the data from the channel or nil if the timeout is reached
