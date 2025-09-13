@@ -29,6 +29,7 @@ import (
 	"VISOR_Client/ClientRegKeys"
 	"VISOR_Client/Logo"
 	"VISOR_Client/Screens"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -58,6 +59,8 @@ var content_container_GL *fyne.Container = nil
 
 var modDirsInfo_GL Utils.ModDirsInfo
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
 	// Command line arguments
 	var flag_log_level *int = flag.IntP("loglevel", "l", 9, "Log level to use. 0 = ERROR, 1 = WARNING, 2 = INFO, 3 = " +
 		"DEBUG. Default is 0 (ERROR).")

@@ -35,7 +35,7 @@ import (
 func storeCalendarsEvents(client *http.Client) bool {
 	service, err := calendar.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Calendar client: %v\n", err)
+		Utils.LogLnError("Unable to retrieve Calendar client:", err)
 
 		return false
 	}
@@ -43,7 +43,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 	// Get the list of all calendars
 	calendarList, err := service.CalendarList.List().Do()
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Calendar list: %v\n", err)
+		Utils.LogLnError("Unable to retrieve Calendar list:", err)
 
 		return false
 	}
@@ -128,7 +128,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 func addEvent(event ModsFileInfo.GEvent, client *http.Client) bool {
 	service, err := calendar.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Calendar client: %v\n", err)
+		Utils.LogLnError("Unable to retrieve Calendar client:", err)
 
 		return false
 	}
@@ -153,12 +153,12 @@ func addEvent(event ModsFileInfo.GEvent, client *http.Client) bool {
 	// Insert the event into the primary calendar
 	createdEvent, err := service.Events.Insert("primary", google_event).Do()
 	if err != nil {
-		Utils.LogfError("Unable to create event: %v\n", err)
+		Utils.LogLnError("Unable to create event:", err)
 
 		return false
 	}
 
-	Utils.LogfInfo("Event created: %s\n", createdEvent.HtmlLink)
+	Utils.LogLnInfo("Event created: " + createdEvent.HtmlLink)
 
 	return true
 }

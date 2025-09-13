@@ -75,25 +75,25 @@ func main(module_stop *bool, moduleInfo_any any) {
 				var event ModsFileInfo.GEvent
 				err := Utils.FromJsonGENERAL([]byte(to_process_str), &event)
 				if err != nil {
-					Utils.LogfError("Unable to parse calendar event: %v\n", err)
+					Utils.LogLnError("Unable to parse calendar event:", err)
 
 					continue
 				}
 
 				if !addEvent(event, client) {
-					Utils.LogfError("Unable to add calendar event: %v\n", err)
+					Utils.LogLnError("Unable to add calendar event:", err)
 				}
 			} else {
 				var task ModsFileInfo.GTask
 				err := Utils.FromJsonGENERAL([]byte(to_process_str), &task)
 				if err != nil {
-					Utils.LogfError("Unable to parse task: %v\n", err)
+					Utils.LogLnError("Unable to parse task:", err)
 
 					continue
 				}
 
 				if !addTask(task, client) {
-					Utils.LogfError("Unable to add task: %v\n", err)
+					Utils.LogLnError("Unable to add task:", err)
 				}
 			}
 		}
@@ -144,7 +144,7 @@ func getClient() *http.Client {
 	// Parse credentials to config
 	config, err := ParseConfigJSON()
 	if err != nil {
-		Utils.LogfError("Unable to parse client secret file to config: %v\n", err)
+		Utils.LogLnError("Unable to parse client secret file to config:", err)
 
 		return nil
 	}

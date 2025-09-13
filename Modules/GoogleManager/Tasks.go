@@ -36,7 +36,7 @@ func storeTasks(client *http.Client) bool {
 	// Create a new Tasks service.
 	srv, err := tasks.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Tasks client: %v\n", err)
+		Utils.LogLnError("Unable to retrieve Tasks client:", err)
 
 		return false
 	}
@@ -44,7 +44,7 @@ func storeTasks(client *http.Client) bool {
 	// Retrieve the user's task lists.
 	task_lists, err := srv.Tasklists.List().MaxResults(9999).Do()
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Task lists: %v\n", err)
+		Utils.LogLnError("Unable to retrieve Task lists:", err)
 
 		return false
 	}
@@ -100,7 +100,7 @@ func storeTasks(client *http.Client) bool {
 func addTask(task ModsFileInfo.GTask, client *http.Client) bool {
 	srv, err := tasks.NewService(context.Background(), option.WithHTTPClient(client))
 	if err != nil {
-		Utils.LogfError("Unable to retrieve Tasks client: %v\n", err)
+		Utils.LogLnError("Unable to retrieve Tasks client:", err)
 
 		return false
 	}
@@ -121,7 +121,7 @@ func addTask(task ModsFileInfo.GTask, client *http.Client) bool {
 	// Insert the new task into the primary task list
 	_, err = srv.Tasks.Insert("@default", new_task).Do()
 	if err != nil {
-		Utils.LogfError("Unable to add task: %v\n", err)
+		Utils.LogLnError("Unable to add task:", err)
 
 		return false
 	}

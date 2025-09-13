@@ -119,7 +119,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					var battery_percentage int = int(UtilsSWA.GetValueREGISTRY(ClientRegKeys.K_BATTERY_LEVEL).
 						GetInt(true))
 					var speak string = "Battery percentage: " + strconv.Itoa(battery_percentage) + "%"
-					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
+					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 
 				case CMD_TELL_WEATHER:
 					var speak string = "Obtaining the weather..."

@@ -234,7 +234,7 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 		}
 		defer resp.Body.Close()
 
-		return readGPT(device_id, resp, true)
+		return readGPT(device_id, resp, false)
 	} else {
 		// Only the server runs this code
 

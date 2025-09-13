@@ -138,7 +138,7 @@ func startCommunicatorInternalSERVER() {
 			var index_bar int = strings.Index(message_str, "|")
 			var truncated_msg []byte = message[index_bar+1:]
 
-			LogLnInfo("Received message to:", message_str[:index_bar])
+			LogLnInfo("Received message to: " + message_str[:index_bar])
 
 			if msg_to == "G" {
 				if !srvComm_stopping_GL {
@@ -203,7 +203,7 @@ func startCommunicatorInternalSERVER() {
 			if strings.Index(string(message), "|") != -1 {
 				msg_to = string(message[:strings.Index(string(message), "|")])
 			}
-			LogLnInfo("Sent message to:", msg_to)
+			LogLnInfo("Sent message to: " + msg_to)
 		}
 		routines_working[1] = false
 	}()

@@ -36,6 +36,8 @@ import (
 
 var modDirsInfo_GL Utils.ModDirsInfo
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
 	// Command line arguments
 	var flag_log_level *int = flag.IntP("loglevel", "l", 0, "Log level to use. 0 = ERROR, 1 = WARNING, 2 = INFO, 3 = DEBUG. Default is 0 (ERROR).")
 	flag.Bool("status", false, "Keeps printing the status of the modules.")
