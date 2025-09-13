@@ -310,7 +310,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					} else {
 						speak = "Not connected to the server to add event."
 					}
-					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
+					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 
 				case CMD_CREATE_TASK:
 					var about_str string = ""
@@ -350,7 +350,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					} else {
 						speak = "Not connected to the server to add task."
 					}
-					speakInternal(speak, speech_priority, speech_mode2, GPTComm.SESSION_TYPE_TEMP, false, true)
+					speakInternal(speak, speech_priority, speech_mode2, _SESSION_TYPE_NONE, false, true)
 			}
 		}
 
