@@ -23,11 +23,12 @@ package Screens
 
 import (
 	"Utils"
+	"strconv"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"strconv"
-	"time"
 )
 
 func ModModulesManager(param any) fyne.CanvasObject {

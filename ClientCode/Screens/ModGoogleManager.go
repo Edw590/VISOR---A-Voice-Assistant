@@ -25,22 +25,71 @@ import (
 	"GMan"
 	"GoogleManager"
 	"Utils"
+	"Utils/ModsFileInfo"
 	"context"
 	"errors"
+	"net/url"
+	"strings"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"golang.org/x/oauth2"
-	"net/url"
-	"time"
 )
 
 func ModGoogleManager() fyne.CanvasObject {
 	Current_screen_GL = ID_GOOGLE_MANAGER
 
 	return container.NewAppTabs(
+		container.NewTabItem("Active calendars", googleManagerCreateActiveCalsTab()),
 		container.NewTabItem("Settings", googleManagerCreateSettingsTab()),
+	)
+}
+
+func googleManagerCreateActiveCalsTab() *container.Scroll {
+	var label_description *widget.Label = widget.NewLabel("List of calendar associated with the Google account:")
+	label_description.Wrapping = fyne.TextWrapWord
+
+	var label_not_connected *widget.Label = widget.NewLabel("[Not connected to the server to get the calendars]")
+	var calendar_ids string = GMan.GetCalendarsIdsList()
+	var calendar_ids_split []string = nil
+	if calendar_ids != "" {
+		calendar_ids_split = strings.Split(calendar_ids, "|")
+	}
+
+	var scroll_content []fyne.CanvasObject = nil
+	scroll_content = append(scroll_content, label_description)
+	if !Utils.IsCommunicatorConnectedSERVER() {
+		scroll_content = append(scroll_content, label_not_connected)
+	} else {
+		for _, cal_id := range calendar_ids_split {
+			var calendar *ModsFileInfo.GCalendar = GMan.GetCalendar(cal_id)
+			if calendar == nil {
+				continue
+			}
+
+			var cal_id_local string = cal_id
+			var check *widget.Check = widget.NewCheck("", func(checked bool) {
+				if !GMan.SetCalendarEnabled(cal_id_local, checked) {
+					dialog.ShowError(errors.New("failed to set calendar state"), Current_window_GL)
+				}
+			})
+			if calendar.Enabled {
+				check.SetChecked(true)
+			}
+
+			var label = widget.NewLabel(calendar.Title)
+
+			var wrapped_check *fyne.Container = container.NewHBox(check, label)
+
+			scroll_content = append(scroll_content, wrapped_check)
+		}
+	}
+
+	return createMainContentScrollUTILS(
+		scroll_content...
 	)
 }
 

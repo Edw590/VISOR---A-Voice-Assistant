@@ -360,6 +360,8 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_7.Sessions)
 				case "GManTok":
 					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14.Token)
+				case "GManCals":
+					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14.Calendars)
 				case "GManEvents":
 					settings = *Utils.ToJsonGENERAL(Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14.Events)
 				case "GManTasks":
@@ -412,8 +414,9 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					Utils.LogLnError(json_dest)
 			}
 		case "GMan":
-			// Add a calendar event or task.
-			// Example: "'event' or 'task'|the JSON of the GEvent or GTask struct"
+			// Add a calendar event or task, or enable or disable usage of specific calendar IDs.
+			// Example: "'event', 'task' or 'calendar'|the JSON of the GEvent or GTask struct; or for the 3rd case, the
+			// ID of the calendar|true to enable, false to disable"
 			// Returns: nothing
 			var bytes_str string = string(bytes)
 			var action string = strings.Split(bytes_str, "|")[0]
@@ -425,6 +428,21 @@ func handleMessage(type_ string, bytes []byte) []byte {
 					Utils.SendToModChannel(Utils.NUM_MOD_GoogleManager, 0, "Event", data)
 				case "task":
 					Utils.SendToModChannel(Utils.NUM_MOD_GoogleManager, 0, "Task", data)
+				case "calendar":
+					var data_str string = string(data)
+					var calendar_id string = strings.Split(data_str, "|")[0]
+					var enable bool = strings.Split(data_str, "|")[1] == "true"
+					var calendars map[string]ModsFileInfo.GCalendar = Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14.Calendars
+					for id := range Utils.GetGenSettings(Utils.LOCK_UNLOCK).MOD_14.Calendars {
+						if id == calendar_id {
+							calendars[id] = ModsFileInfo.GCalendar{
+								Title:   calendars[id].Title,
+								Enabled: enable,
+							}
+
+							break
+						}
+					}
 				default:
 					// Nothing
 			}

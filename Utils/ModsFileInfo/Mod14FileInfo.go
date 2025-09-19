@@ -29,12 +29,15 @@ type Mod14GenInfo struct {
 	Token_invalid bool
 	// Token_invalid_notified is whether the user has been notified about the invalid token
 	Token_invalid_notified bool
-	// Events is the list of events
+	// Calendars maps calendar IDs to their corresponding GCalendar structs
+	Calendars map[string]GCalendar
+	// Events is the list of all events associated with the account
 	Events []GEvent
-	// Tasks is the list of tasks
+	// Tasks is the list of all tasks associated with the account
 	Tasks []GTask
 }
 
+// GTask represents a Google Task
 type GTask struct {
 	// Id is the ID of the task
 	Id string
@@ -48,9 +51,12 @@ type GTask struct {
 	Completed bool
 }
 
+// GEvent represents a Google Calendar Event
 type GEvent struct {
 	// Id is the ID of the event
 	Id string
+	// Calendar_id is the calendar ID associated with the event
+	Calendar_id string
 	// Summary is the title of the event
 	Summary string
 	// Location is the location of the event
@@ -61,6 +67,14 @@ type GEvent struct {
 	Start_time_s int64
 	// Duration_min is the duration of the event in minutes
 	Duration_min int64
+}
+
+// GCalendar represents a Google Calendar
+type GCalendar struct {
+	// Title is the title of the calendar
+	Title string
+	// Enabled is whether the calendar is enabled for usage within VISOR
+	Enabled bool
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -230,7 +230,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 					// TODO: make him turn on Ethernet and Wi-Fi in case they're off and wait 10s instead of 0
 
 					if UtilsSWA.WaitForNetwork(0) {
-						var events_ids []string = strings.Split(GMan.GetEventsIdsList(), "|")
+						var events_ids []string = strings.Split(GMan.GetEventsIdsList(true), "|")
 						var tasks_ids []string = strings.Split(GMan.GetTasksIdsList(), "|")
 
 						speak = getEventsList(events_ids, intent.Value)

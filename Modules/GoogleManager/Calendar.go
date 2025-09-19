@@ -48,6 +48,26 @@ func storeCalendarsEvents(client *http.Client) bool {
 		return false
 	}
 
+	// Store the calendars
+	if getModGenSettings().Calendars == nil {
+		getModGenSettings().Calendars = make(map[string]ModsFileInfo.GCalendar)
+	}
+	for _, calendarListEntry := range calendarList.Items {
+		var summary string = calendarListEntry.SummaryOverride
+		if summary == "" {
+			summary = calendarListEntry.Summary
+		}
+		var cal_enabled bool = true
+		if cal, ok := getModGenSettings().Calendars[calendarListEntry.Id]; ok {
+			// If the calendar is already on the list, use its enabled state (else, default to true)
+			cal_enabled = cal.Enabled
+		}
+		getModGenSettings().Calendars[calendarListEntry.Id] = ModsFileInfo.GCalendar{
+			Title:   summary, // Don't check if the calendar is new or not - this field must be always updated
+			Enabled: cal_enabled,
+		}
+	}
+
 	// Calculate the start of the current week (Monday)
 	var now time.Time = time.Now()
 	var weekday int = int(now.Weekday())
@@ -67,6 +87,10 @@ func storeCalendarsEvents(client *http.Client) bool {
 
 	// Iterate over each calendar and retrieve events
 	for _, calendarListEntry := range calendarList.Items {
+		if !getModGenSettings().Calendars[calendarListEntry.Id].Enabled {
+			continue
+		}
+
 		//log.Printf("Calendar: %s\n", calendarListEntry.Summary)
 
 		events, err := service.Events.List(calendarListEntry.Id).
@@ -110,6 +134,7 @@ func storeCalendarsEvents(client *http.Client) bool {
 				// Store the event
 				events_final = append(events_final, ModsFileInfo.GEvent{
 					Id:           item.Id,
+					Calendar_id:  calendarListEntry.Id,
 					Summary:      item.Summary,
 					Location:     item.Location,
 					Description:  item.Description,
