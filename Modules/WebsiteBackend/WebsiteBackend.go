@@ -102,7 +102,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	defer cancel()
 
 	for {
-		if Utils.WaitWithStopDATETIME(module_stop, 1000000000) {
+		if Utils.WaitWithStopDATETIME(module_stop, -1) {
 			_ = srv.Shutdown(ctx)
 
 			for i := 0; i < MAX_CLIENTS; i++ {

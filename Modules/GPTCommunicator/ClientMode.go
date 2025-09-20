@@ -76,7 +76,7 @@ func clientMode() {
 	}()
 
 	for {
-		if Utils.WaitWithStopDATETIME(module_stop_GL, 1000000000) {
+		if Utils.WaitWithStopDATETIME(module_stop_GL, -1) {
 			return
 		}
 	}

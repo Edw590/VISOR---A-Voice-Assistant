@@ -213,7 +213,7 @@ func startCommunicatorInternalSERVER() {
 	srvComm_connected_GL = true
 
 	for {
-		if WaitWithStopDATETIME(&stop, 1000000000) {
+		if WaitWithStopDATETIME(&stop, -1) {
 			srvComm_stopping_GL = true
 			close(srvComm_gen_ch_in_GL)
 			close(srvComm_gen_ch_out_GL)

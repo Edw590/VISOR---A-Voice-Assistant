@@ -101,7 +101,7 @@ WaitWithStopDATETIME waits for a certain amount of time or until a stop signal i
 
 – Params:
   - stop – the stop signal
-  - time_sleep_s – the time to wait in seconds
+  - time_wait_s – the time to wait in seconds; -1 to wait indefinitely
 
 – Returns:
   - true if the loop was stopped, false if it reached the end time
@@ -114,7 +114,7 @@ func WaitWithStopDATETIME(stop *bool, time_wait_s int) bool {
 
 	var time_end int64 = time.Now().Unix() + int64(time_wait_s)
 	var stopped bool = false
-	for time.Now().Unix() < time_end {
+	for time_wait_s == -1 || time.Now().Unix() < time_end {
 		if *stop {
 			stopped = true
 

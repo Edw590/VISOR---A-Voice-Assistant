@@ -56,7 +56,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 	}()
 
 	for {
-		if Utils.WaitWithStopDATETIME(module_stop, 1000000000) {
+		if Utils.WaitWithStopDATETIME(module_stop, -1) {
 			TEHelper.StopChecker()
 
 			return
