@@ -190,7 +190,7 @@ func prepareCommandsString() string {
 		{CMD_TOGGLE_ETHERNET, ACD.CMDi_TYPE_TURN_ONFF, "", "", "ethernet"},
 		{CMD_TOGGLE_NETWORKING, ACD.CMDi_TYPE_TURN_ONFF, "", "", "networking/internet"},
 		{CMD_ASK_EVENTS, ACD.CMDi_TYPE_ASK, "", "", "have today|have tomorrow|have this week|have next week"},
-		{CMD_HELP_PICTURE, ACD.CMDi_TYPE_NONE, "help", "", "this image/picture|image/picture clipboard/copied"},
+		{CMD_HELP_PICTURE, ACD.CMDi_TYPE_NONE, "analyse analyze help", "", "this image/picture|image/picture clipboard/copied"},
 		{CMD_CREATE_EVENT, ACD.CMDi_TYPE_NONE, "create set", "", "event/meeting"},
 		{CMD_CREATE_TASK, ACD.CMDi_TYPE_NONE, "create set", "", "task/to-do/todo"},
 	}
@@ -208,52 +208,42 @@ func getIntentList() []*DialogMan.Intent {
 		{
 			Acd_cmd_id: CMD_TOGGLE_WIFI,
 			Task_name: "Toggle the Wi-Fi",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_TOGGLE_ETHERNET,
 			Task_name: "Toggle the Ethernet",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_TOGGLE_NETWORKING,
 			Task_name: "Toggle all networking",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_TELL_WEATHER,
 			Task_name: "Tell the weather",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_TELL_NEWS,
 			Task_name: "Tell the news",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_ASK_TIME,
 			Task_name: "Ask the time",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_ASK_DATE,
 			Task_name: "Ask the date",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_ASK_BATTERY_PERCENT,
 			Task_name: "Ask the battery percentage",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_ASK_EVENTS,
 			Task_name: "Ask about events and tasks",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_HELP_PICTURE,
 			Task_name: "Help with a picture",
-			Slots: nil,
 		},
 		{
 			Acd_cmd_id: CMD_CREATE_EVENT,
@@ -261,15 +251,12 @@ func getIntentList() []*DialogMan.Intent {
 			Slots: []*DialogMan.Slot{
 				{
 					Prompt: "What is the event about?",
-					Acd_cmd_id: "",
 				},
 				{
 					Prompt: "When?",
-					Acd_cmd_id: "",
 				},
 				{
 					Prompt: "For how long?",
-					Acd_cmd_id: "",
 				},
 			},
 		},
@@ -279,11 +266,9 @@ func getIntentList() []*DialogMan.Intent {
 			Slots: []*DialogMan.Slot{
 				{
 					Prompt: "What is the task about?",
-					Acd_cmd_id: "",
 				},
 				{
 					Prompt: "On what date?",
-					Acd_cmd_id: "",
 				},
 			},
 		},
