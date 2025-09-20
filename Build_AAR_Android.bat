@@ -2,6 +2,9 @@
 
 :: This needs JDK 8 to be on the PATH and a maximum Android SDK installed in Android Studio that is compiled with JDK 8.
 
+:: This also needs NDK version >= r19c (19.2.5345600) installed on Android Studio (very recent versions may not work. In
+:: case just install r19c which will work just fine.
+
 :: Run "go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20240707233753-b765e5d5218f" and
 :: "go install golang.org/x/mobile/cmd/gobind@v0.0.0-20240707233753-b765e5d5218f" to install the gomobile tools.
 :: Must be the version I wrote - it's the last one supporting Go 1.20 (that I found on WayBackMachine at least).
