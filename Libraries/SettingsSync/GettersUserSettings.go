@@ -49,3 +49,15 @@ GetMod12InfoUSERSETS returns the MOD_12 user information from the user settings.
 func GetMod12InfoUSERSETS() *ModsFileInfo.Mod12UserInfo {
 	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).UserLocator
 }
+
+/*
+GetMod14InfoUSERSETS returns the MOD_14 user information from the user settings.
+
+-----------------------------------------------------------
+
+– Returns:
+  - the MOD_14 user information from the user settings
+*/
+func GetMod14InfoUSERSETS() *ModsFileInfo.Mod14UserInfo {
+	return &Utils.GetUserSettings(Utils.LOCK_UNLOCK).GoogleManager
+}

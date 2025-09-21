@@ -23,10 +23,8 @@ package Screens
 
 import (
 	"GMan"
-	"GoogleManager"
 	"Utils"
 	"Utils/ModsFileInfo"
-	"context"
 	"errors"
 	"net/url"
 	"strings"
@@ -36,7 +34,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	"golang.org/x/oauth2"
 )
 
 func ModGoogleManager() fyne.CanvasObject {
@@ -53,17 +50,14 @@ func googleManagerCreateActiveCalsTab() *container.Scroll {
 	label_description.Wrapping = fyne.TextWrapWord
 
 	var label_not_connected *widget.Label = widget.NewLabel("[Not connected to the server to get the calendars]")
-	var calendar_ids string = GMan.GetCalendarsIdsList()
-	var calendar_ids_split []string = nil
-	if calendar_ids != "" {
-		calendar_ids_split = strings.Split(calendar_ids, "|")
-	}
 
 	var scroll_content []fyne.CanvasObject = nil
 	scroll_content = append(scroll_content, label_description)
 	if !Utils.IsCommunicatorConnectedSERVER() {
 		scroll_content = append(scroll_content, label_not_connected)
 	} else {
+		var calendar_ids string = GMan.GetCalendarsIdsList()
+		var calendar_ids_split []string = strings.Split(calendar_ids, "|")
 		for _, cal_id := range calendar_ids_split {
 			var calendar *ModsFileInfo.GCalendar = GMan.GetCalendar(cal_id)
 			if calendar == nil {
@@ -100,7 +94,7 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 	link, _ := url.Parse("https://console.cloud.google.com/projectcreate")
 	var link_google *widget.Hyperlink = widget.NewHyperlink("Click here and watch the video on the link below", link)
 
-	link, _ = url.Parse("https://youtu.be/B2E82UPUnOY?si=TIHV5U1kxY5mCKsD&t=95")
+	link, _ = url.Parse("https://youtu.be/B2E82UPUnOY?t=95")
 	var link_video *widget.Hyperlink = widget.NewHyperlink("How to obtain the Google credentials JSON", link)
 
 	var label_additional_info *widget.Label = widget.NewLabel("Activate the Calendar, Gmail and Tasks APIs by " +
@@ -138,14 +132,12 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 			return
 		}
 
-		config, err := GoogleManager.ParseConfigJSON()
+		auth_url, err := GMan.GetAuthUrl()
 		if err != nil {
 			dialog.ShowError(err, Current_window_GL)
 
 			return
 		}
-
-		auth_url := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 
 		var entry_auth_code *widget.Entry = widget.NewEntry()
 		dialog.ShowForm("Google authorization code", "Enter", "Cancel", []*widget.FormItem{
@@ -155,20 +147,12 @@ func googleManagerCreateSettingsTab() *container.Scroll {
 				return
 			}
 
-			token, err := config.Exchange(context.Background(), entry_auth_code.Text)
+			err = GMan.StoreTokenFromAuthCode(entry_auth_code.Text)
 			if err != nil {
 				dialog.ShowError(err, Current_window_GL)
 
 				return
 			}
-
-			if !Utils.IsCommunicatorConnectedSERVER() {
-				dialog.ShowError(errors.New("not connected to the server"), Current_window_GL)
-
-				return
-			}
-
-			GMan.SetToken(token)
 
 			dialog.ShowInformation("Information", "Authorization code saved. You're all set!", Current_window_GL)
 		}, Current_window_GL)

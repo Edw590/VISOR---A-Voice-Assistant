@@ -22,23 +22,14 @@
 package GoogleManager
 
 import (
+	"GMan"
 	"Utils"
 	"Utils/ModsFileInfo"
 	"context"
 	"net/http"
 
 	"golang.org/x/oauth2"
-	"google.golang.org/api/calendar/v3"
-	"google.golang.org/api/gmail/v1"
-	"google.golang.org/api/tasks/v1"
 )
-
-// _SCOPES defines the Google Calendar scope required for read-only access
-var _SCOPES = []string{
-	calendar.CalendarScope,
-	tasks.TasksScope,
-	gmail.GmailModifyScope,
-}
 
 var modDirsInfo_GL Utils.ModDirsInfo
 func Start(module *Utils.Module) {Utils.ModStartup(main, module)}
@@ -142,7 +133,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 // getClient retrieves a token, saves it, and returns a new client
 func getClient() *http.Client {
 	// Parse credentials to config
-	config, err := ParseConfigJSON()
+	config, err := GMan.ParseConfigJSON()
 	if err != nil {
 		Utils.LogLnError("Unable to parse client secret file to config:", err)
 
