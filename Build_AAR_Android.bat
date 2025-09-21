@@ -1,6 +1,9 @@
 :: Execute with the current directory as the project root directory
 
-:: This needs JDK 8 to be on the PATH and a maximum Android SDK installed in Android Studio that is compiled with JDK 8.
+:: This needs JDK 8 to be on the PATH and a maximum Android SDK installed in Android Studio that is compiled with JDK 8,
+:: which I think means Android 12 (API level 31) or lower (or might be instead Android 11, API level 30, not sure).
+:: BUT... it's possible to use a newer version. In the case of VISOR where I use hidden APIs, I also use a modified
+:: android.jar - the modified versions are sometimes compiled or modified to work with JDK 8. Right now I have API 36.
 
 :: This also needs NDK version >= r19c (19.2.5345600) installed on Android Studio (very recent versions may not work. In
 :: case just install r19c which will work just fine.
@@ -20,7 +23,7 @@ gomobile bind^
  -x^
  -v^
  -ldflags="-v -s -w -compressdwarf=true"^
- -o="bin/MainLibraries.aar"^
+ -o="bin/VISORLibraries.aar"^
  "ACD/ACD"^
  "GMan"^
  "GPTComm"^
