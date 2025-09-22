@@ -40,6 +40,7 @@ var srvComm_gen_ch_out_GL chan []byte
 var srvComm_stopping_GL bool = false
 var srvComm_started_GL bool = false
 var srvComm_connected_GL bool = false
+var websocket_conn_GL *websocket.Conn = nil
 
 /*
 StartCommunicatorSERVER keeps the server communicator running in background.
@@ -52,6 +53,19 @@ func StartCommunicatorSERVER() {
 			time.Sleep(1 * time.Second)
 		}
 	}()
+}
+
+/*
+StopCommunicatorSERVER stops the server communicator.
+ */
+func StopCommunicatorSERVER() {
+	if !srvComm_started_GL {
+		return
+	}
+	srvComm_stopping_GL = true
+	close(srvComm_gen_ch_in_GL)
+	close(srvComm_gen_ch_out_GL)
+	_ = websocket_conn_GL.Close()
 }
 
 /*
@@ -104,7 +118,8 @@ func startCommunicatorInternalSERVER() {
 	}
 
 	// Establish WebSocket connection
-	conn, _, err := dialer.Dial(u.String(), headers)
+	var err error = nil
+	websocket_conn_GL, _, err = dialer.Dial(u.String(), headers)
 	if err != nil {
 		//log.Println("Response:", r)
 		//log.Println("Dial error:", err)
@@ -113,13 +128,13 @@ func startCommunicatorInternalSERVER() {
 
 		return
 	}
-	defer conn.Close()
+	defer websocket_conn_GL.Close()
 
 	// Receiver
 	go func() {
 		routines_working[0] = true
 		for {
-			message_type, message, err := conn.ReadMessage()
+			message_type, message, err := websocket_conn_GL.ReadMessage()
 			if err != nil {
 				//log.Println("Read error:", err)
 				stop = true
@@ -189,7 +204,7 @@ func startCommunicatorInternalSERVER() {
 				}
 			}
 
-			err = conn.WriteMessage(websocket.BinaryMessage, CompressBytes(message))
+			err = websocket_conn_GL.WriteMessage(websocket.BinaryMessage, CompressBytes(message))
 			if err != nil {
 				//log.Println("Write error:", err)
 				stop = true
@@ -217,7 +232,7 @@ func startCommunicatorInternalSERVER() {
 			srvComm_stopping_GL = true
 			close(srvComm_gen_ch_in_GL)
 			close(srvComm_gen_ch_out_GL)
-			_ = conn.Close()
+			_ = websocket_conn_GL.Close()
 			for {
 				if !routines_working[0] && !routines_working[1] {
 					//log.Println("Communicator stopped")

@@ -34,6 +34,13 @@ func StartCommunicatorSERVER() {
 }
 
 /*
+StopCommunicatorSERVER stops the server communicator.
+*/
+func StopCommunicatorSERVER() {
+	Utils.StopCommunicatorSERVER()
+}
+
+/*
 QueueGeneralMessageSERVER queues a general message to be sent to the server.
 
 It is received by GetGeneralMessageSERVER().
