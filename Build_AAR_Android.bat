@@ -25,6 +25,7 @@ gomobile bind^
  -ldflags="-v -s -w -compressdwarf=true"^
  -o="bin/VISORLibraries.aar"^
  "ACD/ACD"^
+ "DialogMan"^
  "GMan"^
  "GPTComm"^
  "OICComm"^
