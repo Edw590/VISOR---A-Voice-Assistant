@@ -30,8 +30,8 @@ import (
 	"github.com/fatih/color"
 )
 
-const MAX_FILE_NAME_LEN int = 6
-const MAX_LINE_NUM_LEN int = 4
+const _MAX_FILE_NAME_LEN int = 6
+const _MAX_LINE_NUM_LEN int = 4
 
 var log_level_GL int = 90
 
@@ -42,6 +42,14 @@ const (
 	LOG_LEVEL_DEBUG
 )
 
+/*
+SetLogLevel sets the global log level.
+
+-----------------------------------------------------------
+
+– Params:
+  - log_level – the log level to set (one of the LOG_LEVEL_* constants)
+ */
 func SetLogLevel(log_level int) {
 	if log_level < LOG_LEVEL_ERROR {
 		log_level_GL = LOG_LEVEL_ERROR
@@ -177,9 +185,9 @@ func logPrintln(log_level int, file string, line int, args ...any) {
 		return
 	}
 
-	var caps_file_name string = getInitialsOfFileName(file)
-	var line_str string = formatLineNumber(line)
-	var middle_str string = caps_file_name + ":" + line_str + "|> "
+	var caps_file_name string = GetInitialsOfFileNameLOGGING(file)
+	var line_str string = FormatLineNumberLOGGING(line)
+	var middle_str string = caps_file_name + ":" + line_str + "|>"
 
 	switch log_level {
 		case LOG_LEVEL_ERROR:
@@ -219,8 +227,8 @@ func logPrintf(log_level int, file string, line int, format string, args ...any)
 		return
 	}
 
-	var caps_file_name string = getInitialsOfFileName(file)
-	var line_str string = formatLineNumber(line)
+	var caps_file_name string = GetInitialsOfFileNameLOGGING(file)
+	var line_str string = FormatLineNumberLOGGING(line)
 	var middle_str string = caps_file_name + ":" + line_str + "|> "
 
 	switch log_level {
@@ -243,13 +251,25 @@ func logPrintf(log_level int, file string, line int, format string, args ...any)
 	}
 }
 
-func formatLineNumber(line int) string {
+/*
+FormatLineNumberLOGGING formats a line number to a fixed length string.
+
+-----------------------------------------------------------
+
+– Params:
+  - line – the line number to format
+
+– Returns:
+  - the formatted line number string, up to _MAX_LINE_NUM_LEN characters
+*/
+func FormatLineNumberLOGGING(line int) string {
 	var line_str string = fmt.Sprintf("%d", line)
-	if len(line_str) > MAX_LINE_NUM_LEN {
-		line_str = line_str[:MAX_LINE_NUM_LEN-2] + ".."
+	// Up to _MAX_LINE_NUM_LEN characters
+	if len(line_str) > _MAX_LINE_NUM_LEN {
+		line_str = line_str[:_MAX_LINE_NUM_LEN-2] + ".."
 	} else {
-		// But always 10 characters
-		for len(line_str) < MAX_LINE_NUM_LEN {
+		// But always _MAX_LINE_NUM_LEN characters
+		for len(line_str) < _MAX_LINE_NUM_LEN {
 			line_str += " "
 		}
 	}
@@ -257,7 +277,18 @@ func formatLineNumber(line int) string {
 	return line_str
 }
 
-func getInitialsOfFileName(file_name string) string {
+/*
+GetInitialsOfFileNameLOGGING returns the initials of a file name.
+
+-----------------------------------------------------------
+
+– Params:
+  - file_name – the full path of the file
+
+– Returns:
+  - the initials of the file name, up to _MAX_FILE_NAME_LEN characters
+*/
+func GetInitialsOfFileNameLOGGING(file_name string) string {
 	// Note: this function is prepared for Pascal Case only
 
 	// "file_name" comes as the full path, we only want the file name
@@ -293,12 +324,12 @@ func getInitialsOfFileName(file_name string) string {
 		}
 	}
 
-	// Up to 10 characters
-	if len(letters) > MAX_FILE_NAME_LEN {
-		letters = letters[:MAX_FILE_NAME_LEN-2] + ".."
+	// Up to _MAX_FILE_NAME_LEN characters
+	if len(letters) > _MAX_FILE_NAME_LEN {
+		letters = letters[:_MAX_FILE_NAME_LEN-2] + ".."
 	} else {
-		// But always 10 characters
-		for len(letters) < MAX_FILE_NAME_LEN {
+		// But always _MAX_FILE_NAME_LEN characters
+		for len(letters) < _MAX_FILE_NAME_LEN {
 			letters = " " + letters
 		}
 	}
