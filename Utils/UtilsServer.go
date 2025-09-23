@@ -62,10 +62,18 @@ func StopCommunicatorSERVER() {
 	if !srvComm_started_GL {
 		return
 	}
-	srvComm_stopping_GL = true
-	close(srvComm_gen_ch_in_GL)
-	close(srvComm_gen_ch_out_GL)
-	_ = websocket_conn_GL.Close()
+	if srvComm_gen_ch_in_GL != nil {
+		close(srvComm_gen_ch_in_GL)
+		srvComm_gen_ch_in_GL = nil
+	}
+	if srvComm_gen_ch_out_GL != nil {
+		close(srvComm_gen_ch_out_GL)
+		srvComm_gen_ch_out_GL = nil
+	}
+	if websocket_conn_GL != nil {
+		_ = websocket_conn_GL.Close()
+		websocket_conn_GL = nil
+	}
 }
 
 /*
@@ -230,9 +238,18 @@ func startCommunicatorInternalSERVER() {
 	for {
 		if WaitWithStopDATETIME(&stop, -1) {
 			srvComm_stopping_GL = true
-			close(srvComm_gen_ch_in_GL)
-			close(srvComm_gen_ch_out_GL)
-			_ = websocket_conn_GL.Close()
+			if srvComm_gen_ch_in_GL != nil {
+				close(srvComm_gen_ch_in_GL)
+				srvComm_gen_ch_in_GL = nil
+			}
+			if srvComm_gen_ch_out_GL != nil {
+				close(srvComm_gen_ch_out_GL)
+				srvComm_gen_ch_out_GL = nil
+			}
+			if websocket_conn_GL != nil {
+				_ = websocket_conn_GL.Close()
+				websocket_conn_GL = nil
+			}
 			for {
 				if !routines_working[0] && !routines_working[1] {
 					//log.Println("Communicator stopped")

@@ -54,10 +54,16 @@ CloseCommsChannels closes the modules and libraries communication channels.
  */
 func CloseCommsChannels() {
 	for i := 0; i < _MODS_COMMS_CHANNELS_SIZE; i++ {
-		close(mods_comms_channels_GL[i])
+		if mods_comms_channels_GL[i] != nil {
+			close(mods_comms_channels_GL[i])
+			mods_comms_channels_GL[i] = nil
+		}
 	}
 	for i := 0; i < _LIBS_COMMS_CHANNELS_SIZE; i++ {
-		close(libs_comms_channels_GL[i])
+		if libs_comms_channels_GL[i] != nil {
+			close(libs_comms_channels_GL[i])
+			libs_comms_channels_GL[i] = nil
+		}
 	}
 }
 
