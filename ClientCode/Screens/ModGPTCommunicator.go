@@ -124,7 +124,6 @@ func gptCommunicatorCreateListCommandsTab() *container.Scroll {
 		"--> Ask for help with a picture (that you have on clipboard - must be a PNG specifically! Image or path to " +
 			"image). Example: \"Help me with this picture what do you see in it\" (no punctuation, like the comma, on " +
 			"the first part)\n" +
-		"--> Create a reminder (VISOR will ask you for the reminder details)\n" +
 		"--> Create a Google Calendar event (VISOR will ask you for the event details)\n" +
 		"--> Create a Google task (VISOR will ask you for the task details)\n",
 	)

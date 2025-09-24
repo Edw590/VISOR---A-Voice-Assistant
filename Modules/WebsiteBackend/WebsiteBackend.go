@@ -467,8 +467,10 @@ func registerChannel() int {
 func unregisterChannel(channel_num int) {
 	if channel_num >= 0 && channel_num < MAX_CLIENTS && channels_GL[channel_num] != nil {
 		used_channels_GL[channel_num] = false
-		close(channels_GL[channel_num])
-		channels_GL[channel_num] = nil
+		if channels_GL[channel_num] != nil {
+			close(channels_GL[channel_num])
+			channels_GL[channel_num] = nil
+		}
 	}
 }
 

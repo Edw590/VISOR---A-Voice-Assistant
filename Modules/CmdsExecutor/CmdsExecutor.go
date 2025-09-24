@@ -44,7 +44,10 @@ func main(module_stop *bool, moduleInfo_any any) {
 	modDirsInfo_GL = moduleInfo_any.(Utils.ModDirsInfo)
 
 	ACD.ReloadCmdsArray(prepareCommandsString())
-	DialogMan.ReloadIntentList(getIntentList())
+	DialogMan.ClearIntentsList()
+	for _, intent := range getIntentList() {
+		DialogMan.AddToIntentList(intent)
+	}
 
 	var handle_input_result *DialogMan.HandleInputResult = nil
 	for {
@@ -289,7 +292,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 								how_long_min /= 60
 						}
 					}
-					if about_str == "" || when_s == 0 || how_long_min == 0 {
+					if about_str == "" || when_s <= 0 || how_long_min <= 0 {
 						break
 					}
 
@@ -354,7 +357,7 @@ func main(module_stop *bool, moduleInfo_any any) {
 			}
 		}
 
-		if !any_intent_detected {
+		if !any_intent_detected && !handle_input_result.Something_detected {
 			sendToGPT(sentence)
 
 			continue

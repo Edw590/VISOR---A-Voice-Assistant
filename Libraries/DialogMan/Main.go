@@ -24,7 +24,6 @@ package DialogMan
 import (
 	"ACD/ACD"
 	"Utils"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -40,6 +39,8 @@ var curr_intent_idx_GL int = -1
 
 // HandleInputResult is the result of HandleInput()
 type HandleInputResult struct {
+	// Something_detected is set to true if something useful for the intents was detected, false otherwise
+	Something_detected bool
 	// Response is the response to speak to the user, if any
 	Response string
 	// next_intent_slot_idx is the index of the intent that will solely be used in the next HandleInput call, or -1 if
@@ -73,34 +74,23 @@ type HandleInputResult struct {
 }
 
 /*
-ReloadIntentList reloads the global intents list with a new one
+AddToIntentList adds an intent to the global intents list.
 
 -----------------------------------------------------------
 
 – Params:
-  - intents – the new intents list
+  - intent – the intent to add
  */
-func ReloadIntentList(intents []*Intent) {
-	intents_GL = intents
-	curr_intent_idx_GL = -1
+func AddToIntentList(intent *Intent) {
+	intents_GL = append(intents_GL, intent)
 }
 
 /*
-ReloadIntentListJson reloads the global intents list with a new one from a JSON string
-
------------------------------------------------------------
-
-– Params:
-  - intents – the new intents list in JSON format
-
-– Returns:
-  - true if the JSON was parsed successfully, false otherwise
- */
-func ReloadIntentListJson(intents string) bool {
-	err := Utils.FromJsonGENERAL([]byte(intents), &intents_GL)
+ClearIntentsList clears the global intents list.
+*/
+func ClearIntentsList() {
+	intents_GL = nil
 	curr_intent_idx_GL = -1
-
-	return err == nil
 }
 
 /*
@@ -152,6 +142,7 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 		}
 	}
 
+	var something_detected bool = false
 	if next_intent_idx >= 0 && intents_GL[next_intent_idx].Slots[next_intent_slot_idx].Acd_cmd_id == "" {
 		// Means HandleInput wants anything as answer for the intent - no need to run the ACD
 		var intent *Intent = intents_GL[next_intent_idx]
@@ -159,12 +150,14 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 		slot.Sentence = sentence
 		slot.Value = sentence
 		slot.filled = true
+
+		something_detected = true
 	} else {
 		var cmds_info_str string = ACD.Main(sentence, false, true, last_it_GL + "|" + last_and_GL)
 		var cmds_info *ACD.CmdsInfo = ACD.ParseMainResult(cmds_info_str)
 		if cmds_info != nil {
-			log.Println("*****************************")
-			log.Println(cmds_info_str)
+			Utils.LogLnDebug("*****************************")
+			Utils.LogLnDebug(cmds_info_str)
 
 			if cmds_info.Last_it != "" {
 				last_it_GL = cmds_info.Last_it
@@ -175,9 +168,9 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 				last_and_when_GL = time.Now().UnixMilli()
 			}
 
-			//log.Println(last_it_GL)
-			//log.Println(last_and_GL)
-			log.Println("*****************************")
+			//Utils.LogLnDebug(last_it_GL)
+			//Utils.LogLnDebug(last_and_GL)
+			Utils.LogLnDebug("*****************************")
 
 			if len(cmds_info.Detected_cmds) == 0 {
 				return nil
@@ -194,6 +187,8 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 						intent.Sentence = sentence
 						intent.Value = command.Cmd_variant
 						intent.in_processing = true
+
+						something_detected = true
 
 						break
 					}
@@ -223,6 +218,8 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 									slot.Indexes_str = slot.Indexes_str[:len(slot.Indexes_str)-len(ACD.IDXS_SEPARATOR)]
 								}
 								slot.filled = true
+
+								something_detected = true
 
 								break
 							}
@@ -292,6 +289,7 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 	endFunc:
 
 	return &HandleInputResult{
+		Something_detected:   something_detected,
 		Response:             speak,
 		next_intent_idx:      to_be_next_intent_idx,
 		next_intent_slot_idx: to_be_next_intent_slot_idx,
