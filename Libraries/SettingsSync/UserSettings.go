@@ -135,7 +135,7 @@ LoadUserSettings loads the user settings from the given JSON string.
   - json – the JSON string to load the user settings from
 
 – Returns:
-  - true if the user settings were successfully loaded, false otherwise
+  - an error if the user settings could not be loaded, nil otherwise
  */
 func LoadUserSettings(json string) error {
 	if json == "" {

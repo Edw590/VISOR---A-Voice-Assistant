@@ -363,7 +363,6 @@ func main(module_stop *bool, moduleInfo_any any) {
 			continue
 		}
 
-
 		if Utils.WaitWithStopDATETIME(module_stop, 1) {
 			TEHelper.StopChecker()
 

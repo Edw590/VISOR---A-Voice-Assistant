@@ -21,7 +21,10 @@
 
 package SettingsSync
 
-import "Utils"
+import (
+	"Utils"
+	"errors"
+)
 
 /*
 GetJsonGenSettings returns the generated settings in JSON format.
@@ -44,21 +47,21 @@ LoadGenSettings loads the generated settings from the given JSON string.
   - json – the JSON string to load the generated settings from
 
 – Returns:
-  - true if the generated settings were successfully loaded, false otherwise
+  - an error if the generated settings could not be loaded, nil otherwise
  */
-func LoadGenSettings(json string) bool {
+func LoadGenSettings(json string) error {
 	if json == "" {
-		return false
+		return errors.New("empty json string")
 	}
 
 	var gen_settings Utils.GenSettings
 	if err := Utils.FromJsonGENERAL([]byte(json), &gen_settings); err != nil {
-		return false
+		return err
 	}
 
 	*Utils.GetGenSettings(Utils.LOCK_UNLOCK) = gen_settings
 
-	return true
+	return nil
 }
 
 /*
