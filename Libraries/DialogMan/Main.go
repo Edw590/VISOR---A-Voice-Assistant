@@ -280,13 +280,11 @@ func HandleInput(sentence string, handle_input_result *HandleInputResult) *Handl
 				if ready_intents[i] == nil {
 					ready_intents[i] = intents_GL[intent_idx]
 
-					goto endFunc
+					break
 				}
 			}
 		}
 	}
-
-	endFunc:
 
 	return &HandleInputResult{
 		Something_detected:   something_detected,
