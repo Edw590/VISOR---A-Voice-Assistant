@@ -177,7 +177,7 @@ func serverMode() {
 			// Search for the Wikipedia page title
 			var query string = text[strings.Index(text, SEARCH_WIKIPEDIA)+len(SEARCH_WIKIPEDIA):]
 
-			_ = gpt_text_txt.WriteTextFile(getStartString(device_id)+OnlineInfoChk.RetrieveWikipedia(query)+
+			_ = gpt_text_txt.WriteTextFile(getStartString(device_id) + OnlineInfoChk.RetrieveWikipedia(query) +
 				getEndString(), true)
 		} else if !strings.HasSuffix(text, STOP_CMD) {
 			chatWithGPT(chatWithGPT_params)
@@ -208,9 +208,9 @@ func addSessionEntry(session_id string, last_interaction_s int64, user_message s
 			var message_without_add_info string = user_message[strings.Index(user_message, "]") + 1:]
 			// I've titled the text for you, Sir: "App Notification Settings on OnePlus Watch".
 			// Get the text inside the quotation marks.
-			var prompt string = "Create a title for the following text and possible files (beginning of a " +
-				"conversation) and put it inside \"double quotation marks\", please. Don't include the date and time. " +
-				"Text --> " + message_without_add_info + " <--"
+			var prompt string = "Create ONLY a title for the following (beginning of a conversation) and put it " +
+                "inside \"double quotation marks\", please. Don't include the date and time. Text --> " +
+                message_without_add_info + " <--"
 			var chatWithGPT_params _ChatWithGPTParams = _ChatWithGPTParams{
 				Device_id:    Utils.GetGenSettings(Utils.LOCK_UNLOCK).Device_settings.Id,
 				User_message: prompt,
