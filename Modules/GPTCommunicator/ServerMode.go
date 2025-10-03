@@ -274,6 +274,7 @@ func checkStopSpeechServer() bool {
 	// Retrieve all values from the channel
 	var temp_values []any
 	for {
+		// Either there's a stop command already there or not. We don't wait for it.
 		var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 2, 0)
 		if comms_map == nil {
 			break

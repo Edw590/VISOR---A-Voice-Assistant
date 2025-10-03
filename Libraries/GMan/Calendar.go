@@ -34,7 +34,7 @@ func getEvents() {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|GManEvents")) {
 		return
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0, 10)
 	if comms_map == nil {
 		return
 	}
@@ -50,7 +50,7 @@ func getCalendars() {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 0, []byte("G_S|true|GManCals")) {
 		return
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 0, 10)
 	if comms_map == nil {
 		return
 	}

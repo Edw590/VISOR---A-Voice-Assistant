@@ -124,7 +124,7 @@ func checkModels(device_models []string, model_type_to_use string) string {
 func getDeviceLocalModels(device_id string) []string {
 	Utils.QueueMessageBACKEND(true, Utils.NUM_MOD_GPTCommunicator, 1, device_id, nil)
 
-	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(true, Utils.NUM_MOD_GPTCommunicator, 1, 10)
 	if comms_map == nil {
 		return nil
 	}

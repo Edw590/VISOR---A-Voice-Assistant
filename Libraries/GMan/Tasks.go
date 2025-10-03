@@ -32,7 +32,7 @@ func getTasks() {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 1, []byte("G_S|true|GManTasks")) {
 		return
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 1, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 1, 10)
 	if comms_map == nil {
 		return
 	}

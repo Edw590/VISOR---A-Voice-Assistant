@@ -93,13 +93,6 @@ func startCommunicatorInternalSERVER() {
 	}
 	srvComm_started_GL = true
 
-	// Ensure all channels are closed and re-initialized before starting. Already happened sending 4 times the first
-	// message and the rest is all frozen. I think that means that for example GetModuleState() is frozen waiting for a
-	// response which will never come because the communicator restarted and missed the response. So restarting all
-	// channels should fix these freezes.
-	CloseCommsChannels()
-	InitializeCommsChannels()
-
 	srvComm_gen_ch_in_GL = make(chan []byte)
 	srvComm_gen_ch_out_GL = make(chan []byte, 1000)
 	var routines_working [2]bool

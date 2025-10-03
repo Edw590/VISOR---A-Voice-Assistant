@@ -69,7 +69,7 @@ func IsTokenValid() bool {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GMan, 2, []byte("G_S|true|GManTokVal")) {
 		return false
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 2, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GMan, 2, 10)
 	if comms_map == nil {
 		return false
 	}

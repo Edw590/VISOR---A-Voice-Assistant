@@ -114,7 +114,7 @@ func SendText(text string, session_type string, role string, more_coming bool) i
 		return -1
 	}
 
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 1, 10)
 	if comms_map == nil {
 		return -1
 	}
@@ -152,7 +152,7 @@ func GetModuleState() int32 {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 5, []byte("GPT|process|")) {
 		return -1
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 5, 10)
 	if comms_map == nil {
 		return -1
 	}
@@ -176,7 +176,7 @@ func GetMemories() string {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_GPTComm, 3, []byte("G_S|true|GPTMem")) {
 		return ""
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 3, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 3, 10)
 	if comms_map == nil {
 		return ""
 	}
@@ -239,7 +239,7 @@ func getEntry(time int64, num int) *_Entry {
 			time_ms:   -1,
 		}
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_GPTComm, 2, 10)
 	if comms_map == nil {
 		return &_Entry{
 			device_id: "",

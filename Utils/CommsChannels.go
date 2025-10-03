@@ -73,6 +73,8 @@ func CloseCommsChannels() {
 /*
 GetFromCommsChannel gets data from a module or library communication channel.
 
+ALWAYS USE TIMEOUT >= 0 WHENEVER YOU CAN TO AVOID BLOCKING THE APP!!!
+
 -----------------------------------------------------------
 
 – Params:

@@ -32,7 +32,7 @@ func getAllNews() {
 	if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_OICComm, 1, []byte("G_S|true|News")) {
 		return
 	}
-	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_OICComm, 1, -1)
+	var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_OICComm, 1, 10)
 	if comms_map == nil {
 		return
 	}

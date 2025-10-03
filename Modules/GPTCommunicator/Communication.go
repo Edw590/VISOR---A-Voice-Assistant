@@ -28,7 +28,6 @@ import (
 	"Utils/UtilsSWA"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -234,7 +233,7 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 		}
 		defer resp.Body.Close()
 
-		return readGPT(device_id, resp, false)
+		return readGPT(device_id, resp)
 	} else {
 		// Only the server runs this code
 
@@ -288,7 +287,7 @@ func sendReceiveOllamaRequest(device_id string, request_json []byte, device_id_w
 	}
 }
 
-func readGPT(device_id string, http_response *http.Response, print bool) (string, int64) {
+func readGPT(device_id string, http_response *http.Response) (string, int64) {
 	var timestamp_s int64 = -1
 
 	// Default is false because the client can generate text to itself (if it's true it will ignore the text - not
@@ -330,9 +329,8 @@ func readGPT(device_id string, http_response *http.Response, print bool) (string
 			if !writing_to_self {
 				sendWriteText(content)
 			}
-			if print {
-				fmt.Print(content)
-			}
+
+			//fmt.Print(content)
 		} else {
 			break
 		}
