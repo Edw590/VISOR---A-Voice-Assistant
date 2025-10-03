@@ -63,11 +63,11 @@ func SyncUserSettings() {
 
 				if get_settings && remoteSettingsChanged() {
 					if !Utils.QueueMessageSERVER(false, Utils.NUM_LIB_SettingsSync, 0, []byte("G_S|true|US")) {
-						return
+						goto end
 					}
 					var comms_map map[string]any = Utils.GetFromCommsChannel(false, Utils.NUM_LIB_SettingsSync, 0, -1)
 					if comms_map == nil {
-						return
+						goto end
 					}
 
 					var json []byte = comms_map[Utils.COMMS_MAP_SRV_KEY].([]byte)
@@ -76,6 +76,8 @@ func SyncUserSettings() {
 					last_user_settings_json = GetJsonUserSettings()
 				}
 			}
+
+			end:
 
 			if Utils.WaitWithStopDATETIME(&stop_GL, 1) {
 				return
