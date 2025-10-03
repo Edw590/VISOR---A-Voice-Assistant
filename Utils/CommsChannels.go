@@ -45,7 +45,7 @@ func InitializeCommsChannels() {
 			mods_comms_channels_GL[getFullChannelNum(i, j)] = make(chan map[string]any, MOD_NUMS_INFO[i].Chan_size)
 		}
 	}
-	for i := 0; i < _LIBS_COMMS_CHANNELS_SIZE; i++ {
+	for i := 0; i < LIBS_ARRAY_SIZE; i++ {
 		for j := 0; j < _COMMS_CH_MUL; j++ {
 			libs_comms_channels_GL[getFullChannelNum(i, j)] = make(chan map[string]any, LIB_NUMS_INFO[i].Chan_size)
 		}
@@ -57,21 +57,15 @@ CloseCommsChannels closes the modules and libraries communication channels.
  */
 func CloseCommsChannels() {
 	for i := 0; i < _MODS_COMMS_CHANNELS_SIZE; i++ {
-		for j := 0; j < _COMMS_CH_MUL; j++ {
-			var full_channel_num int = getFullChannelNum(i, j)
-			if mods_comms_channels_GL[full_channel_num] != nil {
-				close(mods_comms_channels_GL[full_channel_num])
-				mods_comms_channels_GL[full_channel_num] = nil
-			}
+		if mods_comms_channels_GL[i] != nil {
+			close(mods_comms_channels_GL[i])
+			mods_comms_channels_GL[i] = nil
 		}
 	}
 	for i := 0; i < _LIBS_COMMS_CHANNELS_SIZE; i++ {
-		for j := 0; j < _COMMS_CH_MUL; j++ {
-			var full_channel_num int = getFullChannelNum(i, j)
-			if libs_comms_channels_GL[full_channel_num] != nil {
-				close(libs_comms_channels_GL[full_channel_num])
-				libs_comms_channels_GL[full_channel_num] = nil
-			}
+		if libs_comms_channels_GL[i] != nil {
+			close(libs_comms_channels_GL[i])
+			libs_comms_channels_GL[i] = nil
 		}
 	}
 }
