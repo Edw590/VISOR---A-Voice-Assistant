@@ -58,7 +58,7 @@ func serverMode() {
 	}
 
 	// Prepare the session for the temp and dumb sessions
-	// Very low timestamp to avoid being selected as latest sessions
+	// Mega old timestamp to avoid being selected as latest sessions
 	addSessionEntry("temp", -1000000, "", nil)
 	addSessionEntry("dumb", -1000000, "", nil)
 

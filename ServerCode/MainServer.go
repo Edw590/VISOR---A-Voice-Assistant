@@ -141,12 +141,11 @@ func handleCtrlCGracefully(module_stop *bool) {
 }
 
 func printModulesStatus(modules []Utils.Module) {
-	log.Println("--------------------------------")
+	Utils.LogLnDebug("--------------------------------")
 	for _, module := range modules {
-		log.Println("--- " + module.Name + " ---")
-		log.Println("- Enabled: " + strconv.FormatBool(module.Enabled))
-		log.Println("- To stop: " + strconv.FormatBool(module.Stop))
-		log.Println("- Support: " + strconv.FormatBool(Utils.IsModSupportedMODULES(module.Num)))
-		log.Println("- Running: " + strconv.FormatBool(!module.Stopped))
+		Utils.LogLnDebug("--- " + module.Name + " ---")
+		Utils.LogLnDebug("- Enabled: " + strconv.FormatBool(module.Enabled) + " | To stop: " +
+			strconv.FormatBool(module.Stop) + " | Running: " + strconv.FormatBool(!module.Stopped) + " | Supported: " +
+			strconv.FormatBool(Utils.IsModSupportedMODULES(module.Num)))
 	}
 }
