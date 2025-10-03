@@ -26,14 +26,15 @@ import (
 	"TEHelper"
 	"Utils"
 	"Utils/ModsFileInfo"
+	"strconv"
+	"strings"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const DATE_TIME_FORMAT string = "2006-01-02 -- 15:04:05"
@@ -101,13 +102,18 @@ func tasksExecutorCreateAddTaskTab() *container.Scroll {
 
 	repeat_each_min, _ := strconv.ParseInt(entry_repeat_each_min.Text, 10, 64)
 	var btn_add *widget.Button = widget.NewButton("Add", func() {
-		t, err := time.Parse(DATE_TIME_FORMAT, entry_time.Text)
-		if err != nil {
-			return
+		var unix_time int64 = 0
+		if entry_time.Text != "" {
+			t, err := time.Parse(DATE_TIME_FORMAT, entry_time.Text)
+			if err != nil {
+				return
+			}
+
+			unix_time = t.Unix()
 		}
 
 		SettingsSync.AddTaskTASKS(check_enabled.Checked, check_device_active.Checked, entry_device_ids.Text,
-			entry_message.Text, entry_command.Text, t.Unix(), repeat_each_min, entry_user_location.Text,
+			entry_message.Text, entry_command.Text, unix_time, repeat_each_min, entry_user_location.Text,
 			entry_programmable_condition.Text)
 
 		reloadScreen()
