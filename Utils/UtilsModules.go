@@ -23,14 +23,15 @@ package Utils
 
 import (
 	"errors"
-	Tcef "github.com/Edw590/TryCatch-go"
-	"github.com/shirou/gopsutil/v4/process"
 	"log"
 	"os"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	Tcef "github.com/Edw590/TryCatch-go"
+	"github.com/shirou/gopsutil/v4/process"
 )
 
 const (
@@ -423,7 +424,7 @@ func GetModNameMODULES(mod_num int) string {
 		return module_info.Name
 	}
 
-	return "INVALID MODULE NUMBER"
+	return ""
 }
 
 /*

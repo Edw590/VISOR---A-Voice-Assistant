@@ -35,18 +35,39 @@ const (
 
 	LIBS_ARRAY_SIZE
 )
-// LIB_NUMS_NAMES is a map of the numbers of the libraries and their names. Use with the NUM_LIB_ constants.
-var LIB_NUMS_NAMES map[int]string = map[int]string{
-	NUM_LIB_ACD:          "Advanced Commands Detection",
-	NUM_LIB_OICComm:      "Online Information Checker Communicator",
-	NUM_LIB_GPTComm:      "GPT Communicator",
-	NUM_LIB_SpeechQueue:  "Speech Queue",
-	NUM_LIB_TEHelper:     "Tasks Executor Helper",
-	NUM_LIB_SettingsSync: "Settings Synchronizer",
-	NUM_LIB_ULHelper:     "User Locator Helper",
-	NUM_LIB_SCLink:       "System Checker Link",
-	NUM_LIB_GMan:         "Google Manager",
-	NUM_LIB_DialogMan:    "Dialogue Manager",
+
+// LIB_NUMS_INFO is a map of the numbers of the libraries and their respective ModuleInfo.
+var LIB_NUMS_INFO map[int]ModuleInfo = map[int]ModuleInfo{
+	NUM_LIB_ACD: {
+		Name: "Advanced Commands Detection",
+	},
+	NUM_LIB_OICComm: {
+		Name: "Online Information Checker Communicator",
+	},
+	NUM_LIB_GPTComm: {
+		Name: "GPT Communicator",
+	},
+	NUM_LIB_SpeechQueue: {
+		Name: "Speech Queue",
+	},
+	NUM_LIB_TEHelper: {
+		Name: "Tasks Executor Helper",
+	},
+	NUM_LIB_SettingsSync: {
+		Name: "Settings Synchronizer",
+	},
+	NUM_LIB_ULHelper: {
+		Name: "User Locator Helper",
+	},
+	NUM_LIB_SCLink: {
+		Name: "System Checker Link",
+	},
+	NUM_LIB_GMan: {
+		Name: "Google Manager",
+	},
+	NUM_LIB_DialogMan: {
+		Name: "Dialogue Manager",
+	},
 }
 
 /*
@@ -61,9 +82,9 @@ GetLibNameMODULES gets the name of a module.
   - the name of the module or an empty string if the module number is invalid
 */
 func GetLibNameMODULES(lib_num int) string {
-	if library_info, ok := LIB_NUMS_NAMES[lib_num]; ok {
-		return library_info
+	if library_info, ok := LIB_NUMS_INFO[lib_num]; ok {
+		return library_info.Name
 	}
 
-	return "INVALID LIBRARY NUMBER"
+	return ""
 }
